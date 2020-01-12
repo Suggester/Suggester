@@ -1,0 +1,53 @@
+{
+  "developer": [
+    "Developer IDs in array here",
+    "Has access to all commands on all servers"
+  ],
+  "global_override": "Role ID of the Global Permissions role on the main_guild, gives access to usage of non-developer commands globally",
+  "main_guild": "Server ID of the main guild used for logging and the Global Permissions role",
+  "initial": {
+    "prefix": "Default prefix",
+    "up": "",
+    "mid": "",
+    "down": ""
+  },
+  "prefix": "Default prefix",
+  "colors": {
+      "default": "#7289da",
+      "red": "#e74c3c",
+      "green": "#2ecc71",
+      "blue": "#3498db",
+      "gray": "#979c9f",
+      "orange": "#e67e22",
+      "yellow": "#f1c40f"
+    },
+  "release": "production",
+  "log_guild:": "566002482166104066",
+  "logs": {
+    "commands": "614433607078903818",
+    "core": "614433641266937884",
+    "guild": "614433722707738634"
+  },
+  "emoji": {
+    "x": "suggester_x:614554969198166027",
+    "check": "suggester_check:614554968812421160"
+  },
+  "log_hooks": {
+    "commands": {
+      "id": "616009057337081891",
+      "token": "ydL3386-G-10BFS5WUbYDvwOiOkdpqEjYq9chC1GDslxutIYs3oMm49lPlkQ5p7wmKbK"
+    },
+    "core": {
+      "id": "616009571470802953",
+      "token": "XwtScZLHDrkZ-LQRp5tNLyc75MEvM2uABsCadKxfY7aXD5uFmy-F6rJmwrkCp-5CMNTv"
+    },
+    "guild": {
+      "id": "616009776068952091",
+      "token": "PBEMoAz1hG8VU5ZK3seawh_t0SQVgcHISoUVZad9lS-BDbp40TN-ZGsTQLL9qEA09Ak8"
+    },
+    "debug": {
+      "id": "616009571470802953",
+      "token": "XwtScZLHDrkZ-LQRp5tNLyc75MEvM2uABsCadKxfY7aXD5uFmy-F6rJmwrkCp-5CMNTv"
+    }
+  }
+}
