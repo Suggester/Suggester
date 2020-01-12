@@ -118,6 +118,7 @@ module.exports = {
 		}
 
 		let replyEmbed = new Discord.RichEmbed()
+			.setTitle("Suggestion Approved")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setFooter(`Approved by ${message.author.tag}`, message.author.displayAvatarURL)
 			.setDescription(qSuggestionDB.suggestion);

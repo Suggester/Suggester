@@ -109,6 +109,7 @@ module.exports = {
 		}
 
 		let replyEmbed = new Discord.RichEmbed()
+			.setTitle("Suggestion Denied")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setFooter(`Denied by ${message.author.tag}`, message.author.displayAvatarURL)
 			.setDescription(qSuggestionDB.suggestion)
