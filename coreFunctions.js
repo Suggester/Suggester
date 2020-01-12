@@ -161,6 +161,12 @@ module.exports = {
 			break;
 		}
 	},
+	/**
+	 * Logs an input to the specified server's log channel
+	 * @param input - What to send
+	 * @param {Object} server - Server configuration settings
+	 * @returns null
+	 */
 	serverLog: (input, server) => {
 		if (!server.config.loghook) return `<:${emoji.x}> No log hook configured, please reconfigure a log channel`;
 		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send(input);
