@@ -72,7 +72,7 @@ module.exports = {
 				return message.channel.send(embed);
 			}
 		} else {
-			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a staff review channel.`);
+			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		}
 
 		let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: args[0], id: message.guild.id });
