@@ -169,7 +169,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.green);
 			isComment ? logEmbed.addField("Comment Added by Approver", comment) : "";
-			serverLog(logEmbed, message.guild.id, client);
+			serverLog(logEmbed, qServerDB);
 		}
 
 		let updateEmbed = new Discord.RichEmbed()

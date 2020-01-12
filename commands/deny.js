@@ -157,7 +157,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.red);
 			reason ? logEmbed.addField("Denial Reason", reason) : "";
-			serverLog(logEmbed, message.guild.id, client);
+			serverLog(logEmbed, qServerDB);
 		}
 
 	}

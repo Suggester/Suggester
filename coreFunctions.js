@@ -1,5 +1,5 @@
 const config = require("./config.json");
-const { colors } = require("./config.json");
+const { colors, emoji } = require("./config.json");
 const Discord = require("discord.js");
 let models = require("./utils/schemas");
 
@@ -161,15 +161,9 @@ module.exports = {
 			break;
 		}
 	},
-	serverLog: (input, id, client) => {
-		/*
-		const config = require("./config.json");
-		if (!client.servers.get(id) || !client.servers.get(id, "loghook")) return `<:${config.emoji.x}> No log hook configured, please reconfigure a log channel`;
-		(new Discord.WebhookClient(client.servers.get(id, "loghook")[0], client.servers.get(id, "loghook")[1]))
-			.send(input)
-			.catch(() => {
-				return `<:${config.emoji.x}> Logging webhook is invalid, please reconfigure a log channel`;
-			});*/
+	serverLog: (input, server) => {
+		if (!server.config.loghook) return `<:${emoji.x}> No log hook configured, please reconfigure a log channel`;
+		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send(input);
 	},
 	errorLog: (err, type, footer) => {
 		let errorText = "Error Not Set";
