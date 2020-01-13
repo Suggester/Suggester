@@ -13,14 +13,18 @@ module.exports = {
 			id: message.guild.id,
 			whitelist: true,
 			config: {
-				prefix: ".//", // you can remove this line if you want to use the default prefix (.)
+				prefix: "./", // you can remove this line if you want to use the default prefix (.)
 				admin_roles: ["566029680168271892"],
 				staff_roles: ["566029680168271892"],
 				channels: {
-					suggestions: "566352198271893589",
-					staff: "566352198271893589",
-					log: "566352198271893589",
-					denied: "566352198271893589"
+					suggestions: "615249868998574081",
+					staff: "615249847926128650",
+					log: "654517672201027584",
+					denied: "615249906608766999"
+				},
+				loghook: {
+					id: "654517711463776316",
+					token: "SuPCEtaM_q4QpayybMHRPaOWYG2U3QDOkP5YvpjO6p2yMWl3Nsk2pX3aei14h4wLVG0U"
 				}
 			}
 		}).save();

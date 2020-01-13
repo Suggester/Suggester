@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../config.json");
-const { dbQuery, channelPermissions, serverLog, fetchUser, dbModify, suggestionEmbed } = require("../coreFunctions.js");
+const { dbQuery, channelPermissions, serverLog, fetchUser, dbModify } = require("../coreFunctions.js");
 module.exports = {
 	controls: {
 		permission: 3,
@@ -53,7 +53,7 @@ module.exports = {
 					let embed = new Discord.RichEmbed()
 						.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.denied}> channel:`)
 						.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-						.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.staff}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+						.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.denied}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
 						.setColor(colors.red);
 					return message.channel.send(embed);
 				}
@@ -109,6 +109,7 @@ module.exports = {
 		}
 
 		let replyEmbed = new Discord.RichEmbed()
+			.setTitle("Suggestion Denied")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setFooter(`Denied by ${message.author.tag}`, message.author.displayAvatarURL)
 			.setDescription(qSuggestionDB.suggestion)
@@ -156,7 +157,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.red);
 			reason ? logEmbed.addField("Denial Reason", reason) : "";
-			serverLog(logEmbed, message.guild.id, client);
+			serverLog(logEmbed, qServerDB);
 		}
 
 	}

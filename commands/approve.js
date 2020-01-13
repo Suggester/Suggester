@@ -72,7 +72,7 @@ module.exports = {
 				return message.channel.send(embed);
 			}
 		} else {
-			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a staff review channel.`);
+			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		}
 
 		let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: args[0], id: message.guild.id });
@@ -118,6 +118,7 @@ module.exports = {
 		}
 
 		let replyEmbed = new Discord.RichEmbed()
+			.setTitle("Suggestion Approved")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setFooter(`Approved by ${message.author.tag}`, message.author.displayAvatarURL)
 			.setDescription(qSuggestionDB.suggestion);
@@ -168,7 +169,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.green);
 			isComment ? logEmbed.addField("Comment Added by Approver", comment) : "";
-			serverLog(logEmbed, message.guild.id, client);
+			serverLog(logEmbed, qServerDB);
 		}
 
 		let updateEmbed = new Discord.RichEmbed()

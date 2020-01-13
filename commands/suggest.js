@@ -1,6 +1,6 @@
 const { emoji, colors, initial } = require("../config.json");
 const core = require("../coreFunctions.js");
-const { dbQuery, dbModifyId, dbDeleteOne, dbModify } = require("../coreFunctions");
+const { dbQuery, dbModifyId, dbDeleteOne, dbModify, serverLog } = require("../coreFunctions");
 const { Suggestion } = require("../utils/schemas");
 module.exports = {
 	controls: {
@@ -121,7 +121,7 @@ module.exports = {
 					.setFooter(`Suggestion ID: ${id.toString()} | User ID: ${message.author.id}`)
 					.setTimestamp()
 					.setColor(colors.yellow);
-				core.serverLog(logEmbed, message.guild.id, client);
+				serverLog(logEmbed, qServerDB);
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.get(qServerDB.config.channels.suggestions)) {
@@ -196,7 +196,7 @@ module.exports = {
 					.setFooter(`Suggestion ID: ${id.toString()} | User ID: ${message.author.id}`)
 					.setTimestamp()
 					.setColor(colors.green);
-				core.serverLog(logEmbed, message.guild.id, client);
+				serverLog(logEmbed, qServerDB);
 			}
 		}
 	}
