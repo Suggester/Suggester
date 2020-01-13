@@ -11,8 +11,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		let qUserDB = await dbQuery("User", { id: message.author.id });
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+
 		let id = client.users.find((user) => user.id === args[0]) || message.mentions.members.first() || message.author;
 		if (!id) {
 			let embed = new Discord.RichEmbed()
@@ -21,6 +20,9 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 		id = id.id;
+
+		let qUserDB = await dbQuery("User", { id: id });
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 
 		let globalPosArr = [];
 		let posArr = [];
@@ -57,9 +59,15 @@ module.exports = {
 		let embed = new Discord.RichEmbed()
 			.setAuthor(client.users.get(id).tag, client.users.get(id).displayAvatarURL)
 			.setColor(config.colors.default);
-		if (globalPosArr.length > 0) embed.addField("Global Acknowledgements", `${globalPosArr.join("\n")}`);
-		if (posArr.length > 0) embed.addField("Server Acknowledgements", `${posArr.join("\n")}`);
+		if (globalPosArr.length > 0) embed.addField("Global Acknowledgements", `${globalPosArr.join("\n")}`, true);
+		if (posArr.length > 0) embed.addField("Server Acknowledgements", `${posArr.join("\n")}`, true);
 		qUserDB.ack ? embed.setDescription(qUserDB.ack) : embed.setDescription("This user has no acknowledgements");
+
+		if (qUserDB.beans) {
+			let beans = qUserDB.beans;
+			embed.addField("<:bean:657650134502604811> Bean Statistics", `**__Received__**\n<:bean:657650134502604811> ${beans.received.bean} beans\n<:hyperbean:666099809668694066> ${beans.received.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.received.nukebean} nukebeans\n**__Sent__**\n<:bean:657650134502604811> ${beans.sent.bean} beans\n<:hyperbean:666099809668694066> ${beans.sent.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.sent.nukebean} nukebeans`);
+		}
+
 		return message.channel.send(embed);
 	}
 };
