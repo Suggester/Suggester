@@ -82,7 +82,7 @@ module.exports = {
 
 		if (qUserDB.ack) embed.setDescription(qUserDB.ack);
 		else if (!hasAcks) embed.setDescription("This user has no acknowledgements");
-		
+
 		return message.channel.send(embed);
 	}
 };
