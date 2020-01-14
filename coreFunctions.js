@@ -233,6 +233,23 @@ module.exports = {
 			});
 	},
 	/**
+	 * Search the database for some parameters
+	 * @param {string} collection - The collection to query.
+	 * @param  {Object} query - The term to search for
+	 * @returns {Object}
+	 */
+	dbQueryNoNew: async (collection, query) => {
+		return await models[collection].findOne(
+			query
+		)
+			.then((res) => {
+				if (!res) return null;
+				else return res;
+			}).catch((error) => {
+				console.log(error);
+			});
+	},
+	/**
 	 * Modify the database by providing either the userId or serverId
 	 * @param {string} collection - Who should be modified, user or server.
 	 * @param  {Snowflake | string} id - The id of the user/server

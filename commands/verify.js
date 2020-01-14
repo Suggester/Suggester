@@ -1,6 +1,6 @@
 const config = require("../config.json");
 var xEmoji = config.emoji.x;
-const { dbQuery } = require("../coreFunctions");
+const { dbQuery, checkPermissions } = require("../coreFunctions");
 module.exports = {
 	controls: {
 		permission: 10,
@@ -58,14 +58,16 @@ module.exports = {
 
 		let embed = new Discord.RichEmbed()
 			.setAuthor(client.users.get(id).tag, client.users.get(id).displayAvatarURL)
-			.setColor(config.colors.default);
-		if (globalPosArr.length > 0) embed.addField("Global Acknowledgements", `${globalPosArr.join("\n")}`, true);
-		if (posArr.length > 0) embed.addField("Server Acknowledgements", `${posArr.join("\n")}`, true);
+			.setColor(config.colors.default)
+			.setFooter(`Permission Level: ${checkPermissions(message.guild.members.get(id), client)}`);
+		if (globalPosArr.length > 0) embed.addField("Global Acknowledgements", `${globalPosArr.join("\n")}`);
+		if (posArr.length > 0) embed.addField("Server Acknowledgements", `${posArr.join("\n")}`);
 		qUserDB.ack ? embed.setDescription(qUserDB.ack) : embed.setDescription("This user has no acknowledgements");
 
 		if (qUserDB.beans) {
 			let beans = qUserDB.beans;
-			embed.addField("<:bean:657650134502604811> Bean Statistics", `**__Received__**\n<:bean:657650134502604811> ${beans.received.bean} beans\n<:hyperbean:666099809668694066> ${beans.received.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.received.nukebean} nukebeans\n**__Sent__**\n<:bean:657650134502604811> ${beans.sent.bean} beans\n<:hyperbean:666099809668694066> ${beans.sent.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.sent.nukebean} nukebeans`);
+			embed.addField("Received Bean Statistics <:bean:657650134502604811>", `<:bean:657650134502604811> ${beans.received.bean} beans\n<:hyperbean:666099809668694066> ${beans.received.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.received.nukebean} nukebeans`)
+				.addField("Sent Bean Statistics <:bean:657650134502604811>", `<:bean:657650134502604811> ${beans.sent.bean} beans\n<:hyperbean:666099809668694066> ${beans.sent.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.sent.nukebean} nukebeans`);
 		}
 
 		return message.channel.send(embed);
