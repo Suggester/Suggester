@@ -24,10 +24,14 @@ module.exports = {
 	checkPermissions: async (member, client) => {
 		if (config.developer.includes(member.id)) return 0;
 		let { dbQueryNoNew } = require("./coreFunctions.js");
-		let qUserDB = await dbQueryNoNew("User", {id: member.id});
-		let qServerDB = await dbQueryNoNew("Server", {id: member.guild.id});
+		let qUserDB = await dbQueryNoNew("User", { id: member.id });
+		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (client.guilds.get(config.main_guild) && client.guilds.get(config.main_guild).available && client.guilds.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) return 1;
+		if (client.guilds.get(config.main_guild)
+			&& client.guilds.get(config.main_guild).available
+			&& client.guilds.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) {
+			return 1;
+		}
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
 		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
 		let hasAdminRole = false;
@@ -84,7 +88,7 @@ module.exports = {
 		}
 		// Suggestion
 		embed.setDescription(suggestion.suggestion)
-		// Footer
+			// Footer
 			.setTimestamp(suggestion.submitted)
 			.setFooter(`Suggestion ID: ${suggestion.suggestionId} | Submitted at`);
 		// Side Color
@@ -183,8 +187,7 @@ module.exports = {
 		if (err.stack) {
 			console.error((require("chalk")).red(err.stack));
 			errorText = err.stack;
-		}
-		else {
+		} else {
 			console.error((require("chalk")).red(err.error));
 			errorText = err.error;
 		}
@@ -206,17 +209,11 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - The bot client
 	 * @returns {Collection}
 	 */
-	fetchUser: async (id, client) => {
-		if (client.users.get(id)) {
-			return client.users.get(id);
-		} else {
-			client.fetchUser(id, true).then(user => {
-				return user;
-			}).catch(notFound => {
-				return null;
-			});
-		}
-		return null;
+
+	async fetchUser (id, client) {
+		return await client.users.get(id)
+		|| await client.fetchUser(id, true)
+		|| null;
 	},
 	/**
 	 * Search the database for an id
@@ -250,8 +247,11 @@ module.exports = {
 			query
 		)
 			.then((res) => {
-				if (!res) return null;
-				else return res;
+				if (!res) {
+					return null;
+				} else {
+					return res;
+				}
 			}).catch((error) => {
 				console.log(error);
 			});

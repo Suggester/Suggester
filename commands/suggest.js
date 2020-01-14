@@ -1,6 +1,6 @@
-const { emoji, colors, initial } = require("../config.json");
+const { emoji, colors } = require("../config.json");
 const core = require("../coreFunctions.js");
-const { dbQuery, dbModifyId, dbDeleteOne, dbModify, serverLog, suggestionEmbed } = require("../coreFunctions");
+const { dbQuery, dbModify, serverLog, suggestionEmbed } = require("../coreFunctions");
 const { Suggestion } = require("../utils/schemas");
 module.exports = {
 	controls: {
@@ -125,7 +125,7 @@ module.exports = {
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.get(qServerDB.config.channels.suggestions)) {
-				var perms = core.channelPermissions(client.channels.get(qServerDB.config.channels.suggestions).memberPermissions(client.user.id), "suggestions", client);
+				let perms = core.channelPermissions(client.channels.get(qServerDB.config.channels.suggestions).memberPermissions(client.user.id), "suggestions", client);
 				if (perms.length > 0) {
 					let embed = new Discord.RichEmbed()
 						.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.suggestions}> channel:`)

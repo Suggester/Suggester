@@ -1,30 +1,50 @@
-module.exports = (Discord, client, message) => {
-	/*
-	const core = require("../coreFunctions.js");
-	if (!client.suggestions.find(s => s.messageid == message.id)) return;
-	var suggestion = client.suggestions.find(s => s.messageid == message.id);
-	var id = suggestion.id;
+const core = require("../coreFunctions.js");
+//const { dbQuery, dbDeleteOne } = require("../coreFunctions");
+const { Suggestion, Server } = require("../utils/schemas");
+module.exports = async (Discord, client, message) => {
 
-	if (suggestion.status === "denied") return; //Denied already
+	/**
+	 * @returns {Object} - The suggestion
+	 */
+	let suggestion = await Suggestion.findOne({
+		messageId: message.id
+	})
+		.then((res) => {
+			return res;
+		});
+	if (!suggestion) return; // not a suggestion
 
-	client.suggestions.set(id, "denied", "status");
-	client.suggestions.set(id, client.user.id, "staff_member");
-
-	var reason = "[Automatic] Deleted from suggestions feed";
-
-	var suggester;
-	if (client.users.get(client.suggestions.get(id, "suggester"))) {
-		suggester = client.users.get(client.suggestions.get(id, "suggester"));
-	} else {
-		var found = false;
-		client.fetchUser(client.users.get(client.suggestions.get(id, "suggester")), true).then(user => {
-			suggester = user;
-			found = true;
-		}).catch(notFound => {
-			found = false;
+	/**
+	 * @returns {Object} - The server's settings
+	 */
+	let server = await Server.findOne({
+		id: message.guild.id
+	})
+		.then((res) => {
+			if (!res) {
+				return new Server().save();
+			}
+			return res;
 		});
 
+	console.log(suggestion);
+
+	if (suggestion.status === "denied") return;
+	suggestion.status = "denied";
+	suggestion.staff_member = client.user.id;
+	await suggestion.save();
+
+	let reason = "[Automatic] Deleted from the suggestion feed";
+
+	let suggester;
+	if (client.users.find((user) => user.id === suggestion.suggester)) {
+		suggester = client.users.find((user) => user.id === suggestion.suggester);
+	} else {
+		client.fetchUser(client.users.find((user) => user.id === suggestion.suggester), true)
+			.then((user) => suggester = user);
 	}
+	let id = suggestion.suggestionId;
+
 	if (suggester) {
 		let dmEmbed = new Discord.RichEmbed()
 			.setTitle("Your Suggestion Was Deleted")
@@ -36,40 +56,44 @@ module.exports = (Discord, client, message) => {
 
 	}
 
-	if (suggestion.reviewMessage && client.channels.get(client.servers.get(suggestion.guild, "channels.staff"))) {
+	if (suggestion.reviewMessage && client.channels.get(server.config.channels.staff)) {
 		let updateEmbed = new Discord.RichEmbed()
 			.setTitle("Suggestion Awaiting Review (#" + id.toString() + ")")
 			.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setDescription(suggestion.suggestion)
 			.setColor("#e74c3c")
 			.addField("A change was processed on this suggestion", "This suggestion has been deleted");
-		client.channels.get(client.servers.get(message.guild.id, "channels.staff")).fetchMessage(client.suggestions.get(id, "reviewMessage")).then(fetched => fetched.edit(updateEmbed));
+		client.channels.find((channel) => channel.id === server.id)
+			.fetchMessage(suggestion.reviewMessage)
+			.then((fetched) => fetched.edit(updateEmbed));
+
 	}
 
-	if (client.servers.get(suggestion.guild, "channels.denied")) {
+	if (server.config.channels.denied) {
 		let deniedEmbed = new Discord.RichEmbed()
 			.setTitle("Suggestion Deleted")
 			.setDescription(suggestion.suggestion)
 			.setFooter(`Suggestion ID: ${id.toString()}`)
 			.setColor("#e74c3c");
 		if (suggester) {
-			deniedEmbed.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`);
-			deniedEmbed.setThumbnail(suggester.displayAvatarURL);
+			deniedEmbed.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`)
+				.setThumbnail(suggester.displayAvatarURL);
 		} else {
 			deniedEmbed.setAuthor(`Suggestion from ${suggestion.suggester}`);
 		}
-		reason ? deniedEmbed.addField("Reason Given:", reason) : "";
-		client.channels.get(client.servers.get(suggestion.guild, "channels.denied")).send(deniedEmbed);
+		if (reason) deniedEmbed.addField("Reason Given:", reason);
+		client.channels.get(server.config.channels.denied)
+			.send(deniedEmbed);
 	}
 
-	if (client.servers.get(suggestion.guild, "channels.log")) {
+	if (server.config.channels.log) {
 		let logEmbed = new Discord.RichEmbed()
 			.setAuthor(`Suggestion #${id.toString()} was deleted automatically`, client.user.displayAvatarURL)
 			.addField("Suggestion", suggestion.suggestion)
 			.setFooter(`Suggestion ID: ${id.toString()}`)
 			.setTimestamp()
 			.setColor("#e74c3c");
-		reason ? logEmbed.addField("Deletion Reason", reason) : "";
-		core.serverLog(logEmbed, suggestion.guild, client);
-	*/
+		if (reason) logEmbed.addField("Deletion Reason", reason);
+		core.serverLog(logEmbed, server);
+	}
 };
