@@ -21,6 +21,7 @@ const settings = new Schema({
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
 		mode: { type: String, default: "review" },
+		blacklist: [String],
 		emojis: {
 			up: { type: String, default: "👍" },
 			mid: { type: String, default: "🤷" },

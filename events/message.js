@@ -9,7 +9,7 @@ module.exports = async (Discord, client, message) => {
 	}
 	if (message.author.bot === true) return;
 
-	let permission = core.checkPermissions(message.member, client);
+	let permission = await core.checkPermissions(message.member, client);
 
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
 	let prefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || config.prefix;

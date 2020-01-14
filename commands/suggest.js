@@ -1,6 +1,6 @@
 const { emoji, colors, initial } = require("../config.json");
 const core = require("../coreFunctions.js");
-const { dbQuery, dbModifyId, dbDeleteOne, dbModify, serverLog } = require("../coreFunctions");
+const { dbQuery, dbModifyId, dbDeleteOne, dbModify, serverLog, suggestionEmbed } = require("../coreFunctions");
 const { Suggestion } = require("../utils/schemas");
 module.exports = {
 	controls: {
@@ -152,26 +152,27 @@ module.exports = {
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
+			let embedSuggest = await suggestionEmbed(qSuggestionDB, qServerDB, client);
 			client.channels
 				.get(qServerDB.config.channels.suggestions)
-				.send(core.suggestionEmbed(qSuggestionDB, client))
+				.send(embedSuggest)
 				.then(async (posted) => {
 					await dbModify("Suggestion", { suggestionId: id }, { messageId: posted.id });
 
-					if (qServerDB.config.react && qServerDB.config.react === true) {
-						let up = qServerDB.config.emojis.up ? qServerDB.config.emojis.up : qSuggestionDB.emojis.up;
-						let mid = qServerDB.config.emojis.mid ? qServerDB.config.emojis.mid : qSuggestionDB.emojis.mid;
-						let down = qServerDB.config.emojis.down ? qServerDB.config.emojis.down : qSuggestionDB.emojis.down;
+					if (qServerDB.config.react) {
+						let reactEmojiUp = qServerDB.config.emojis.up;
+						let reactEmojiMid = qServerDB.config.emojis.mid;
+						let reactEmojiDown = qServerDB.config.emojis.down;
+						await posted.react(reactEmojiUp);
+						await posted.react(reactEmojiMid);
+						await posted.react(reactEmojiDown);
 						await dbModify("Suggestion", { suggestionId: id }, {
 							emojis: {
-								up: up,
-								mid: mid,
-								down: down
+								up: reactEmojiUp,
+								mid: reactEmojiDown,
+								down: reactEmojiDown
 							}
 						});
-						await posted.react(up);
-						await posted.react(mid);
-						await posted.react(down);
 					}
 				});
 

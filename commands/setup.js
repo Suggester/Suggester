@@ -337,7 +337,7 @@ module.exports = {
 								qServerDB.config.loghook.token = webhook.token;
 							});
 							await dbModify("Server", {id: message.guild.id}, qServerDB);
-							
+
 							message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the log channel.`);
 							setup(7);
 							return;

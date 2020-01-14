@@ -1,4 +1,5 @@
-const config = require("../config.json");
+const { emoji } = require("../config.json");
+const { dbQuery, dbQueryNoNew } = require("../coreFunctions.js");
 module.exports = {
 	controls: {
 		permission: 1,
@@ -7,32 +8,25 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: (message, client, args, Discord) => {
-		var server;
-		if (!args[0]) {
-			server = message.guild;
-		} else {
-			if (client.guilds.get(args[0])) {
-				server = client.guilds.get(args[0]);
-			} else {
-				return message.channel.send(`<:${config.emoji.x}> I couldn't find a guild with ID \`${args[0]}\``);
-			}
-		}
-		if (!client.servers.get(server.id)) return message.channel.send(`<:${config.emoji.x}> This guild does not have a database entry.`);
-		var cfgArr = [];
-		var issuesAlert = 0;
-		var issuesFine = 0;
+	do: async (message, client, args, Discord) => {
+		let server = message.guild || client.guilds.get(args[0]) || null;
+		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild with ID \`${args[0]}\``);
+
+		let qServerDB = dbQueryNoNew("Server", {id: message.guild.id})
+		if (!qServerDB) return message.channel.send(`<:${emoji.x}> This guild does not have a database entry.`);
+
+		let cfgArr = [];
+		let issuesCountFatal = 0;
+		let issuesCountMinor = 0;
 
 		// Admin roles
-		if (!client.servers.get(server.id, "admin_roles") || client.servers.get(server.id, "admin_roles").length < 1) {
-			cfgArr.push(`<:${config.emoji.x}> **Admin Roles:** None Configured`);
-			issuesAlert++;
+		if (!qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) {
+			cfgArr.push(`<:${emoji.x}> **Admin Roles:** None Configured`);
+			issuesCountFatal++;
 		} else {
-			var adminRoleList = [];
-			var configRoles = client.servers.get(server.id, "admin_roles");
-			configRoles.forEach(id => {
-				if (server.roles.get(id)) {
-					//Push to the list
+			let adminRoleList = [];
+			qServerDB.config.admin_roles.forEach(roleId => {
+				if (server.roles.get(roleId)) {
 					adminRoleList.push(`${server.roles.get(id).name} (ID: \`${id}\`)`);
 				} else {
 					// Fix role list and delete the old no longer found role
