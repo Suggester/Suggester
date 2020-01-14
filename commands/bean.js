@@ -10,7 +10,8 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		if (checkPermissions(message.member, client) > 2 && !client.guilds.get(main_guild).roles.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
+		let userPermission = checkPermissions(message.member, client);
+		if (userPermission > 2 && !client.guilds.get(main_guild).roles.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
 
 		if (!args[0]) return message.channel.send("You must specify a member!");
 		let member = message.mentions.members.first() || message.guild.members.find((user) => user.id === args[0]);

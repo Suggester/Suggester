@@ -15,26 +15,33 @@ function sendWebhook (cfg, input) {
 }
 
 module.exports = {
-	//checkPermissions: Returns permission level of inputted ID
-	checkPermissions: (member, client) => {
+	/**
+	 * Returns permission level of inputted ID
+	 * @param member - Member object fetched from a server
+	 * @param client - The Discord client
+	 * @returns {Promise<number>}
+	 */
+	checkPermissions: async (member, client) => {
 		if (config.developer.includes(member.id)) return 0;
-		return 15;
-		if (client.core.get("blacklist") && client.core.get("blacklist", "users").includes(member.id)) return 12;
+		let { dbQueryNoNew } = require("./coreFunctions.js");
+		let qUserDB = await dbQueryNoNew("User", {id: member.id});
+		let qServerDB = await dbQueryNoNew("Server", {id: member.guild.id});
+		if (qUserDB && qUserDB.blocked) return 12;
 		if (client.guilds.get(config.main_guild) && client.guilds.get(config.main_guild).available && client.guilds.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) return 1;
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
-		if (!client.servers.get(member.guild.id) || !client.servers.get(member.guild.id, "admin_roles")) return 10;
-		var adminRoles = 0;
-		client.servers.get(member.guild.id, "admin_roles").forEach(roleid => {
-			if (member.roles.has(roleid)) adminRoles++;
+		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
+		let hasAdminRole = false;
+		qServerDB.config.admin_roles.forEach(roleId => {
+			if (member.roles.has(roleId)) hasAdminRole = true;
 		});
-		if (adminRoles > 0) return 2;
-		if (!client.servers.get(member.guild.id, "staff_roles")) return 10;
-		var staffRoles = 0;
-		client.servers.get(member.guild.id, "staff_roles").forEach(roleid => {
-			if (member.roles.has(roleid)) staffRoles++;
+		if (hasAdminRole) return 2;
+		if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) return 10;
+		let hasStaffRole = false;
+		qServerDB.config.staff_roles.forEach(roleId => {
+			if (member.roles.has(roleId)) hasStaffRole = true;
 		});
-		if (staffRoles > 0) return 3;
-		if (client.servers.get(member.guild.id) && client.servers.get(member.guild.id, "blacklist") && client.servers.get(member.guild.id, "blacklist").includes(member.id)) return 11;
+		if (hasStaffRole) return 2;
+		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;
 		return 10;
 	},
 	guildLog: (input) => {

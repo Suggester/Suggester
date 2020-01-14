@@ -13,13 +13,9 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		console.log(1);
-		let permission = checkPermissions(message.member, client);
-		console.log(2);
+		let permission = await checkPermissions(message.member, client);
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		console.log(3);
 		let prefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || config.prefix;
-		console.log(4);
 		if (!args[0]) {
 			let embed = new Discord.RichEmbed()
 				.setDescription("Please see https://suggester.gitbook.io/ for a command list and usage information!")
