@@ -1,5 +1,5 @@
-const config = require("../config.json");
-const core = require("../coreFunctions.js");
+const { emoji, colors, prefix } = require("../config.json");
+const { dbQuery, channelPermissions, serverLog, fetchUser, dbModify, suggestionEmbed } = require("../coreFunctions.js");
 module.exports = {
 	controls: {
 		permission: 3,
@@ -9,35 +9,54 @@ module.exports = {
 		docs: "staff/comment",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: (message, client, args, Discord) => {
+	do: async (message, client, args, Discord) => {
 
-		var missingConfigs = [];
-		if (!client.servers.get(message.guild.id)) return message.channel.send(`<:${config.emoji.x}> You must configure your server to use this command. Please use the \`config\` command.\n:rotating_light: The database was recently lost due to an accident, which means that all configuration settings and suggestions were lost. Please join the support server for more information.`);
-		if (!client.servers.get(message.guild.id, "admin_roles") || client.servers.get(message.guild.id, "admin_roles").length < 1) missingConfigs.push("Server Admin Roles");
-		if (!client.servers.get(message.guild.id, "staff_roles") || client.servers.get(message.guild.id, "staff_roles").length < 1) missingConfigs.push("Server Staff Roles");
-		if (!client.servers.get(message.guild.id, "channels.suggestions") || !client.channels.get(client.servers.get(message.guild.id, "channels.suggestions"))) missingConfigs.push("Approved Suggestions Channel");
-		if (client.servers.get(message.guild.id, "mode") === "review" && (!client.servers.get(message.guild.id, "channels.staff") || !client.channels.get(client.servers.get(message.guild.id, "channels.staff")))) missingConfigs.push("Suggestion Review Channel");
+		let missingConfigs = [];
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+
+		if (!qServerDB.config.admin_roles ||
+			qServerDB.config.admin_roles < 1) {
+			missingConfigs.push("Server Admin Roles");
+		}
+		if (!qServerDB.config.staff_roles ||
+			qServerDB.config.staff_roles < 1) {
+			missingConfigs.push("Server Staff Roles");
+		}
+		if (!qServerDB.config.channels.suggestions ||
+			qServerDB.config.channels.suggestions < 1) {
+			missingConfigs.push("Approved Suggestions Channel");
+		}
+		if (!qServerDB.config.mode === "review" && !qServerDB.config.channels.staff ||
+			!client.channels.get(qServerDB.config.channels.staff)) {
+			missingConfigs.push("Suggestion Review Channel");
+		}
 
 		if (missingConfigs.length > 1) {
 			let embed = new Discord.RichEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${client.servers.get(message.guild.id, "prefix")}config\` command.`)
-				.addField("Missing Elements", `<:${config.emoji.x}> ${missingConfigs.join(`\n<:${config.emoji.x}> `)}`)
-				.setColor("#e74c3c");
+				.setDescription(
+					`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${qServerDB.config.prefix}config\` command.`
+				)
+				.addField(
+					"Missing Elements",
+					`<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`
+				)
+				.setColor(colors.red);
 			return message.channel.send(embed);
 		}
 
-		if (client.channels.get(client.servers.get(message.guild.id, "channels.suggestions"))) {
-			var perms = core.channelPermissions(client.channels.get(client.servers.get(message.guild.id, "channels.suggestions")).memberPermissions(client.user.id), "suggestions", client);
+		if (client.channels.get(qServerDB.config.channels.suggestions)) {
+			let perms = channelPermissions(client.channels.get(qServerDB.config.channels.suggestions).memberPermissions(client.user.id), "suggestions", client);
 			if (perms.length > 0) {
 				let embed = new Discord.RichEmbed()
-					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${client.servers.get(message.guild.id, "channels.suggestions")}> channel:`)
-					.addField("Missing Elements", `<:${config.emoji.x}> ${perms.join(`\n<:${config.emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${client.servers.get(message.guild.id, "channels.suggestions")}>, make sure that **${client.user.username}** has a <:${config.emoji.check}> for the above permissions.`)
-					.setColor("#e74c3c");
+					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.suggestions}> channel:`)
+					.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
+					.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.suggestions}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+					.setColor(colors.red);
 				return message.channel.send(embed);
 			}
 		} else {
-			return message.channel.send(`<:${config.emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestion channel.`);
+			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		}
 
 		if (!args[0] || !client.suggestions.find(s => s.id.toString() == args[0] && s.guild == message.guild.id)) return message.channel.send(`<:${config.emoji.x}> Please provide a valid suggestion id!`);

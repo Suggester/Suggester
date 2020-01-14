@@ -1,6 +1,6 @@
 const config = require("../config.json");
 var xEmoji = config.emoji.x;
-const { dbQuery } = require("../coreFunctions");
+const { dbQuery, checkPermissions } = require("../coreFunctions");
 module.exports = {
 	controls: {
 		permission: 10,
@@ -11,8 +11,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		let qUserDB = await dbQuery("User", { id: message.author.id });
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+
 		let id = client.users.find((user) => user.id === args[0]) || message.mentions.members.first() || message.author;
 		if (!id) {
 			let embed = new Discord.RichEmbed()
@@ -21,6 +20,9 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 		id = id.id;
+
+		let qUserDB = await dbQuery("User", { id: id });
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 
 		let globalPosArr = [];
 		let posArr = [];
@@ -56,10 +58,18 @@ module.exports = {
 
 		let embed = new Discord.RichEmbed()
 			.setAuthor(client.users.get(id).tag, client.users.get(id).displayAvatarURL)
-			.setColor(config.colors.default);
+			.setColor(config.colors.default)
+			.setFooter(`Permission Level: ${checkPermissions(message.guild.members.get(id), client)}`);
 		if (globalPosArr.length > 0) embed.addField("Global Acknowledgements", `${globalPosArr.join("\n")}`);
 		if (posArr.length > 0) embed.addField("Server Acknowledgements", `${posArr.join("\n")}`);
 		qUserDB.ack ? embed.setDescription(qUserDB.ack) : embed.setDescription("This user has no acknowledgements");
+
+		if (qUserDB.beans) {
+			let beans = qUserDB.beans;
+			embed.addField("Received Bean Statistics <:bean:657650134502604811>", `<:bean:657650134502604811> ${beans.received.bean} beans\n<:hyperbean:666099809668694066> ${beans.received.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.received.nukebean} nukebeans`)
+				.addField("Sent Bean Statistics <:bean:657650134502604811>", `<:bean:657650134502604811> ${beans.sent.bean} beans\n<:hyperbean:666099809668694066> ${beans.sent.megabean} megabeans\n<:nukebean:666102191895085087> ${beans.sent.nukebean} nukebeans`);
+		}
+
 		return message.channel.send(embed);
 	}
 };

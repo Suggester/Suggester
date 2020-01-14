@@ -77,7 +77,19 @@ const core = new Schema({
 const user = new Schema({
 	id: { type: String, required: true }, // user id
 	ack: String,
-	blocked: { type: Boolean, default: false }
+	blocked: { type: Boolean, default: false },
+	beans: {
+		sent: {
+			bean: { type: Number, default: 0 },
+			megabean: { type: Number, default: 0 },
+			nukebean: { type: Number, default: 0 }
+		},
+		received: {
+			bean: { type: Number, default: 0 },
+			megabean: { type: Number, default: 0 },
+			nukebean: { type: Number, default: 0 }
+		}
+	}
 });
 
 module.exports = {

@@ -10,7 +10,6 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async (message, client, args, Discord) => {
-		// TODO: Use async/await instead of callbacks
 		const clean = (text) => {
 			if (typeof (text) === "string") {
 				return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));

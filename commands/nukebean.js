@@ -1,4 +1,5 @@
 const { emoji } = require("../config.json");
+const { checkPermissions, dbModifyId, dbQuery } = require("../coreFunctions");
 module.exports = {
 	controls: {
 		permission: 0,
@@ -8,7 +9,7 @@ module.exports = {
 		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: (message, client, args, Discord) => {
+	do: async (message, client, args, Discord) => {
 
 		if (!args[0]) return message.channel.send("You must specify a member!");
 		let member = message.mentions.members.first() || message.guild.members.find((user) => user.id === args[0]);
@@ -31,6 +32,50 @@ module.exports = {
 				global.beans[member.id].count++;
 			}
 		});
+
+		let qMemberDB = await dbQuery("User", { id: member.id });
+		let qSenderDB = await dbQuery("User", { id: message.author.id });
+		if (!qMemberDB || !qMemberDB.beans) await dbModifyId("User", member.id, { beans: {
+			sent: {
+				bean: { type: Number, default: 0 },
+				megabean: { type: Number, default: 0 },
+				nukebean: { type: Number, default: 0 }
+			},
+			received: {
+				bean: { type: Number, default: 0 },
+				megabean: { type: Number, default: 0 },
+				nukebean: { type: Number, default: 0 }
+			}
+		}
+		});
+		if (!qSenderDB || !qSenderDB.beans) await dbModifyId("User", message.author.id, { beans: {
+			sent: {
+				bean: { type: Number, default: 0 },
+				megabean: { type: Number, default: 0 },
+				nukebean: { type: Number, default: 0 }
+			},
+			received: {
+				bean: { type: Number, default: 0 },
+				megabean: { type: Number, default: 0 },
+				nukebean: { type: Number, default: 0 }
+			}
+		}
+		});
+
+		let memberSentBeanCount = qMemberDB.beans.sent;
+		let memberReceivedBeanCount = {
+			bean: qMemberDB.beans.received.bean,
+			megabean: qMemberDB.beans.received.megabean,
+			nukebean: qMemberDB.beans.received.nukebean+1
+		};
+		let senderReceivedBeanCount = qSenderDB.beans.received;
+		let senderSentBeanCount = {
+			bean: qSenderDB.beans.sent.bean,
+			megabean: qSenderDB.beans.sent.megabean,
+			nukebean: qSenderDB.beans.sent.nukebean+1
+		};
+		await dbModifyId("User", member.id, { beans: { sent: memberSentBeanCount, received: memberReceivedBeanCount } });
+		await dbModifyId("User", message.author.id, { beans: { sent: senderSentBeanCount, received: senderReceivedBeanCount } });
 
 		message.channel.send(`<:nukebean:666102191895085087> Nukebeaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
 		member.user.send(`<:nukebean:666102191895085087> **You have been nukebeaned from ${message.guild.name}**`, beanSendEmbed)
