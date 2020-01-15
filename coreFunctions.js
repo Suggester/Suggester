@@ -211,8 +211,13 @@ module.exports = {
 	 */
 
 	async fetchUser (id, client) {
+		async function fetchUnknownUser (uid) {
+			client.fetchUser(uid, true).catch(err => {
+				return null;
+			});
+		}
 		return await client.users.get(id)
-		|| await client.fetchUser(id, true)
+		|| await fetchUnknownUser(id)
 		|| null;
 	},
 	/**

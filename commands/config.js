@@ -282,13 +282,16 @@ module.exports = {
 					.setColor(colors.red);
 				return message.channel.send(embed);
 			}
-			await logChannel.createWebhook("Suggester Logs", client.user.displayAvatarURL, "Create log channel").then(webhook => {
+			await logChannel.createWebhook("Suggester Logs", client.user.displayAvatarURL, "Create log channel").then(async (webhook) => {
 				qServerDB.config.loghook.id = webhook.id;
 				qServerDB.config.loghook.token = webhook.token;
+				qServerDB.config.channels.log = logChannel.id;
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully set <#${logChannel.id}> as the log channel.`);
+			}).catch(err => {
+				return message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
 			});
-			qServerDB.config.channels.log = logChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${logChannel.id}> as the log channel.`);
+			break;
 		case "prefix":
 			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
 			let prefix = args[1];
