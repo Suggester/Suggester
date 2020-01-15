@@ -165,7 +165,7 @@ module.exports = {
 				let suggestionChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the channel where all suggestions are sent once they are approved")
-					.addField("Inputs", "You can send a channel #mention or channel ID", false);
+					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name", false);
 				message.channel.send("**SETUP: Suggestion Channel**", suggestionChannelEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
@@ -176,7 +176,7 @@ module.exports = {
 							let input = collected.first().content.split(" ")[0].toLowerCase();
 							let channel = collected.first().mentions.channels.first() || message.guild.channels.find(channel => channel.id === input) || message.guild.channels.find(channel => channel.name === input) || null;
 							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention** or **channel ID**.`);
+								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								setup(3);
 								return;
 							}
@@ -208,7 +208,7 @@ module.exports = {
 					let reviewChannelEmbed = new Discord.RichEmbed()
 						.setColor(colors.default)
 						.setDescription("This is the channel where all suggestions are sent once they are suggested and awaiting review")
-						.addField("Inputs", "You can send a channel #mention or channel ID", false);
+						.addField("Inputs", "You can send a channel #mention, channel ID, or channel name", false);
 					message.channel.send("**SETUP: Suggestion Review Channel**", reviewChannelEmbed).then(msg => {
 						msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 							max: 1,
@@ -219,7 +219,7 @@ module.exports = {
 								let input = collected.first().content.split(" ")[0].toLowerCase();
 								let channel = collected.first().mentions.channels.first() || message.guild.channels.find(channel => channel.id === input) || message.guild.channels.find(channel => channel.name === input) || null;
 								if (!channel) {
-									message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention** or **channel ID**.`);
+									message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 									setup(4);
 									return;
 								}
@@ -253,7 +253,7 @@ module.exports = {
 				let deniedChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the channel where all denied or deleted suggestions are sent")
-					.addField("Inputs", "You can send a channel #mention or channel ID\nOr send `skip` to not set a denied suggestions channel (it is optional)", false);
+					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name\nOr send `skip` to not set a denied suggestions channel (it is optional)", false);
 				message.channel.send("**SETUP: Denied Suggestions Channel**", deniedChannelEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
@@ -269,7 +269,7 @@ module.exports = {
 							let input = collected.first().content.split(" ")[0].toLowerCase();
 							let channel = collected.first().mentions.channels.first() || message.guild.channels.find(channel => channel.id === input) || message.guild.channels.find(channel => channel.name === input) || null;
 							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention** or **channel ID**.`);
+								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								setup(5);
 								return;
 							}
@@ -300,7 +300,7 @@ module.exports = {
 				let logChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the channel where all actions on suggestions are logged")
-					.addField("Inputs", "You can send a channel #mention or channel ID\nOr send `skip` to not set a log channel (it is optional)", false);
+					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name\nOr send `skip` to not set a log channel (it is optional)", false);
 				message.channel.send("**SETUP: Log Channel**", logChannelEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
@@ -316,7 +316,7 @@ module.exports = {
 							let input = collected.first().content.split(" ")[0].toLowerCase();
 							let channel = collected.first().mentions.channels.first() || message.guild.channels.find(channel => channel.id === input) || message.guild.channels.find(channel => channel.name === input) || null;
 							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention** or **channel ID**.`);
+								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								setup(6);
 								return;
 							}
@@ -372,9 +372,9 @@ module.exports = {
 								setup(7);
 								return;
 							}
-							qServerDB.config.prefix = prefix;
-							await dbModify("Server", {id: message.guild.id}, qServerDB)
-							message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to ${prefix}`);
+							qServerDB.config.prefix = prefix.toLowerCase();
+							await dbModify("Server", {id: message.guild.id}, qServerDB);
+							message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to ${prefix.toLowerCase()}`);
 							setup(8);
 						});
 				});
