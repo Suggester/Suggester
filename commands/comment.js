@@ -59,74 +59,59 @@ module.exports = {
 			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		}
 
-		if (!args[0] || !client.suggestions.find(s => s.id.toString() == args[0] && s.guild == message.guild.id)) return message.channel.send(`<:${config.emoji.x}> Please provide a valid suggestion id!`);
+		let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: args[0], id: message.guild.id });
+		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion id!`);
 
-		var suggestion = client.suggestions.find(s => s.id.toString() == args[0] && s.guild == message.guild.id);
-		var id = suggestion.id.toString();
+		let id = qSuggestionDB.suggestionId;
 
-		if (suggestion.status !== "approved") return message.channel.send(`<:${config.emoji.x}> Comments can only be added to approved suggestions!`);
+		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
 
-		if (!args[1]) return message.channel.send(`<:${config.emoji.x}> Please provide a comment!`);
+		if (!args[1]) return message.channel.send(`<:${emoji.x}> You must provide a comment!`);
 
-		if (suggestion.comments && suggestion.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(`<:${config.emoji.x}> Suggestions can only have up to 23 comments.`);
+		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(`<:${emoji.x}> Suggestions can only have up to 23 comments.`);
 
-		var comment = args.splice(1).join(" ");
+		let comment = args.splice(1).join(" ");
 
-		if (!client.suggestions.get(id, "comments")) client.suggestions.set(id, [], "comments");
+		qSuggestionDB.comments.push({
+			comment: comment,
+			author: message.author.id,
+			id: qSuggestionDB.comments.length+1
+		});
+		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
-		client.suggestions.push(id, {
-			"comment": comment,
-			"author": message.author.id,
-			"id": client.suggestions.get(id, "comments").length + 1
-		}, "comments");
-
-		var suggester;
-		if (client.users.get(client.suggestions.get(id, "suggester"))) {
-			suggester = client.users.get(client.suggestions.get(id, "suggester"));
-		} else {
-			var found = false;
-			var sent = false;
-			client.fetchUser(client.users.get(client.suggestions.get(id, "suggester")), true).then(user => {
-				suggester = user;
-				found = true;
-			}).catch(notFound => {
-				found = false;
-				sent = true;
-				return message.channel.send(`${config.emoji.x} The suggesting user could not be fetched, please try again. If the issue persists, please contact our support team.`);
-			});
-
-			if (!suggester && !found && !sent) return message.channel.send(`${config.emoji.x} The suggesting user could not be fetched, please try again. If the issue persists, please contact our support team.`);
-		}
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
 
 		let replyEmbed = new Discord.RichEmbed()
 			.setTitle("Comment Added")
-			.setDescription(`${suggestion.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${client.suggestions.get(id, "guild")}/${client.servers.get(client.suggestions.get(id, "guild"), "channels.suggestions")}/${client.suggestions.get(id, "messageid")})`)
+			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(`Official Comment from ${message.author.tag}`, comment)
-			.setColor("#3498db")
+			.setColor(colors.blue)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
 		message.channel.send(replyEmbed);
 
-		if (client.servers.get(message.guild.id, "notify") && client.servers.get(message.guild.id, "notify") == true) {
+		if (qServerDB.config.notify) {
 			let dmEmbed = new Discord.RichEmbed()
 				.setTitle("A comment was added to your suggestion!")
-				.setDescription(`${suggestion.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${client.suggestions.get(id, "guild")}/${client.servers.get(client.suggestions.get(id, "guild"), "channels.suggestions")}/${client.suggestions.get(id, "messageid")})`)
+				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField(`Official Comment from ${message.author.tag}`, comment)
-				.setColor("#3498db")
+				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
 			suggester.send(dmEmbed);
 		}
 
-		client.channels.get(client.servers.get(client.suggestions.get(id, "guild"), "channels.suggestions")).fetchMessage(client.suggestions.get(id, "messageid")).then(f => f.edit(core.suggestionEmbed(client.suggestions.get(id), client)));
+		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
+		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => f.edit(suggestionEditEmbed));
 
-		if (client.servers.get(message.guild.id, "channels.log")) {
+		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.RichEmbed()
 				.setAuthor(`${message.author.tag} added a comment to #${id.toString()}`, message.author.displayAvatarURL)
-				.addField("Suggestion", suggestion.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion)
 				.addField("Comment", comment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Commenter ID: ${message.author.id}`)
 				.setTimestamp()
-				.setColor("#3498db");
-			core.serverLog(logEmbed, message.guild.id, client);
+				.setColor(colors.blue);
+			serverLog(logEmbed, qServerDB);
 		}
 	}
 };

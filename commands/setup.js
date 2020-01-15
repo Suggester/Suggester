@@ -332,15 +332,20 @@ module.exports = {
 								return;
 							}
 							qServerDB.config.channels.log = channel.id;
-							await channel.createWebhook("Suggester Logs", client.user.displayAvatarURL, "Create log channel from setup").then(webhook => {
+							await channel.createWebhook("Suggester Logs", client.user.displayAvatarURL, "Create log channel from setup").then(async (webhook) => {
 								qServerDB.config.loghook.id = webhook.id;
 								qServerDB.config.loghook.token = webhook.token;
-							});
-							await dbModify("Server", {id: message.guild.id}, qServerDB);
 
-							message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the log channel.`);
-							setup(7);
-							return;
+								await dbModify("Server", {id: message.guild.id}, qServerDB);
+
+								message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the log channel.`);
+								setup(7);
+								return;
+							}).catch(err => {
+								message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
+								setup(6);
+								return;
+							});
 						}).catch((e) => {
 							console.log(e);
 							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
@@ -352,7 +357,7 @@ module.exports = {
 				let prefixEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the text you put before the command to trigger the bot.")
-					.addField("Inputs", `Any string with no spaces\nOr send \`skip\` to keep the same prefix of **${qServerDB.config.prefix}**`, false);
+					.addField("Inputs", `Any string with no spaces\nOr send \`skip\` to keep the default prefix of **${qServerDB.config.prefix}**`, false);
 				message.channel.send("**SETUP: Prefix**", prefixEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
