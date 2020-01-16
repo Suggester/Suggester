@@ -82,6 +82,9 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
 
+		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
+		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => f.edit(suggestionEditEmbed));
+
 		let replyEmbed = new Discord.RichEmbed()
 			.setTitle("Comment Added")
 			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
@@ -99,9 +102,6 @@ module.exports = {
 				.setFooter(`Suggestion ID: ${id.toString()}`);
 			suggester.send(dmEmbed);
 		}
-
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => f.edit(suggestionEditEmbed));
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.RichEmbed()
