@@ -22,7 +22,8 @@
     "node-emoji": "^1.10.0",
     "numbered": "^1.1.0",
     "mongoose-sequence": "^5.2.2",
-    "decache": "^4.5.1"
+    "decache": "^4.5.1",
+    "valid-url": "1.0.9"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"

@@ -1,4 +1,4 @@
-const { dbQuery, dbModify, channelPermissions, fetchUser, serverLog, suggestionEmbed } = require("../coreFunctions.js");
+const { dbQuery, dbModify, channelPermissions, fetchUser, serverLog, suggestionEmbed, dbQueryNoNew } = require("../coreFunctions.js");
 const { emoji, colors } = require("../config.json");
 module.exports = {
 	controls: {
@@ -62,7 +62,7 @@ module.exports = {
 		if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a comment ID!`);
 		let idsections = args[0].split("_");
 		if (!idsections[0] || !idsections[1]) return message.channel.send(`<:${emoji.x}> You must specify a valid comment ID!`);
-		let qSuggestionDB = await dbQuery("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
+		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
 		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion id!`);
 
 		let id = qSuggestionDB.suggestionId;

@@ -1,5 +1,6 @@
-const config = require("../config.json");
-const core = require("../coreFunctions.js");
+const { colors, emoji, prefix } = require("../config.json");
+const { dbQuery, dbModify, channelPermissions, dbQueryNoNew, serverLog, suggestionEmbed } = require("../coreFunctions.js");
+const validUrl = require('valid-url');
 module.exports = {
 	controls: {
 		permission: 3,
@@ -9,35 +10,67 @@ module.exports = {
 		docs: "staff/attach",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"]
 	},
-	do: (message, client, args, Discord) => {
+	do: async (message, client, args, Discord) => {
+		let missingConfigs = [];
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
 
-		var missingConfigs = [];
-		if (!client.servers.get(message.guild.id)) return message.channel.send(`<:${config.emoji.x}> You must configure your server to use this command. Please use the \`.config\` commands.`);
-		if (!client.servers.get(message.guild.id, "admin_roles") || client.servers.get(message.guild.id, "admin_roles").length < 1) missingConfigs.push("Server Admin Roles");
-		if (!client.servers.get(message.guild.id, "staff_roles") || client.servers.get(message.guild.id, "staff_roles").length < 1) missingConfigs.push("Server Staff Roles");
-		if (!client.servers.get(message.guild.id, "channels.suggestions") || !client.channels.get(client.servers.get(message.guild.id, "channels.suggestions"))) missingConfigs.push("Approved Suggestions Channel");
-		if (client.servers.get(message.guild.id, "mode") === "review" && (!client.servers.get(message.guild.id, "channels.staff") || !client.channels.get(client.servers.get(message.guild.id, "channels.staff")))) missingConfigs.push("Suggestion Review Channel");
+		if (!qServerDB.config.admin_roles ||
+			qServerDB.config.admin_roles < 1) {
+			missingConfigs.push("Server Admin Roles");
+		}
+		if (!qServerDB.config.staff_roles ||
+			qServerDB.config.staff_roles < 1) {
+			missingConfigs.push("Server Staff Roles");
+		}
+		if (!qServerDB.config.channels.suggestions ||
+			qServerDB.config.channels.suggestions < 1) {
+			missingConfigs.push("Approved Suggestions Channel");
+		}
+		if (!qServerDB.config.mode === "review" && !qServerDB.config.channels.staff ||
+			!client.channels.get(qServerDB.config.channels.staff)) {
+			missingConfigs.push("Suggestion Review Channel");
+		}
 
 		if (missingConfigs.length > 1) {
 			let embed = new Discord.RichEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${client.servers.get(message.guild.id, "prefix")}config\` command.`)
-				.addField("Missing Elements", `<:${config.emoji.x}> ${missingConfigs.join(`\n<:${config.emoji.x}> `)}`)
-				.setColor("#e74c3c");
+				.setDescription(
+					`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${qServerDB.config.prefix}config\` command.`
+				)
+				.addField(
+					"Missing Elements",
+					`<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`
+				)
+				.setColor(colors.red);
 			return message.channel.send(embed);
 		}
 
-		if (!args[0] || !client.suggestions.find(s => s.id.toString() == args[0] && s.guild == message.guild.id)) return message.channel.send(`<:${config.emoji.x}> Please provide a valid suggestion id!`);
+		if (client.channels.get(qServerDB.config.channels.suggestions)) {
+			let perms = channelPermissions(client.channels.get(qServerDB.config.channels.suggestions).memberPermissions(client.user.id), "suggestions", client);
+			if (perms.length > 0) {
+				let embed = new Discord.RichEmbed()
+					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.suggestions}> channel:`)
+					.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
+					.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.suggestions}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+					.setColor(colors.red);
+				return message.channel.send(embed);
+			}
+		} else {
+			return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
+		}
 
-		var suggestion = client.suggestions.find(s => s.id.toString() == args[0] && s.guild == message.guild.id);
-		var id = suggestion.id.toString();
+		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
+		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion id!`);
 
-		if (suggestion.status !== "approved") return message.channel.send(`<:${config.emoji.x}> Attachments can only be added to approved suggestions!`);
+		let id = qSuggestionDB.suggestionId;
 
-		if (suggestion.attachment) return message.channel.send(`<:${config.emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
+		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
 
-		if (!args[1] && !message.attachments.first()) return message.channel.send(`<:${config.emoji.x}> Please provide an attachment!`);
+		if (qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
 
-		var attachment = message.attachments.first() ? message.attachments.first().url : args.splice(1).join(" ");
+		if (!args[1] && !message.attachments.first()) return message.channel.send(`<:${emoji.x}> Please provide an attachment!`);
+
+		let attachment = message.attachments.first() ? message.attachments.first().url : args.splice(1).join(" ");
 
 		/**
        * Check a URL to see if it makes a valid attachment
@@ -45,55 +78,37 @@ module.exports = {
        * @returns {boolean}
        */
 		function checkURL (url) {
-			var noparams = url.split("?")[0];
-			return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
+			if (validUrl.isUri(url)){
+				let noparams = url.split("?")[0];
+				return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
+			} else return false;
 		}
 
-		if (!(checkURL(attachment))) return message.channel.send(`<:${config.emoji.x}> Please provide a valid attachment!`);
+		if (!(checkURL(attachment))) return message.channel.send(`<:${emoji.x}> Please provide a valid attachment! Attachments can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``);
 
-		if (!client.suggestions.get(id, "attachment")) client.suggestions.set(id, attachment, "attachment");
+		qSuggestionDB.attachment = attachment;
+		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
-		var suggester;
-		if (client.users.get(client.suggestions.get(id, "suggester"))) {
-			suggester = client.users.get(client.suggestions.get(id, "suggester"));
-		} else {
-			var found = false;
-			var sent = false;
-			client.fetchUser(client.users.get(client.suggestions.get(id, "suggester")), true)
-				.then(user => {
-					suggester = user;
-					found = true;
-				}).catch(() => {
-					found = false;
-					sent = true;
-					return message.channel.send(`${config.emoji.x} The suggesting user could not be fetched, please try again. If the issue persists, please contact our support team.`);
-				});
-
-			if (!suggester && !found && !sent) return message.channel.send(`${config.emoji.x} The suggesting user could not be fetched, please try again. If the issue persists, please contact our support team.`);
-
-		}
+		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
+		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => f.edit(suggestionEditEmbed));
 
 		let replyEmbed = new Discord.RichEmbed()
 			.setTitle("Attachment Added")
-			.setDescription(`${suggestion.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${client.suggestions.get(id, "guild")}/${client.servers.get(client.suggestions.get(id, "guild"), "channels.suggestions")}/${client.suggestions.get(id, "messageid")})`)
+			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
-			.setColor("#3498db")
+			.setColor(colors.blue)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
 		message.channel.send(replyEmbed);
 
-		client.channels.get(client.servers.get(client.suggestions.get(id, "guild"), "channels.suggestions"))
-			.fetchMessage(client.suggestions.get(id, "messageid"))
-			.then(f => f.edit(core.suggestionEmbed(client.suggestions.get(id), client)));
-
-		if (client.servers.get(message.guild.id, "channels.log")) {
+		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.RichEmbed()
 				.setAuthor(`${message.author.tag} added an attachment to #${id.toString()}`, message.author.displayAvatarURL)
-				.addField("Suggestion", suggestion.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion)
 				.setImage(attachment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Attacher ID: ${message.author.id}`)
 				.setTimestamp()
-				.setColor("#3498db");
-			core.serverLog(logEmbed, message.guild.id, client);
+				.setColor(colors.blue);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };
