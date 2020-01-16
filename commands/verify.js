@@ -53,7 +53,7 @@ module.exports = {
 			});
 			if (staffRoles > 0) posArr.push(":tools: Server Staff");
 		}
-		if (qServerDB && qServerDB.blocked) posArr.push(":no_entry_sign: Blacklisted on this server");
+		if (qServerDB && qServerDB.config.blacklist.includes(id)) posArr.push(":no_entry_sign: Blacklisted on this server");
 		if (client.guilds.get(config.main_guild) && client.guilds.get(config.main_guild).available && client.guilds.get(config.main_guild).roles.get("614084573139173389").members.get(id)) globalPosArr.push("<:canary:621530343081508899> Suggester Canary Program");
 
 		let hasAcks = false;

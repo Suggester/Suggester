@@ -211,6 +211,7 @@ module.exports = {
 	 */
 
 	async fetchUser (id, client) {
+		if (!id) return null;
 		async function fetchUnknownUser (uid) {
 			client.fetchUser(uid, true).then(u => {
 				return client.users.get(uid);
