@@ -223,7 +223,7 @@ module.exports = {
 		|| null;
 	},
 	/**
-	 * Search the database for an id
+	 * Search the database for an id, creates a new entry if not found
 	 * @param {string} collection - The collection to query.
 	 * @param  {Object} query - The term to search for
 	 * @returns {Object}
@@ -244,7 +244,27 @@ module.exports = {
 			});
 	},
 	/**
-	 * Search the database for some parameters
+	 * Search the database for some parameters and return all entries that match, does not create a new entry if not found
+	 * @param {string} collection - The collection to query.
+	 * @param  {Object} query - The term to search for
+	 * @returns {Object}
+	 */
+	dbQueryAll: async (collection, query) => {
+		return await models[collection].find(
+			query
+		)
+			.then((res) => {
+				if (!res) {
+					return null;
+				} else {
+					return res;
+				}
+			}).catch((error) => {
+				console.log(error);
+			});
+	},
+	/**
+	 * Search the database for some parameters, returns one entry and does not create a new entry if not found
 	 * @param {string} collection - The collection to query.
 	 * @param  {Object} query - The term to search for
 	 * @returns {Object}
