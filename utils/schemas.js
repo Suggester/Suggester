@@ -1,4 +1,5 @@
 const { Schema, model  } = require("mongoose");
+const { prefix } = require("../config.json");
 //const autoIncrement = require("mongoose-sequence")(connection);
 
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
@@ -8,7 +9,7 @@ const settings = new Schema({
 	blocked: { type: Boolean, default: false },
 	whitelist: { type: Boolean, default: false },
 	config: {
-		prefix: { type: String, default: "." },
+		prefix: { type: String, default: prefix },
 		admin_roles: [String],
 		staff_roles: [String],
 		channels: {
