@@ -18,19 +18,5 @@ module.exports = async (Discord, client, guild) => {
 		return guildLog(`:no_entry: I was added to non-whitelisted guild **${guild.name}** (${guild.id}) and left`, client);
 	}
 
-	if (qSuggestionDB.length > 0) {
-		if (qServerDB.config.suggestion &&
-			qServerDB.config.channels.suggestions &&
-			client.channels.find((c) => c.id === qServerDB.config.suggestion)) {
-			qSuggestionDB.forEach((suggestion) => {
-				client.channels.find((c) => c.id === qSuggestionDB.config.channels.suggestions)
-					.fetchMessage(suggestion.messageId)
-					.catch((err) => {
-						throw new Error(err);
-					});
-			});
-		}
-	}
-
 	await guildLog(`:inbox_tray: New Guild: **${guild.name}** (${guild.id})\n>>> **Owner:** ${guild.owner.user.tag}\n**Member Count:** ${guild.memberCount}`, client);
 };

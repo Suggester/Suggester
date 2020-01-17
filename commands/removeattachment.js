@@ -70,7 +70,13 @@ module.exports = {
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => f.edit(suggestionEditEmbed));
+		let messageEdited;
+		await client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => {
+			f.edit(suggestionEditEmbed);
+			messageEdited = true;
+		}).catch(err => messageEdited = false);
+
+		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
 		let replyEmbed = new Discord.RichEmbed()
 			.setTitle("Attachment Removed")
