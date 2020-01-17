@@ -47,7 +47,7 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 		let listarray = [];
-		let queuedSuggestions = await dbQueryAll("Suggestion", { status: "awaiting_review", id: message.guild.id })
+		let queuedSuggestions = await dbQueryAll("Suggestion", { status: "awaiting_review", id: message.guild.id });
 		queuedSuggestions.forEach(suggestion => {
 			listarray.push({
 				"fieldTitle": `Suggestion #${suggestion.suggestionId.toString()}`,

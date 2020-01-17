@@ -113,6 +113,14 @@ module.exports = {
 			});
 		}
 
+		let messageDeleted;
+		await client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => {
+			f.delete()
+			messageDeleted = true;
+		}).catch(err => messageDeleted = false);
+
+		if (!messageDeleted) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+
 		client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(m => m.delete()).catch(err => {});
 
 		let replyEmbed = new Discord.RichEmbed()
