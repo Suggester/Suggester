@@ -1,5 +1,5 @@
 const { emoji } = require("../config.json");
-const { dbQuery, dbModifyId } = require("../coreFunctions");
+const { dbQuery, dbModifyId, fetchUser } = require("../coreFunctions");
 
 module.exports = {
 	controls: {
@@ -14,32 +14,36 @@ module.exports = {
 		let type = args.shift();
 		switch (type) {
 		case "user": {
-			let foundUser = client.users.find((user) => user.id === args[0]) ||
-				message.mentions.members.first() ||
-				await client.fetchUser(args[0], true);
-			if (!foundUser) return message.channel.send(`<:${emoji.x}> User not found.`);
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Incorrect usage.`);
+			if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a user!`);
+			let foundUser = await fetchUser(args[0], client);
+			if (!foundUser) return message.channel.send(`<:${emoji.x}> User not found. If this is a valid ID, please try again.`);
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Invalid setting. Specify \`true\` to block the user and \`false\` to unblock the user.`);
+			let qUserDB = await dbQuery("User", { id: foundUser.id });
 			if (!args[1]) {
-				let { blocked } = await dbQuery("User", { id: foundUser.id });
-				return message.channel.send(`<:${emoji.check}> \`${foundUser.user.tag}\`is ${blocked ? "" : "not "}globally blocked.`);
+				let { blocked } = qUserDB;
+				return message.channel.send(`<:${emoji.check}> \`${foundUser.tag}\`is ${blocked ? "" : "not "}globally blocked.`);
 			}
-			let { blocked } = await dbModifyId("User", foundUser.id, { blocked: args[1] });
-			return message.channel.send(`<:${emoji.check}> \`${foundUser.user.tag}\`is ${blocked ? "now" : "no longer"} globally blocked.`);
+
+			if (args[1] === "true") qUserDB.blocked = true;
+			else if (args[1] === "false") qUserDB.blocked = false;
+			await dbModifyId("User", foundUser.id, qUserDB);
+			return message.channel.send(`<:${emoji.check}> \`${foundUser.tag}\`is ${!qUserDB.blocked ? "no longer" : "now"} globally blocked.`);
 		}
 		case "server":
 		case "guild": {
 			if (!args[0]) return message.channel.send(`<:${emoji.x}> Please specify a guild!`);
 			let foundGuild = client.guilds.get(args[0]);
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Incorrect usage.`);
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Invalid setting. Specify \`true\` to block the server and \`false\` to unblock the server.`);
+			let qServerDB = await dbQuery("Server", { id: args[0] });
 			if (!args[1]) {
-				let { blocked } = await dbQuery("Server", { id: args[0] });
+				let { blocked } = qServerDB;
 				return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${blocked ? "" : "not "}globally blocked.`);
 			}
-			if (!foundGuild) {
-				message.channel.send(`I am not in this guild but I will ${JSON.parse(args[1]) ? "" : "un"}block it anyways.`);
-			}
-			let { blocked } = await dbModifyId("Server", args[0],{ blocked: args[1] });
-			return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${blocked ? "now" : "no longer"} globally blocked.`);
+			if (args[1] === "true") qServerDB.blocked = true;
+			else if (args[1] === "false") qServerDB.blocked = false;
+			await dbModifyId("Server", args[0], qServerDB);
+			if (foundGuild && qServerDB.blocked) foundGuild.leave();
+			return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${qServerDB.blocked ? "now" : "no longer"} globally blocked.`);
 		}
 		default: {
 			return message.reply(`<:${emoji.x}> You must specify either \`user\` or \`guild\`.`);
