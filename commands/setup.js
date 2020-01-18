@@ -451,8 +451,7 @@ module.exports = {
 								}
 							});
 
-							if (args[0] && parseInt(args[0]) && parseInt(args[0]) >= 0 && parseInt(args[0]) <= 8) setup(parseInt(args[0]));
-							else setup(0);
+							setup(0);
 						}
 					});
 			});
