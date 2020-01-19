@@ -1,7 +1,5 @@
-const { Schema, model  } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const { prefix } = require("../config.json");
-//const autoIncrement = require("mongoose-sequence")(connection);
-
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
 
 const settings = new Schema({
@@ -66,16 +64,7 @@ const suggestion = new Schema({
 	],
 	attachment: String
 });
-//suggestion.plugin(autoIncrement, {inc_field: "autoIncId"});
-/*
-const core = new Schema({
-	presence: {
-		type: String,
-		activity: String,
-		status: String
-	}
-});
-*/
+
 const user = new Schema({
 	id: { type: String, required: true }, // user id
 	ack: String,
@@ -97,6 +86,5 @@ const user = new Schema({
 module.exports = {
 	Server: model("servers", settings, "settings"),
 	Suggestion: model("suggestions", suggestion, "suggestions"),
-	//Core: model("core", core, "core"),
 	User: model("user", user, "users")
 };

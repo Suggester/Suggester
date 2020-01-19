@@ -115,7 +115,7 @@ module.exports = {
 			.setDescription(qSuggestionDB.suggestion)
 			.setColor(colors.red);
 		reason ? replyEmbed.addField("Reason Given", reason) : "";
-		message.channel.send(replyEmbed);
+		await message.channel.send(replyEmbed);
 
 		if (qServerDB.config.notify) {
 			let dmEmbed = new Discord.RichEmbed()

@@ -19,8 +19,8 @@ const { readFile, readFileSync, writeFileSync } = require("fs");
 module.exports = class Persist {
 	/**
 	 * Make a new instance of the Persist class
-	 * @param {string | null} path
-	 * @param {object | null} data - What data is being stored
+	 * @param {string | null} [path]
+	 * @param {object | null} [data] - What data is being stored
 	 * @example
 	 * let persist = new Persist("./persistent.json", {
 	 *     "presence": {
