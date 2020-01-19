@@ -75,7 +75,15 @@ module.exports = {
 			return "Undefined, permission level not mapped in `core.permLevelToRole()`";
 		}
 	},
+	/**
+	 * Send a suggestion to the suggestion channel
+	 * @param {Object} suggestion - The database record for the suggestion
+	 * @param {Object} server - The server's database record
+	 * @param {module:"discord.js".Client} client - Discord.js client
+	 * @return {Promise<module:"discord.js".RichEmbed>}
+	 */
 	suggestionEmbed: async (suggestion, server, client) => {
+		console.log(suggestion);
 		let { fetchUser } = require("./coreFunctions.js");
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.RichEmbed();
@@ -209,19 +217,23 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - The bot client
 	 * @returns {Collection}
 	 */
-
 	async fetchUser (id, client) {
+		console.log("ID:", id);
 		if (!id) return null;
-		async function fetchUnknownUser (uid) {
-			client.fetchUser(uid, true).then(u => {
-				return client.users.get(uid);
-			}).catch(err => {
-				return null;
-			});
+
+		function fetchUnknownUser (uid) {
+			return client.fetchUser(uid, true)
+				.then(() => {
+					return client.users.get(uid);
+				})
+				.catch(() => {
+					return null;
+				});
 		}
-		return await client.users.get(id)
-		|| await fetchUnknownUser(id)
-		|| null;
+
+		return client.users.get(id)
+			|| fetchUnknownUser(id)
+			|| null;
 	},
 	/**
 	 * Search the database for an id, creates a new entry if not found
