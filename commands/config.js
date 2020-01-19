@@ -398,7 +398,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiDown;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiDown = emoji.find(args[2]).emoji;
+					inputEmojiDown = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let downsplit1 = args[2].split(":");
 					let downid = downsplit1[downsplit1.length - 1].split(">")[0];
