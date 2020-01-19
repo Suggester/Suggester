@@ -83,7 +83,6 @@ module.exports = {
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
 	suggestionEmbed: async (suggestion, server, client) => {
-		console.log(suggestion);
 		let { fetchUser } = require("./coreFunctions.js");
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.RichEmbed();
@@ -218,7 +217,6 @@ module.exports = {
 	 * @returns {Collection}
 	 */
 	async fetchUser (id, client) {
-		console.log("ID:", id);
 		if (!id) return null;
 
 		function fetchUnknownUser (uid) {
