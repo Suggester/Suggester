@@ -1,6 +1,6 @@
 const { colors } = require("../config.json");
 const { dbQueryAll } = require("../coreFunctions");
-const { Suggestion } = require("../utils/schemas");
+const { Suggestion, Server } = require("../utils/schemas");
 const humanizeDuration = require("humanize-duration");
 module.exports = {
 	controls: {
@@ -14,6 +14,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let totalSuggestionsGlobal = await Suggestion.countDocuments();
+		let totalConfiguredServers = await Server.countDocuments();
 		let approvedSuggestionsGlobal = await dbQueryAll("Suggestion", {status: "approved"});
 		let deniedSuggestionsGlobal = await dbQueryAll("Suggestion", {status: "denied"});
 		let totalSuggestionsServer = await dbQueryAll("Suggestion", {id: message.guild.id});
@@ -21,8 +22,8 @@ module.exports = {
 		let deniedSuggestionsServer = await dbQueryAll("Suggestion", {status: "denied", id: message.guild.id});
 		let statEmbed = new Discord.RichEmbed()
 			.setTitle("Suggestion Statistics")
-			.addField("Global Statistics", `**${totalSuggestionsGlobal.toString()}** submitted globally\n**${approvedSuggestionsGlobal.length}** approved globally\n**${deniedSuggestionsGlobal.length}** denied globally`)
-			.addField("Server Statistics", `**${totalSuggestionsServer.length}** submitted on this server\n**${approvedSuggestionsServer.length}** approved on this server\n**${deniedSuggestionsServer.length}** denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-message.guild.me.joinedTimestamp)}**`)
+			.addField("Global Statistics", `**${client.guilds.size}** servers\n**${totalConfiguredServers}** server configurations\n**${totalSuggestionsGlobal.toString()}** suggestions submitted globally\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
+			.addField("Server Statistics", `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-message.guild.me.joinedTimestamp)}**`)
 			.setColor(colors.default);
 		message.channel.send(statEmbed);
 		return;
