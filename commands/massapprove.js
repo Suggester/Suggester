@@ -63,11 +63,14 @@ module.exports = {
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
-		if (reasonSplit[1]) reason = reasonSplit[1].split(" ").splice(1).join(" ");
+		if (reasonSplit[1]) {
+			reason = reasonSplit[1].split(" ").splice(1).join(" ");
+			if (reason.length > 1024) return message.channel.send(`<:${config.emoji.x}> Comments cannot be longer than 1024 characters.`);
+		}
 		let suggestions = reasonSplit[0].split(" ");
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send("One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers.");
+		if (suggestions.some(isNaN)) return message.channel.send(`<:${config.emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers.`);
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send("Processing... this may take a moment");
 
