@@ -115,7 +115,7 @@ module.exports = {
 					if (reason) dmEmbed.addField("Reason Given", reason);
 					await suggester.send(dmEmbed)
 						.catch((err) => {
-							throw err;
+							console.log(err);
 						});
 				}
 				if (qServerDb.config.channels.log) {

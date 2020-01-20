@@ -133,7 +133,7 @@ module.exports = {
 
 					await suggester.send(dmEmbed)
 						.catch((err) => {
-							throw err;
+							console.log(err);
 						});
 				}
 
