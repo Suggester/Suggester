@@ -20,10 +20,13 @@ module.exports = {
 		let totalSuggestionsServer = await dbQueryAll("Suggestion", {id: message.guild.id});
 		let approvedSuggestionsServer = await dbQueryAll("Suggestion", {status: "approved", id: message.guild.id});
 		let deniedSuggestionsServer = await dbQueryAll("Suggestion", {status: "denied", id: message.guild.id});
+		let suggestionsUserGlobal = await dbQueryAll("Suggestion", {suggester: message.author.id});
+		let suggestionsUserServer = await dbQueryAll("Suggestion", {suggester: message.author.id, id: message.guild.id});
 		let statEmbed = new Discord.RichEmbed()
 			.setTitle("Suggestion Statistics")
 			.addField("Global Statistics", `**${client.guilds.size}** servers\n**${totalConfiguredServers}** server configurations\n**${totalSuggestionsGlobal.toString()}** suggestions submitted globally\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
 			.addField("Server Statistics", `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-message.guild.me.joinedTimestamp)}**`)
+			.addField("Your Statistics", `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server\n**${client.guilds.filter(guild => guild.members.find(member => member.id === message.author.id)).size}** shared servers with the bot`)
 			.setColor(colors.default);
 		message.channel.send(statEmbed);
 		return;
