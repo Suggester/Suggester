@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		permission: 2,
 		aliases: ["serverconfig", "cfg", "configure"],
-		usage: "config <admin|staff|review|suggestions|denied|prefix|mode>`\n\n**admin**: <add|remove> <role name or @mention>\n**staff**: <add|remove> <role name or @mention>\n**review**: <channel id or #mention>\n**suggestions**: <channel id or #mention>\n**denied**: <channel id or #mention>\n**prefix**: <new prefix>\n**mode**: <reviewcmd|autoapprove>",
+		usage: "config (element) (additional parameters)",
 		description: "Shows/edits server configuration",
 		enabled: true,
 		docs: "admin/config",
