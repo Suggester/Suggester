@@ -351,7 +351,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiUp;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiUp = emoji.find(args[2]).emoji;
+					inputEmojiUp = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let upsplit1 = args[2].split(":");
 					let upid = upsplit1[upsplit1.length - 1].split(">")[0];
@@ -375,7 +375,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiMid;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiMid = emoji.find(args[2]).emoji;
+					inputEmojiMid = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let midsplit1 = args[2].split(":");
 					let midid = midsplit1[midsplit1.length - 1].split(">")[0];
@@ -398,7 +398,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiDown;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiDown = emoji.find(args[2]).emoji;
+					inputEmojiDown = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let downsplit1 = args[2].split(":");
 					let downid = downsplit1[downsplit1.length - 1].split(">")[0];
