@@ -81,18 +81,18 @@ module.exports = {
 
 		let id = qSuggestionDB.suggestionId;
 
-		if (qSuggestionDB.reviewMessage && client.channels.get(qServerDB.config.channels.staff)) {
-			let perms = channelPermissions(client.channels.get(qServerDB.config.channels.staff).memberPermissions(client.user.id), "staff", client);
-			if (perms.length > 0) {
-				let embed = new Discord.RichEmbed()
-					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.staff}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.staff}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-		} else {
-			return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
+			if (client.channels.get(qServerDB.config.channels.staff)) {
+				let perms = channelPermissions(client.channels.get(qServerDB.config.channels.staff).memberPermissions(client.user.id), "staff", client);
+				if (perms.length > 0) {
+					let embed = new Discord.RichEmbed()
+						.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDB.config.channels.staff}> channel:`)
+						.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
+						.addField("How to Fix", `In the channel settings for <#${qServerDB.config.channels.staff}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+						.setColor(colors.red);
+					return message.channel.send(embed);
+				}
+			} else return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
 		}
 
 		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Only approved suggestions can be deleted!`);
@@ -143,7 +143,7 @@ module.exports = {
 			suggester.send(dmEmbed).catch(err => console.log(err));
 		}
 
-		if (qSuggestionDB.reviewMessage && client.channels.get(qServerDB.config.channels.staff)) {
+		if (qServerDB.config.channels.staff && qSuggestionDB.reviewMessage && client.channels.get(qServerDB.config.channels.staff)) {
 			let updateEmbed = new Discord.RichEmbed()
 				.setTitle(`Suggestion Awaiting Review (#${id.toString()})`)
 				.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
