@@ -52,6 +52,8 @@ module.exports = {
 
 		let suggestion = args.join(" ");
 
+		if (suggestion.length > 1024) return message.channel.send(`<:${emoji.x}> Suggestions cannot be longer than 1024 characters.`);
+
 		let id = await Suggestion.countDocuments() + 1;
 
 		//Review

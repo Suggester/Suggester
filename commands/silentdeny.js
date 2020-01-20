@@ -103,6 +103,7 @@ module.exports = {
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
+			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Denial reasons cannot be longer than 1024 characters.`);
 			await dbModify("Suggestion", { suggestionId: id }, {
 				denial_reason: reason
 			});

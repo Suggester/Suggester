@@ -357,7 +357,7 @@ module.exports = {
 				let prefixEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the text you put before the command to trigger the bot.")
-					.addField("Inputs", `Any string with no spaces\nOr send \`skip\` to keep the default prefix of **${qServerDB.config.prefix}**`, false);
+					.addField("Inputs", `Any string with no spaces`, false);
 				message.channel.send("**SETUP: Prefix**", prefixEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
@@ -366,14 +366,14 @@ module.exports = {
 					})
 						.then(async (collected) => {
 							let prefix = collected.first().content.split(" ")[0];
-							if (prefix.toLowerCase() === "skip") {
-								message.channel.send(`<:${emoji.check}> Skipped setting a new prefix, the prefix is still ${qServerDB.config.prefix}`);
-								setup(8);
-								return;
-							}
 							let disallowed = ["suggester:", `${client.user.id}:`];
 							if (disallowed.includes(prefix.toLowerCase())) {
 								message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different one.`);
+								setup(7);
+								return;
+							}
+							if (prefix.length > 20) {
+								message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
 								setup(7);
 								return;
 							}

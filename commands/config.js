@@ -297,6 +297,7 @@ module.exports = {
 			let prefix = args[1];
 			let disallowed = ["suggester:", `${client.user.id}:`];
 			if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different prefix.`);
+			if (prefix.length > 20) return message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${prefix.toLowerCase()}**`);
