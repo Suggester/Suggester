@@ -174,7 +174,7 @@ module.exports = {
 
 		let updateEmbed = new Discord.RichEmbed()
 			.setTitle(`Suggestion Awaiting Review (#${id.toString()})`)
-			.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, message.author.displayAvatarURL)
+			.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 			.setDescription(qSuggestionDB2.suggestion)
 			.setColor(colors.green)
 			.addField("A change was processed on this suggestion", "This suggestion has been approved");
