@@ -1,4 +1,4 @@
-const { emoji } = require("../config.json");
+const { emoji, release } = require("../config.json");
 const { coreLog } = require("../coreFunctions.js");
 const exec = (require("util").promisify((require("child_process").exec)));
 module.exports = {
@@ -16,7 +16,11 @@ module.exports = {
 		await coreLog("📥 Deploy initiated");
 		await generateEmbed("Deploy command received");
 		await generateEmbed("Updating code");
-		exec("git fetch origin && git reset --hard origin/production") // Pull new code from the production branch on GitHub
+
+		let branch;
+		release === "canary" ? branch = "staging" : branch = "production";
+
+		exec(`git fetch origin && git reset --hard origin/${branch}`) // Pull new code from GitHub
 			.then(async () => {
 				await generateEmbed("Removing old node modules");
 				return exec("rm -rf node_modules/"); // Delete old node_modules

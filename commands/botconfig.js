@@ -1,5 +1,4 @@
 const { colors } = require("../config.json");
-const core = require("../coreFunctions.js");
 const Persist = require("../utils/Persistent");
 module.exports = {
 	controls: {
@@ -10,10 +9,9 @@ module.exports = {
 		hidden: false
 	},
 	do: async (message, client, args, Discord) => {
-		//let qCoreDb = await core.dbQuery("Core", { default: false });
 		const persistent = new Persist();
 		if (!args[0]) {
-			return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+			return message.channel.send("Invalid parameters!");
 		}
 		switch (args[0]) {
 		case "game": {
@@ -52,7 +50,6 @@ module.exports = {
 					type: type
 				}
 			});
-			//TODO: Make this work
 
 			persistent.save("presence", {
 				activity: activity,
@@ -63,7 +60,7 @@ module.exports = {
 		}
 		case "status": {
 			if (!args[1]) {
-				return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+				return message.channel.send("Invalid parameters!");
 			} else {
 				let statusEmbed = new Discord.RichEmbed()
 					.setColor(colors.default);
@@ -90,7 +87,7 @@ module.exports = {
 					break;
 				}
 				default: {
-					return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+					return message.channel.send("Invalid parameters!");
 				}
 				}
 				await client.user.setStatus(status);
@@ -103,7 +100,7 @@ module.exports = {
 		}
 		case "username": {
 			if (!args[1]) {
-				return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+				return message.channel.send("Invalid parameters!");
 			} else {
 				let usernameEmbed = new Discord.RichEmbed()
 					.setDescription(args.splice(1).join(" "))
@@ -115,7 +112,7 @@ module.exports = {
 		case "nick":
 		case "nickname": {
 			if (!args[1]) {
-				return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+				return message.channel.send("Invalid parameters!");
 			} else {
 				let nickEmbed = new Discord.RichEmbed()
 					.setDescription(args.splice(1).join(" "))
@@ -129,7 +126,7 @@ module.exports = {
 		case "av":
 		case "picture": {
 			if (!args[0]) {
-				return message.channel.send("Invalid parameters!", core.helpEmbed("botconfig"));
+				return message.channel.send("Invalid parameters!");
 			} else {
 				let avatarEmbed = new Discord.RichEmbed()
 					.setImage(client.user.displayAvatarURL)

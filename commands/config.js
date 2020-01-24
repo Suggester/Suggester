@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		permission: 2,
 		aliases: ["serverconfig", "cfg", "configure"],
-		usage: "config <admin|staff|review|suggestions|denied|prefix|mode>`\n\n**admin**: <add|remove> <role name or @mention>\n**staff**: <add|remove> <role name or @mention>\n**review**: <channel id or #mention>\n**suggestions**: <channel id or #mention>\n**denied**: <channel id or #mention>\n**prefix**: <new prefix>\n**mode**: <reviewcmd|autoapprove>",
+		usage: "config (element) (additional parameters)",
 		description: "Shows/edits server configuration",
 		enabled: true,
 		docs: "admin/config",
@@ -297,6 +297,7 @@ module.exports = {
 			let prefix = args[1];
 			let disallowed = ["suggester:", `${client.user.id}:`];
 			if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different prefix.`);
+			if (prefix.length > 20) return message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${prefix.toLowerCase()}**`);
@@ -351,7 +352,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiUp;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiUp = emoji.find(args[2]).emoji;
+					inputEmojiUp = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let upsplit1 = args[2].split(":");
 					let upid = upsplit1[upsplit1.length - 1].split(">")[0];
@@ -375,7 +376,7 @@ module.exports = {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiMid;
 				if (nodeEmoji.find(args[2])) {
-					inputEmojiMid = emoji.find(args[2]).emoji;
+					inputEmojiMid = nodeEmoji.find(args[2]).emoji;
 				} else {
 					let midsplit1 = args[2].split(":");
 					let midid = midsplit1[midsplit1.length - 1].split(">")[0];

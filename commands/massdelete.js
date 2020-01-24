@@ -48,7 +48,10 @@ module.exports = {
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
-		if (reasonSplit[1]) reason = reasonSplit[1].split(" ").splice(1).join(" ");
+		if (reasonSplit[1]) {
+			reason = reasonSplit[1].split(" ").splice(1).join(" ");
+			if (reason.length > 1024) return message.channel.send(`<:${config.emoji.x}> Deletion reasons cannot be longer than 1024 characters.`);
+		}
 		let suggestions = reasonSplit[0].split(" ");
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();

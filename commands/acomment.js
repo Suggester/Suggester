@@ -72,6 +72,8 @@ module.exports = {
 
 		let comment = args.splice(1).join(" ");
 
+		if (comment.length > 1024) return message.channel.send(`<:${emoji.x}> Comments cannot be longer than 1024 characters.`);
+
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: 0,
