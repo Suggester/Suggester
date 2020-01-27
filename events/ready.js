@@ -10,8 +10,8 @@ module.exports = async (Discord, client) => {
 	//Bot List Posting
 	if (release === "stable") {
 		const request = require("request");
-		let serverCount = 533;
-		let userCount = 171432;
+		let serverCount = client.guilds.size;
+		let userCount = client.users.size;
 		//Botlist.Space
 		let blsoptions = {
 			url: "https://api.botlist.space/v1/bots/564426594144354315",
