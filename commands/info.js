@@ -123,12 +123,14 @@ module.exports = {
 
 			if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
-			let opinion = upCount - downCount;
-			opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
-			embed.addField("Upvotes", upCount.toString(), true)
-				.addField("Downvotes", downCount.toString(), true)
-				.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
-			break;
+			if (!isNaN(upCount) && !isNaN(downCount)) {
+				let opinion = upCount - downCount;
+				opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
+				embed.addField("Upvotes", upCount.toString(), true)
+					.addField("Downvotes", downCount.toString(), true)
+					.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+				break;
+			}
 		}
 
 		message.channel.send(embed);

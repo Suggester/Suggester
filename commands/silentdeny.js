@@ -87,7 +87,7 @@ module.exports = {
 				return message.channel.send(`<:${emoji.x}> This suggestion has been approved already! Use \`${qServerDB.config.prefix}delete ${id.toString()}\` to remove it.`);
 				break;
 			case "denied":
-				return message.channel.send(`<:${emoji.x}> This suggestion has already been denied! Previously denied suggestions cannot be approved.`);
+				return message.channel.send(`<:${emoji.x}> This suggestion has already been denied!`);
 				break;
 			}
 		}
