@@ -44,7 +44,7 @@ module.exports = {
 		qServerDB.config.staff_roles.forEach(roleId => {
 			if (member.roles.has(roleId)) hasStaffRole = true;
 		});
-		if (hasStaffRole) return 2;
+		if (hasStaffRole) return 3;
 		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;
 		return 10;
 	},

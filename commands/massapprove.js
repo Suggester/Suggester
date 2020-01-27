@@ -117,6 +117,9 @@ module.exports = {
 		for (let s in approved) {
 			// eslint-disable-next-line no-prototype-builtins
 			if (approved.hasOwnProperty(s)) {
+				let suggester = client.users.get(approved[s].suggester)
+					|| client.fetchUser(approved[s].suggester);
+
 				let msg = await client.channels.get(qServerDb.config.channels.suggestions)
 					.send(await core.suggestionEmbed(approved[s], qServerDb, client));
 
@@ -128,12 +131,10 @@ module.exports = {
 						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${qServerDb.id}/${qServerDb.config.channels.suggestions}/${msg.id})`)
 						.setColor("#2ecc71");
 					if (reason) dmEmbed.addField("Comment Added", reason);
-					let suggester = client.users.get(approved[s].suggester)
-						|| client.fetchUser(approved[s].suggester);
 
 					await suggester.send(dmEmbed)
 						.catch((err) => {
-							throw err;
+							console.log(err);
 						});
 				}
 
@@ -150,7 +151,7 @@ module.exports = {
 
 				let updateEmbed = new Discord.RichEmbed()
 					.setTitle("Suggestion Awaiting Review (#" + approved[s].suggestionId + ")")
-					.setAuthor(`${message.author.tag} (ID: ${message.author.id})`, message.author.displayAvatarURL)
+					.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
 					.setDescription(approved[s].suggestion)
 					.setColor("#2ecc71")
 					.addField("A change was processed on this suggestion", "This suggestion has been approved");

@@ -300,7 +300,7 @@ module.exports = {
 			if (prefix.length > 20) return message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${prefix.toLowerCase()}**`);
+			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
 		case "mode":
 			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
 			switch (args[1].toLowerCase()) {
@@ -639,7 +639,7 @@ module.exports = {
 				issuesCountFatal++;
 			}
 			// Prefix
-			cfgArr.push(`<:${emoji.check}> **Prefix:** ${qServerDB.config.prefix}`);
+			cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
 			qServerDB.config.notify ? cfgArr.push(`<:${emoji.check}> **Notifications:** All suggestion actions DM the suggesting user`) : cfgArr.push(`<:${emoji.check}> **Notifications:** Suggestion actions do not DM the suggesting user`);
 

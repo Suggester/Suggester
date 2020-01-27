@@ -30,7 +30,7 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
-		if (client.channels.get(qServerDb.config.channels.staff)) {
+		if (qServerDb.config.channels.staff && client.channels.get(qServerDb.config.channels.staff)) {
 			let perms = core.channelPermissions(client.channels.get(qServerDb.config.channels.staff).memberPermissions(client.user.id), "staff", client);
 			if (perms.length > 0) {
 				let embed = new Discord.RichEmbed()
@@ -115,7 +115,7 @@ module.exports = {
 					if (reason) dmEmbed.addField("Reason Given", reason);
 					await suggester.send(dmEmbed)
 						.catch((err) => {
-							throw err;
+							console.log(err);
 						});
 				}
 				if (qServerDb.config.channels.log) {

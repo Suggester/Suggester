@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../config.json");
-const { dbQuery, dbModify, serverLog } = require("../coreFunctions.js");
+const { dbQuery, dbModify, serverLog, checkPermissions } = require("../coreFunctions.js");
 module.exports = {
 	controls: {
 		permission: 3,
@@ -47,6 +47,10 @@ module.exports = {
 
 		let member = message.mentions.members.first() || message.guild.members.find((user) => user.id === args[0]);
 		if (!member) return message.channel.send(`<:${emoji.x}> I couldn't find a member of this server based on your input. Make sure to specify a **user @mention** or **user ID**.`);
+
+		if (member.user.bot) return message.channel.send(`<:${emoji.x}> This user is a bot, and therefore cannot be blacklisted.`);
+		let memberPermission = await checkPermissions(member, client);
+		if (memberPermission < 3) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a staff member.`);
 
 		if (qServerDB.config.blacklist.includes(member.id)) return message.channel.send(`<:${emoji.x}> This user is already blacklisted from using the bot on this server!`);
 		qServerDB.config.blacklist.push(member.id);

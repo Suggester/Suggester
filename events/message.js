@@ -14,8 +14,8 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
 	let prefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || config.prefix;
 
-	let possiblementions = [`<@${client.user.id}> help`, `<@${client.user.id}>help`, `<@!${client.user.id}> help`, `<@!${client.user.id}>help`, `<@${client.user.id}> prefix`, `<@${client.user.id}>prefix`, `<@!${client.user.id}> prefix`, `<@!${client.user.id}>prefix`];
-	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is **${prefix}**\nYou can read more about my commands at https://suggester.gitbook.io/`);
+	let possiblementions = [`<@${client.user.id}> help`, `<@${client.user.id}>help`, `<@!${client.user.id}> help`, `<@!${client.user.id}>help`, `<@${client.user.id}> prefix`, `<@${client.user.id}>prefix`, `<@!${client.user.id}> prefix`, `<@!${client.user.id}>prefix`, `<@${client.user.id}> ping`, `<@${client.user.id}>ping`, `<@!${client.user.id}> ping`, `<@!${client.user.id}>ping`];
+	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is ${Discord.escapeMarkdown(prefix)}\nYou can read more about my commands at https://suggester.gitbook.io/`);
 
 	if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) prefix = "suggester:";
 	if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) prefix = `${client.user.id}:`;
