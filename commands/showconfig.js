@@ -169,7 +169,7 @@ module.exports = {
 			issuesCountFatal++;
 		}
 		// Prefix
-		cfgArr.push(`<:${emoji.check}> **Prefix:** ${qServerDB.config.prefix}`);
+		cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 		// Notify
 		qServerDB.config.notify ? cfgArr.push(`<:${emoji.check}> **Notifications:** All suggestion actions DM the suggesting user`) : cfgArr.push(`<:${emoji.check}> **Notifications:** Suggestion actions do not DM the suggesting user`);
 
