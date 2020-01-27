@@ -57,10 +57,7 @@ module.exports = class Persist {
 	 * @returns {JSON} Entire document
 	 */
 	get getData () {
-		return readFileSync(this.path, "utf8")
-			.catch((err) => {
-				throw new Error(err);
-			});
+		return readFileSync(this.path, "utf8");
 	}
 
 	/**
