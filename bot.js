@@ -54,39 +54,7 @@ connection.on("open", () => {
 connection.on("error", (err) => {
 	console.error("Connection error: ", err);
 });
-/*
-const DBL = require("dblapi.js");
-const dbl = new DBL(process.env.DBL_TOKEN, client);
 
-// Optional events
-dbl.on("posted", () => {
-	core.coreLog(":hash: **Server Count Posted to Discord Bot List (.org)**", client);
-});
-
-dbl.on("error", e => {
-	core.coreLog(`:rotating_light: **DBL (.org) ERROR** \n\`\`\`${e}\`\`\``, client);
-});
-*/
-/*
-const Enmap = require("enmap");
-
-if (!client.suggestions) {
-	client.suggestions = new Enmap({
-		name: "suggestions"
-	});
-}
-
-if (!client.servers) {
-	client.servers = new Enmap({
-		name: "servers"
-	});
-}
-if (!client.core) {
-	client.core = new Enmap({
-		name: "core"
-	});
-}
-*/
 fs.readdir("./events/", (err, files) => {
 	files.forEach(file => {
 		const eventHandler = require(`./events/${file}`);
