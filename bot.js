@@ -14,14 +14,8 @@ const client = new Discord.Client({disabledEvents:[
 	"GUILD_ROLE_UPDATE",
 	"GUILD_BAN_ADD",
 	"GUILD_BAN_REMOVE",
-	"CHANNEL_CREATE",
-	"CHANNEL_DELETE",
-	"CHANNEL_UPDATE",
 	"CHANNEL_PINS_UPDATE",
-	"MESSAGE_DELETE",
 	"MESSAGE_DELETE_BULK",
-	"MESSAGE_REACTION_ADD",
-	"MESSAGE_REACTION_REMOVE",
 	"MESSAGE_REACTION_REMOVE_ALL",
 	"USER_UPDATE",
 	"USER_NOTE_UPDATE",
@@ -54,39 +48,7 @@ connection.on("open", () => {
 connection.on("error", (err) => {
 	console.error("Connection error: ", err);
 });
-/*
-const DBL = require("dblapi.js");
-const dbl = new DBL(process.env.DBL_TOKEN, client);
 
-// Optional events
-dbl.on("posted", () => {
-	core.coreLog(":hash: **Server Count Posted to Discord Bot List (.org)**", client);
-});
-
-dbl.on("error", e => {
-	core.coreLog(`:rotating_light: **DBL (.org) ERROR** \n\`\`\`${e}\`\`\``, client);
-});
-*/
-/*
-const Enmap = require("enmap");
-
-if (!client.suggestions) {
-	client.suggestions = new Enmap({
-		name: "suggestions"
-	});
-}
-
-if (!client.servers) {
-	client.servers = new Enmap({
-		name: "servers"
-	});
-}
-if (!client.core) {
-	client.core = new Enmap({
-		name: "core"
-	});
-}
-*/
 fs.readdir("./events/", (err, files) => {
 	files.forEach(file => {
 		const eventHandler = require(`./events/${file}`);
