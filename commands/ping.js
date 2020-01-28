@@ -1,4 +1,5 @@
-const { colors, developer, version } = require("../config.json");
+const { colors, developer } = require("../config.json");
+const { core } = require("../persistent.json");
 const humanizeDuration = require("humanize-duration");
 const ms = require("ms");
 module.exports = {
@@ -24,7 +25,7 @@ module.exports = {
 			.addField("Guild Count", client.guilds.size)
 			.addField("Uptime", humanizeDuration(client.uptime))
 			.addField("Client Ping", client.ping + " ms")
-			.setFooter(`${client.user.tag} v${version}`, client.user.displayAvatarURL)
+			.setFooter(`${client.user.tag} v${core.version}`, client.user.displayAvatarURL)
 			.setThumbnail(client.user.displayAvatarURL)
 			.setColor(colors.default);
 		message.reply("👋 Hi there! Here's some info:", embed).then((sent) => {

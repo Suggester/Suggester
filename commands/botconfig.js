@@ -135,6 +135,15 @@ module.exports = {
 				return message.channel.send("👤 Avatar set!", avatarEmbed);
 			}
 		}
+		case "version": {
+			if (!args[1]) return message.channel.send("Invalid parameters!");
+			else {
+				persistent.save("core", {
+					"version": args[1]
+				});
+				return message.channel.send(`Bot version set to ${args[1]}. Initiate a reboot to see this change take effect.`);
+			}
+		}
 		}
 	}
 };
