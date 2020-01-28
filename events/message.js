@@ -6,6 +6,7 @@ const { emoji, colors, prefix } = require("../config.json");
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
 		if (message.channel.type === "dm" && client.user.id !== message.author.id) return core.coreLog(":e_mail: **" + message.author.tag + "** (" + message.author.id + ") sent a DM to the bot:\n" + message.content, client);
+		return;
 	}
 	if (message.author.bot === true) return;
 
