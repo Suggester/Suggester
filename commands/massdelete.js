@@ -108,7 +108,7 @@ module.exports = {
 
 				if (qServerDb.config.notify) {
 					let dmEmbed = new Discord.RichEmbed()
-						.setTitle("Your suggestion was deleted")
+						.setTitle(`Your suggestion in **${message.guild.name}** was deleted`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
 						.setDescription(denied[s].suggestion)
 						.setColor("#e74c3c");

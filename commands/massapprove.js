@@ -125,7 +125,7 @@ module.exports = {
 
 				if (qServerDb.config.notify) {
 					let dmEmbed = new Discord.RichEmbed()
-						.setTitle("Your suggestion was approved!")
+						.setTitle(`Your suggestion in **${message.guild.name}** was approved!`)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId}`)
 						.setDescription(approved[s].suggestion)
 						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${qServerDb.id}/${qServerDb.config.channels.suggestions}/${msg.id})`)
@@ -179,5 +179,3 @@ module.exports = {
 		}
 	}
 };
-
-
