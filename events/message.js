@@ -2,7 +2,7 @@
 const fs = require("fs");
 const core = require("../coreFunctions.js");
 const { dbQuery, dbModifyId, dbDeleteOne, dbModify } = require("../coreFunctions");
-const { emoji, colors, initial } = require("../config.json");
+const { emoji, colors, prefix } = require("../config.json");
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
 		if (message.channel.type === "dm" && client.user.id !== message.author.id) return core.coreLog(":e_mail: **" + message.author.tag + "** (" + message.author.id + ") sent a DM to the bot:\n" + message.content, client);
@@ -12,14 +12,14 @@ module.exports = async (Discord, client, message) => {
 	let permission = await core.checkPermissions(message.member, client);
 
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
-	let prefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || config.prefix;
+	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 	let possiblementions = [`<@${client.user.id}> help`, `<@${client.user.id}>help`, `<@!${client.user.id}> help`, `<@!${client.user.id}>help`, `<@${client.user.id}> prefix`, `<@${client.user.id}>prefix`, `<@!${client.user.id}> prefix`, `<@!${client.user.id}>prefix`, `<@${client.user.id}> ping`, `<@${client.user.id}>ping`, `<@!${client.user.id}> ping`, `<@!${client.user.id}>ping`];
-	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is ${Discord.escapeMarkdown(prefix)}\nYou can read more about my commands at https://suggester.gitbook.io/`);
+	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is ${Discord.escapeMarkdown(serverPrefix)}\nYou can read more about my commands at https://suggester.gitbook.io/`);
 
 	if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) prefix = "suggester:";
 	if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) prefix = `${client.user.id}:`;
-	if (!message.content.toLowerCase().startsWith(prefix)) return;
+	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	//Only commands after this point
 	//Check if message is a command
 	fs.readdir("./commands/", (err, files) => {
@@ -28,7 +28,7 @@ module.exports = async (Discord, client, message) => {
 			const command = require("../commands/" + commandName); //Command file
 			let args = message.content.split(" ").splice(1);
 
-			let commandText = message.content.split(" ")[0].toLowerCase().split(prefix)[1]; //Input command
+			let commandText = message.content.split(" ")[0].toLowerCase().split(serverPrefix)[1]; //Input command
 			if (commandText === commandName || (command.controls.aliases && command.controls.aliases.includes(commandText))) { //Check if command matches
 				if (permission > command.controls.permission) {
 					core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.\nFull Content: \`${message.content}\``, client);
