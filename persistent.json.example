@@ -3,5 +3,8 @@
     "type": "WATCHING",
     "activity": "suggestions!",
     "status": "online"
+  },
+  "core": {
+      "version": "3.0.2"
   }
 }
