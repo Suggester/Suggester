@@ -102,7 +102,7 @@ module.exports = {
 					|| client.fetchUser(denied[s].suggester);
 				if (qServerDb.config.notify) {
 					let dmEmbed = new Discord.RichEmbed()
-						.setTitle("Your suggestion was denied")
+						.setTitle(`Your suggestion in **${message.guild.name}** was denied`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
 						.setDescription(denied[s].suggestion)
 						.setColor("#e74c3c");

@@ -644,7 +644,7 @@ module.exports = {
 			qServerDB.config.notify ? cfgArr.push(`<:${emoji.check}> **Notifications:** All suggestion actions DM the suggesting user`) : cfgArr.push(`<:${emoji.check}> **Notifications:** Suggestion actions do not DM the suggesting user`);
 
 			let cfgEmbed = new Discord.RichEmbed()
-				.setTitle(`Server Configuration for ${server.name}`)
+				.setTitle(`Server Configuration for **${server.name}**`)
 				.setDescription(cfgArr.join("\n"));
 			if (issuesCountFatal > 0) {
 				cfgEmbed.setColor(colors.red)
