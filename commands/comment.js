@@ -103,7 +103,7 @@ module.exports = {
 
 		if (qServerDB.config.notify) {
 			let dmEmbed = new Discord.RichEmbed()
-				.setTitle("A comment was added to your suggestion!")
+				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
 				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField(`Official Comment from ${message.author.tag}`, comment)
 				.setColor(colors.blue)

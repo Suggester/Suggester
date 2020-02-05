@@ -120,7 +120,7 @@ module.exports = {
 
 		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify) {
 			let dmEmbed = new Discord.RichEmbed()
-				.setTitle("The status of your suggestion has been edited!")
+				.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
 				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField("Status", statusInfo[1])
 				.setColor(statusInfo[0])

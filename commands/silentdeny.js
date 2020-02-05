@@ -119,7 +119,7 @@ module.exports = {
 
 		if (qServerDB.config.notify) {
 			let dmEmbed = new Discord.RichEmbed()
-				.setTitle("Your Suggestion Was Denied")
+				.setTitle(`Your Suggestion in **${message.guild.name}** Was Denied`)
 				.setFooter(`Suggestion ID: ${id.toString()}`)
 				.setDescription(qSuggestionDB.suggestion)
 				.setColor(colors.red);

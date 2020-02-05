@@ -136,7 +136,7 @@ module.exports = {
 			});
 			if (qServerDB.config.notify) {
 				let dmEmbed = new Discord.RichEmbed()
-					.setTitle("Your Suggestion Was Approved!")
+					.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 					.setFooter(`Suggestion ID: ${id.toString()}`)
 					.setDescription(qSuggestionDB2.suggestion)
 					.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB2.id}/${qServerDB.config.channels.suggestions}/${posted.id})`)
