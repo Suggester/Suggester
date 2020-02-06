@@ -24,12 +24,14 @@ module.exports = async (Discord, client, message) => {
 	//Only commands after this point
 	//Check if message is a command
 	fs.readdir("./commands/", (err, files) => {
+		//Input command
+		const commandText = message.content.slice(serverPrefix.length).split(" ")[0].toLowerCase();
+
 		files.forEach(file => {
 			const commandName = file.split(".")[0]; //Command to check against
 			const command = require("../commands/" + commandName); //Command file
 			let args = message.content.split(" ").splice(1);
 
-			let commandText = message.content.split(" ")[0].toLowerCase().split(serverPrefix)[1]; //Input command
 			if (commandText === commandName || (command.controls.aliases && command.controls.aliases.includes(commandText))) { //Check if command matches
 				if (permission > command.controls.permission) {
 					core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.\nFull Content: \`${message.content}\``, client);
