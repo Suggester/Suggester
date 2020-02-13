@@ -64,7 +64,7 @@ module.exports = {
 
 		let id = qSuggestionDB.suggestionId;
 
-		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
+		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Attachments can only be added to approved suggestions!`);
 
 		if (qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
 
