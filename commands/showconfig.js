@@ -1,6 +1,7 @@
 const { emoji, colors } = require("../config.json");
 const { dbQueryNoNew, dbModify } = require("../coreFunctions.js");
 const nodeEmoji = require("node-emoji");
+const permissions = require("../utils/permissions");
 module.exports = {
 	controls: {
 		permission: 1,
@@ -36,7 +37,7 @@ module.exports = {
 					qServerDB.config.admin_roles.splice(index, 1);
 				}
 			});
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			await dbModify("Server", {id: server.id}, qServerDB);
 			cfgArr.push(`<:${emoji.check}> **Admin Roles:** ${adminRoleList.join(", ")}`);
 		}
 		// Staff roles
@@ -53,7 +54,7 @@ module.exports = {
 					qServerDB.config.staff_roles.splice(index, 1);
 				}
 			});
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			await dbModify("Server", {id: server.id}, qServerDB);
 			cfgArr.push(`<:${emoji.check}> **Staff Roles:** ${staffRoleList.join(", ")}`);
 		}
 		// Staff review channel
@@ -186,6 +187,13 @@ module.exports = {
 			cfgEmbed.setColor(colors.green)
 				.addField("Config Status", `<:${emoji.check}> Fully Configured`);
 		}
+
+		let hasPermissionList = [];
+		Object.keys(permissions).forEach(perm => {
+			server.me.permissions.has(perm) ? hasPermissionList.push(permissions[perm]) : "";
+		});
+
+		cfgEmbed.addField("Bot Permissions", hasPermissionList.join(", "));
 		return message.channel.send(cfgEmbed);
 	}
 };
