@@ -9,7 +9,7 @@ module.exports = {
 		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
-	do: async (message, client) => {
+	do: async message => {
 		await message.channel.send("Shutting down...");
 		await coreLog(`🔌 ${message.author.tag} (\`${message.author.id}\`) initiated a reboot`);
 		return process.exit(0);

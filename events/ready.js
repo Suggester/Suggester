@@ -1,8 +1,8 @@
-module.exports = async (Discord, client) => {
-	const {presence} = require("../persistent");
-	const {coreLog, dbQueryAll, dbQuery} = require("../coreFunctions.js");
-	const {release} = require("../config.json");
+const { presence } = require("../persistent");
+const { coreLog } = require("../coreFunctions.js");
+const { release } = require("../config.json");
 
+module.exports = async (Discord, client) => {
 	coreLog(`:ok: Logged in with ${client.guilds.size} servers!`, client);
 	console.log(`Logged in as ${client.user.tag}! (Release: ${release})`);
 	client.user.setActivity(presence.activity || "", {type: presence.type || "PLAYING"});
@@ -27,13 +27,13 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function blscallback(error, response, body) {
+
+		request(blsoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to botlist.space!");
 			}
-		}
+		});
 
-		request(blsoptions, blscallback);
 		//Glenn Bot List
 		let gbloptions = {
 			url: "https://glennbotlist.xyz/api/v2/bot/564426594144354315/stats",
@@ -47,13 +47,14 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function gblcallback(error, response, body) {
+
+
+		request(gbloptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to glennbotlist.xyz!");
 			}
-		}
+		});
 
-		request(gbloptions, gblcallback);
 		//Top.gg
 		let topggoptions = {
 			url: "https://top.gg/api/bots/564426594144354315/stats",
@@ -67,13 +68,12 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function topggcallback(error, response, body) {
+		request(topggoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to top.gg!");
 			}
-		}
+		});
 
-		request(topggoptions, topggcallback);
 		//Bots For Discord
 		let bfdoptions = {
 			url: "https://botsfordiscord.com/api/bot/564426594144354315",
@@ -88,13 +88,12 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function bfdcallback(error, response, body) {
+		request(bfdoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to botsfordiscord.com!");
 			}
-		}
+		});
 
-		request(bfdoptions, bfdcallback);
 		//Discord Bot List
 		let dbloptions = {
 			url: "https://discordbotlist.com/api/bots/564426594144354315/stats",
@@ -110,13 +109,12 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function dblcallback(error, response, body) {
+		request(dbloptions, (error, response) => {
 			if (!error && response.statusCode === 204) {
 				console.log("Server statistics posted to discordbotlist.com!");
 			}
-		}
+		});
 
-		request(dbloptions, dblcallback);
 		//Discord Boats
 		let dboatsoptions = {
 			url: "https://discord.boats/api/bot/564426594144354315",
@@ -131,13 +129,11 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function dboatscallback(error, response, body) {
+		request(dboatsoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to discord.boats!");
 			}
-		}
-
-		request(dboatsoptions, dboatscallback);
+		});
 
 		//Discord Bots
 		let dbotsoptions = {
@@ -153,13 +149,11 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function dbotscallback(error, response, body) {
+		request(dbotsoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to discord.bots.gg!");
 			}
-		}
-
-		request(dbotsoptions, dbotscallback);
+		});
 		//Divine Discord Bot List
 		let divineoptions = {
 			url: "https://divinediscordbots.com/bot/564426594144354315/stats",
@@ -174,12 +168,10 @@ module.exports = async (Discord, client) => {
 			}
 		};
 
-		function divinecallback(error, response, body) {
+		request(divineoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to divinediscordbots.com!");
 			}
-		}
-
-		request(divineoptions, divinecallback);
+		});
 	}
 };

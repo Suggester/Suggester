@@ -82,7 +82,7 @@ module.exports = {
 					}
 					count++;
 				});
-				message.channel.send(embed).then(m => message.channel.send(embed2));
+				message.channel.send(embed).then(() => message.channel.send(embed2));
 			} else {
 				let embed = new Discord.RichEmbed()
 					.setColor(colors.yellow)
@@ -105,7 +105,7 @@ module.exports = {
 				});
 
 				if (notShown > 0) embed2.addField("List Truncated", `There are ${notShown.toString()} other suggestions awaiting review. Only 49 are shown on this list.`);
-				message.channel.send(embed).then(m => message.channel.send(embed2));
+				message.channel.send(embed).then(() => message.channel.send(embed2));
 			}
 
 		}
