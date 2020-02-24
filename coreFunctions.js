@@ -140,7 +140,7 @@ module.exports = {
 
 		return embed;
 	},
-	channelPermissions: (permissions, type, client) => {
+	channelPermissions: (permissions, type) => {
 		const permissionNames = require("./utils/permissions.json");
 		let required = [];
 		let list = [];
@@ -153,7 +153,6 @@ module.exports = {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
 			});
 			return list;
-			break;
 		case "staff":
 			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
 			list = [];
@@ -161,7 +160,6 @@ module.exports = {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
 			});
 			return list;
-			break;
 		case "denied":
 			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
 			list = [];
@@ -169,7 +167,6 @@ module.exports = {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
 			});
 			return list;
-			break;
 		case "log":
 			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
 			list = [];
@@ -177,7 +174,6 @@ module.exports = {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
 			});
 			return list;
-			break;
 		}
 	},
 	/**

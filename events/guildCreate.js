@@ -1,4 +1,4 @@
-const { dbQuery, dbQueryAll, guildLog } = require("../coreFunctions.js");
+const { dbQuery, guildLog } = require("../coreFunctions.js");
 const { release } = require("../config.json");
 module.exports = async (Discord, client, guild) => {
 	let qServerDB = await dbQuery("Server", { id: guild.id });

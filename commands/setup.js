@@ -1,5 +1,5 @@
 const { emoji, colors } = require("../config.json");
-const { dbQuery, dbModify, dbModifyId, dbQueryNoNew, channelPermissions } = require("../coreFunctions.js");
+const { dbQuery, dbModify, dbQueryNoNew, channelPermissions } = require("../coreFunctions.js");
 module.exports = {
 	controls: {
 		permission: 2,
@@ -10,10 +10,10 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"]
 	},
 	do: async (message, client, args, Discord) => {
-		async function setup (through, add)  {
+		async function setup (through)  {
 			let qServerDB = await dbQuery("Server", {id: message.guild.id});
 			switch (through) {
-			case 0:
+			case 0: {
 				//Server Admin role
 				let adminRolesEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
@@ -60,7 +60,8 @@ module.exports = {
 						});
 				});
 				break;
-			case 1:
+			}
+			case 1: {
 				let staffRolesEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("Any member with a server staff role can use all staff commands to manage suggestions.")
@@ -107,7 +108,8 @@ module.exports = {
 						});
 				});
 				break;
-			case 2:
+			}
+			case 2: {
 				//Mode
 				let modeEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
@@ -130,11 +132,10 @@ module.exports = {
 								message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **review**.`);
 								setup(3);
 								return;
-								break;
 							case "autoapprove":
 							case "auto-approve":
 							case "auto_approve":
-							case "auto":
+							case "auto": {
 								let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: message.guild.id});
 								if (suggestionsAwaitingReview) {
 									message.channel.send(`<:${emoji.x}> All suggestions awaiting review must be cleared before the autoapprove mode is set.`);
@@ -147,7 +148,7 @@ module.exports = {
 								message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **autoapprove**.`);
 								setup(3);
 								return;
-								break;
+							}
 							default:
 								message.channel.send(`<:${emoji.x}> Please specify a valid mode.`);
 								setup(2);
@@ -160,7 +161,8 @@ module.exports = {
 				});
 
 				break;
-			case 3:
+			}
+			case 3: {
 				//Suggestion channel
 				let suggestionChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
@@ -202,6 +204,7 @@ module.exports = {
 						});
 				});
 				break;
+			}
 			case 4:
 				//Review channel (if mode is review)
 				if (qServerDB.config.mode === "review") {
@@ -248,7 +251,7 @@ module.exports = {
 					return setup(5);
 				}
 				break;
-			case 5:
+			case 5: {
 				//Denied channel
 				let deniedChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
@@ -295,7 +298,8 @@ module.exports = {
 						});
 				});
 				break;
-			case 6:
+			}
+			case 6: {
 				//Logs
 				let logChannelEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
@@ -341,7 +345,7 @@ module.exports = {
 								message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the log channel.`);
 								setup(7);
 								return;
-							}).catch(err => {
+							}).catch(() => {
 								message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
 								setup(6);
 								return;
@@ -352,12 +356,13 @@ module.exports = {
 						});
 				});
 				break;
-			case 7:
+			}
+			case 7: {
 				//Prefix
 				let prefixEmbed = new Discord.RichEmbed()
 					.setColor(colors.default)
 					.setDescription("This is the text you put before the command to trigger the bot.")
-					.addField("Inputs", `Any string with no spaces`, false);
+					.addField("Inputs", "Any string with no spaces", false);
 				message.channel.send("**SETUP: Prefix**", prefixEmbed).then(msg => {
 					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
 						max: 1,
@@ -384,7 +389,8 @@ module.exports = {
 						});
 				});
 				break;
-			case 8:
+			}
+			case 8: {
 				let doneEmbed = new Discord.RichEmbed()
 					.setTitle("Setup Complete!")
 					.setColor(colors.default)
@@ -392,6 +398,7 @@ module.exports = {
 					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.gitbook.io/docs/admin/config for more information.");
 				message.channel.send(doneEmbed);
 				break;
+			}
 			}
 		}
 

@@ -85,7 +85,7 @@ module.exports = {
 			}
 			case "list": {
 				if (!qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) {
-					return message.channel.send(`**Admin Roles:** None Configured`);
+					return message.channel.send("**Admin Roles:** None Configured");
 				} else {
 					let adminRoleList = [];
 					qServerDB.config.admin_roles.forEach(roleId => {
@@ -104,7 +104,7 @@ module.exports = {
 				if (args[1]) return message.channel.send("Please specify either `add`, `remove` or `list`.");
 				else {
 					if (!qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) {
-						return message.channel.send(`**Admin Roles:** None Configured`);
+						return message.channel.send("**Admin Roles:** None Configured");
 					} else {
 						let adminRoleList = [];
 						qServerDB.config.admin_roles.forEach(roleId => {
@@ -121,7 +121,6 @@ module.exports = {
 				}
 			}
 			}
-			break;
 		}
 		case "staff":
 		case "reviewrole": {
@@ -152,7 +151,7 @@ module.exports = {
 			}
 			case "list": {
 				if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) {
-					return message.channel.send(`**Staff Roles:** None Configured`);
+					return message.channel.send("**Staff Roles:** None Configured");
 				} else {
 					let staffRoleList = [];
 					qServerDB.config.staff_roles.forEach(roleId => {
@@ -171,7 +170,7 @@ module.exports = {
 				if (args[1]) return message.channel.send("Please specify either `add`, `remove` or `list`.");
 				else {
 					if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) {
-						return message.channel.send(`**Staff Roles:** None Configured`);
+						return message.channel.send("**Staff Roles:** None Configured");
 					} else {
 						let staffRoleList = [];
 						qServerDB.config.staff_roles.forEach(roleId => {
@@ -188,10 +187,10 @@ module.exports = {
 				}
 			}
 			}
-			break;
 		}
 		case "review":
-		case "reviewchannel": //Legacy from V1
+		case "reviewchannel": {
+			//Legacy from V1
 			if (!args[1]) {
 				qServerDB.config.channels.staff ? message.channel.send(`The suggestion review channel is currently configured to <#${qServerDB.config.channels.staff}>`) : message.channel.send("This server has no suggestion review channel set!");
 				return;
@@ -211,8 +210,10 @@ module.exports = {
 			qServerDB.config.channels.staff = reviewChannel.id;
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set <#${reviewChannel.id}> as the suggestion review channel.`);
+		}
 		case "suggestions":
-		case "suggestionschannel": //Legacy from V1
+		case "suggestionschannel": {
+			//Legacy from V1
 			if (!args[1]) {
 				qServerDB.config.channels.suggestions ? message.channel.send(`The approved suggestions channel is currently configured to <#${qServerDB.config.channels.staff}>`) : message.channel.send("This server has no approved suggestions channel set!");
 				return;
@@ -232,8 +233,10 @@ module.exports = {
 			qServerDB.config.channels.suggestions = suggestionChannel.id;
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set <#${suggestionChannel.id}> as the approved suggestions channel.`);
+		}
 		case "denied":
-		case "deniedchannel": //Legacy from V1
+		case "deniedchannel": {
+			//Legacy from V1
 			if (!args[1]) {
 				qServerDB.config.channels.denied ? message.channel.send(`The denied suggestions channel is currently configured to <#${qServerDB.config.channels.denied}>`) : message.channel.send("This server has no denied suggestions channel set!");
 				return;
@@ -258,9 +261,11 @@ module.exports = {
 			qServerDB.config.channels.denied = deniedChannel.id;
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set <#${deniedChannel.id}> as the denied suggestions channel.`);
+		}
 		case "log":
 		case "logs":
-		case "logchannel": //Legacy from V1
+		case "logchannel": {
+			//Legacy from V1
 			if (!args[1]) {
 				qServerDB.config.channels.log ? message.channel.send(`The log channel is currently configured to <#${qServerDB.config.channels.log}>`) : message.channel.send("This server has no log channel set!");
 				return;
@@ -288,11 +293,12 @@ module.exports = {
 				qServerDB.config.channels.log = logChannel.id;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set <#${logChannel.id}> as the log channel.`);
-			}).catch(err => {
+			}).catch(() => {
 				return message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
 			});
 			break;
-		case "prefix":
+		}
+		case "prefix": {
 			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
 			let prefix = args[1];
 			let disallowed = ["suggester:", `${client.user.id}:`];
@@ -301,39 +307,39 @@ module.exports = {
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
-		case "mode":
+		}
+		case "mode": {
 			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
 			switch (args[1].toLowerCase()) {
 			case "review":
 				qServerDB.config.mode = "review";
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **review**.`);
-				break;
 			case "autoapprove":
 			case "auto-approve":
 			case "auto_approve":
-			case "auto":
+			case "auto": {
 				let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: message.guild.id});
 				if (suggestionsAwaitingReview) return message.channel.send(`<:${emoji.x}> All suggestions awaiting review must be cleared before the autoapprove mode is set.`);
 				qServerDB.config.mode = "autoapprove";
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **autoapprove**.`);
-				break;
+			}
 			default:
 				return message.channel.send(`<:${emoji.x}> Please specify a valid mode (either \`review\` or \`autoapprove\`.`);
 			}
-			break;
+		}
 		case "emoji":
 		case "emotes":
 		case "emojis":
 		case "emote":
 		case "react":
-		case "reactions":
-			function checkEmoji(emoji) {
+		case "reactions": {
+			const checkEmoji = function(emoji) {
 				if (nodeEmoji.find(emoji)) return emoji;
 				else if (emoji.startsWith("a")) return `<${emoji}>`;
 				else return `<:${emoji}>`;
-			}
+			};
 
 			if (!args[1]) {
 				let reactEmbed = new Discord.RichEmbed()
@@ -348,7 +354,7 @@ module.exports = {
 			switch (args[1].toLowerCase()) {
 			case "up":
 			case "upvote":
-			case "yes":
+			case "yes": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiUp;
 				if (nodeEmoji.find(args[2])) {
@@ -369,10 +375,11 @@ module.exports = {
 				qServerDB.config.emojis.up = inputEmojiUp;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the upvote emoji for this server to ${checkEmoji(qServerDB.config.emojis.up)}.`);
+			}
 			case "shrug":
 			case "neutral":
 			case "middle":
-			case "mid":
+			case "mid": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiMid;
 				if (nodeEmoji.find(args[2])) {
@@ -393,9 +400,10 @@ module.exports = {
 				qServerDB.config.emojis.mid = inputEmojiMid;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the shrug/no opinion emoji for this server to ${checkEmoji(qServerDB.config.emojis.mid)}.`);
+			}
 			case "down":
 			case "downvote":
-			case "no":
+			case "no": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				let inputEmojiDown;
 				if (nodeEmoji.find(args[2])) {
@@ -416,6 +424,7 @@ module.exports = {
 				qServerDB.config.emojis.down = inputEmojiDown;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the downvote emoji for this server to ${checkEmoji(qServerDB.config.emojis.down)}.`);
+			}
 			case "enable":
 				if (!qServerDB.config.react) {
 					qServerDB.config.react = true;
@@ -424,7 +433,6 @@ module.exports = {
 				} else {
 					return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already enabled!`);
 				}
-				break;
 			case "disable":
 				if (qServerDB.config.react) {
 					qServerDB.config.react = false;
@@ -433,7 +441,6 @@ module.exports = {
 				} else {
 					return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already disabled!`);
 				}
-				break;
 			case "toggle":
 				if (qServerDB.config.react) {
 					qServerDB.config.react = false;
@@ -444,11 +451,10 @@ module.exports = {
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled suggestion feed reactions.`);
 				}
-				break;
 			default:
 				return message.channel.send("Please specify a valid emoji setting (`up`, `mid`, `down`, or `toggle`).");
 			}
-			break;
+		}
 		case "notify":
 			if (!args[1]) {
 				qServerDB.config.notify ? message.channel.send("DM notifications on suggestion changes are currently **enabled**.") : message.channel.send("DM notifications on suggestion changes are currently **disabled**.");
@@ -463,7 +469,6 @@ module.exports = {
 				} else {
 					return message.channel.send(`<:${emoji.x}> User notifications are already enabled!`);
 				}
-				break;
 			case "disable":
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
@@ -472,7 +477,6 @@ module.exports = {
 				} else {
 					return message.channel.send(`<:${emoji.x}> User notifications are already disabled!`);
 				}
-				break;
 			case "toggle":
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
@@ -483,9 +487,9 @@ module.exports = {
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
 				}
-				break;
 			}
-		case "list":
+			break;
+		case "list": {
 			let server = message.guild;
 
 			let cfgArr = [];
@@ -657,6 +661,7 @@ module.exports = {
 					.addField("Config Status", `<:${emoji.check}> Fully Configured`);
 			}
 			return message.channel.send(cfgEmbed);
+		}
 		default:
 			return message.channel.send(`<:${emoji.x}> Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.`);
 		}

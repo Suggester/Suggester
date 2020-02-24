@@ -1,7 +1,7 @@
 //this is a change
 const fs = require("fs");
 const core = require("../coreFunctions.js");
-const { dbQuery, dbModifyId, dbDeleteOne, dbModify } = require("../coreFunctions");
+const { dbQuery } = require("../coreFunctions");
 const { emoji, colors, prefix } = require("../config.json");
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
@@ -57,12 +57,12 @@ module.exports = async (Discord, client, message) => {
 								.addField("Missing Elements", `<:${emoji.x}> ${list.join(`\n<:${emoji.x}> `)}`)
 								.addField("How to Fix", `In the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
 								.setColor(colors.red);
-							return message.channel.send(embed).catch(err => {
+							return message.channel.send(embed).catch(() => {
 								message.author.send(`Your command \`${commandText}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`);
 							});
 						} else {
 							//Cannot embed
-							return message.channel.send(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${message.channel.id}> channel:\n - ${list.join("\n- ")}\nIn the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has the following permissions allowed.`).catch(err => {
+							return message.channel.send(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${message.channel.id}> channel:\n - ${list.join("\n- ")}\nIn the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has the following permissions allowed.`).catch(() => {
 								message.author.send(`Your command \`${commandText}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`);
 							});
 						}
@@ -70,11 +70,11 @@ module.exports = async (Discord, client, message) => {
 				}
 
 				try {
-					return command.do(message, client, args, Discord)
+					return command.do(message, client, args, Discord);
 				} catch (err) {
 					message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
 					core.errorLog(err, "Command Handler", `Message Content: ${message.content}`);
-				};
+				}
 			}
 		});
 	});

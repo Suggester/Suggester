@@ -70,6 +70,6 @@ module.exports = {
 
 		message.channel.send(`<:bean:657650134502604811> Beaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
 		member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed)
-			.catch(err => {});
+			.catch(() => {});
 	}
 };
