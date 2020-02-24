@@ -1,5 +1,8 @@
 const config = require("../config.json");
 
+/* eslint-disable-next-line no-unused-vars */
+const core = require("../coreFunctions.js");
+
 module.exports = {
 	controls: {
 		permission: 0,
@@ -9,7 +12,8 @@ module.exports = {
 		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
-	do: async (message, client, args) => {
+	/* eslint-disable-next-line no-unused-vars */
+	do: async (message, client, args, Discord) => {
 		const clean = (text) => {
 			if (typeof (text) === "string") {
 				return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
