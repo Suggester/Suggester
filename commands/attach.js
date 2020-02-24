@@ -1,6 +1,6 @@
 const { colors, emoji, prefix } = require("../config.json");
 const { dbQuery, dbModify, channelPermissions, dbQueryNoNew, serverLog, suggestionEmbed } = require("../coreFunctions.js");
-const validUrl = require('valid-url');
+const validUrl = require("valid-url");
 module.exports = {
 	controls: {
 		permission: 3,
@@ -64,7 +64,7 @@ module.exports = {
 
 		let id = qSuggestionDB.suggestionId;
 
-		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
+		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Attachments can only be added to approved suggestions!`);
 
 		if (qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
 
@@ -94,7 +94,7 @@ module.exports = {
 		await client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
 			messageEdited = true;
-		}).catch(err => messageEdited = false);
+		}).catch(() => messageEdited = false);
 
 		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 

@@ -9,7 +9,7 @@ module.exports = {
 		docs: "all/invite",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (message, client) => {
 		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=604367937>";
 		let stableId = "564426594144354315";
 		if (config.release === "stable") return message.reply(`You can invite Suggester to your server with this link: ${url.replace("[ID]", client.user.id)}`);

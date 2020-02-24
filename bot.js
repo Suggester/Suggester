@@ -1,3 +1,16 @@
+if (process.env.PROJECT_NAME && process.env.PORT) {
+	const http = require("http");
+	const express = require("express");
+	const app = express();
+	app.get("/", (request, response) => {
+		response.sendStatus(200);
+	});
+	app.listen(process.env.PORT);
+	setInterval(() => {
+		http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+	}, 280000);
+}
+
 const Discord = require("discord.js");
 const fs = require("fs");
 

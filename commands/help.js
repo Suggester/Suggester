@@ -44,7 +44,7 @@ module.exports = {
 						.addField("Usage", `\`${prefix}${commandInfo.usage}\``, true)
 						.setAuthor(`Command: ${commandName}`, "https://cdn.discordapp.com/attachments/654421515646795784/663738333398302770/9cfdac24571247cb012d11125397864e.png");
 
-					if (aliases) returnEmbed.addField("Aliases", commandInfo.aliases.join(", "))
+					if (aliases) returnEmbed.addField("Aliases", commandInfo.aliases.join(", "));
 					if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.gitbook.io/docs/${commandInfo.docs}`);
 					if (!commandInfo.enabled) returnEmbed.addField("Additional Information", "⚠️ This command is currently disabled");
 

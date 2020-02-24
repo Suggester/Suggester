@@ -114,3 +114,4 @@ build/
 commands/test.js
 utils/testSchemas.js
 /persistent.json
+watch.json

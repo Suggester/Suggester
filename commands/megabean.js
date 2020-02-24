@@ -1,5 +1,5 @@
 const { emoji } = require("../config.json");
-const { checkPermissions, dbModifyId, dbQuery } = require("../coreFunctions");
+const { dbModifyId, dbQuery } = require("../coreFunctions");
 module.exports = {
 	controls: {
 		permission: 0,
@@ -66,9 +66,7 @@ module.exports = {
 		await dbModifyId("User", message.author.id, { beans: { sent: senderSentBeanCount, received: senderReceivedBeanCount } });
 
 		message.channel.send(`<:hyperbean:666099809668694066> Megabeaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
-		member.user.send(`<:hyperbean:666099809668694066> **You have been megabeaned from ${message.guild.name}**`, beanSendEmbed).catch(err => {});
+		member.user.send(`<:hyperbean:666099809668694066> **You have been megabeaned from ${message.guild.name}**`, beanSendEmbed).catch(()=> {});
 
 	}
 };
-
-

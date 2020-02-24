@@ -46,7 +46,7 @@ module.exports = {
 		if (missingConfigs.length > 1) {
 			let embed = new Discord.RichEmbed();
 			embed.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${client.servers.get(message.guild.id, "prefix")}config\` command.`);
-			embed.addField("Missing Elements", `<:${config.emoji.x}> ${missingConfigs.join(`\n<:${config.emoji.x}> `)}`);
+			embed.addField("Missing Elements", `<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`);
 			embed.setColor("#e74c3c");
 			return message.channel.send(embed);
 		}
@@ -77,7 +77,7 @@ module.exports = {
 			embed.setColor(colors.yellow)
 				.addField("Internal Status", `Awaiting Staff Review ([Queue Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
-		case "denied":
+		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
 			embed.setColor(colors.red)
 				.addField("Internal Status", `Denied by ${denier.tag} (${denier.id})`);
@@ -85,7 +85,8 @@ module.exports = {
 				embed.addField("Denial Reason", qSuggestionDB.denial_reason);
 			}
 			break;
-		case "approved":
+		}
+		case "approved": {
 			if (qSuggestionDB.displayStatus) {
 				let statusArr = [];
 				switch (qSuggestionDB.displayStatus) {
@@ -119,7 +120,7 @@ module.exports = {
 					f.reactions.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.get(qSuggestionDB.emojis.down).count-1 : downCount = f.reactions.get(qSuggestionDB.emojis.down);
 				}
 				messageFetched = true;
-			}).catch(err => messageFetched = false);
+			}).catch(() => messageFetched = false);
 
 			if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
@@ -131,6 +132,7 @@ module.exports = {
 					.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
 				break;
 			}
+		}
 		}
 
 		message.channel.send(embed);

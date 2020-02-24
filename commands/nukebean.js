@@ -1,5 +1,5 @@
 const { emoji } = require("../config.json");
-const { checkPermissions, dbModifyId, dbQuery } = require("../coreFunctions");
+const { dbModifyId, dbQuery } = require("../coreFunctions");
 module.exports = {
 	controls: {
 		permission: 0,
@@ -79,8 +79,6 @@ module.exports = {
 
 		message.channel.send(`<:nukebean:666102191895085087> Nukebeaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
 		member.user.send(`<:nukebean:666102191895085087> **You have been nukebeaned from ${message.guild.name}**`, beanSendEmbed)
-			.catch(err => {});
+			.catch(() => {});
 	}
 };
-
-

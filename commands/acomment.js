@@ -89,7 +89,7 @@ module.exports = {
 		await client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
 			messageEdited = true;
-		}).catch(err => messageEdited = false);
+		}).catch(() => messageEdited = false);
 
 		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
@@ -105,7 +105,7 @@ module.exports = {
 			let dmEmbed = new Discord.RichEmbed()
 				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
 				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-				.addField(`Official Comment`, comment)
+				.addField("Official Comment", comment)
 				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
 			suggester.send(dmEmbed);

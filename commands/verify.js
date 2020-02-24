@@ -1,5 +1,5 @@
 const config = require("../config.json");
-var xEmoji = config.emoji.x;
+let xEmoji = config.emoji.x;
 const { dbQuery, checkPermissions } = require("../coreFunctions");
 module.exports = {
 	controls: {
@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		if (qServerDB && qServerDB.config.staff_roles && message.guild.members.get(id)) {
-			var staffRoles = 0;
+			let staffRoles = 0;
 			qServerDB.config.staff_roles.forEach((roleid) => {
 				if (message.guild.members.get(id).roles.has(roleid)) staffRoles++;
 			});
