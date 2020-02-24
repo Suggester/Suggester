@@ -1,5 +1,5 @@
 const { dbQuery, dbModify, channelPermissions, fetchUser, serverLog, suggestionEmbed, dbQueryNoNew } = require("../coreFunctions.js");
-const { emoji, colors } = require("../config.json");
+const { emoji, colors, prefix } = require("../config.json");
 module.exports = {
 	controls: {
 		permission: 3,
