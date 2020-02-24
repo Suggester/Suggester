@@ -488,6 +488,7 @@ module.exports = {
 					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
 				}
 			}
+			break;
 		case "list": {
 			let server = message.guild;
 
