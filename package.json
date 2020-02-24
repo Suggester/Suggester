@@ -3,7 +3,8 @@
   "description": "A bot that manages suggestions on Discord",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "lint": "eslint ."
   },
   "engines": {
     "node": "12.14.1"
