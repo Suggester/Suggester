@@ -25,8 +25,8 @@ module.exports = {
 		let totalSuggestionsServer = await dbQueryAll("Suggestion", {id: server.id});
 		let approvedSuggestionsServer = await dbQueryAll("Suggestion", {status: "approved", id: server.id});
 		let deniedSuggestionsServer = await dbQueryAll("Suggestion", {status: "denied", id: server.id});
-		let suggestionsUserGlobal = await dbQueryAll("Suggestion", {suggester: server.id});
-		let suggestionsUserServer = await dbQueryAll("Suggestion", {suggester: server.id, id: server.id});
+		let suggestionsUserGlobal = await dbQueryAll("Suggestion", {suggester: message.author.id});
+		let suggestionsUserServer = await dbQueryAll("Suggestion", {suggester: message.author.id, id: server.id});
 		let statEmbed = new Discord.RichEmbed()
 			.setTitle(`Suggestion Statistics for **${server.name}**`)
 			.addField("Global Statistics", `**${client.guilds.size}** servers\n**${totalConfiguredServers}** server configurations\n**${totalSuggestionsGlobal.toString()}** suggestions submitted globally\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
