@@ -25,12 +25,12 @@ module.exports = async (Discord, client, message) => {
 	//Check if message is a command
 	fs.readdir("./commands/", (err, files) => {
 		//Input command
-		const commandText = message.content.slice(serverPrefix.length).split(" ")[0].toLowerCase();
+		const [_commandText, ...args] = message.content.slice(serverPrefix.length).split(/\s+/);
+		const commandText = _commandText.toLowerCase();
 
 		files.forEach(file => {
 			const commandName = file.split(".")[0]; //Command to check against
 			const command = require("../commands/" + commandName); //Command file
-			let args = message.content.split(" ").splice(1);
 
 			if (commandText === commandName || (command.controls.aliases && command.controls.aliases.includes(commandText))) { //Check if command matches
 				if (permission > command.controls.permission) {
