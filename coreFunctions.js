@@ -2,13 +2,15 @@ const config = require("./config.json");
 const { colors, emoji } = require("./config.json");
 const Discord = require("discord.js");
 let models = require("./utils/schemas");
+const { promises } = require("fs");
+const { resolve } = require("path");
 
 /**
  * Send a message from a webhook
  * @param {Object} cfg - Where to send the webhook; contains webhook token and id
  * @param {module:"discord.js".RichEmbed} input - What to send
  */
-function sendWebhook (cfg, input) {
+function sendWebhook(cfg, input) {
 	(new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
 		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
 	});
@@ -17,6 +19,14 @@ function sendWebhook (cfg, input) {
 module.exports = {
 	/**
 	 * Returns permission level of inputted ID
+	 * 
+	 * 11 - Blacklisted\
+	 * 10 - Everyone\
+	 * 3 - Server staff\
+	 * 2 - Server Admin\
+	 * 1 - Global Permissions\
+	 * 0 - Developer/Global Admin
+	 * 
 	 * @param member - Member object fetched from a server
 	 * @param client - The Discord client
 	 * @returns {Promise<number>}
@@ -60,20 +70,20 @@ module.exports = {
 	},
 	permLevelToRole: (permLevel) => {
 		switch (permLevel) {
-		case -1:
-			return "No Users";
-		case 0:
-			return "Bot Administrator";
-		case 1:
-			return "Global Permissions+";
-		case 2:
-			return "Server Administrator (Manage Server or Admin Role)+";
-		case 3:
-			return "Server Staff (Staff Role)+";
-		case 10:
-			return "All Users";
-		default:
-			return "Undefined, permission level not mapped in `core.permLevelToRole()`";
+			case -1:
+				return "No Users";
+			case 0:
+				return "Bot Administrator";
+			case 1:
+				return "Global Permissions+";
+			case 2:
+				return "Server Administrator (Manage Server or Admin Role)+";
+			case 3:
+				return "Server Staff (Staff Role)+";
+			case 10:
+				return "All Users";
+			default:
+				return "Undefined, permission level not mapped in `core.permLevelToRole()`";
 		}
 	},
 	/**
@@ -101,28 +111,28 @@ module.exports = {
 			.setFooter(`Suggestion ID: ${suggestion.suggestionId} | Submitted at`);
 		// Side Color
 		switch (suggestion.displayStatus) {
-		case "implemented": {
-			embed.setColor(colors.green)
-				.addField("Status", "Implemented");
-			break;
-		}
-		case "working": {
-			embed.addField("Status", "In Progress")
-				.setColor(colors.orange);
-			break;
-		}
-		case "no": {
-			embed.addField("Status", "Not Happening")
-				.setColor(colors.gray);
-			break;
-		}
-		default: {
-			if (suggestion.votes.upvotes - suggestion.votes.downvotes >= server.config.gold_threshold) {
-				embed.setColor(colors.gold);
-			} else {
-				embed.setColor(colors.default);
+			case "implemented": {
+				embed.setColor(colors.green)
+					.addField("Status", "Implemented");
+				break;
 			}
-		}
+			case "working": {
+				embed.addField("Status", "In Progress")
+					.setColor(colors.orange);
+				break;
+			}
+			case "no": {
+				embed.addField("Status", "Not Happening")
+					.setColor(colors.gray);
+				break;
+			}
+			default: {
+				if (suggestion.votes.upvotes - suggestion.votes.downvotes >= server.config.gold_threshold) {
+					embed.setColor(colors.gold);
+				} else {
+					embed.setColor(colors.default);
+				}
+			}
 		}
 		// Comments
 		if (suggestion.comments) {
@@ -145,35 +155,35 @@ module.exports = {
 		let required = [];
 		let list = [];
 		switch (type) {
-		case "suggestions":
-			required = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
+			case "suggestions":
+				required = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+				list = [];
 
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
-		case "staff":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
-		case "denied":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
-		case "log":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+				required.forEach(permission => {
+					if (!permissions.has(permission)) list.push(permissionNames[permission]);
+				});
+				return list;
+			case "staff":
+				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+				list = [];
+				required.forEach(permission => {
+					if (!permissions.has(permission)) list.push(permissionNames[permission]);
+				});
+				return list;
+			case "denied":
+				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+				list = [];
+				required.forEach(permission => {
+					if (!permissions.has(permission)) list.push(permissionNames[permission]);
+				});
+				return list;
+			case "log":
+				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
+				list = [];
+				required.forEach(permission => {
+					if (!permissions.has(permission)) list.push(permissionNames[permission]);
+				});
+				return list;
 		}
 	},
 	/**
@@ -213,10 +223,10 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - The bot client
 	 * @returns {Collection}
 	 */
-	async fetchUser (id, client) {
+	async fetchUser(id, client) {
 		if (!id) return null;
 
-		function fetchUnknownUser (uid) {
+		function fetchUnknownUser(uid) {
 			return client.fetchUser(uid, true)
 				.then(() => {
 					return client.users.get(uid);
@@ -323,7 +333,7 @@ module.exports = {
 	 * @param {Object} modify - What to change it to
 	 * @returns {Promise}
 	 */
-	dbModify (collection, query, modify) {
+	dbModify(collection, query, modify) {
 		return models[collection].findOneAndUpdate(query, modify)
 			.then((res) => {
 				return res;
@@ -344,5 +354,25 @@ module.exports = {
 				await res.deleteOne();
 				return res;
 			});
-	}
+	},
+
 };
+
+/**
+ * Like readdir but recursive :eyes:
+ * @param {string} dir
+ * @returns {Promise<string[]>} - Array of paths
+ */
+const fileLoader = async function* (dir) {
+	const files = await promises.readdir(dir, { withFileTypes: true });
+	for (let file of files) {
+		const res = resolve(dir, file.name);
+		if (file.isDirectory()) {
+			yield* fileLoader(res);
+		} else {
+			yield res;
+		}
+	}
+}
+
+module.exports.fileLoader = fileLoader;

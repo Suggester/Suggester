@@ -7,7 +7,7 @@
     "lint": "eslint ."
   },
   "engines": {
-    "node": "12.14.1"
+    "node": "13.9.0"
   },
   "dependencies": {
     "botlist.space": "^3.1.6",
