@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const Discord = require("discord.js");
 const fs = require("fs");
