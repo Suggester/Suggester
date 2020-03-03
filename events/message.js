@@ -23,10 +23,8 @@ module.exports = async (Discord, client, message) => {
 	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	let args = message.content.split(" ");
 	let commandName = args.shift().slice(serverPrefix.length).toLowerCase();
-	console.log(commandName);
 	
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName))
-	console.log(!!command);
 	
 	if (!command) return;
 
