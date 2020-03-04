@@ -43,7 +43,7 @@ module.exports = {
 		async function generateEmbed(msg) {
 			if (typeof generateEmbed.message == "undefined") generateEmbed.message = [];
 			generateEmbed.message.push(`- ${msg}`);
-			let embed = new Discord.RichEmbed()
+			let embed = new Discord.MessageEmbed()
 				.setDescription(`\`\`\`md\n${generateEmbed.message.join("\n")}\`\`\``)
 				.setColor("RANDOM");
 			console.log(msg);
