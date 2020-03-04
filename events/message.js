@@ -3,7 +3,9 @@ const { dbQuery } = require("../coreFunctions");
 const { emoji, colors, prefix } = require("../config.json");
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
-		if (message.channel.type === "dm" && client.user.id !== message.author.id) return core.coreLog(":e_mail: **" + message.author.tag + "** (" + message.author.id + ") sent a DM to the bot:\n" + message.content, client);
+		let dmEmbed = new Discord.MessageEmbed()
+			.setDescription(message.content);
+		if (message.channel.type === "dm" && client.user.id !== message.author.id) return core.coreLog(`:e_mail: **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, dmEmbed);
 		return;
 	}
 	if (message.author.bot === true) return;
@@ -26,15 +28,18 @@ module.exports = async (Discord, client, message) => {
 	
 	if (!command) return;
 
-	if (permission > command.controls.permission) {
-		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.\nFull Content: \`${message.content}\``, client);
-		return message.react("🚫");
-	}
+	let contentEmbed = new Discord.MessageEmbed()
+		.setDescription(message.content);
+
 	if (command.controls.enabled === false) {
-		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.\nFull Content: \`${message.content}\``, client);
+		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, contentEmbed);
 		return message.channel.send("This command is currently disabled globally.");
 	}
-	core.commandLog(`:wrench: ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).\nFull Content: \`${message.content}\``, client);
+	if (permission > command.controls.permission) {
+		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
+		return message.react("🚫");
+	}
+	core.commandLog(`:wrench: ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
 
 	if (command.controls.permissions) {
 		let channelPermissions = message.channel.permissionsFor(client.user.id);

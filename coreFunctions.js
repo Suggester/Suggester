@@ -9,9 +9,14 @@ const { resolve } = require("path");
  * Send a message from a webhook
  * @param {Object} cfg - Where to send the webhook; contains webhook token and id
  * @param {module:"discord.js".RichEmbed} input - What to send
+ * @param {module:"discord.js".RichEmbed} embed - embed to send
  */
-function sendWebhook(cfg, input) {
-	(new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
+function sendWebhook (cfg, input, embed) {
+	input = Discord.Util.removeMentions(input);
+	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
+		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
+	});
+	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
 		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
 	});
 }
@@ -38,9 +43,9 @@ module.exports = {
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (client.guilds.get(config.main_guild)
-			&& client.guilds.get(config.main_guild).available
-			&& client.guilds.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) {
+		if (client.guilds.cache.get(config.main_guild)
+			&& client.guilds.cache.get(config.main_guild).available
+			&& client.guilds.cache.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) {
 			return 1;
 		}
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
@@ -59,14 +64,14 @@ module.exports = {
 		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;
 		return 10;
 	},
-	guildLog: (input) => {
-		return sendWebhook(config.log_hooks.guild, input);
+	guildLog: (input, embed) => {
+		return sendWebhook(config.log_hooks.guild, input, embed ? embed : null);
 	},
-	coreLog: (input) => {
-		return sendWebhook(config.log_hooks.core, input);
+	coreLog: (input, embed) => {
+		return sendWebhook(config.log_hooks.core, input, embed ? embed : null);
 	},
-	commandLog: (input) => {
-		return sendWebhook(config.log_hooks.commands, input);
+	commandLog: (input, embed) => {
+		return sendWebhook(config.log_hooks.commands, input, embed ? embed : null);
 	},
 	permLevelToRole: (permLevel) => {
 		switch (permLevel) {
@@ -207,7 +212,7 @@ module.exports = {
 		}
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(type)
-			.setTitle(err.message.substring(0, 256))
+			.setTitle(err.message ? err.message.substring(0, 256) : "No Message Value")
 			.setDescription(`\`\`\`js\n${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\``)
 			.setColor("DARK_RED")
 			.setTimestamp()
