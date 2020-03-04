@@ -23,7 +23,7 @@ module.exports = {
 			}
 		};
 		const code = args.join(" ");
-		if (code.toLowerCase().includes("delete") || code.toLowerCase().includes("token") || code.toLowerCase().includes("secret") || code.toLowerCase().includes("webhook")) {
+		if (code.toLowerCase().includes("delete") || code.toLowerCase().includes("token") || code.toLowerCase().includes("secret") || code.toLowerCase().includes("webhook") || code.toLowerCase().includes("process.env")) {
 			message.reply(`:warning: **PLEASE REREAD YOUR COMMAND** :warning:\nThis command has been flagged as possibly destructive, please ensure:\n- You are using the right prefix\n- You know what you are deleting/exposing\n- You want to do this\n\nClick <:${config.emoji.check}> to proceed with the eval command, click <:${config.emoji.x}> to abort the eval command.`)
 				.then(async (checkMsg) => {
 					await checkMsg.react(config.emoji.check);

@@ -33,7 +33,7 @@ module.exports = {
 		case "server":
 		case "guild": {
 			if (!args[0]) return message.channel.send(`<:${emoji.x}> Please specify a guild!`);
-			let foundGuild = client.guilds.get(args[0]);
+			let foundGuild = client.guilds.cache.get(args[0]);
 			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Invalid setting. Specify \`true\` to block the server and \`false\` to unblock the server.`);
 			let qServerDB = await dbQuery("Server", { id: args[0] });
 			if (!args[1]) {
@@ -47,7 +47,7 @@ module.exports = {
 			return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${qServerDB.blocked ? "now" : "no longer"} globally blocked.`);
 		}
 		default: {
-			return message.reply(`<:${emoji.x}> You must specify either \`user\` or \`guild\`.`);
+			return message.channel.send(`<:${emoji.x}> You must specify either \`user\` or \`guild\`.`);
 		}
 		}
 

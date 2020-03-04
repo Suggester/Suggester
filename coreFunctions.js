@@ -45,7 +45,7 @@ module.exports = {
 		if (qUserDB && qUserDB.blocked) return 12;
 		if (client.guilds.cache.get(config.main_guild)
 			&& client.guilds.cache.get(config.main_guild).available
-			&& client.guilds.cache.get(config.main_guild).roles.get(config.global_override).members.get(member.id)) {
+			&& client.guilds.cache.get(config.main_guild).roles.cache.get(config.global_override).members.get(member.id)) {
 			return 1;
 		}
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
