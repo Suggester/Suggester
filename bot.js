@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const Discord = require("discord.js");
-const fs = require("fs");
 const { errorLog, fileLoader } = require("./coreFunctions.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
@@ -54,10 +53,10 @@ client.commands = new Discord.Collection();
 
 		client.on(eventName, (...args) => {
 			try {
-				event(Discord, client, ...args)
+				event(Discord, client, ...args);
 			}
 			catch (err) {
-				errorLog(err, "Event Handler", `Event: ${eventName}`)
+				errorLog(err, "Event Handler", `Event: ${eventName}`);
 			}
 		});
 		console.log("[Event] Loaded", eventName);
@@ -71,9 +70,9 @@ client.commands = new Discord.Collection();
 		let commandName = basename(file).split(".")[0];
 
 		client.commands.set(commandName, command);
-		console.log("[Command] Loaded", commandName)
+		console.log("[Command] Loaded", commandName);
 	}
-})()
+})();
 
 client.login(process.env.TOKEN)
 	.catch((err) => {

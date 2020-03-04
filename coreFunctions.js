@@ -70,20 +70,20 @@ module.exports = {
 	},
 	permLevelToRole: (permLevel) => {
 		switch (permLevel) {
-			case -1:
-				return "No Users";
-			case 0:
-				return "Bot Administrator";
-			case 1:
-				return "Global Permissions+";
-			case 2:
-				return "Server Administrator (Manage Server or Admin Role)+";
-			case 3:
-				return "Server Staff (Staff Role)+";
-			case 10:
-				return "All Users";
-			default:
-				return "Undefined, permission level not mapped in `core.permLevelToRole()`";
+		case -1:
+			return "No Users";
+		case 0:
+			return "Bot Administrator";
+		case 1:
+			return "Global Permissions+";
+		case 2:
+			return "Server Administrator (Manage Server or Admin Role)+";
+		case 3:
+			return "Server Staff (Staff Role)+";
+		case 10:
+			return "All Users";
+		default:
+			return "Undefined, permission level not mapped in `core.permLevelToRole()`";
 		}
 	},
 	/**
@@ -111,28 +111,28 @@ module.exports = {
 			.setFooter(`Suggestion ID: ${suggestion.suggestionId} | Submitted at`);
 		// Side Color
 		switch (suggestion.displayStatus) {
-			case "implemented": {
-				embed.setColor(colors.green)
-					.addField("Status", "Implemented");
-				break;
+		case "implemented": {
+			embed.setColor(colors.green)
+				.addField("Status", "Implemented");
+			break;
+		}
+		case "working": {
+			embed.addField("Status", "In Progress")
+				.setColor(colors.orange);
+			break;
+		}
+		case "no": {
+			embed.addField("Status", "Not Happening")
+				.setColor(colors.gray);
+			break;
+		}
+		default: {
+			if (suggestion.votes.upvotes - suggestion.votes.downvotes >= server.config.gold_threshold) {
+				embed.setColor(colors.gold);
+			} else {
+				embed.setColor(colors.default);
 			}
-			case "working": {
-				embed.addField("Status", "In Progress")
-					.setColor(colors.orange);
-				break;
-			}
-			case "no": {
-				embed.addField("Status", "Not Happening")
-					.setColor(colors.gray);
-				break;
-			}
-			default: {
-				if (suggestion.votes.upvotes - suggestion.votes.downvotes >= server.config.gold_threshold) {
-					embed.setColor(colors.gold);
-				} else {
-					embed.setColor(colors.default);
-				}
-			}
+		}
 		}
 		// Comments
 		if (suggestion.comments) {
@@ -155,35 +155,35 @@ module.exports = {
 		let required = [];
 		let list = [];
 		switch (type) {
-			case "suggestions":
-				required = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-				list = [];
+		case "suggestions":
+			required = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			list = [];
 
-				required.forEach(permission => {
-					if (!permissions.has(permission)) list.push(permissionNames[permission]);
-				});
-				return list;
-			case "staff":
-				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-				list = [];
-				required.forEach(permission => {
-					if (!permissions.has(permission)) list.push(permissionNames[permission]);
-				});
-				return list;
-			case "denied":
-				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-				list = [];
-				required.forEach(permission => {
-					if (!permissions.has(permission)) list.push(permissionNames[permission]);
-				});
-				return list;
-			case "log":
-				required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
-				list = [];
-				required.forEach(permission => {
-					if (!permissions.has(permission)) list.push(permissionNames[permission]);
-				});
-				return list;
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
+		case "staff":
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			list = [];
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
+		case "denied":
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			list = [];
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
+		case "log":
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
+			list = [];
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
 		}
 	},
 	/**
@@ -205,7 +205,7 @@ module.exports = {
 			console.error((require("chalk")).red(err.error));
 			errorText = err.error;
 		}
-		let embed = new Discord.RichEmbed()
+		let embed = new Discord.MessageEmbed()
 			.setAuthor(type)
 			.setTitle(err.message.substring(0, 256))
 			.setDescription(`\`\`\`js\n${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\``)
@@ -225,19 +225,23 @@ module.exports = {
 	 */
 	async fetchUser(id, client) {
 		if (!id) return null;
+		let foundId;
+		let matches = id.match(/^<@!?(\d+)>$/);
+		if (!matches) foundId = id;
+		else foundId = matches[1];
 
 		function fetchUnknownUser(uid) {
-			return client.fetchUser(uid, true)
+			return client.users.fetch(uid, true)
 				.then(() => {
-					return client.users.get(uid);
+					return client.users.cache.get(uid);
 				})
 				.catch(() => {
 					return null;
 				});
 		}
 
-		return client.users.get(id)
-			|| fetchUnknownUser(id)
+		return client.users.cache.get(foundId)
+			|| fetchUnknownUser(foundId)
 			|| null;
 	},
 	/**
@@ -373,6 +377,6 @@ const fileLoader = async function* (dir) {
 			yield res;
 		}
 	}
-}
+};
 
 module.exports.fileLoader = fileLoader;

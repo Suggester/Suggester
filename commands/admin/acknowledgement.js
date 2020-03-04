@@ -1,5 +1,5 @@
 const { emoji } = require("../../config.json");
-const { dbModifyId, dbQuery } = require("../../coreFunctions");
+const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "acknowledgement",
@@ -12,7 +12,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args) => {
-		let user = client.users.find((user) => user.id === args[0]) || message.mentions.members.first();
+		let user = await fetchUser(args[0], client);
 		if (!user || !args[1]) {
 			if (!user) user = message.author;
 			let dbUser = await dbQuery("User", { id: user.id });
