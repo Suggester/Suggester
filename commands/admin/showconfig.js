@@ -14,8 +14,8 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let server;
 		if (!args[0]) server = message.guild;
-		else if (client.guilds.get(args[0])) server = client.guilds.get(args[0]);
-		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild with ID \`${args[0]}\``);
+		else if (client.guilds.get(args[0])) server = client.guilds.cache.get(args[0]);
+		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild based on your query!`);
 
 		let qServerDB = await dbQueryNoNew("Server", {id: server.id});
 		if (!qServerDB || !qServerDB.config) return message.channel.send(`<:${emoji.x}> This guild does not have a database entry.`);
@@ -31,8 +31,8 @@ module.exports = {
 		} else {
 			let adminRoleList = [];
 			qServerDB.config.admin_roles.forEach(roleId => {
-				if (server.roles.get(roleId)) {
-					adminRoleList.push(`${server.roles.get(roleId).name} (ID: \`${roleId}\`)`);
+				if (server.roles.cache.get(roleId)) {
+					adminRoleList.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
 				} else {
 					let index = qServerDB.config.admin_roles.findIndex(r => r === roleId);
 					qServerDB.config.admin_roles.splice(index, 1);
@@ -48,8 +48,8 @@ module.exports = {
 		} else {
 			let staffRoleList = [];
 			qServerDB.config.staff_roles.forEach(roleId => {
-				if (server.roles.get(roleId)) {
-					staffRoleList.push(`${server.roles.get(roleId).name} (ID: \`${roleId}\`)`);
+				if (server.roles.cache.get(roleId)) {
+					staffRoleList.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
 				} else {
 					let index = qServerDB.config.staff_roles.findIndex(r => r === roleId);
 					qServerDB.config.staff_roles.splice(index, 1);
@@ -63,7 +63,7 @@ module.exports = {
 			cfgArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
 			qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
 		} else {
-			let channel = server.channels.get(qServerDB.config.channels.staff);
+			let channel = server.channels.cache.get(qServerDB.config.channels.staff);
 			if (!channel) {
 				qServerDB.config.channels.staff = "";
 				qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
@@ -78,7 +78,7 @@ module.exports = {
 			cfgArr.push(`<:${emoji.x}> **Approved Suggestions Channel:** None Configured`);
 			issuesCountFatal++;
 		} else {
-			let channel = server.channels.get(qServerDB.config.channels.suggestions);
+			let channel = server.channels.cache.get(qServerDB.config.channels.suggestions);
 			if (!channel) {
 				qServerDB.config.channels.suggestions = "";
 				issuesCountFatal++;
@@ -93,7 +93,7 @@ module.exports = {
 			cfgArr.push(`<:${emoji.x}> **Denied Suggestions Channel:** None Configured`);
 			issuesCountMinor++;
 		} else {
-			let channel = server.channels.get(qServerDB.config.channels.denied);
+			let channel = server.channels.cache.get(qServerDB.config.channels.denied);
 			if (!channel) {
 				qServerDB.config.channels.denied = "";
 				issuesCountMinor++;
@@ -108,7 +108,7 @@ module.exports = {
 			cfgArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
 			issuesCountMinor++;
 		} else {
-			let channel = server.channels.get(qServerDB.config.channels.log);
+			let channel = server.channels.cache.get(qServerDB.config.channels.log);
 			if (!channel) {
 				qServerDB.config.channels.log = "";
 				issuesCountMinor++;
@@ -175,7 +175,7 @@ module.exports = {
 		// Notify
 		qServerDB.config.notify ? cfgArr.push(`<:${emoji.check}> **Notifications:** All suggestion actions DM the suggesting user`) : cfgArr.push(`<:${emoji.check}> **Notifications:** Suggestion actions do not DM the suggesting user`);
 
-		let cfgEmbed = new Discord.RichEmbed()
+		let cfgEmbed = new Discord.MessageEmbed()
 			.setTitle(`Server Configuration for **${server.name}**`)
 			.setDescription(cfgArr.join("\n"));
 		if (issuesCountFatal > 0) {

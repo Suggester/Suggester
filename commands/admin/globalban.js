@@ -8,7 +8,6 @@ module.exports = {
 		usage: "globalban <guild|user> <id> [true|false]",
 		description: "Excludes a user or server from using the bot globally",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args) => {

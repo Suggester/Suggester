@@ -18,8 +18,7 @@ module.exports = {
 		permission: 0,
 		usage: "config <game|status|username|nick|avatar>\n\n**game:** <type> <new game>\n**status:** <new status>\n**username:** <new username>\n**nick:** <new nickname>\n**avatar**: <new avatar link>",
 		description: "Configures elements of the bot user",
-		enabled: true,
-		hidden: false
+		enabled: true
 	},
 	do: async (message, client, args, Discord) => {
 		const persistent = new Persist();

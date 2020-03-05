@@ -10,7 +10,6 @@ module.exports = {
 		usage: "eval <code>",
 		description: "Runs code",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	/* eslint-disable-next-line no-unused-vars */

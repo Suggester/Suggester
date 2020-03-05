@@ -1,5 +1,5 @@
 const { emoji } = require("../../config.json");
-const { dbModifyId, dbQuery } = require("../../coreFunctions");
+const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "nukebean",
@@ -7,18 +7,17 @@ module.exports = {
 		usage: "nukebean <member> (reason)",
 		description: "Nukebeans a member from the server",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-
-		if (!args[0]) return message.channel.send("You must specify a member!");
-		let member = message.mentions.members.first() || message.guild.members.find((user) => user.id === args[0]);
-		if (!member) return message.channel.send(`<:${emoji.x}> Could not find server member \`${args[0]}\``);
+		let user = await fetchUser(args[0], client);
+		if (!user) return message.channel.send("You must specify a valid member!");
+		let member = message.guild.members.cache.get(user.id);
+		if (!member) return message.channel.send("You must specify a valid member!");
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
 
-		let beanSendEmbed = new Discord.RichEmbed()
+		let beanSendEmbed = new Discord.MessageEmbed()
 			.setColor("#AAD136")
 			.setDescription(reason)
 			.setImage("https://media.tenor.com/images/334d8d0f9bf947f31256cdaacc7f6cf0/tenor.gif");
@@ -27,6 +26,7 @@ module.exports = {
 		global.beans[member.id] = {
 			count: 0
 		};
+
 		client.on("message", (message) => {
 			if (message.author.id === member.id && global.beans[member.id].count < 5) {
 				message.react("nukebean:666102191895085087");
@@ -78,7 +78,7 @@ module.exports = {
 		await dbModifyId("User", member.id, { beans: { sent: memberSentBeanCount, received: memberReceivedBeanCount } });
 		await dbModifyId("User", message.author.id, { beans: { sent: senderSentBeanCount, received: senderReceivedBeanCount } });
 
-		message.channel.send(`<:nukebean:666102191895085087> Nukebeaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
+		message.channel.send(`<:nukebean:666102191895085087> Nukebeaned ${user.tag} (\`${member.id}\`)`, beanSendEmbed);
 		member.user.send(`<:nukebean:666102191895085087> **You have been nukebeaned from ${message.guild.name}**`, beanSendEmbed)
 			.catch(() => {});
 	}

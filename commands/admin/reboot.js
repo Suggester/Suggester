@@ -7,7 +7,6 @@ module.exports = {
 		usage: "reboot",
 		description: "Reboots the bot by exiting the process",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async message => {

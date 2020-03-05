@@ -8,7 +8,6 @@ module.exports = {
 		usage: "deploy",
 		description: "Updates the bot",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {

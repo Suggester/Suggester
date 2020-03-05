@@ -52,13 +52,13 @@ module.exports = {
 		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
 		let hasAdminRole = false;
 		qServerDB.config.admin_roles.forEach(roleId => {
-			if (member.roles.has(roleId)) hasAdminRole = true;
+			if (member.roles.cache.has(roleId)) hasAdminRole = true;
 		});
 		if (hasAdminRole) return 2;
 		if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) return 10;
 		let hasStaffRole = false;
 		qServerDB.config.staff_roles.forEach(roleId => {
-			if (member.roles.has(roleId)) hasStaffRole = true;
+			if (member.roles.cache.has(roleId)) hasStaffRole = true;
 		});
 		if (hasStaffRole) return 3;
 		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;

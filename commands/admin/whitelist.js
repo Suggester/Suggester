@@ -8,7 +8,6 @@ module.exports = {
 		usage: "whitelist <guild id>",
 		description: "Whitelists a server",
 		enabled: true,
-		hidden: false,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args) => {
