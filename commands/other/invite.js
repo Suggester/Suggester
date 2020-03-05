@@ -16,7 +16,7 @@ module.exports = {
 		if (config.release === "stable") return message.reply(`You can invite Suggester to your server with this link: ${url.replace("[ID]", client.user.id)}`);
 		if (config.release === "canary") {
 			let userPermission = await checkPermissions(message.member, client);
-			if (client.guilds.get(config.main_guild) && client.guilds.get(config.main_guild).available && client.guilds.get(config.main_guild).roles.get("614084573139173389").members.get(message.author.id) || userPermission <= 1) {
+			if (client.guilds.cache.get(config.main_guild) && client.guilds.cache.get(config.main_guild).available && client.guilds.cache.get(config.main_guild).roles.cache.get("614084573139173389").members.get(message.author.id) || userPermission <= 1) {
 				return message.channel.send(`You can invite the Canary bot to your server with this link: ${url.replace("[ID]", client.user.id)}`);
 			} else {
 				return message.channel.send(`This instance of Suggester is the **Canary** version. You must apply to be a part of the Canary program on the main server.\nYou can invite the **public** version of Suggester at ${url.replace("[ID]", stableId)}`);
