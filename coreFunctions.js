@@ -101,11 +101,11 @@ module.exports = {
 	suggestionEmbed: async (suggestion, server, client) => {
 		let { fetchUser } = require("./coreFunctions.js");
 		let suggester = await fetchUser(suggestion.suggester, client);
-		let embed = new Discord.RichEmbed();
+		let embed = new Discord.MessageEmbed();
 		// User information
 		if (suggester) {
-			embed.setAuthor(`Suggestion from ${suggester.tag}`, suggester.displayAvatarURL)
-				.setThumbnail(suggester.displayAvatarURL);
+			embed.setAuthor(`Suggestion from ${suggester.tag}`, suggester.displayAvatarURL({format: "png", dynamic: true}))
+				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}));
 		} else {
 			embed.setTitle("Suggestion from Unknown User");
 		}
@@ -219,8 +219,6 @@ module.exports = {
 			.setFooter(footer);
 
 		sendWebhook(config.log_hooks.debug, embed);
-		//sendWebhook(config.log_hooks.commands, ("<@255834596766253057>" + embed));
-
 	},
 	/**
 	 * Fetch a user
