@@ -144,9 +144,9 @@ module.exports = {
 						let reactEmojiUp = qServerDB.config.emojis.up;
 						let reactEmojiMid = qServerDB.config.emojis.mid;
 						let reactEmojiDown = qServerDB.config.emojis.down;
-						await posted.react(reactEmojiUp).catch(async () => await posted.react("👍"));
-						await posted.react(reactEmojiMid).catch(async () => await posted.react("🤷"));
-						await posted.react(reactEmojiDown).catch(async () => await posted.react("👎"));
+						if (reactEmojiUp !== "none") await posted.react(reactEmojiUp).catch(async () => await posted.react("👍"));
+						if (reactEmojiMid !== "none") await posted.react(reactEmojiMid).catch(async () => await posted.react("🤷"));
+						if (reactEmojiDown !== "none") await posted.react(reactEmojiDown).catch(async () => await posted.react("👎"));
 						await dbModify("Suggestion", { suggestionId: id }, {
 							emojis: {
 								up: reactEmojiUp,

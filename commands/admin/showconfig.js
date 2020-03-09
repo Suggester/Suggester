@@ -1,5 +1,5 @@
 const { emoji, colors } = require("../../config.json");
-const { dbQueryNoNew, dbModify } = require("../../coreFunctions.js");
+const { dbQueryNoNew, dbModify, findEmoji } = require("../../coreFunctions.js");
 const nodeEmoji = require("node-emoji");
 const permissions = require("../../utils/permissions");
 module.exports = {
@@ -39,7 +39,7 @@ module.exports = {
 				}
 			});
 			await dbModify("Server", {id: server.id}, qServerDB);
-			cfgArr.push(`<:${emoji.check}> **Admin Roles:** ${adminRoleList.join(", ")}`);
+			cfgArr.push(`<:${emoji.check}> **Admin Roles:**\n> ${adminRoleList.join("\n> ")}`);
 		}
 		// Staff roles
 		if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) {
@@ -56,7 +56,7 @@ module.exports = {
 				}
 			});
 			await dbModify("Server", {id: server.id}, qServerDB);
-			cfgArr.push(`<:${emoji.check}> **Staff Roles:** ${staffRoleList.join(", ")}`);
+			cfgArr.push(`<:${emoji.check}> **Staff Roles:**\n> ${staffRoleList.join("\n > ")}`);
 		}
 		// Staff review channel
 		if (!qServerDB.config.channels.staff) {
@@ -119,45 +119,18 @@ module.exports = {
 			}
 		}
 		// Emojis
-		let upEmoji;
-		let midEmoji;
-		let downEmoji;
-		if (qServerDB.config.emojis.up) {
-			if (nodeEmoji.find(qServerDB.config.emojis.up)) {
-				upEmoji = qServerDB.config.emojis.up;
-			} else if (qServerDB.config.emojis.up.startsWith("a")) {
-				upEmoji = `<${qServerDB.config.emojis.up}>`;
-			} else {
-				upEmoji = `<:${qServerDB.config.emojis.up}>`;
-			}
-		} else {
-			upEmoji = "No Upvote Emoji";
-		}
-		if (qServerDB.config.emojis.mid) {
-			if (nodeEmoji.find(qServerDB.config.emojis.mid)) {
-				midEmoji = qServerDB.config.emojis.mid;
-			} else if (qServerDB.config.emojis.mid.startsWith("a")) {
-				midEmoji = `<${qServerDB.config.emojis.mid}>`;
-			} else {
-				midEmoji = `<:${qServerDB.config.emojis.mid}>`;
-			}
-		} else {
-			midEmoji = "No Middle Emoji";
-		}
-		if (qServerDB.config.emojis.down) {
-			if (nodeEmoji.find(qServerDB.config.emojis.down)) {
-				downEmoji = qServerDB.config.emojis.down;
-			} else if (qServerDB.config.emojis.down.startsWith("a")) {
-				downEmoji = `<${qServerDB.config.emojis.down}>`;
-			} else {
-				downEmoji = `<:${qServerDB.config.emojis.down}>`;
-			}
-		} else {
-			downEmoji = "No Downvote Emoji";
-		}
+		const checkEmoji = function(emoji) {
+			if (emoji === "none") return "Disabled";
+			else if (nodeEmoji.find(emoji)) return emoji;
+			else if (emoji.startsWith("a")) return `<${emoji}>`;
+			else return `<:${emoji}>`;
+		};
+		let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), message.guild.emojis.cache))[1] || "(Upvote Reaction Disabled)";
+		let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), message.guild.emojis.cache))[1] || "(Shrug/No Opinion Reaction Disabled)";
+		let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), message.guild.emojis.cache))[1] || "(Downvote Reaction Disabled)";
 
 		cfgArr.push(`<:${emoji.check}> **Reaction Emojis:** ${upEmoji}, ${midEmoji}, ${downEmoji}`);
-		qServerDB.config.react ? cfgArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** Enabled`) : cfgArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** Disabled`);
+		cfgArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** ${qServerDB.config.react ? "Enabled" : "Disabled"}`);
 		// Mode
 		switch (qServerDB.config.mode) {
 		case "review":
@@ -173,7 +146,7 @@ module.exports = {
 		// Prefix
 		cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 		// Notify
-		qServerDB.config.notify ? cfgArr.push(`<:${emoji.check}> **Notifications:** All suggestion actions DM the suggesting user`) : cfgArr.push(`<:${emoji.check}> **Notifications:** Suggestion actions do not DM the suggesting user`);
+		cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
 
 		let cfgEmbed = new Discord.MessageEmbed()
 			.setTitle(`Server Configuration for **${server.name}**`)

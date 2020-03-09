@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 let models = require("./utils/schemas");
 const { promises } = require("fs");
 const { resolve } = require("path");
+const nodeEmoji = require("node-emoji");
 
 /**
  * Send a message from a webhook
@@ -246,6 +247,55 @@ module.exports = {
 		return client.users.cache.get(foundId)
 			|| fetchUnknownUser(foundId)
 			|| null;
+	},
+	/**
+	 * Finds a role based on an input
+	 * @param input {String} - Role mention, name, or ID
+	 * @param roles - Represents a guild's roles cache
+	 * @returns {Promise<null|*>}
+	 */
+	async findRole(input, roles) {
+		if (!input) return null;
+		let foundId;
+		let matches = input.match(/^<@&(\d+)>$/);
+		if (!matches) {
+			let roleFromNonMention = roles.find(role => role.name.toLowerCase() === input.toLowerCase()) || roles.get(input) || null;
+			if (roleFromNonMention) foundId = roleFromNonMention.id;
+		} else foundId = matches[1];
+
+		return roles.get(foundId) || null;
+	},
+	/**
+	 * Finds a channel based on an input
+	 * @param input {String} - Channel mention, name, or ID
+	 * @param channels - Represents a guild's channels cache
+	 * @returns {Promise<null|*>}
+	 */
+	async findChannel(input, channels) {
+		if (!input) return null;
+		let foundId;
+		let matches = input.match(/^<#(\d+)>$/);
+		if (!matches) {
+			let channelFromNonMention = channels.find(channel => channel.name.toLowerCase() === input.toLowerCase()) || channels.get(input) || null;
+			if (channelFromNonMention) foundId = channelFromNonMention.id;
+		} else foundId = matches[1];
+
+		return channels.get(foundId) || null;
+	},
+	/**
+	 * Finds an emoji based on an input
+	 * @param input {String} - Emoji
+	 * @param emotes - Represents a guild's emoji cache
+	 * @returns {Promise<null|*>}
+	 */
+	async findEmoji(input, emotes) {
+		if (!input) return [null, null];
+		if (nodeEmoji.find(input)) return [input, input];
+		let matches = input.match(/<a?:[a-z0-9~-]+:([0-9]+)>/i) || null;
+		if (!matches) return [null, null];
+		let emote = emotes.get(matches[1]) || null;
+		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
+		else return [null, null];
 	},
 	/**
 	 * Search the database for an id, creates a new entry if not found
