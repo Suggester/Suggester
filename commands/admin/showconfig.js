@@ -125,9 +125,9 @@ module.exports = {
 			else if (emoji.startsWith("a")) return `<${emoji}>`;
 			else return `<:${emoji}>`;
 		};
-		let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), message.guild.emojis.cache))[1] || "(Upvote Reaction Disabled)";
-		let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), message.guild.emojis.cache))[1] || "(Shrug/No Opinion Reaction Disabled)";
-		let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), message.guild.emojis.cache))[1] || "(Downvote Reaction Disabled)";
+		let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? "(Upvote Reaction Disabled)" : "👍");
+		let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? "(Shrug/No Opinion Reaction Disabled)" : "🤷");
+		let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? "(Downvote Reaction Disabled)" : "👎");
 
 		cfgArr.push(`<:${emoji.check}> **Reaction Emojis:** ${upEmoji}, ${midEmoji}, ${downEmoji}`);
 		cfgArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** ${qServerDB.config.react ? "Enabled" : "Disabled"}`);
