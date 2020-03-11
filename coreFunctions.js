@@ -133,11 +133,7 @@ module.exports = {
 			break;
 		}
 		default: {
-			if (suggestion.votes.upvotes - suggestion.votes.downvotes >= server.config.gold_threshold) {
-				embed.setColor(colors.gold);
-			} else {
-				embed.setColor(colors.default);
-			}
+			embed.setColor(colors.default);
 		}
 		}
 		// Comments
@@ -291,7 +287,7 @@ module.exports = {
 	async findEmoji(input, emotes) {
 		if (!input) return [null, null];
 		if (nodeEmoji.find(input)) return [input, input];
-		let matches = input.match(/<a?:[a-z0-9~-]+:([0-9]+)>/i) || null;
+		let matches = input.match(/<a?:[a-z0-9_~-]+:([0-9]+)>/i) || null;
 		if (!matches) return [null, null];
 		let emote = emotes.get(matches[1]) || null;
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];

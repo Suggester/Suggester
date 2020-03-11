@@ -26,7 +26,6 @@ module.exports = {
 		}
 
 		let missingPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		console.log(missingPerms);
 		if (!missingPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		if (missingPerms !== true) return message.channel.send(missingPerms);
 

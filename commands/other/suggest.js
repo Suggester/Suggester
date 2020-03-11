@@ -126,11 +126,7 @@ module.exports = {
 				suggestion: suggestion,
 				status: "approved",
 				suggestionId: id,
-				staff_member: client.user.id,
-				votes: {
-					upvotes: 0,
-					downvotes: 0
-				}
+				staff_member: client.user.id
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });

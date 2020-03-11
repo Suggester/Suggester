@@ -30,7 +30,6 @@ module.exports = {
 						log: "",
 						denied: ""
 					},
-					gold_threshold: 20,
 					notify: true,
 					react: true,
 					mode: "review",

@@ -80,11 +80,7 @@ module.exports = {
 		}, {
 			$set: {
 				status: "approved",
-				staff_member: message.author.id,
-				votes: {
-					upvotes: 0,
-					downvotes: 0
-				}
+				staff_member: message.author.id
 			},
 		}, {
 			multi: true
