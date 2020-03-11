@@ -298,6 +298,48 @@ module.exports = {
 		else return [null, null];
 	},
 	/**
+	 * Checks configuration for most commands
+	 * @param db - qServerDB.config
+	 * @returns {null|[]} - Array of missing permissions
+	 */
+	checkConfig(db) {
+		if (!db) return null;
+
+		let config = db.config;
+		let missing = [];
+
+		if (!config.admin_roles || config.admin_roles < 1) missing.push("Server Admin Roles");
+		if (!config.staff_roles || config.staff_roles < 1) missing.push("Server Staff Roles");
+		if (!config.channels.suggestions) missing.push("Approved Suggestions Channel");
+		if (config.mode === "review" && !config.channels.staff) missing.push("Suggestion Review Channel");
+
+		return missing;
+	},
+	/**
+	 * Checks permissions for a channel of a certain type
+	 * @param channelId - ID of the channel (for fetching)
+	 * @param guildChannels - Cache of guild channels
+	 * @param type {String} - Type of channel to check permissions for
+	 * @param client {module:"discord.js".Client} - Bot client
+	 * @returns {null|boolean|module:"discord.js".MessageEmbed}
+	 */
+	checkChannel(channelId, guildChannels, type, client) {
+		const { channelPermissions } = require("./coreFunctions.js");
+		if (!channelId || !guildChannels || !type) return null;
+		let channel = guildChannels.get(channelId) || null;
+		if (!channel) return null;
+		let permissions = channel.permissionsFor(client.user.id);
+		let missingPerms = channelPermissions(permissions, type, client);
+		if (missingPerms.length > 0) {
+			let embed = new Discord.MessageEmbed()
+				.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${channelId}> channel:`)
+				.addField("Missing Elements", `<:${emoji.x}> ${missingPerms.join(`\n<:${emoji.x}> `)}`)
+				.addField("How to Fix", `In the channel settings for <#${channelId}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+				.setColor(colors.red);
+			return embed;
+		} else return true;
+	},
+	/**
 	 * Search the database for an id, creates a new entry if not found
 	 * @param {string} collection - The collection to query.
 	 * @param  {Object} query - The term to search for

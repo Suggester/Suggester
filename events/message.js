@@ -10,6 +10,8 @@ module.exports = async (Discord, client, message) => {
 	}
 	if (message.author.bot === true) return;
 
+	await message.guild.members.fetch();
+
 	let permission = await core.checkPermissions(message.member, client);
 
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
