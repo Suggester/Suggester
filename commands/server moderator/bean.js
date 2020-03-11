@@ -1,5 +1,5 @@
-const { main_guild, developer, emoji } = require("../../config.json");
-const { checkPermissions, dbModifyId, dbQuery } = require("../../coreFunctions");
+const { main_guild, developer } = require("../../config.json");
+const { checkPermissions, dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "bean",
@@ -12,17 +12,22 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let userPermission = await checkPermissions(message.member, client);
-		if (userPermission > 2 && !client.guilds.get(main_guild).roles.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
+		if (userPermission > 2 && !client.guilds.cache.get(main_guild).roles.cache.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
 
-		if (!args[0]) return message.channel.send("You must specify a member!");
-		let member = message.mentions.members.first() || message.guild.members.find((user) => user.id === args[0]);
-		if (!member) return message.channel.send(`<:${emoji.x}> Could not find server member \`${args[0]}\``);
+		let user = await fetchUser(args[0], client);
+		if (!user) return message.channel.send("You must specify a valid member!");
+		let member = message.guild.members.cache.get(user.id);
+		if (!member) return message.channel.send("You must specify a valid member!");
 
-		if (developer.includes(member.id)) member = message.member;
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
 
-		let beanSendEmbed = new Discord.RichEmbed()
-			.setColor("#AAD136")
+		let beanSendEmbed = new Discord.MessageEmbed()
+		if (developer.includes(member.id) && !developer.includes(message.author.id)) {
+			member = message.member;
+			user = message.author;
+			beanSendEmbed.setImage("https://media.tenor.com/images/fdc481469f2c9deb220b1e986e40a39d/tenor.gif")
+		}
+		beanSendEmbed.setColor("#AAD136")
 			.setDescription(reason);
 
 		let qMemberDB = await dbQuery("User", { id: member.id });
@@ -69,7 +74,7 @@ module.exports = {
 		await dbModifyId("User", member.id, { beans: { sent: memberSentBeanCount, received: memberReceivedBeanCount } });
 		await dbModifyId("User", message.author.id, { beans: { sent: senderSentBeanCount, received: senderReceivedBeanCount } });
 
-		message.channel.send(`<:bean:657650134502604811> Beaned ${member.user.tag} (\`${member.id}\`)`, beanSendEmbed);
+		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
 		member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed)
 			.catch(() => {});
 	}

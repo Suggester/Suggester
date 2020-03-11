@@ -11,7 +11,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		let user = await fetchUser(args[0], client);
+		let user = await fetchUser(args[0] ? args[0] : message.author.id, client);
 		let id;
 		user ? id = user.id : id = message.author.id;
 
