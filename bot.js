@@ -88,3 +88,19 @@ client.on("warn", (warning) => {
 process.on("unhandledRejection", (err) => { // this catches unhandledPromiserejectionWarning and other unhandled rejections
 	errorLog(err, "unhandledRejection", "oof something is broken x.x");
 });
+
+/**
+ * Define the chunk method in the prototype of an array
+ * that returns an array with arrays of the given size.
+ *
+ * @param chunkSize {Integer} Size of every group
+ */
+Object.defineProperty(Array.prototype, "chunk", {
+	value: function(chunkSize){
+		let temporal = [];
+		for (let i = 0; i < this.length; i+= chunkSize){
+			temporal.push(this.slice(i,i+chunkSize));
+		}
+		return temporal;
+	}
+});

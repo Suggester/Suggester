@@ -128,6 +128,5 @@ module.exports = {
 			reason ? logEmbed.addField("Denial Reason", reason) : "";
 			serverLog(logEmbed, qServerDB);
 		}
-
 	}
 };
