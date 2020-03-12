@@ -30,7 +30,7 @@ module.exports = {
 		if (!missingSuggestionPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
 		if (missingSuggestionPerms !== true) return message.channel.send(missingSuggestionPerms);
 
-		let missingReviewPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "staff", client);
+		let missingReviewPerms = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
 		if (!missingReviewPerms) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
 		if (missingReviewPerms !== true) return message.channel.send(missingReviewPerms);
 
