@@ -387,7 +387,7 @@ module.exports = {
 			case "no": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
-					qServerDB.config.emojis.dwn = "none";
+					qServerDB.config.emojis.down = "none";
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the downvote reaction.`);
 				}

@@ -1,5 +1,5 @@
 const { colors, emoji, prefix } = require("../../config.json");
-const { dbQuery, fetchUser, dbQueryNoNew } = require("../../coreFunctions.js");
+const { dbQuery, fetchUser, dbQueryNoNew, checkConfig } = require("../../coreFunctions.js");
 module.exports = {
 	controls: {
 		name: "info",
@@ -11,44 +11,16 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		let missingConfigs = [];
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
 
-		if (!qServerDB.config.admin_roles ||
-			qServerDB.config.admin_roles < 1) {
-			missingConfigs.push("Server Admin Roles");
-		}
-		if (!qServerDB.config.staff_roles ||
-			qServerDB.config.staff_roles < 1) {
-			missingConfigs.push("Server Staff Roles");
-		}
-		if (!qServerDB.config.channels.suggestions ||
-			qServerDB.config.channels.suggestions < 1) {
-			missingConfigs.push("Approved Suggestions Channel");
-		}
-		if (!qServerDB.config.mode === "review" && !qServerDB.config.channels.staff ||
-			!client.channels.get(qServerDB.config.channels.staff)) {
-			missingConfigs.push("Suggestion Review Channel");
-		}
+		let missing = checkConfig(qServerDB);
 
-		if (missingConfigs.length > 1) {
-			let embed = new Discord.RichEmbed()
-				.setDescription(
-					`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${qServerDB.config.prefix}config\` command.`
-				)
-				.addField(
-					"Missing Elements",
-					`<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`
-				)
+		if (missing.length > 1) {
+			let embed = new Discord.MessageEmbed()
+				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
+				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
 				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-		if (missingConfigs.length > 1) {
-			let embed = new Discord.RichEmbed();
-			embed.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${client.servers.get(message.guild.id, "prefix")}config\` command.`);
-			embed.addField("Missing Elements", `<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`);
-			embed.setColor("#e74c3c");
 			return message.channel.send(embed);
 		}
 
@@ -60,9 +32,9 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
 
-		let embed = new Discord.RichEmbed()
+		let embed = new Discord.MessageEmbed()
 			.setTitle(`Suggestion Info: #${id.toString()}`)
-			.setThumbnail(suggester.displayAvatarURL)
+			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion)
 			.addField("Author", `${suggester.tag} (${suggester.id})`)
 			.setColor(colors.blue);
@@ -113,26 +85,26 @@ module.exports = {
 			let upCount = "Unknown";
 			let downCount = "Unknown";
 			let messageFetched;
-			await client.channels.get(qServerDB.config.channels.suggestions).fetchMessage(qSuggestionDB.messageId).then(f => {
-				if (f.reactions.get(qSuggestionDB.emojis.up)) {
-					f.reactions.get(qSuggestionDB.emojis.up).me ? upCount = f.reactions.get(qSuggestionDB.emojis.up).count-1 : upCount = f.reactions.get(qSuggestionDB.emojis.up);
+			await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+				if (qSuggestionDB.emojis.up !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.up)) {
+					f.reactions.cache.get(qSuggestionDB.emojis.up).me ? upCount = f.reactions.cache.get(qSuggestionDB.emojis.up).count-1 : upCount = f.reactions.cache.get(qSuggestionDB.emojis.up);
 				}
-				if (f.reactions.get(qSuggestionDB.emojis.down)) {
-					f.reactions.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.get(qSuggestionDB.emojis.down).count-1 : downCount = f.reactions.get(qSuggestionDB.emojis.down);
+				if (qSuggestionDB.emojis.down !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.down)) {
+					f.reactions.cache.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.cache.get(qSuggestionDB.emojis.down).count-1 : downCount = f.reactions.cache.get(qSuggestionDB.emojis.down);
 				}
 				messageFetched = true;
 			}).catch(() => messageFetched = false);
 
-			if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+			if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
 			if (!isNaN(upCount) && !isNaN(downCount)) {
 				let opinion = upCount - downCount;
 				opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
 				embed.addField("Upvotes", upCount.toString(), true)
 					.addField("Downvotes", downCount.toString(), true)
-					.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
-				break;
 			}
+			embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+			break;
 		}
 		}
 
