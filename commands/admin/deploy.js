@@ -18,7 +18,8 @@ module.exports = {
 		await generateEmbed("Updating code");
 
 		let branch;
-		release === "canary" ? branch = "staging" : branch = "production";
+		if (args[0]) branch = args[0];
+		else release === "canary" ? branch = "staging" : branch = "production";
 
 		exec(`git fetch origin && git reset --hard origin/${branch}`) // Pull new code from GitHub
 			.then(async () => {
