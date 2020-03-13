@@ -16,7 +16,6 @@ const settings = new Schema({
 			log: { type: String },
 			denied: { type: String }
 		},
-		gold_threshold: { type: Number, default: 20 },
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
 		mode: { type: String, default: "review" },
@@ -44,10 +43,6 @@ const suggestion = new Schema({
 	reviewMessage: String,
 	staff_member: String,
 	denial_reason: String,
-	votes: {
-		upvotes: { type: Number, default: 0 },
-		downvotes: { type: Number, default: 0 }
-	},
 	emojis: {
 		up: { type: String, default: "👍" },
 		mid: { type: String, default: "🤷" },
