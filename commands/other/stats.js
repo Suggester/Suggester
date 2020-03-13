@@ -17,7 +17,7 @@ module.exports = {
 		let server;
 		let permission = await checkPermissions(message.member, client);
 		if (!args[0] || permission > 1) server = message.guild;
-		else if (client.guilds.get(args[0])) server = client.guilds.get(args[0]);
+		else if (client.guilds.cache.get(args[0])) server = client.guilds.cache.get(args[0]);
 		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild with ID \`${args[0]}\``);
 		let totalConfiguredServers = await Server.countDocuments();
 

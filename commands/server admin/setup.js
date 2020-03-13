@@ -173,8 +173,8 @@ module.exports = {
 						.then(async (collected) => {
 							let input = collected.first().content.split(" ")[0].toLowerCase();
 							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+							if (!channel || channel.type !== "text") {
+								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								return setup(3);
 							}
 							let perms = channelPermissions(channel.permissionsFor(client.user.id), "suggestions", client);
@@ -215,8 +215,8 @@ module.exports = {
 							.then(async (collected) => {
 								let input = collected.first().content.split(" ")[0].toLowerCase();
 								let channel = await findChannel(input, message.guild.channels.cache);
-								if (!channel) {
-									message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+								if (!channel || channel.type !== "text") {
+									message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 									return setup(4);
 								}
 								let perms = channelPermissions(channel.permissionsFor(client.user.id), "staff", client);
@@ -260,8 +260,8 @@ module.exports = {
 								return setup(6);
 							}
 							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+							if (!channel || channel.type !== "text") {
+								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								return setup(5);
 							}
 							let perms = channelPermissions(channel.permissionsFor(client.user.id), "denied", client);
@@ -305,8 +305,8 @@ module.exports = {
 								return setup(7);
 							}
 							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel) {
-								message.channel.send(`<:${emoji.x}> I could not find a channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+							if (!channel || channel.type !== "text") {
+								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 								return setup(6);
 							}
 							let perms = channelPermissions(channel.permissionsFor(client.user.id), "log", client);

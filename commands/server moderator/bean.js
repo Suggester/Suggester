@@ -21,11 +21,11 @@ module.exports = {
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
 
-		let beanSendEmbed = new Discord.MessageEmbed()
+		let beanSendEmbed = new Discord.MessageEmbed();
 		if (developer.includes(member.id) && !developer.includes(message.author.id)) {
 			member = message.member;
 			user = message.author;
-			beanSendEmbed.setImage("https://media.tenor.com/images/fdc481469f2c9deb220b1e986e40a39d/tenor.gif")
+			beanSendEmbed.setImage("https://media.tenor.com/images/fdc481469f2c9deb220b1e986e40a39d/tenor.gif");
 		}
 		beanSendEmbed.setColor("#AAD136")
 			.setDescription(reason);

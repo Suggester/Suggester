@@ -3,15 +3,15 @@ const { coreLog } = require("../coreFunctions.js");
 const { release } = require("../config.json");
 
 module.exports = async (Discord, client) => {
-	coreLog(`:ok: Logged in with ${client.guilds.size} servers!`, client);
+	coreLog(`:ok: Logged in with ${client.guilds.cache.size} servers!`, client);
 	console.log(`Logged in as ${client.user.tag}! (Release: ${release})`);
-	client.user.setPresence({ activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" })
+	client.user.setPresence({ activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" });
 
 	//Bot List Posting
 	if (release === "stable") {
 		const request = require("request");
-		let serverCount = client.guilds.size;
-		let userCount = client.users.size;
+		let serverCount = client.guilds.cache.size;
+		let userCount = client.users.cache.size;
 		//Botlist.Space
 		let blsoptions = {
 			url: "https://api.botlist.space/v1/bots/564426594144354315",
