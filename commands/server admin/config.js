@@ -1,4 +1,4 @@
-const { colors, emoji } = require("../../config.json");
+const { colors, emoji, prefix } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify, channelPermissions, findRole, findChannel, findEmoji } = require("../../coreFunctions.js");
 const nodeEmoji = require("node-emoji");
 module.exports = {
@@ -50,7 +50,7 @@ module.exports = {
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed();
-			embed.setDescription(`Please see https://suggester.gitbook.io/docs/admin/config for information about the config command. You can use \`${qServerDB.prefix}setup\` to walkthrough setting up your server.`);
+			embed.setDescription(`Please see https://suggester.gitbook.io/docs/admin/config for information about the config command. You can use \`${qServerDB.config.prefix || prefix}setup\` to walkthrough setting up your server.`);
 			embed.setColor(colors.default);
 			return message.channel.send(embed);
 		}
