@@ -1,5 +1,5 @@
-const config = require("../../config.json");
-const core = require("../../coreFunctions.js");
+const { emoji, colors, prefix } = require("../../config.json");
+const { dbQuery, checkConfig, checkChannel, fetchUser, suggestionEmbed, serverLog } = require("../../coreFunctions.js");
 const { Suggestion } = require("../../utils/schemas");
 module.exports = {
 	controls: {
@@ -13,51 +13,28 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDb = await core.dbQuery("Server", { id: message.guild.id });
-		if (qServerDb.config.mode === "autoapprove") return message.channel.send(`<:${config.emoji.x}> This command is disabled when the suggestion mode is set to \`autoapprove\`.`);
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
 
-		let missingConfigs = [];
-		if (!qServerDb) return message.channel.send(`<:${config.emoji.x}> You must configure your server to use this command. Please use the \`config\` command.\n:rotating_light: The database was recently lost due to an accident, which means that all configuration settings and suggestions were lost. Please join the support server for more information.`);
-		if (!qServerDb.config.admin_roles || qServerDb.config.admin_roles.length < 1) missingConfigs.push("Server Admin Roles");
-		if (!qServerDb.config.staff_roles || qServerDb.config.staff_roles.length < 1) missingConfigs.push("Server Staff Roles");
-		if (!qServerDb.config.channels.suggestions || !client.channels.get(qServerDb.config.channels.suggestions)) missingConfigs.push("Approved Suggestions Channel");
-		if (qServerDb.config.mode === "review" && (!qServerDb.config.channels.staff || !client.channels.get(qServerDb.config.channels.staff))) missingConfigs.push("Suggestion Review Channel");
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(`<:${emoji.x}> This command is disabled when the suggestion mode is set to \`autoapprove\`.`);
 
-		if (missingConfigs.length > 1) {
-			let embed = new Discord.RichEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${qServerDb.config.prefix}config\` command.`)
-				.addField("Missing Elements", `<:${config.emoji.x}> ${missingConfigs.join(`\n<:${config.emoji.x}> `)}`)
-				.setColor("#e74c3c");
+		let missing = checkConfig(qServerDB);
+
+		if (missing.length > 1) {
+			let embed = new Discord.MessageEmbed()
+				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
+				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.setColor(colors.red);
 			return message.channel.send(embed);
 		}
 
-		if (client.channels.get(qServerDb.config.channels.suggestions)) {
-			let perms = core.channelPermissions(client.channels.get(qServerDb.config.channels.suggestions).memberPermissions(client.user.id), "suggestions", client);
-			if (perms.length > 0) {
-				let embed = new Discord.RichEmbed()
-					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDb.config.channels.suggestions}> channel:`)
-					.addField("Missing Elements", `<:${config.emoji.x}> ${perms.join(`\n<:${config.emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${qServerDb.config.channels.suggestions}>, make sure that **${client.user.username}** has a <:${config.emoji.check}> for the above permissions.`)
-					.setColor("#e74c3c");
-				return message.channel.send(embed);
-			}
-		} else {
-			return message.channel.send(`<:${config.emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestion channel.`);
-		}
+		let missingSuggestionPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
+		if (!missingSuggestionPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
+		if (missingSuggestionPerms !== true) return message.channel.send(missingSuggestionPerms);
 
-		if (client.channels.get(qServerDb.config.channels.staff)) {
-			let perms = core.channelPermissions(client.channels.get(qServerDb.config.channels.staff).memberPermissions(client.user.id), "staff", client);
-			if (perms.length > 0) {
-				let embed = new Discord.RichEmbed()
-					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${qServerDb.config.channels.staff}> channel:`)
-					.addField("Missing Elements", `<:${config.emoji.x}> ${perms.join(`\n<:${config.emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${qServerDb.config.channels.staff}>, make sure that **${client.user.username}** has a <:${config.emoji.check}> for the above permissions.`)
-					.setColor("#e74c3c");
-				return message.channel.send(embed);
-			}
-		} else {
-			return message.channel.send(`<:${config.emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
-		}
+		let missingReviewPerms = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
+		if (!missingReviewPerms) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
+		if (missingReviewPerms !== true) return message.channel.send(missingReviewPerms);
 
 		if (!args[0]) return message.channel.send("You must specify at least one suggestion!");
 
@@ -65,14 +42,19 @@ module.exports = {
 		let reasonSplit = args.join(" ").split("-r");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(`<:${config.emoji.x}> Comments cannot be longer than 1024 characters.`);
+			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Comments cannot be longer than 1024 characters.`);
 		}
 		let suggestions = reasonSplit[0].split(" ");
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(`<:${config.emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers.`);
+		if (suggestions.some(isNaN)) return message.channel.send(`<:${emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers.`);
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send("Processing... this may take a moment");
+
+		let preApprove = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
+		let alreadyApproved = preApprove.filter((s) => s.status === "approved");
+
+		let notApprovedId = alreadyApproved.map((s) => s.suggestionId);
 
 		let { n, nModified } = await Suggestion.update({
 			suggestionId: { $in: su },
@@ -87,16 +69,15 @@ module.exports = {
 		});
 
 		let postApprove = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
-		let approved = postApprove.filter((s) => s.status === "approved");
-		let approvedId = postApprove.map((s) => s.suggestionId);
-		let notApprovedId = su.filter((s) => !approvedId.includes(s));
+		let approved = postApprove.filter((s) => s.status === "approved" && !notApprovedId.includes(s.suggestionId));
+		let approvedId = approved.map((s) => s.suggestionId);
 
 		if (n !== 0) {
 			await msg.edit(
-				new Discord.RichEmbed()
-					.setDescription(`<:${config.emoji.check}> ${nModified !== 0 ? "Successfully approved" : "Approved"} ${nModified}/${su.length} suggestions`)
+				new Discord.MessageEmbed()
+					.setDescription(`<:${emoji.check}> ${nModified !== 0 ? "Successfully approved" : "Approved"} ${nModified}/${postApprove.length} suggestions`)
 					.addField("Result", `**Approved**: ${approvedId.length > 0 ? approvedId.join(", ") : "No suggestions were approved."}\n${notApprovedId.length > 0 ? "**Could Not Approve**: " + notApprovedId.join(", ") : ""}`)
-					.setColor("#2ecc71")
+					.setColor(colors.green)
 					.setFooter(nModified !== su.length
 						? "One or more of your suggestions could not be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved."
 						: "All of your suggestions have been approved."
@@ -104,28 +85,48 @@ module.exports = {
 			);
 		} else {
 			return await msg.edit(
-				new Discord.RichEmbed()
-					.setDescription(`<:${config.emoji.x}> None of the suggestions you provided could be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved.`)
-					.setColor("#e74c3c")
+				new Discord.MessageEmbed()
+					.setDescription(`<:${emoji.x}> None of the suggestions you provided could be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved.`)
+					.setColor(colors.red)
 			);
 		}
 
 		for (let s in approved) {
 			// eslint-disable-next-line no-prototype-builtins
 			if (approved.hasOwnProperty(s)) {
-				let suggester = client.users.get(approved[s].suggester)
-					|| client.fetchUser(approved[s].suggester);
+				let suggester = await fetchUser(approved[s].suggester, client);
 
-				let msg = await client.channels.get(qServerDb.config.channels.suggestions)
-					.send(await core.suggestionEmbed(approved[s], qServerDb, client));
+				let msg = await client.channels.cache.get(qServerDB.config.channels.suggestions)
+					.send(await suggestionEmbed(approved[s], qServerDB, client));
 
-				if (qServerDb.config.notify) {
-					let dmEmbed = new Discord.RichEmbed()
+				if (qServerDB.config.react) {
+					let reactEmojiUp = qServerDB.config.emojis.up;
+					let reactEmojiMid = qServerDB.config.emojis.mid;
+					let reactEmojiDown = qServerDB.config.emojis.down;
+					if (reactEmojiUp !== "none") await msg.react(reactEmojiUp).catch(async () => {
+						await msg.react("👍");
+						reactEmojiUp = "👍";
+					});
+					if (reactEmojiMid !== "none") await msg.react(reactEmojiMid).catch(async () => {
+						await msg.react("🤷");
+						reactEmojiMid = "🤷";
+					});
+					if (reactEmojiDown !== "none") await msg.react(reactEmojiDown).catch(async () => {
+						await msg.react("👎");
+						reactEmojiDown = "👎";
+					});
+					approved[s].emojis.up = reactEmojiUp;
+					approved[s].emojis.mid = reactEmojiMid;
+					approved[s].emojis.down = reactEmojiDown;
+				}
+
+				if (qServerDB.config.notify) {
+					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId}`)
 						.setDescription(approved[s].suggestion)
-						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${qServerDb.id}/${qServerDb.config.channels.suggestions}/${msg.id})`)
-						.setColor("#2ecc71");
+						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${message.guild.id}/${qServerDB.config.channels.suggestions}/${msg.id})`)
+						.setColor(colors.green);
 					if (reason) dmEmbed.addField("Comment Added", reason);
 
 					await suggester.send(dmEmbed)
@@ -134,32 +135,27 @@ module.exports = {
 						});
 				}
 
-				if (qServerDb.config.channels.log) {
-					let logEmbed = new Discord.RichEmbed()
-						.setAuthor(`${message.author.tag} approved #${approved[s].suggestionId}`, message.author.displayAvatarURL)
+				if (qServerDB.config.channels.log) {
+					let logEmbed = new Discord.MessageEmbed()
+						.setAuthor(`${message.author.tag} approved #${approved[s].suggestionId}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
 						.addField("Suggestion", approved[s].suggestion)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId} | Approver ID: ${message.author.id}`)
 						.setTimestamp()
-						.setColor("#2ecc71");
+						.setColor(colors.green);
 					if (reason) logEmbed.addField("Comment Added by Approver", reason);
-					core.serverLog(logEmbed, qServerDb);
+					serverLog(logEmbed, qServerDB);
 				}
 
-				let updateEmbed = new Discord.RichEmbed()
-					.setTitle("Suggestion Awaiting Review (#" + approved[s].suggestionId + ")")
-					.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL)
+				let updateEmbed = new Discord.MessageEmbed()
+					.setTitle(`Suggestion Awaiting Review (${approved[s].suggestionId})`)
+					.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
 					.setDescription(approved[s].suggestion)
-					.setColor("#2ecc71")
+					.setColor(colors.green)
 					.addField("A change was processed on this suggestion", "This suggestion has been approved");
-				client.channels.get(qServerDb.config.channels.staff)
-					.fetchMessage(approved[s].reviewMessage)
+				client.channels.cache.get(qServerDB.config.channels.staff)
+					.messages.fetch(approved[s].reviewMessage)
 					.then((fetched) => fetched.edit(updateEmbed));
 
-				if (qServerDb.config.react) {
-					await msg.react(approved[s].emojis.up);
-					await msg.react(approved[s].emojis.mid);
-					await msg.react(approved[s].emojis.down);
-				}
 				let modified = approved[s];
 				if (reason) {
 					modified.comments = [{

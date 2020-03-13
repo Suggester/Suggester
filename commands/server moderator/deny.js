@@ -26,9 +26,9 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
-		let missingPermsSuggestions = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPermsSuggestions) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPermsSuggestions !== true) return message.channel.send(missingPermsSuggestions);
+		let missingPermsReview = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
+		if (!missingPermsReview) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
+		if (missingPermsReview !== true) return message.channel.send(missingPermsReview);
 
 		if (qServerDB.config.channels.denied) {
 			let missingPermsDenied = checkChannel(qServerDB.config.channels.denied, message.guild.channels.cache, "denied", client);
