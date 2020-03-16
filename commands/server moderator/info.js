@@ -101,7 +101,7 @@ module.exports = {
 				let opinion = upCount - downCount;
 				opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
 				embed.addField("Upvotes", upCount.toString(), true)
-					.addField("Downvotes", downCount.toString(), true)
+					.addField("Downvotes", downCount.toString(), true);
 			}
 			embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
 			break;

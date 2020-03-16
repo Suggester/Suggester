@@ -14,7 +14,7 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let server;
 		if (!args[0]) server = message.guild;
-		else if (client.guilds.get(args[0])) server = client.guilds.cache.get(args[0]);
+		else if (client.guilds.cache.get(args[0])) server = client.guilds.cache.get(args[0]);
 		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild based on your query!`);
 
 		let qServerDB = await dbQueryNoNew("Server", {id: server.id});

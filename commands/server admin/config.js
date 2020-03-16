@@ -202,7 +202,7 @@ module.exports = {
 			if (!args[1]) return message.channel.send(qServerDB.config.channels.staff ? `The suggestion review channel is currently configured to <#${qServerDB.config.channels.staff}>` : "This server has no suggestion review channel set!");
 			let reviewInput = args.splice(1).join(" ").toLowerCase();
 			let reviewChannel = await findChannel(reviewInput, message.guild.channels.cache);
-			if (!reviewChannel) return message.channel.send(`<:${emoji.x}> I could not find a channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			if (!reviewChannel || reviewChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 			let reviewPerms = channelPermissions(reviewChannel.permissionsFor(client.user.id), "staff", client);
 			if (reviewPerms.length > 0) {
 				let embed = new Discord.MessageEmbed()
@@ -224,7 +224,7 @@ module.exports = {
 			}
 			let suggestionInput = args.splice(1).join(" ").toLowerCase();
 			let suggestionChannel = await findChannel(suggestionInput, message.guild.channels.cache);
-			if (!suggestionChannel) return message.channel.send(`<:${emoji.x}> I could not find a channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			if (!suggestionChannel || suggestionChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 			let reviewPerms = channelPermissions(suggestionChannel.permissionsFor(client.user.id), "suggestions", client);
 			if (reviewPerms.length > 0) {
 				let embed = new Discord.MessageEmbed()
@@ -248,7 +248,7 @@ module.exports = {
 				return message.channel.send(`<:${emoji.check}> Successfully reset the denied suggestions channel.`);
 			}
 			let deniedChannel = await findChannel(deniedInput, message.guild.channels.cache);
-			if (!deniedChannel) return message.channel.send(`<:${emoji.x}> I could not find a channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			if (!deniedChannel || deniedChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 			let deniedPerms = channelPermissions(deniedChannel.permissionsFor(client.user.id), "denied", client);
 			if (deniedPerms.length > 0) {
 				let embed = new Discord.MessageEmbed()
@@ -273,7 +273,7 @@ module.exports = {
 				return message.channel.send(`<:${emoji.check}> Successfully reset the log channel.`);
 			}
 			let logChannel = await findChannel(logInput, message.guild.channels.cache);
-			if (!logChannel) return message.channel.send(`<:${emoji.x}> I could not find a channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			if (!logChannel || logChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
 			let logPerms = channelPermissions(logChannel.permissionsFor(client.user.id), "log", client);
 			if (logPerms.length > 0) {
 				let embed = new Discord.MessageEmbed()
@@ -489,7 +489,7 @@ module.exports = {
 				qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.staff);
-				if (!channel) {
+				if (!channel || channel.type !== "text") {
 					qServerDB.config.channels.staff = "";
 					qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
@@ -504,7 +504,7 @@ module.exports = {
 				issuesCountFatal++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.suggestions);
-				if (!channel) {
+				if (!channel || channel.type !== "text") {
 					qServerDB.config.channels.suggestions = "";
 					issuesCountFatal++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
@@ -519,7 +519,7 @@ module.exports = {
 				issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.denied);
-				if (!channel) {
+				if (!channel || channel.type !== "text") {
 					qServerDB.config.channels.denied = "";
 					issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
@@ -534,7 +534,7 @@ module.exports = {
 				issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.log);
-				if (!channel) {
+				if (!channel || channel.type !== "text") {
 					qServerDB.config.channels.log = "";
 					issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
