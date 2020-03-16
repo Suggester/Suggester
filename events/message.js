@@ -16,7 +16,7 @@ module.exports = async (Discord, client, message) => {
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 	let possiblementions = [`<@${client.user.id}> help`, `<@${client.user.id}>help`, `<@!${client.user.id}> help`, `<@!${client.user.id}>help`, `<@${client.user.id}> prefix`, `<@${client.user.id}>prefix`, `<@!${client.user.id}> prefix`, `<@!${client.user.id}>prefix`, `<@${client.user.id}> ping`, `<@${client.user.id}>ping`, `<@!${client.user.id}> ping`, `<@!${client.user.id}>ping`];
-	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is ${Discord.escapeMarkdown(serverPrefix)}\nYou can read more about my commands at https://suggester.gitbook.io/`);
+	if (possiblementions.includes(message.content.toLowerCase())) return message.reply(`Hi there! My prefix in this server is \`${Discord.escapeMarkdown(serverPrefix)}\`\nYou can read more about my commands at https://suggester.gitbook.io/`);
 
 	if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) serverPrefix = "suggester:";
 	if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) serverPrefix = `${client.user.id}:`;
