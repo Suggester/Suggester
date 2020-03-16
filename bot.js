@@ -75,9 +75,7 @@ client.commands = new Discord.Collection();
 })();
 
 client.login(process.env.TOKEN)
-	.catch((err) => {
-		throw new Error(err);
-	});
+	.catch(console.error);
 
 client.on("error", (err) => {
 	errorLog(err, "error", "something happened and idk what");
