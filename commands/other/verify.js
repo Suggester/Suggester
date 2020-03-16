@@ -20,12 +20,18 @@ module.exports = {
 
 		let globalPosArr = [];
 		let posArr = [];
-		if (developer.includes(id)) globalPosArr.push("<:suggester:621530308592009242> Developer");
-		if (developer.includes(id)) globalPosArr.push("<:suggester:621530308592009242> Global Administrator");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get(global_override).members.get(id)) globalPosArr.push("<:suggester:621530308592009242> Global Permissions");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566029891590422566").members.get(id)) globalPosArr.push("<:suggester:621530308592009242> Suggester Server Moderator");
+		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer");
+		if (developer.includes(id)) globalPosArr.push("<:suggesteradmin:689138045122773006> Global Administrator");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get(global_override).members.get(id)) globalPosArr.push("<:suggesterglobal:689121762952216625> Global Permissions");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566029891590422566").members.get(id)) globalPosArr.push("<:suggestermod:689138045328293974> Suggester Server Moderator");
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566030511840034816").members.get(id)) globalPosArr.push("<:support:643571568638689332> Suggester Support Team");
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("657644875499569161").members.get(id)) globalPosArr.push("<:bean:657650134502604811> Global Bean Permissions");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("614084573139173389").members.get(id)) globalPosArr.push("<:canary:621530343081508899> Suggester Canary Program");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("631986751375933446").members.get(id)) globalPosArr.push(":star: Suggester Contributor");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("574193409829634048").members.get(id)) globalPosArr.push("<:partner:689138870096363559> Suggester Partner");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("618893176295653397").members.get(id)) globalPosArr.push(":sunglasses: Super Supporter (Tier 3)");
+		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("640906114321612821").members.get(id)) globalPosArr.push(":sunglasses: Upper Tier Upvoter (Tier 2)");
+		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("569954188675776522").members.get(id)) globalPosArr.push(":sunglasses: Supporter (Tier 1)");
 
 		if (qUserDB.blocked) globalPosArr.push(":no_entry_sign: Blacklisted Globally");
 
@@ -47,7 +53,6 @@ module.exports = {
 			if (staffRoles > 0) posArr.push(":tools: Server Staff");
 		}
 		if (qServerDB && qServerDB.config.blacklist.includes(id)) posArr.push(":no_entry_sign: Blacklisted on this server");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("614084573139173389").members.get(id)) globalPosArr.push("<:canary:621530343081508899> Suggester Canary Program");
 
 		let hasAcks = false;
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(id), client);
