@@ -74,18 +74,20 @@ module.exports = {
 			.setTitle("Suggestion Deleted")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(`Deleted by ${message.author.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion)
+			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 			.setColor(colors.red);
 		reason ? replyEmbed.addField("Reason Given", reason) : "";
 		message.channel.send(replyEmbed);
 
-		if (qServerDB.config.notify) {
+		let qUserDB = await dbQuery("User", { id: suggester.id });
+		if (qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`Your Suggestion in **${message.guild.name}** Was Deleted`)
 				.setFooter(`Suggestion ID: ${id.toString()}`)
-				.setDescription(qSuggestionDB.suggestion)
+				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setColor(colors.red);
 			reason ? dmEmbed.addField("Reason Given", reason) : "";
+			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
 			suggester.send(dmEmbed).catch(() => {});
 		}
 
@@ -104,21 +106,23 @@ module.exports = {
 				.setTitle("Suggestion Deleted")
 				.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`)
 				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion)
+				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setFooter(`Suggestion ID: ${id.toString()}`)
 				.setColor(colors.red);
 			reason ? deniedEmbed.addField("Reason Given:", reason) : "";
+			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} deleted #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setFooter(`Suggestion ID: ${id.toString()} | Deleter ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.red);
 			reason ? logEmbed.addField("Deletion Reason", reason) : "";
+			qSuggestionDB.attachment ? logEmbed.setImage(qSuggestionDB.attachment) : "";
 			serverLog(logEmbed, qServerDB);
 		}
 

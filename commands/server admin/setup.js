@@ -51,7 +51,7 @@ module.exports = {
 							await qServerDB.config.admin_roles.push(role.id);
 							await dbModify("Server", { id: message.guild.id }, qServerDB);
 
-							await message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server admin roles.`);
+							await message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server admin roles.`, {disableMentions: "everyone"});
 							return setup(0);
 						})
 						.catch(e => {
@@ -97,7 +97,7 @@ module.exports = {
 							await qServerDB.config.staff_roles.push(role.id);
 							await dbModify("Server", { id: message.guild.id }, qServerDB);
 
-							message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server staff roles.`);
+							message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server staff roles.`, {disableMentions: "everyone"});
 							return setup(1);
 						})
 						.catch(e => {
@@ -320,7 +320,7 @@ module.exports = {
 								return setup(6);
 							}
 							qServerDB.config.channels.log = channel.id;
-							await channel.createWebhook("Suggester Logs", client.user.displayAvatarURL, "Create log channel from setup").then(async (webhook) => {
+							await channel.createWebhook("Suggester Logs", client.user.displayAvatarURL({format: "png"}), "Create log channel from setup").then(async (webhook) => {
 								qServerDB.config.loghook.id = webhook.id;
 								qServerDB.config.loghook.token = webhook.token;
 
@@ -407,13 +407,13 @@ module.exports = {
 							return checkMsg.edit(`<:${emoji.x}> **Setup Cancelled**`);
 						} else {
 							checkMsg.delete();
-
+							let oldWhitelist = qServerDB.whitelist;
 							await dbDeleteOne("Server", {id: message.guild.id});
 
 							await new Server({
 								id: message.guild.id,
 								blocked: false,
-								whitelist: false,
+								whitelist: oldWhitelist,
 								config: {
 									prefix: ".",
 									admin_roles: [],

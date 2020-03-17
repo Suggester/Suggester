@@ -64,7 +64,7 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.addField("Comment", comment.comment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Deleter ID: ${message.author.id}`)
 				.setTimestamp()

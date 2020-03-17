@@ -68,7 +68,7 @@ module.exports = {
 				if (qServerDB.config.admin_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role has already been added as an admin role.`);
 				qServerDB.config.admin_roles.push(role.id);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server admin roles.`);
+				return message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server admin roles.`, {disableMentions: "everyone"});
 			}
 			case "remove":
 			case "-":
@@ -81,7 +81,7 @@ module.exports = {
 				if (!qServerDB.config.admin_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently an admin role.`);
 				qServerDB.config.admin_roles.splice(qServerDB.config.admin_roles.findIndex(r => r === role.id), 1);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server admin roles.`);
+				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server admin roles.`, {disableMentions: "everyone"});
 			}
 			case "list": {
 				if (!qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) {
@@ -99,7 +99,7 @@ module.exports = {
 						}
 					});
 					if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
-					return message.channel.send(`**Admin Roles:**\n>>> ${adminRoleList.join("\n")}`);
+					return message.channel.send(`**Admin Roles:**\n>>> ${adminRoleList.join("\n")}`, {disableMentions: "everyone"});
 				}
 			}
 			default: {
@@ -120,7 +120,7 @@ module.exports = {
 							}
 						});
 						if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
-						return message.channel.send(`**Admin Roles:**\n>>> ${adminRoleList.join("\n")}`);
+						return message.channel.send(`**Admin Roles:**\n>>> ${adminRoleList.join("\n")}`, {disableMentions: "everyone"});
 					}
 				}
 			}
@@ -139,7 +139,7 @@ module.exports = {
 				if (qServerDB.config.staff_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role has already been added as a staff role.`);
 				qServerDB.config.staff_roles.push(role.id);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server staff roles.`);
+				return message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server staff roles.`, {disableMentions: "everyone"});
 			}
 			case "remove":
 			case "-":
@@ -152,7 +152,7 @@ module.exports = {
 				if (!qServerDB.config.staff_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently a staff role.`);
 				qServerDB.config.staff_roles.splice(qServerDB.config.admin_roles.findIndex(r => r === role.id), 1);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server staff roles.`);
+				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server staff roles.`, {disableMentions: "everyone"});
 			}
 			case "list": {
 				if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) {
@@ -170,7 +170,7 @@ module.exports = {
 						}
 					});
 					if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
-					return message.channel.send(`**Staff Roles:**\n>>> ${staffRoleList.join("\n")}`);
+					return message.channel.send(`**Staff Roles:**\n>>> ${staffRoleList.join("\n")}`, {disableMentions: "everyone"});
 				}
 			}
 			default: {
@@ -191,7 +191,7 @@ module.exports = {
 							}
 						});
 						if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
-						return message.channel.send(`**Staff Roles:**\n>>> ${staffRoleList.join("\n")}`);
+						return message.channel.send(`**Staff Roles:**\n>>> ${staffRoleList.join("\n")}`, {disableMentions: "everyone"});
 					}
 				}
 			}

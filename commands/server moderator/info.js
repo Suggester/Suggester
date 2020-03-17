@@ -35,9 +35,15 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(`Suggestion Info: #${id.toString()}`)
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion)
+			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 			.addField("Author", `${suggester.tag} (${suggester.id})`)
 			.setColor(colors.blue);
+
+		if (qSuggestionDB.attachment) {
+			embed.addField("Attachment", qSuggestionDB.attachment)
+				.setImage(qSuggestionDB.attachment);
+		}
+
 		if (qSuggestionDB.comments && qSuggestionDB.comments.length > 0) {
 			if (qSuggestionDB.comments.filter(c => c.deleted).length > 0) {
 				embed.addField("Comment Count", `${qSuggestionDB.comments.filter(c => !c.deleted).length} (+${qSuggestionDB.comments.filter(c => c.deleted).length} deleted)`);

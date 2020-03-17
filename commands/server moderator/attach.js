@@ -70,7 +70,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Attachment Added")
-			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
 			.setColor(colors.blue)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -79,7 +79,7 @@ module.exports = {
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} added an attachment to #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setImage(attachment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Attacher ID: ${message.author.id}`)
 				.setTimestamp()

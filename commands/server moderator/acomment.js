@@ -65,16 +65,17 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Anonymous Comment Added")
-			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField("Official Comment", comment)
 			.setColor(colors.blue)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
 		message.channel.send(replyEmbed);
 
-		if (qServerDB.config.notify) {
+		let qUserDB = await dbQuery("User", { id: suggester.id });
+		if (qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
-				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField("Official Comment", comment)
 				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -84,7 +85,7 @@ module.exports = {
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} added an anonymous comment to #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.addField("Comment", comment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Commenter ID: ${message.author.id}`)
 				.setTimestamp()

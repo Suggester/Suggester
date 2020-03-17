@@ -32,50 +32,12 @@ module.exports = {
 
 		let qMemberDB = await dbQuery("User", { id: member.id });
 		let qSenderDB = await dbQuery("User", { id: message.author.id });
-		if (!qMemberDB || !qMemberDB.beans) await dbModifyId("User", member.id, { beans: {
-			sent: {
-				bean: { type: Number, default: 0 },
-				megabean: { type: Number, default: 0 },
-				nukebean: { type: Number, default: 0 }
-			},
-			received: {
-				bean: { type: Number, default: 0 },
-				megabean: { type: Number, default: 0 },
-				nukebean: { type: Number, default: 0 }
-			}
-		}
-		});
-		if (!qSenderDB || !qSenderDB.beans) await dbModifyId("User", message.author.id, { beans: {
-			sent: {
-				bean: { type: Number, default: 0 },
-				megabean: { type: Number, default: 0 },
-				nukebean: { type: Number, default: 0 }
-			},
-			received: {
-				bean: { type: Number, default: 0 },
-				megabean: { type: Number, default: 0 },
-				nukebean: { type: Number, default: 0 }
-			}
-		}
-		});
-
-		let memberSentBeanCount = qMemberDB.beans.sent;
-		let memberReceivedBeanCount = {
-			bean: qMemberDB.beans.received.bean+1,
-			megabean: qMemberDB.beans.received.megabean,
-			nukebean: qMemberDB.beans.received.nukebean
-		};
-		let senderReceivedBeanCount = qSenderDB.beans.received;
-		let senderSentBeanCount = {
-			bean: qSenderDB.beans.sent.bean+1,
-			megabean: qSenderDB.beans.sent.megabean,
-			nukebean: qSenderDB.beans.sent.nukebean
-		};
-		await dbModifyId("User", member.id, { beans: { sent: memberSentBeanCount, received: memberReceivedBeanCount } });
-		await dbModifyId("User", message.author.id, { beans: { sent: senderSentBeanCount, received: senderReceivedBeanCount } });
+		qMemberDB.beans.received.bean ? qMemberDB.beans.received.bean = qMemberDB.beans.received.bean++ : qMemberDB.beans.received.bean = 1;
+		qSenderDB.beans.sent.bean ? qSenderDB.beans.sent.bean = qSenderDB.beans.sent.bean++ : qSenderDB.beans.sent.bean = 1;
+		await dbModifyId("User", member.id, qMemberDB);
+		await dbModifyId("User", message.author.id, qSenderDB);
 
 		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
-		member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed)
-			.catch(() => {});
+		if (qMemberDB.notify) member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed).catch(() => {});
 	}
 };

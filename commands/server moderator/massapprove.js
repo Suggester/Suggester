@@ -120,11 +120,12 @@ module.exports = {
 					approved[s].emojis.down = reactEmojiDown;
 				}
 
-				if (qServerDB.config.notify) {
+				let qUserDB = await dbQuery("User", { id: suggester.id });
+				if (qServerDB.config.notify && qUserDB.notify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId}`)
-						.setDescription(approved[s].suggestion)
+						.setDescription(approved[s].suggestion || "[No Suggestion Content]")
 						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${message.guild.id}/${qServerDB.config.channels.suggestions}/${msg.id})`)
 						.setColor(colors.green);
 					if (reason) dmEmbed.addField("Comment Added", reason);
@@ -138,7 +139,7 @@ module.exports = {
 				if (qServerDB.config.channels.log) {
 					let logEmbed = new Discord.MessageEmbed()
 						.setAuthor(`${message.author.tag} approved #${approved[s].suggestionId}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-						.addField("Suggestion", approved[s].suggestion)
+						.addField("Suggestion", approved[s].suggestion || "[No Suggestion Content]")
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId} | Approver ID: ${message.author.id}`)
 						.setTimestamp()
 						.setColor(colors.green);

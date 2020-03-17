@@ -1,11 +1,9 @@
-const { presence } = require("../persistent");
 const { coreLog } = require("../coreFunctions.js");
 const { release } = require("../config.json");
 
 module.exports = async (Discord, client) => {
 	coreLog(`:ok: Logged in with ${client.guilds.cache.size} servers!`, client);
 	console.log(`Logged in as ${client.user.tag}! (Release: ${release})`);
-	client.user.setPresence({ activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" });
 
 	//Bot List Posting
 	if (release === "stable") {

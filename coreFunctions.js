@@ -383,6 +383,7 @@ module.exports = {
 	 * @returns {Object}
 	 */
 	dbQueryNoNew: async (collection, query) => {
+		if (!models[collection]) return 0;
 		return await models[collection].findOne(
 			query
 		)

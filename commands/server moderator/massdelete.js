@@ -101,13 +101,15 @@ module.exports = {
 					.then((m) => m.delete())
 					.catch();
 
-				if (qServerDB.config.notify) {
+				let qUserDB = await dbQuery("User", { id: suggester.id });
+				if (qServerDB.config.notify && qUserDB.notify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion In **${message.guild.name}** Was Deleted`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
-						.setDescription(denied[s].suggestion)
+						.setDescription(denied[s].suggestion || "[No Suggestion Content]")
 						.setColor(colors.red);
-					if (reason) dmEmbed.addField("Reason Given", reason);
+					reason ? dmEmbed.addField("Reason Given:", reason) : "";
+					denied[s].attachment ? dmEmbed.setImage(denied[s].attachment) : "";
 					await suggester.send(dmEmbed)
 						.catch((err) => {
 							console.log(err);
@@ -116,11 +118,12 @@ module.exports = {
 				if (qServerDB.config.channels.log) {
 					let logEmbed = new Discord.MessageEmbed()
 						.setAuthor(`${message.author.tag} deleted #${denied[s].suggestionId}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-						.addField("Suggestion", denied[s].suggestion)
+						.addField("Suggestion", denied[s].suggestion || "[No Suggestion Content]")
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId} | Denier ID: ${message.author.id}`)
 						.setTimestamp()
 						.setColor(colors.red);
-					if (reason) logEmbed.addField("Denial Reason", reason);
+					reason ? logEmbed.addField("Reason Given:", reason) : "";
+					denied[s].attachment ? logEmbed.setImage(denied[s].attachment) : "";
 
 					serverLog(logEmbed, qServerDB);
 				}
@@ -139,10 +142,11 @@ module.exports = {
 						.setTitle("Suggestion Deleted")
 						.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`)
 						.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-						.setDescription(denied[s].suggestion)
+						.setDescription(denied[s].suggestion || "[No Suggestion Content]")
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
 						.setColor(colors.red);
-					if (reason) deniedEmbed.addField("Reason Given", reason);
+					reason ? deniedEmbed.addField("Reason Given:", reason) : "";
+					denied[s].attachment ? deniedEmbed.setImage(denied[s].attachment) : "";
 					await client.channels.cache.get(qServerDB.config.channels.denied)
 						.send(deniedEmbed);
 				}

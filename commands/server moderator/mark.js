@@ -82,16 +82,17 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Status Edited")
-			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setColor(statusInfo[0])
 			.setFooter(`Suggestion ID: ${id.toString()}`)
 			.addField("Status", statusInfo[1]);
 		message.channel.send(replyEmbed);
 
-		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify) {
+		let qUserDB = await dbQuery("User", { id: suggester.id });
+		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
-				.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField("Status", statusInfo[1])
 				.setColor(statusInfo[0])
 				.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -101,7 +102,7 @@ module.exports = {
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} set a status for #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.addField("New Status", statusInfo[1])
 				.setColor(statusInfo[0])
 				.setFooter(`Suggestion ID: ${id.toString()} | Staff Member ID: ${message.author.id}`)

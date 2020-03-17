@@ -26,9 +26,9 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
-		let missingPermsSuggestions = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPermsSuggestions) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPermsSuggestions !== true) return message.channel.send(missingPermsSuggestions);
+		let missingPermsReview = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
+		if (!missingPermsReview) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
+		if (missingPermsReview !== true) return message.channel.send(missingPermsReview);
 
 		if (qServerDB.config.channels.denied) {
 			let missingPermsDenied = checkChannel(qServerDB.config.channels.denied, message.guild.channels.cache, "denied", client);
@@ -81,18 +81,24 @@ module.exports = {
 			.setTitle("Suggestion Denied")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(`Denied by ${message.author.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion)
+			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 			.setColor(colors.red);
 		reason ? replyEmbed.addField("Reason Given", reason) : "";
+		if (qSuggestionDB.attachment) {
+			replyEmbed.addField("With Attachment", qSuggestionDB.attachment)
+				.setImage(qSuggestionDB.attachment);
+		}
 		await message.channel.send(replyEmbed);
 
-		if (qServerDB.config.notify) {
+		let qUserDB = await dbQuery("User", { id: suggester.id });
+		if (qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`Your Suggestion in **${message.guild.name}** Was Denied`)
 				.setFooter(`Suggestion ID: ${id.toString()}`)
-				.setDescription(qSuggestionDB.suggestion)
+				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setColor(colors.red);
 			reason ? dmEmbed.addField("Reason Given", reason) : "";
+			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
 			suggester.send(dmEmbed).catch(err => console.log(err));
 		}
 
@@ -103,17 +109,27 @@ module.exports = {
 				.setDescription(qSuggestionDB.suggestion)
 				.setColor(colors.red)
 				.addField("A change was processed on this suggestion", "This suggestion has been denied");
+
+			if (qSuggestionDB.attachment) {
+				updateEmbed.addField("With Attachment", qSuggestionDB.attachment)
+					.setImage(qSuggestionDB.attachment);
+			}
+
 			client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed));
 		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} denied #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setFooter(`Suggestion ID: ${id.toString()} | Denier ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.red);
 			reason ? logEmbed.addField("Denial Reason", reason) : "";
+			if (qSuggestionDB.attachment) {
+				logEmbed.addField("With Attachment", qSuggestionDB.attachment)
+					.setImage(qSuggestionDB.attachment);
+			}
 			serverLog(logEmbed, qServerDB);
 		}
 	}

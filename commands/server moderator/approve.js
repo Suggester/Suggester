@@ -72,9 +72,15 @@ module.exports = {
 			.setTitle("Suggestion Approved")
 			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(`Approved by ${message.author.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion);
+			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
+			.setColor(colors.green);
 		isComment ? replyEmbed.addField("Comment Added", comment) : "";
-		replyEmbed.setColor(colors.green);
+
+		if (qSuggestionDB.attachment) {
+			replyEmbed.addField("With Attachment", qSuggestionDB.attachment)
+				.setImage(qSuggestionDB.attachment);
+		}
+
 		await message.channel.send(replyEmbed);
 
 		let embedSuggest = await suggestionEmbed(qSuggestionDB, qServerDB, client);
@@ -82,14 +88,16 @@ module.exports = {
 			await dbModify("Suggestion", { suggestionId: id }, {
 				messageId: posted.id
 			});
-			if (qServerDB.config.notify) {
+			let qUserDB = await dbQuery("User", { id: suggester.id });
+			if (qServerDB.config.notify && qUserDB.notify) {
 				let dmEmbed = new Discord.MessageEmbed()
 					.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 					.setFooter(`Suggestion ID: ${id.toString()}`)
-					.setDescription(qSuggestionDB.suggestion)
+					.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
 					.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${posted.id})`)
 					.setColor(colors.green);
 				isComment ? dmEmbed.addField("Comment Added", comment) : "";
+				qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
 				suggester.send(dmEmbed).catch(err => console.error(err));
 			}
 
@@ -122,11 +130,17 @@ module.exports = {
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} approved #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setFooter(`Suggestion ID: ${id.toString()} | Approver ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.green);
 			isComment ? logEmbed.addField("Comment Added by Approver", comment) : "";
+
+			if (qSuggestionDB.attachment) {
+				logEmbed.addField("With Attachment", qSuggestionDB.attachment)
+					.setImage(qSuggestionDB.attachment);
+			}
+
 			serverLog(logEmbed, qServerDB);
 		}
 
@@ -136,6 +150,12 @@ module.exports = {
 			.setDescription(qSuggestionDB.suggestion)
 			.setColor(colors.green)
 			.addField("A change was processed on this suggestion", "This suggestion has been approved");
+
+		if (qSuggestionDB.attachment) {
+			updateEmbed.addField("With Attachment", qSuggestionDB.attachment)
+				.setImage(qSuggestionDB.attachment);
+		}
+
 		client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed));
 
 	}

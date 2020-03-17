@@ -50,7 +50,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Attachment Removed")
-			.setDescription(`${qSuggestionDB.suggestion}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(oldAttachment)
 			.setColor(colors.orange)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -61,7 +61,7 @@ module.exports = {
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} removed attachment from #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion)
+				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
 				.setImage(oldAttachment)
 				.setFooter(`Suggestion ID: ${id.toString()} | Staff Member ID: ${message.author.id}`)
 				.setTimestamp()

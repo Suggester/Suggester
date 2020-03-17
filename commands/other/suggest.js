@@ -2,6 +2,20 @@ const { emoji, colors } = require("../../config.json");
 const core = require("../../coreFunctions.js");
 const { dbQuery, dbModify, serverLog, suggestionEmbed } = require("../../coreFunctions");
 const { Suggestion } = require("../../utils/schemas");
+const validUrl = require("valid-url");
+
+/**
+ * Check a URL to see if it makes a valid attachment
+ * @param {string} url - The string to be checked
+ * @returns {boolean}
+ */
+function checkURL (url) {
+	if (validUrl.isUri(url)){
+		let noparams = url.split("?")[0];
+		return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
+	} else return false;
+}
+
 module.exports = {
 	controls: {
 		name: "suggest",
@@ -14,7 +28,6 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		if (!args) return;
 		let missingConfigs = [];
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`setup\` command.`);
@@ -44,7 +57,9 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
-		if (!args[0]) return message.channel.send("Please provide a suggestion!");
+		let attachment = message.attachments.first() ? message.attachments.first().url : "";
+		if (!args[0] && !attachment) return message.channel.send("Please provide a suggestion!");
+		if (attachment && !(checkURL(attachment))) return message.channel.send(`<:${emoji.x}> Please provide a valid attachment! Attachments can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``);
 
 		let suggestion = args.join(" ");
 
@@ -73,7 +88,8 @@ module.exports = {
 				suggester: message.author.id,
 				suggestion: suggestion,
 				status: "awaiting_review",
-				suggestionId: id
+				suggestionId: id,
+				attachment: attachment
 			}).save();
 
 			let replyEmbed = new Discord.MessageEmbed()
@@ -81,7 +97,8 @@ module.exports = {
 				.setDescription(suggestion)
 				.setFooter(`Suggestion ID: ${id.toString()} | Submitted at `)
 				.setTimestamp()
-				.setColor(colors.default);
+				.setColor(colors.default)
+				.setImage(attachment);
 			message.channel.send("Your suggestion has been submitted for review!", replyEmbed);
 
 			let reviewEmbed = new Discord.MessageEmbed()
@@ -89,7 +106,12 @@ module.exports = {
 				.setAuthor(`${message.author.tag} (ID: ${message.author.id})`, message.author.displayAvatarURL({format: "png", dynamic: true}))
 				.setDescription(suggestion)
 				.setColor(colors.yellow)
-				.addField("Approve/Deny", `Use **${qServerDB.config.prefix}approve ${id.toString()}** to send to <#${qServerDB.config.channels.suggestions}>\nUse **${qServerDB.config.prefix}deny ${id.toString()}** to deny`);
+				.addField("Approve/Deny", `Use **${qServerDB.config.prefix}approve ${id.toString()}** to send to <#${qServerDB.config.channels.suggestions}>\nUse **${qServerDB.config.prefix}deny ${id.toString()}** to deny`)
+
+			if (attachment) {
+				reviewEmbed.addField("With Attachment", attachment)
+					.setImage(attachment);
+			}
 
 			client.channels.cache.get(qServerDB.config.channels.staff).send(reviewEmbed)
 				.then(async (posted) => {
@@ -103,6 +125,12 @@ module.exports = {
 					.setFooter(`Suggestion ID: ${id.toString()} | User ID: ${message.author.id}`)
 					.setTimestamp()
 					.setColor(colors.yellow);
+
+				if (attachment) {
+					logEmbed.setImage(attachment)
+						.addField("With Attachment", attachment);
+				}
+
 				serverLog(logEmbed, qServerDB);
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
@@ -126,7 +154,8 @@ module.exports = {
 				suggestion: suggestion,
 				status: "approved",
 				suggestionId: id,
-				staff_member: client.user.id
+				staff_member: client.user.id,
+				attachment: attachment
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
@@ -167,11 +196,9 @@ module.exports = {
 				.setDescription(suggestion)
 				.setFooter(`Suggestion ID: ${id.toString()} | Submitted at `)
 				.setTimestamp()
-				.setColor(colors.default);
-			message.channel.send(
-				`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`,
-				replyEmbed
-			);
+				.setColor(colors.default)
+				.setImage(attachment);
+			message.channel.send(`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`, replyEmbed);
 
 			if (qServerDB.config.channels.log) {
 				let logEmbed = new Discord.MessageEmbed()
@@ -180,6 +207,12 @@ module.exports = {
 					.setFooter(`Suggestion ID: ${id.toString()} | User ID: ${message.author.id}`)
 					.setTimestamp()
 					.setColor(colors.green);
+
+				if (attachment) {
+					logEmbed.setImage(attachment)
+						.addField("With Attachment", attachment);
+				}
+
 				serverLog(logEmbed, qServerDB);
 			}
 		}

@@ -5,6 +5,7 @@ const { errorLog, fileLoader } = require("./coreFunctions.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
 const { basename } = require("path");
+const { presence } = require("./persistent.json");
 
 const client = new Discord.Client({
 	disabledEvents: [
@@ -24,7 +25,9 @@ const client = new Discord.Client({
 		"RELATIONSHIP_ADD",
 		"RELATIONSHIP_REMOVE",
 		"WEBHOOKS_UPDATE"
-	]
+	],
+	disableMentions: "everyone",
+	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
 });
 
 connect(process.env.MONGO, {
