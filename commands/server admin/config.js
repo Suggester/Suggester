@@ -354,6 +354,7 @@ module.exports = {
 			case "yes": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
+					if (qServerDB.config.emojis.up === "none") return message.channel.send(`<:${emoji.x}> The upvote emoji is already disabled.`);
 					qServerDB.config.emojis.up = "none";
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the upvote reaction.`);
@@ -371,6 +372,7 @@ module.exports = {
 			case "mid": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
+					if (qServerDB.config.emojis.mid === "none") return message.channel.send(`<:${emoji.x}> The shrug/no opinion emoji is already disabled.`);
 					qServerDB.config.emojis.mid = "none";
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the shrug/no opinion reaction.`);
@@ -387,6 +389,7 @@ module.exports = {
 			case "no": {
 				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
+					if (qServerDB.config.emojis.down === "none") return message.channel.send(`<:${emoji.x}> The downvote emoji is already disabled.`);
 					qServerDB.config.emojis.down = "none";
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the downvote reaction.`);
