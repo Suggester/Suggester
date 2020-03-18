@@ -27,12 +27,16 @@ module.exports = {
 
 		if (args[0].toLowerCase() === "list") {
 			if (qServerDB.config.blacklist.length < 1) return message.channel.send("There are no users blacklisted from using the bot on this server!");
-			let list = [];
-			for await (let blacklisted of qServerDB.config.blacklist) {
-				let u = await fetchUser(blacklisted, client);
-				u ? list.push(`${u.tag} (\`${u.id}\`)`) : list.push(`Unknown User (\`${blacklisted}\`)`);
+			let chunks = qServerDB.config.blacklist.chunk(21);
+			for await (let chunk of chunks) {
+				let list = [];
+				for await (let blacklisted of chunk) {
+					let u = await fetchUser(blacklisted, client);
+					u ? list.push(`${u.tag} (\`${u.id}\`)`) : list.push(`Unknown User (\`${blacklisted}\`)`);
+				}
+				message.channel.send(`These users are blacklisted from using Suggester on this server:\n> ${list.join("\n> ")}`);
 			}
-			return message.channel.send(`These users are blacklisted from using Suggester on this server:\n> ${list.join("\n> ")}`);
+			return;
 		}
 
 		let user = await fetchUser(args[0], client);
