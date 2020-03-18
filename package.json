@@ -1,34 +1,34 @@
 {
   "name": "suggester-bot",
   "description": "A bot that manages suggestions on Discord",
+  "repository": "https://github.com/Suggester-Bot/Suggester",
+  "license": "MIT",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
     "lint": "eslint ."
   },
-  "engines": {
-    "node": "12.14.1"
-  },
   "dependencies": {
+    "@sentry/node": "^5.14.1",
     "botlist.space": "^3.1.6",
     "chalk": "^3.0.0",
     "dblapi.js": "^2.3.0",
-    "discord.js": "^11.5.1",
-    "eslint": "^6.8.0",
+    "decache": "^4.5.1",
+    "discord.js": "^12.0.0",
+    "dotenv": "^8.2.0",
     "express": "^4.16.4",
     "gblapi.js": "^1.3.11",
     "humanize-duration": "^3.21.0",
     "mongoose": "^5.8.2",
+    "mongoose-sequence": "^5.2.2",
     "ms": "^2.1.2",
     "node-emoji": "^1.10.0",
     "numbered": "^1.1.0",
-    "mongoose-sequence": "^5.2.2",
-    "decache": "^4.5.1",
-    "valid-url": "1.0.9",
     "request": "^2.88.0",
-    "dotenv": "^8.2.0"
+    "valid-url": "1.0.9"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0"
   }
 }
