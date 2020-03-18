@@ -98,8 +98,8 @@ module.exports = {
 					.setColor(colors.green);
 				isComment ? dmEmbed.addField("Comment Added", comment) : "";
 				qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-				if(qServerDB.config.selfnotify===false && suggester.id!==message.author.id) suggester.send(dmEmbed).catch(err => console.error(err));
-				if(qServerDB.config.selfnotify) suggester.send(dmEmbed).catch(err => console.error(err));
+				if(qUserDB.selfnotify===false && suggester.id!==message.author.id) suggester.send(dmEmbed).catch(err => console.error(err));
+				if(qUserDB.selfnotify) suggester.send(dmEmbed).catch(err => console.error(err));
 			}
 
 			if (qServerDB.config.react) {

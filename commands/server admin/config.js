@@ -31,7 +31,6 @@ module.exports = {
 						denied: ""
 					},
 					notify: true,
-          selfnotify: false,
 					react: true,
 					mode: "review",
 					emojis: {
@@ -445,30 +444,6 @@ module.exports = {
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} user notifications.`);
 			}
-    }
-		case "selfnotify":
-		case "selfnotifications":
-		case "selfnotification":
-		case "selfnotif": {
-			if (!args[1]) return message.channel.send(`DM notifications when staff changes their own suggestions are **${qServerDB.config.selfnotify ? "enabled" : "disabled"}**.`);
-			switch (args[1].toLowerCase()) {
-			case "enable":
-				if (!qServerDB.config.selfnotify) {
-					qServerDB.config.selfnotify = true;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Enabled self change notifications.`);
-				} else return message.channel.send(`<:${emoji.x}> Self change notifications are already enabled!`);
-			case "disable":
-				if (qServerDB.config.selfnotify) {
-					qServerDB.config.selfnotify = false;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Disabled self change notifications.`);
-				} else return message.channel.send(`<:${emoji.x}> Self change notifications are already disabled!`);
-			case "toggle":
-				qServerDB.config.selfnotify = !qServerDB.config.selfnotify;
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.selfnotify ? "Enabled" : "Disabled"} self change notifications.`);
-			}
 			break;
 		}
 		case "list": {
@@ -600,8 +575,6 @@ module.exports = {
 			cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
 			cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
-      // Selfotify
-			cfgArr.push(`<:${emoji.check}> **Self notifications:** ${qServerDB.config.selfnotify ? "All suggestion actions DM the suggesting user even if they also are the one performing the actions" : "If the suggesting user is the same as the user performing actions, they will not get a DM"}`);
 			let cfgEmbed = new Discord.MessageEmbed()
 				.setTitle(`Server Configuration for **${server.name}**`)
 				.setDescription(cfgArr.join("\n"));

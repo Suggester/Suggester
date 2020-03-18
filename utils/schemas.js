@@ -17,7 +17,6 @@ const settings = new Schema({
 			denied: { type: String }
 		},
 		notify: { type: Boolean, default: true },
-		selfnotify: { type: Boolean, default: false},
 		react: { type: Boolean, default: true },
 		mode: { type: String, default: "review" },
 		blacklist: [String],
@@ -66,6 +65,7 @@ const user = new Schema({
 	ack: String,
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
+	selfnotify: { type: Boolean, default: false},
 	beans: {
 		sent: {
 			bean: { type: Number, default: 0 },

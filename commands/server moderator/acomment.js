@@ -79,8 +79,8 @@ module.exports = {
 				.addField("Official Comment", comment)
 				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
-			if(qServerDB.config.selfnotify===false && suggester.id!==message.author.id) suggester.send(dmEmbed);
-			if(qServerDB.config.selfnotify) suggester.send(dmEmbed);
+			if(qUserDB.selfnotify===false && suggester.id!==message.author.id) suggester.send(dmEmbed);
+			if(qUserDB.selfnotify) suggester.send(dmEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
