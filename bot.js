@@ -6,8 +6,10 @@ const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
 const { basename } = require("path");
 const { presence } = require("./persistent.json");
-const { init } = require("@sentry/node");
-if (process.env.NODE_ENV === "production") init({ dsn: process.env.SENTRY_DSN });
+if (process.env.SENTRY_DSN) {
+	const {init} = require("@sentry/node");
+	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
+}
 
 const client = new Discord.Client({
 	disabledEvents: [
