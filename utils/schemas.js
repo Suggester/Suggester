@@ -17,6 +17,7 @@ const settings = new Schema({
 			denied: { type: String }
 		},
 		notify: { type: Boolean, default: true },
+		selfnotify: { type: Boolean, default: false},
 		react: { type: Boolean, default: true },
 		mode: { type: String, default: "review" },
 		blacklist: [String],

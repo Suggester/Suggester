@@ -96,7 +96,8 @@ module.exports = {
 				.addField("Status", statusInfo[1])
 				.setColor(statusInfo[0])
 				.setFooter(`Suggestion ID: ${id.toString()}`);
-			suggester.send(dmEmbed);
+			if(qServerDB.config.selfnotify===false && suggester.id!==message.author.id) suggester.send(dmEmbed);
+			if(qServerDB.config.selfnotify) suggester.send(dmEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
