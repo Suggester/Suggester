@@ -1,5 +1,5 @@
 ![Suggester Banner](https://cdn.discordapp.com/attachments/654421515646795784/671360271930884096/suggester_banner.png)
-[![Discord](https://img.shields.io/discord/566002482166104066?label=Discord&logo=discord&style=flat-square)](https://discord.gg/a3NuakW)
+[![Discord](https://canary.discordapp.com/api/guilds/566002482166104066/widget.png)](https://discord.gg/a3NuakW)
 
 Suggester is a bot that manages server suggestions, allowing staff to review suggestions before they are posted and manage them in many ways.
 
