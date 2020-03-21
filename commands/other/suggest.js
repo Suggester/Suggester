@@ -106,7 +106,7 @@ module.exports = {
 				.setAuthor(`${message.author.tag} (ID: ${message.author.id})`, message.author.displayAvatarURL({format: "png", dynamic: true}))
 				.setDescription(suggestion)
 				.setColor(colors.yellow)
-				.addField("Approve/Deny", `Use **${qServerDB.config.prefix}approve ${id.toString()}** to send to <#${qServerDB.config.channels.suggestions}>\nUse **${qServerDB.config.prefix}deny ${id.toString()}** to deny`)
+				.addField("Approve/Deny", `Use **${qServerDB.config.prefix}approve ${id.toString()}** to send to <#${qServerDB.config.channels.suggestions}>\nUse **${qServerDB.config.prefix}deny ${id.toString()}** to deny`);
 
 			if (attachment) {
 				reviewEmbed.addField("With Attachment", attachment)
@@ -131,7 +131,7 @@ module.exports = {
 						.addField("With Attachment", attachment);
 				}
 
-				serverLog(logEmbed, qServerDB);
+				serverLog(logEmbed, qServerDB, client);
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
@@ -213,7 +213,7 @@ module.exports = {
 						.addField("With Attachment", attachment);
 				}
 
-				serverLog(logEmbed, qServerDB);
+				serverLog(logEmbed, qServerDB, client);
 			}
 		}
 	}

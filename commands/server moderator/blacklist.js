@@ -63,7 +63,7 @@ module.exports = {
 				.setFooter(`Staff Member ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.red);
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };
