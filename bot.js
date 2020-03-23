@@ -11,25 +11,10 @@ if (process.env.SENTRY_DSN) {
 	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
 }
 
+const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
+
 const client = new Discord.Client({
-	disabledEvents: [
-		"GUILD_SYNC",
-		"GUILD_MEMBERS_CHUNK",
-		"GUILD_INTEGRATIONS_UPDATE",
-		"GUILD_BAN_ADD",
-		"GUILD_BAN_REMOVE",
-		"CHANNEL_PINS_UPDATE",
-		"USER_UPDATE",
-		"USER_NOTE_UPDATE",
-		"USER_SETTINGS_UPDATE",
-		"PRESENCE_UPDATE",
-		"VOICE_STATE_UPDATE",
-		"TYPING_START",
-		"VOICE_SERVER_UPDATE",
-		"RELATIONSHIP_ADD",
-		"RELATIONSHIP_REMOVE",
-		"WEBHOOKS_UPDATE"
-	],
+	ws: { intents: intents},
 	disableMentions: "everyone",
 	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
 });

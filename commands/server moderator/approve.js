@@ -141,7 +141,7 @@ module.exports = {
 					.setImage(qSuggestionDB.attachment);
 			}
 
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 
 		let updateEmbed = new Discord.MessageEmbed()

@@ -8,8 +8,9 @@ module.exports = async (Discord, client) => {
 	//Bot List Posting
 	if (release === "stable") {
 		const request = require("request");
-		let serverCount = client.guilds.cache.size;
+		let serverCount = 794;
 		let userCount = client.users.cache.size;
+
 		//Botlist.Space
 		let blsoptions = {
 			url: "https://api.botlist.space/v1/bots/564426594144354315",
@@ -43,7 +44,6 @@ module.exports = async (Discord, client) => {
 				serverCount: serverCount
 			}
 		};
-
 
 
 		request(gbloptions, (error, response) => {
@@ -168,6 +168,26 @@ module.exports = async (Discord, client) => {
 		request(divineoptions, (error, response) => {
 			if (!error && response.statusCode === 200) {
 				console.log("Server statistics posted to divinediscordbots.com!");
+			}
+		});
+
+		//Bots on Discord
+		let bodoptions = {
+			url: "https://bots.ondiscord.xyz/bot-api/bots/564426594144354315/guilds",
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": process.env.BOD_TOKEN
+			},
+			json: true,
+			body: {
+				guildCount: serverCount
+			}
+		};
+
+		request(bodoptions, (error, response) => {
+			if (!error && response.statusCode === 204) {
+				console.log("Server statistics posted to bot.ondiscord.xyz!");
 			}
 		});
 	}

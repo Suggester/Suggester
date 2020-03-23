@@ -11,7 +11,7 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid member!");
-		let member = message.guild.members.cache.get(user.id);
+		let member = await message.guild.members.fetch(user.id).catch(() => message.channel.send("You must specify a valid member!"));
 		if (!member) return message.channel.send("You must specify a valid member!");
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
@@ -23,8 +23,8 @@ module.exports = {
 
 		let qMemberDB = await dbQuery("User", { id: member.id });
 		let qSenderDB = await dbQuery("User", { id: message.author.id });
-		qMemberDB.beans.received.megabean ? qMemberDB.beans.received.megabean = qMemberDB.beans.received.megabean++ : qMemberDB.beans.received.megabean = 1;
-		qSenderDB.beans.sent.megabean ? qSenderDB.beans.sent.megabean = qSenderDB.beans.sent.megabean++ : qSenderDB.beans.sent.megabean = 1;
+		qMemberDB.beans.received.megabean ? qMemberDB.beans.received.megabean++ : qMemberDB.beans.received.megabean = 1;
+		qSenderDB.beans.sent.megabean ? qSenderDB.beans.sent.megabean++ : qSenderDB.beans.sent.megabean = 1;
 		await dbModifyId("User", member.id, qMemberDB);
 		await dbModifyId("User", message.author.id, qSenderDB);
 

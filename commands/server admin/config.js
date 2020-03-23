@@ -283,7 +283,7 @@ module.exports = {
 					.setColor(colors.red);
 				return message.channel.send(embed);
 			}
-			await logChannel.createWebhook("Suggester Logs", client.user.displayAvatarURL({format: "png"}), "Create log channel").then(async (webhook) => {
+			await logChannel.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel"}).then(async (webhook) => {
 				qServerDB.config.loghook.id = webhook.id;
 				qServerDB.config.loghook.token = webhook.token;
 				qServerDB.config.channels.log = logChannel.id;

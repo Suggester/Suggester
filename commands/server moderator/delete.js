@@ -123,7 +123,7 @@ module.exports = {
 				.setColor(colors.red);
 			reason ? logEmbed.addField("Deletion Reason", reason) : "";
 			qSuggestionDB.attachment ? logEmbed.setImage(qSuggestionDB.attachment) : "";
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 
 	}
