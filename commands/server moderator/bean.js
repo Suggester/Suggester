@@ -16,7 +16,7 @@ module.exports = {
 
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid member!");
-		let member = message.guild.members.cache.get(user.id);
+		let member = await message.guild.members.fetch(user.id).catch(() => message.channel.send("You must specify a valid member!"));
 		if (!member) return message.channel.send("You must specify a valid member!");
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
@@ -30,11 +30,11 @@ module.exports = {
 		beanSendEmbed.setColor("#AAD136")
 			.setDescription(reason);
 
-		let qMemberDB = await dbQuery("User", { id: member.id });
+		let qMemberDB = await dbQuery("User", { id: user.id });
 		let qSenderDB = await dbQuery("User", { id: message.author.id });
 		qMemberDB.beans.received.bean ? qMemberDB.beans.received.bean++ : qMemberDB.beans.received.bean = 1;
 		qSenderDB.beans.sent.bean ? qSenderDB.beans.sent.bean++ : qSenderDB.beans.sent.bean = 1;
-		await dbModifyId("User", member.id, qMemberDB);
+		await dbModifyId("User", user.id, qMemberDB);
 		await dbModifyId("User", message.author.id, qSenderDB);
 
 		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);

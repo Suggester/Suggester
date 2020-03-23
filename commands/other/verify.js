@@ -18,6 +18,9 @@ module.exports = {
 		let qUserDB = await dbQuery("User", { id: id });
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 
+		await message.guild.members.fetch(user.id).catch(() => {});
+		await client.guilds.cache.get(main_guild).members.fetch(user.id).catch(() => {});
+
 		let globalPosArr = [];
 		let posArr = [];
 		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer");
