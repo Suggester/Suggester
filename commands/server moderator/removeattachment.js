@@ -66,7 +66,7 @@ module.exports = {
 				.setFooter(`Suggestion ID: ${id.toString()} | Staff Member ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.orange);
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };

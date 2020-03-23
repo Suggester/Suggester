@@ -125,7 +125,7 @@ module.exports = {
 					reason ? logEmbed.addField("Reason Given:", reason) : "";
 					denied[s].attachment ? logEmbed.setImage(denied[s].attachment) : "";
 
-					serverLog(logEmbed, qServerDB);
+					serverLog(logEmbed, qServerDB, client);
 				}
 				let updateEmbed = new Discord.MessageEmbed()
 					.setTitle(`Suggestion Awaiting Review (#${denied[s].suggestionId})`)

@@ -144,7 +144,7 @@ module.exports = {
 						.setTimestamp()
 						.setColor(colors.green);
 					if (reason) logEmbed.addField("Comment Added by Approver", reason);
-					serverLog(logEmbed, qServerDB);
+					serverLog(logEmbed, qServerDB, client);
 				}
 
 				let updateEmbed = new Discord.MessageEmbed()

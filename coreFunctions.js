@@ -25,14 +25,14 @@ function sendWebhook (cfg, input, embed) {
 module.exports = {
 	/**
 	 * Returns permission level of inputted ID
-	 * 
+	 *
 	 * 11 - Blacklisted\
 	 * 10 - Everyone\
 	 * 3 - Server staff\
 	 * 2 - Server Admin\
 	 * 1 - Global Permissions\
 	 * 0 - Developer/Global Admin
-	 * 
+	 *
 	 * @param member - Member object fetched from a server
 	 * @param client - The Discord client
 	 * @returns {Promise<number>}
@@ -194,9 +194,9 @@ module.exports = {
 	 * @param {Object} server - Server configuration settings
 	 * @returns null
 	 */
-	serverLog: (input, server) => {
+	serverLog: (input, server, client) => {
 		if (!server.config.loghook) return `<:${emoji.x}> No log hook configured, please reconfigure a log channel`;
-		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send(input);
+		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send({embeds: [input], avatarURL: client.user.displayAvatarURL({format: "png"})});
 	},
 	errorLog: (err, type, footer) => {
 		let errorText = "Error Not Set";

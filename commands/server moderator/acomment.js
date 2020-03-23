@@ -90,7 +90,7 @@ module.exports = {
 				.setFooter(`Suggestion ID: ${id.toString()} | Commenter ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.blue);
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };
