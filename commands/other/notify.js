@@ -11,7 +11,7 @@ module.exports = {
 		docs: "all/notify",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
 		if (!args[0]) return message.channel.send(`You currently have notifications ${qUserDB.notify ? "**enabled**.\nYou will receive a DM when an action is taken on any of your suggestions": "**disabled**.\nYou will not receive a DM when an action is taken on any of your suggestions."}`);
 		switch (args[0].toLowerCase()) {

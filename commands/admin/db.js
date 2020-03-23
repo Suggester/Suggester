@@ -1,4 +1,4 @@
-const { dbQueryNoNew, dbModify, findEmoji } = require("../../coreFunctions.js");
+const { dbQueryNoNew } = require("../../coreFunctions.js");
 const { emoji, colors } = require("../../config.json");
 module.exports = {
 	controls: {

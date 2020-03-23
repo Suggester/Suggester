@@ -123,6 +123,7 @@ module.exports = {
 				await message.channel.send("📛 Username set!", usernameEmbed);
 				await message.channel.stopTyping();
 			}
+			break;
 		}
 		case "nick":
 		case "nickname": {
