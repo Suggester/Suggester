@@ -32,8 +32,8 @@ module.exports = {
 
 		let qMemberDB = await dbQuery("User", { id: member.id });
 		let qSenderDB = await dbQuery("User", { id: message.author.id });
-		qMemberDB.beans.received.bean ? qMemberDB.beans.received.bean = qMemberDB.beans.received.bean++ : qMemberDB.beans.received.bean = 1;
-		qSenderDB.beans.sent.bean ? qSenderDB.beans.sent.bean = qSenderDB.beans.sent.bean++ : qSenderDB.beans.sent.bean = 1;
+		qMemberDB.beans.received.bean ? qMemberDB.beans.received.bean++ : qMemberDB.beans.received.bean = 1;
+		qSenderDB.beans.sent.bean ? qSenderDB.beans.sent.bean++ : qSenderDB.beans.sent.bean = 1;
 		await dbModifyId("User", member.id, qMemberDB);
 		await dbModifyId("User", message.author.id, qSenderDB);
 
