@@ -200,14 +200,15 @@ module.exports = {
 		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send({embeds: [input], avatarURL: client.user.displayAvatarURL({format: "png"})});
 	},
 	errorLog: (err, type, footer) => {
+		if (!err) return;
 		let errorText = "Error Not Set";
 		if (err.stack) {
 			console.error((require("chalk")).red(err.stack));
 			errorText = err.stack;
-		} else {
+		} else if (err.error) {
 			console.error((require("chalk")).red(err.error));
 			errorText = err.error;
-		}
+		} else return;
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(type)
 			.setTitle(err.message ? err.message.substring(0, 256) : "No Message Value")

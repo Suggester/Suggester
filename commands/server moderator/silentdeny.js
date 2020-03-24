@@ -99,7 +99,7 @@ module.exports = {
 				.setColor(colors.red);
 			reason ? dmEmbed.addField("Reason Given", reason) : "";
 			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-			suggester.send(dmEmbed).catch(err => console.log(err));
+			suggester.send(dmEmbed).catch(() => {});
 		}
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
