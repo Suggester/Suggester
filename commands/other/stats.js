@@ -33,7 +33,7 @@ module.exports = {
 			.setTitle("Suggestion Statistics")
 			.addField("Global Statistics", `**${client.guilds.cache.size}** servers\n**${totalConfiguredServers}** server configurations\n**${suggestions.length.toString()}** suggestions submitted globally\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
 			.addField(`Server Statistics for **${server.name}**`, `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
-			.addField("Your Statistics", `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server\n**${client.guilds.cache.filter(guild => guild.members.cache.get(message.author.id)).size}** shared servers with the bot`)
+			.addField("Your Statistics", `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server`)
 			.setColor(colors.default);
 		message.channel.send(statEmbed);
 		return;

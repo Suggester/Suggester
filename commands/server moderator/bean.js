@@ -12,6 +12,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let userPermission = await checkPermissions(message.member, client);
+		await client.guilds.cache.get(main_guild).members.fetch(message.author.id).catch(() => {});
 		if (userPermission > 2 && !client.guilds.cache.get(main_guild).roles.cache.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
 
 		let user = await fetchUser(args[0], client);
