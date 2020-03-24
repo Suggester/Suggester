@@ -66,8 +66,10 @@ module.exports = {
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
 				return message.channel.send(`<:${emoji.check}> Self change notifications have been ${qUserDB.selfnotify ? "**enabled**. You will receive a DM when you take action on any of your own suggestions": "**disabled**. You will not receive a DM when you take action on any of your own suggestions."}`);
 			}
+			default:
+				return message.channel.send(`<:${emoji.x}> You must specify \`on\`, \`off\`, or \`toggle\`.`);
 			}
-			break;
+
 		}
 		default:
 			return message.channel.send(`<:${emoji.x}> You must specify \`on\`, \`off\`, or \`toggle\`.`);
