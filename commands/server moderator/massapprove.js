@@ -131,9 +131,7 @@ module.exports = {
 					if (reason) dmEmbed.addField("Comment Added", reason);
 
 					await suggester.send(dmEmbed)
-						.catch((err) => {
-							console.log(err);
-						});
+						.catch(() => {});
 				}
 
 				if (qServerDB.config.channels.log) {
