@@ -39,6 +39,36 @@ module.exports = {
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
 			return message.channel.send(`<:${emoji.check}> Notifications have been ${qUserDB.notify ? "**enabled**. You will receive a DM when an action is taken on any of your suggestions": "**disabled**. You will not receive a DM when an action is taken on any of your suggestions."}`);
 		}
+		case "self": {
+			if (!args[1]) return message.channel.send(`You currently have self change notifications ${qUserDB.selfnotify ? "**enabled**.\nYou will receive a DM when you take action on any of your suggestions": "**disabled**.\nYou will not receive a DM when you take action on any of your suggestions."}`);
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on":
+			case "true":
+			case "yes": {
+				if (qUserDB.selfnotify) return message.channel.send(`<:${emoji.x}> You already have notifications for actions on your own suggestions enabled!`);
+				qUserDB.selfnotify = true;
+				await dbModify("User", {id: qUserDB.id}, qUserDB);
+				return message.channel.send(`<:${emoji.check}> Self change notifications have been **enabled**. You will receive a DM when you take action on any of your own suggestions.`);
+			}
+			case "disable":
+			case "off":
+			case "false":
+			case "no": {
+				if (!qUserDB.selfnotify) return message.channel.send(`<:${emoji.x}> You already have notifications for actions on your own suggestions disabled!`);
+				qUserDB.selfnotify = false;
+				await dbModify("User", {id: qUserDB.id}, qUserDB);
+				return message.channel.send(`<:${emoji.check}> Self change notifications have been **disabled**. You will not receive a DM when you take action on any of your own suggestions.`);
+			}
+			case "toggle":
+			case "switch": {
+				qUserDB.selfnotify = !qUserDB.selfnotify;
+				await dbModify("User", {id: qUserDB.id}, qUserDB);
+				return message.channel.send(`<:${emoji.check}> Self change notifications have been ${qUserDB.selfnotify ? "**enabled**. You will receive a DM when you take action on any of your own suggestions": "**disabled**. You will not receive a DM when you take action on any of your own suggestions."}`);
+			}
+			}
+			break;
+		}
 		default:
 			return message.channel.send(`<:${emoji.x}> You must specify \`on\`, \`off\`, or \`toggle\`.`);
 		}

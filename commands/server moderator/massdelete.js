@@ -102,7 +102,10 @@ module.exports = {
 					.catch();
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) {
+				let selfNotify;
+				if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
+				else selfNotify = true;
+				if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion In **${message.guild.name}** Was Deleted`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
@@ -110,8 +113,7 @@ module.exports = {
 						.setColor(colors.red);
 					reason ? dmEmbed.addField("Reason Given:", reason) : "";
 					denied[s].attachment ? dmEmbed.setImage(denied[s].attachment) : "";
-					await suggester.send(dmEmbed)
-						.catch(() => {});
+					await suggester.send(dmEmbed).catch(() => {});
 				}
 				if (qServerDB.config.channels.log) {
 					let logEmbed = new Discord.MessageEmbed()
