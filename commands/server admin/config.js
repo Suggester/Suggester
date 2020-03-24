@@ -575,6 +575,7 @@ module.exports = {
 			cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
 			cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
+
 			let cfgEmbed = new Discord.MessageEmbed()
 				.setTitle(`Server Configuration for **${server.name}**`)
 				.setDescription(cfgArr.join("\n"));

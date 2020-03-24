@@ -121,7 +121,10 @@ module.exports = {
 				}
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) {
+				let selfNotify;
+				if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
+				else selfNotify = true;
+				if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId}`)
@@ -130,8 +133,7 @@ module.exports = {
 						.setColor(colors.green);
 					if (reason) dmEmbed.addField("Comment Added", reason);
 
-					await suggester.send(dmEmbed)
-						.catch(() => {});
+					await suggester.send(dmEmbed).catch(() => {});
 				}
 
 				if (qServerDB.config.channels.log) {
