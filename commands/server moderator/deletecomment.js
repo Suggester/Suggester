@@ -70,7 +70,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.red);
 			commentAuthor ? logEmbed.setAuthor(`${message.author.tag} deleted ${commentAuthor.tag}'s comment #${comment.id} from suggestion #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true})) : logEmbed.setAuthor(`${message.author.tag} deleted comment #${comment.id} from suggestion #${id.toString()}`);
-			serverLog(logEmbed, qServerDB,);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };

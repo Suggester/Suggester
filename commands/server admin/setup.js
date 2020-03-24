@@ -320,7 +320,7 @@ module.exports = {
 								return setup(6);
 							}
 							qServerDB.config.channels.log = channel.id;
-							await channel.createWebhook("Suggester Logs", client.user.displayAvatarURL({format: "png"}), "Create log channel from setup").then(async (webhook) => {
+							await channel.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel from setup"}).then(async (webhook) => {
 								qServerDB.config.loghook.id = webhook.id;
 								qServerDB.config.loghook.token = webhook.token;
 

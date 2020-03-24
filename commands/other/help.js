@@ -1,6 +1,5 @@
 const { dbQuery, checkPermissions, permLevelToRole } = require("../../coreFunctions");
-const { readdir } = require("fs");
-const { colors } = require("../../config.json");
+const { colors, prefix } = require("../../config.json");
 
 module.exports = {
 	controls: {
@@ -16,7 +15,7 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let permission = await checkPermissions(message.member, client);
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		let prefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || config.prefix;
+		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setDescription("Please see https://suggester.gitbook.io/ for a command list and usage information!")
@@ -38,7 +37,7 @@ module.exports = {
 			.setColor(colors.default)
 			.setDescription(commandInfo.description)
 			.addField("Permission Level", permLevelToRole(commandInfo.permission), true)
-			.addField("Usage", `\`${prefix}${commandInfo.usage}\``, true)
+			.addField("Usage", `\`${serverPrefix}${commandInfo.usage}\``, true)
 			.setAuthor(`Command: ${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
 		commandInfo.aliases ? returnEmbed.addField(commandInfo.aliases.length > 1 ? "Aliases" : "Alias", commandInfo.aliases.join(", ")) : "";

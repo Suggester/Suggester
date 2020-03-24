@@ -144,7 +144,7 @@ module.exports = {
 				logEmbed.addField("With Attachment", qSuggestionDB.attachment)
 					.setImage(qSuggestionDB.attachment);
 			}
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };

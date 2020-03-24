@@ -1,6 +1,6 @@
 const { colors, emoji } = require("../../config.json");
 const { dbQueryAll, checkPermissions } = require("../../coreFunctions");
-const { Suggestion, Server } = require("../../utils/schemas");
+const { Server } = require("../../utils/schemas");
 const humanizeDuration = require("humanize-duration");
 module.exports = {
 	controls: {

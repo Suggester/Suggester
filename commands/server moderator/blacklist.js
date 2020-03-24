@@ -42,6 +42,9 @@ module.exports = {
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid user!");
 
+		await message.guild.members.fetch(user.id).catch(() => {});
+		await client.guilds.cache.get(main_guild).members.fetch(user.id).catch(() => {});
+
 		if (user.bot) return message.channel.send(`<:${emoji.x}> This user is a bot, and therefore cannot be blacklisted.`);
 		if (message.guild.members.cache.get(user.id)) {
 			let memberPermission = await checkPermissions(message.guild.members.cache.get(user.id), client);
@@ -63,7 +66,7 @@ module.exports = {
 				.setFooter(`Staff Member ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.red);
-			serverLog(logEmbed, qServerDB);
+			serverLog(logEmbed, qServerDB, client);
 		}
 	}
 };
