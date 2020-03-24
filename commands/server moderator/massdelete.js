@@ -111,9 +111,7 @@ module.exports = {
 					reason ? dmEmbed.addField("Reason Given:", reason) : "";
 					denied[s].attachment ? dmEmbed.setImage(denied[s].attachment) : "";
 					await suggester.send(dmEmbed)
-						.catch((err) => {
-							console.log(err);
-						});
+						.catch(() => {});
 				}
 				if (qServerDB.config.channels.log) {
 					let logEmbed = new Discord.MessageEmbed()
