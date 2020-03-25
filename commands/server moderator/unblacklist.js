@@ -25,6 +25,8 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
+		if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a user!`);
+
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid user!");
 

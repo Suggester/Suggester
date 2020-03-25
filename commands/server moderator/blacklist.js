@@ -25,6 +25,8 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 
+		if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a user or \`list\` to show a list of blacklisted users!`);
+
 		if (args[0].toLowerCase() === "list") {
 			if (qServerDB.config.blacklist.length < 1) return message.channel.send("There are no users blacklisted from using the bot on this server!");
 			let chunks = qServerDB.config.blacklist.chunk(21);
