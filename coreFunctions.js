@@ -197,7 +197,8 @@ module.exports = {
 	 * @returns null
 	 */
 	serverLog: (input, server, client) => {
-		if (!server.config.loghook) return `<:${emoji.x}> No log hook configured, please reconfigure a log channel`;
+		if (!input) return null;
+		if (!server.config.loghook || !server.config.loghook.id || !server.config.loghook.token) return null;
 		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send({embeds: [input], avatarURL: client.user.displayAvatarURL({format: "png"})});
 	},
 	errorLog: (err, type, footer) => {
