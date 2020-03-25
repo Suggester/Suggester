@@ -89,14 +89,17 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify) {
+		let selfNotify;
+		if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
+		else selfNotify = true;
+		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify && selfNotify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
 				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField("Status", statusInfo[1])
 				.setColor(statusInfo[0])
 				.setFooter(`Suggestion ID: ${id.toString()}`);
-			suggester.send(dmEmbed);
+			suggester.send(dmEmbed).catch(() => {});
 		}
 
 		if (qServerDB.config.channels.log) {

@@ -19,6 +19,7 @@ module.exports = {
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setDescription("Please see https://suggester.gitbook.io/ for a command list and usage information!")
+				.setFooter(`My prefix in this server is ${serverPrefix}`)
 				.setColor(colors.default);
 			return message.channel.send(embed);
 		}

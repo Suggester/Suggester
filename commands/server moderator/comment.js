@@ -72,14 +72,17 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) {
+		let selfNotify;
+		if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
+		else selfNotify = true;
+		if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
 				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField(`Official Comment from ${message.author.tag}`, comment)
 				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
-			suggester.send(dmEmbed);
+			suggester.send(dmEmbed).catch(() => {});
 		}
 
 		if (qServerDB.config.channels.log) {

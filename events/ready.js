@@ -8,7 +8,7 @@ module.exports = async (Discord, client) => {
 	//Bot List Posting
 	if (release === "stable") {
 		const request = require("request");
-		let serverCount = 794;
+		let serverCount = client.guilds.cache.size;
 		let userCount = client.users.cache.size;
 
 		//Botlist.Space

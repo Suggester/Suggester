@@ -13,13 +13,17 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0] ? args[0] : message.author.id, client);
 		let id;
-		user ? id = user.id : id = message.author.id;
+		if (user) id = user.id;
+		else {
+			user = message.author;
+			id = message.author.id;
+		}
 
 		let qUserDB = await dbQuery("User", { id: id });
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 
-		await message.guild.members.fetch(user.id).catch(() => {});
-		await client.guilds.cache.get(main_guild).members.fetch(user.id).catch(() => {});
+		await message.guild.members.fetch(id).catch(() => {});
+		await client.guilds.cache.get(main_guild).members.fetch(id).catch(() => {});
 
 		let globalPosArr = [];
 		let posArr = [];
