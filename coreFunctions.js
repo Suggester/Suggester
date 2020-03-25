@@ -13,7 +13,7 @@ const nodeEmoji = require("node-emoji");
  * @param {module:"discord.js".RichEmbed} embed - embed to send
  */
 function sendWebhook (cfg, input, embed) {
-	if (!cfg || !cfg.id || !cfg.input) return;
+	if (!cfg || !cfg.id || !cfg.token) return;
 	if (!input) return;
 	if (typeof input === "string") input = Discord.Util.removeMentions(input);
 	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
@@ -198,7 +198,6 @@ module.exports = {
 	 */
 	serverLog: (input, server, client) => {
 		if (!input) return null;
-		if (server.config.loghook.length) return null;
 		if (!server.config.loghook || !server.config.loghook.id || !server.config.loghook.token) return null;
 		(new Discord.WebhookClient(server.config.loghook.id, server.config.loghook.token)).send({embeds: [input], avatarURL: client.user.displayAvatarURL({format: "png"})});
 	},
@@ -313,7 +312,6 @@ module.exports = {
 		if (!config.staff_roles || config.staff_roles < 1) missing.push("Server Staff Roles");
 		if (!config.channels.suggestions) missing.push("Approved Suggestions Channel");
 		if (config.mode === "review" && !config.channels.staff) missing.push("Suggestion Review Channel");
-		if (config.channels.log && config.loghook.length) missing.push("Correctly Configured Log Channel (please reconfigure your current logging channel)");
 
 		return missing;
 	},
