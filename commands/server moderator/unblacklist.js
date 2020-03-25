@@ -28,10 +28,22 @@ module.exports = {
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid user!");
 
+		let reason;
+		if (args[1]) {
+			reason = args.splice(1).join(" ");
+			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Blacklist reasons must be 1024 characters or less in length.`);
+		}
+
 		if (!qServerDB.config.blacklist.includes(user.id)) return message.channel.send(`<:${emoji.x}> This user is not blacklisted from using the bot on this server!`);
 		qServerDB.config.blacklist.splice(qServerDB.config.blacklist.findIndex(u => u === user.id), 1);
 		await dbModify("Server", {id: message.guild.id}, qServerDB);
-		message.channel.send(`<:${emoji.check}> **${Discord.Util.escapeMarkdown(user.tag)}** (\`${user.id}\`) is no longer blacklisted from using the bot on this server.`);
+		let embed = new Discord.MessageEmbed();
+		if (reason) {
+			embed.setDescription(`**Reason:** ${reason}`)
+				.setColor(colors.default);
+		}
+		message.channel.send(`<:${emoji.check}> **${Discord.Util.escapeMarkdown(user.tag)}** (\`${user.id}\`) is no longer blacklisted from using the bot on this server.`, reason ? embed : "");
+
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} unblacklisted ${user.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
@@ -39,6 +51,8 @@ module.exports = {
 				.setFooter(`Staff Member ID: ${message.author.id}`)
 				.setTimestamp()
 				.setColor(colors.green);
+
+			reason ? logEmbed.addField("Reason", reason)  : "";
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}

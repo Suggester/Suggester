@@ -13,8 +13,9 @@ const nodeEmoji = require("node-emoji");
  * @param {module:"discord.js".RichEmbed} embed - embed to send
  */
 function sendWebhook (cfg, input, embed) {
+	if (!cfg || !cfg.id || !cfg.input) return;
 	if (!input) return;
-	input = Discord.Util.removeMentions(input);
+	if (typeof input === "string") input = Discord.Util.removeMentions(input);
 	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
 		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
 	});
