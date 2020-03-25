@@ -319,10 +319,11 @@ module.exports = {
 								message.channel.send(logChannelPermissionsMissingEmbed);
 								return setup(6);
 							}
-							qServerDB.config.channels.log = channel.id;
 							await channel.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel from setup"}).then(async (webhook) => {
+								qServerDB.config.loghook = {};
 								qServerDB.config.loghook.id = webhook.id;
 								qServerDB.config.loghook.token = webhook.token;
+								qServerDB.config.channels.log = channel.id;
 
 								await dbModify("Server", {id: message.guild.id}, qServerDB);
 
