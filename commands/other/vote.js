@@ -4,8 +4,8 @@ module.exports = {
 	controls: {
 		name: "vote",
 		permission: 10,
-		usage: "support",
-		description: "Shows the link to the support server",
+		usage: "vote",
+		description: "Shows the link to vote for the bot on top.gg",
 		enabled: true,
 		docs: "all/vote",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
