@@ -5,13 +5,13 @@ module.exports = {
 		name: "vote",
 		permission: 10,
 		usage: "vote",
-		description: "Shows the link to vote for the bot on top.gg",
+		description: "Shows the link to info about voting",
 		enabled: true,
 		docs: "all/vote",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async message => {
 		let server = await dbQuery("Server",{ id: message.guild.id });
-		return message.reply(`You can vote for Suggester on Discord Bot List at https://top.gg/bot/564426594144354315/vote\nIf you're in our support server, you can also get cool perks for voting! (Link is in the \`${server.config.prefix || prefix}support\` command)`);
+		return message.reply(`You can find more info about voting and the cool perks here: https://suggester.js.org/#/supporting/info`);
 	}
 };
