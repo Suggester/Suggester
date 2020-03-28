@@ -2,7 +2,7 @@ const { coreLog } = require("../coreFunctions.js");
 const { release } = require("../config.json");
 
 module.exports = async (Discord, client) => {
-	coreLog(`:ok: Logged in with ${client.guilds.cache.size} servers!`, client);
+	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers!`, client);
 	console.log(`Logged in as ${client.user.tag}! (Release: ${release})`);
 
 	//Bot List Posting

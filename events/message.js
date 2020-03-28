@@ -26,7 +26,7 @@ module.exports = async (Discord, client, message) => {
 	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	let args = message.content.split(" ");
 	let commandName = args.shift().slice(serverPrefix.length).toLowerCase();
-	
+
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 	if (!command) return;
 
@@ -41,7 +41,7 @@ module.exports = async (Discord, client, message) => {
 		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
 		return message.react("🚫");
 	}
-	core.commandLog(`:wrench: ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
+	core.commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
 
 	if (command.controls.permissions) {
 		let channelPermissions = message.channel.permissionsFor(client.user.id);

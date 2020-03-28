@@ -388,7 +388,7 @@ module.exports = {
 		let qServerDB = await dbQuery("Server", {id: message.guild.id});
 
 		if (qServerDB) {
-			message.channel.send(`:warning: Your server already has some configuration elements specified. :warning:\n**This setup will overwrite your previous configuration, and this choice is final.**\n\nIf you would still like to continue with setup, click the <:${emoji.check}> reaction. If you would like to abort setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
+			message.channel.send(`⚠️ Your server already has some configuration elements specified. ⚠️\n**This setup will overwrite your previous configuration, and this choice is final.**\n\nIf you would still like to continue with setup, click the <:${emoji.check}> reaction. If you would like to abort setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
 				await checkMsg.react(emoji.check);
 				await checkMsg.react(emoji.x);
 				let checkMatches = emoji.check.match(/[a-z0-9~-]+:([0-9]+)/i)[1] || null;

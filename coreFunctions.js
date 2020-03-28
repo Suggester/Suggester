@@ -459,7 +459,7 @@ module.exports = {
 };
 
 /**
- * Like readdir but recursive :eyes:
+ * Like readdir but recursive 👀
  * @param {string} dir
  * @returns {Promise<string[]>} - Array of paths
  */
