@@ -6,10 +6,9 @@ module.exports = async (Discord, client) => {
 	console.log(`Logged in as ${client.user.tag}! (Release: ${release})`);
 
 	//Bot List Posting
-	if (release === "stable") {
+	function postToBotLists() {
 		const request = require("request");
 		let serverCount = client.guilds.cache.size;
-		let userCount = client.users.cache.size;
 
 		//Botlist.Space
 		let blsoptions = {
@@ -101,8 +100,7 @@ module.exports = async (Discord, client) => {
 			},
 			json: true,
 			body: {
-				guilds: serverCount,
-				users: userCount
+				guilds: serverCount
 			}
 		};
 
@@ -190,5 +188,13 @@ module.exports = async (Discord, client) => {
 				console.log("Server statistics posted to bot.ondiscord.xyz!");
 			}
 		});
+	}
+
+	if (process.env.NODE_ENV === "production") {
+		//Post on startup and every hour
+		postToBotLists();
+		setInterval(function() {
+			postToBotLists();
+		}, 3600000);
 	}
 };
