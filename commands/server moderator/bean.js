@@ -12,13 +12,12 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let userPermission = await checkPermissions(message.member, client);
-		if (!client.guilds.cache.get(main_guild).members.cache.get(message.author.id)) await client.guilds.cache.get(main_guild).members.fetch(message.author.id).catch(() => {});
+		await client.guilds.cache.get(main_guild).members.fetch(message.author.id).catch(() => {});
 		if (userPermission > 2 && !client.guilds.cache.get(main_guild).roles.cache.find((role) => role.id === "657644875499569161").members.get(message.member.id)) return message.react("🚫"); //Restricted to server admin role, Beaner role in main server, or global permissions
 
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid member!");
-		let member = message.guild.members.cache.get(user.id);
-		if (!member) await message.guild.members.fetch(user.id).catch(() => message.channel.send("You must specify a valid member!"));
+		let member = await message.guild.members.fetch(user.id).catch(() => message.channel.send("You must specify a valid member!"));
 		if (!member) return message.channel.send("You must specify a valid member!");
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
