@@ -34,22 +34,22 @@ module.exports = {
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566030511840034816").members.get(id)) globalPosArr.push("<:support:643571568638689332> Suggester Support Team");
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("657644875499569161").members.get(id)) globalPosArr.push("<:bean:657650134502604811> Global Bean Permissions");
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("614084573139173389").members.get(id)) globalPosArr.push("<:canary:621530343081508899> Suggester Canary Program");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("631986751375933446").members.get(id)) globalPosArr.push(":star: Suggester Contributor");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("631986751375933446").members.get(id)) globalPosArr.push("⭐ Suggester Contributor");
 		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("574193409829634048").members.get(id)) globalPosArr.push("<:partner:689138870096363559> Suggester Partner");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("618893176295653397").members.get(id)) globalPosArr.push(":sunglasses: Super Supporter (Tier 3)");
-		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("640906114321612821").members.get(id)) globalPosArr.push(":sunglasses: Upper Tier Upvoter (Tier 2)");
-		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("569954188675776522").members.get(id)) globalPosArr.push(":sunglasses: Supporter (Tier 1)");
+		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("618893176295653397").members.get(id)) globalPosArr.push("😎 Super Supporter (Tier 3)");
+		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("640906114321612821").members.get(id)) globalPosArr.push("😎 Upper Tier Upvoter (Tier 2)");
+		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("569954188675776522").members.get(id)) globalPosArr.push("😎 Supporter (Tier 1)");
 
 		if (qUserDB.blocked) globalPosArr.push(":no_entry_sign: Blacklisted Globally");
 
 		if (message.guild.members.cache.get(id) && message.guild.members.cache.get(id).hasPermission("MANAGE_GUILD")) {
-			posArr.push(":tools: Server Admin");
+			posArr.push("🛠️ Server Admin");
 		} else if (qServerDB && qServerDB.config.admin_roles && message.guild.members.cache.get(id)) {
 			let adminRoles = 0;
 			qServerDB.config.admin_roles.forEach((roleid) => {
 				if (message.guild.members.cache.get(id).roles.cache.has(roleid)) adminRoles++;
 			});
-			if (adminRoles > 0) posArr.push(":tools: Server Admin");
+			if (adminRoles > 0) posArr.push("🛠️ Server Admin");
 		}
 
 		if (qServerDB && qServerDB.config.staff_roles && message.guild.members.cache.get(id)) {
@@ -57,7 +57,7 @@ module.exports = {
 			qServerDB.config.staff_roles.forEach((roleid) => {
 				if (message.guild.members.cache.get(id).roles.cache.has(roleid)) staffRoles++;
 			});
-			if (staffRoles > 0) posArr.push(":tools: Server Staff");
+			if (staffRoles > 0) posArr.push("🛠️ Server Staff");
 		}
 		if (qServerDB && qServerDB.config.blacklist.includes(id)) posArr.push(":no_entry_sign: Blacklisted on this server");
 
