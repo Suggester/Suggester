@@ -22,7 +22,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		const persistent = new Persist();
-		if (!args[0]) return message.channel.send(":warning: Correct usage is `config game <playing|listening|watching> <status>`");
+		if (!args[0]) return message.channel.send("⚠️ Correct usage is `config game <playing|listening|watching> <status>`");
 		switch (args[0]) {
 		case "game": {
 			let activity;
