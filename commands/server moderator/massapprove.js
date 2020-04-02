@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		name: "massapprove",
 		permission: 3,
-		usage: "massapprove <suggestion ids> -r (reason)",
+		usage: "massapprove <suggestion ids> -r (comment)",
 		aliases: ["mapprove", "multiapprove"],
 		description: "Approves all specified suggestions",
 		enabled: true,
