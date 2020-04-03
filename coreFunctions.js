@@ -5,6 +5,7 @@ let models = require("./utils/schemas");
 const { promises } = require("fs");
 const { resolve } = require("path");
 const nodeEmoji = require("node-emoji");
+const { findBestMatch } = require("string-similarity");
 
 /**
  * Send a message from a webhook
@@ -456,6 +457,24 @@ module.exports = {
 			});
 	},
 
+	/**
+	 * Find a role with near matching strings
+	 * @param message - Discord.js message object
+	 * @param words - The string containing a potential string match
+	 */
+	nearMatchRole (message, words) {
+		let role = message.mentions.roles.first()
+      || message.guild.roles.cache.find((r) => r.id === words);
+		if (role) return role;
+		
+		let guildRoles = message.guild.roles.cache.array();
+		let roleArray = guildRoles.map((r) => r.name.toLowerCase());
+
+		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), roleArray);
+
+		if (rating < .3) return null;
+		return guildRoles[bestMatchIndex];
+	}
 };
 
 /**
