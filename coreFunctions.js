@@ -262,6 +262,10 @@ module.exports = {
 		if (!matches) {
 			let roleFromNonMention = roles.find(role => role.name.toLowerCase() === input.toLowerCase()) || roles.get(input) || null;
 			if (roleFromNonMention) foundId = roleFromNonMention.id;
+			else {
+				let nearMatch = nearMatchRole(roles, input);
+				if (nearMatch) return nearMatch;
+			}
 		} else foundId = matches[1];
 
 		return roles.get(foundId) || null;
@@ -279,6 +283,10 @@ module.exports = {
 		if (!matches) {
 			let channelFromNonMention = channels.find(channel => channel.name.toLowerCase() === input.toLowerCase()) || channels.get(input) || null;
 			if (channelFromNonMention) foundId = channelFromNonMention.id;
+			else {
+				let nearMatch = nearMatchRole(channels, input);
+				if (nearMatch) return nearMatch;
+			}
 		} else foundId = matches[1];
 
 		return channels.get(foundId) || null;
@@ -462,12 +470,14 @@ module.exports = {
 	 * @param message - Discord.js message object
 	 * @param words - The string containing a potential string match
 	 */
-	nearMatchRole (message, words) {
-		let role = message.mentions.roles.first()
-      || message.guild.roles.cache.find((r) => r.id === words);
-		if (role) return role;
+	nearMatchRole (roles, words) {
+		//let role = message.mentions.roles.first()
+		// || message.guild.roles.cache.find((r) => r.id === words);
+		//if (role) return role;
+		//let role = this.findRole(words, message.guild.roles.cache);
+		//if (role) return role;
 		
-		let guildRoles = message.guild.roles.cache.array();
+		let guildRoles = roles.array();
 		let roleArray = guildRoles.map((r) => r.name.toLowerCase());
 
 		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), roleArray);
@@ -476,7 +486,26 @@ module.exports = {
 		return guildRoles[bestMatchIndex];
 	}
 };
+/**
+ * Find a role with near matching strings
+ * @param roles 
+ * @param words - The string containing a potential string match
+ */
+function nearMatchRole (roles, words) {
+	//let role = message.mentions.roles.first()
+	// || message.guild.roles.cache.find((r) => r.id === words);
+	//if (role) return role;
+	//let role = this.findRole(words, message.guild.roles.cache);
+	//if (role) return role;
+		
+	let guildRoles = roles.array();
+	let roleArray = guildRoles.map((r) => r.name.toLowerCase());
 
+	let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), roleArray);
+
+	if (rating < .3) return null;
+	return guildRoles[bestMatchIndex];
+}
 /**
  * Like readdir but recursive 👀
  * @param {string} dir
