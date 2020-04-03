@@ -66,6 +66,7 @@ const user = new Schema({
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
 	selfnotify: { type: Boolean, default: true},
+	flags: [ String ],
 	beans: {
 		sent: {
 			bean: { type: Number, default: 0 },

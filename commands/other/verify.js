@@ -1,4 +1,4 @@
-const { colors, developer, main_guild, global_override } = require("../../config.json");
+const { colors, developer, main_guild } = require("../../config.json");
 const { dbQuery, checkPermissions, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
@@ -27,18 +27,13 @@ module.exports = {
 
 		let globalPosArr = [];
 		let posArr = [];
-		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer");
-		if (developer.includes(id)) globalPosArr.push("<:suggesteradmin:689138045122773006> Global Administrator");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get(global_override).members.get(id)) globalPosArr.push("<:suggesterglobal:689121762952216625> Global Permissions");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566029891590422566").members.get(id)) globalPosArr.push("<:suggestermod:689138045328293974> Suggester Server Moderator");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("566030511840034816").members.get(id)) globalPosArr.push("<:support:643571568638689332> Suggester Support Team");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("657644875499569161").members.get(id)) globalPosArr.push("<:bean:657650134502604811> Global Bean Permissions");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("614084573139173389").members.get(id)) globalPosArr.push("<:canary:621530343081508899> Suggester Canary Program");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("631986751375933446").members.get(id)) globalPosArr.push("⭐ Suggester Contributor");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("574193409829634048").members.get(id)) globalPosArr.push("<:partner:689138870096363559> Suggester Partner");
-		if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("618893176295653397").members.get(id)) globalPosArr.push("😎 Super Supporter (Tier 3)");
-		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("640906114321612821").members.get(id)) globalPosArr.push("😎 Upper Tier Upvoter (Tier 2)");
-		else if (client.guilds.cache.get(main_guild) && client.guilds.cache.get(main_guild).available && client.guilds.cache.get(main_guild).roles.cache.get("569954188675776522").members.get(id)) globalPosArr.push("😎 Supporter (Tier 1)");
+		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer", "<:suggesteradmin:689138045122773006> Global Administrator");
+
+		if (qUserDB) {
+			if (qUserDB.flags.includes("GLOBAL_PERMISSIONS")) globalPosArr.push("<:suggesterglobal:689121762952216625> Global Permissions");
+			if (qUserDB.flags.includes("STAFF")) globalPosArr.push("<:suggestermod:689138045328293974> Suggester Staff Team");
+			if (qUserDB.flags.includes("BEANS")) globalPosArr.push("<:bean:657650134502604811> Global Bean Permissions");
+		}
 
 		if (qUserDB.blocked) globalPosArr.push(":no_entry_sign: Blacklisted Globally");
 
@@ -100,6 +95,9 @@ module.exports = {
 				}
 			}
 		}
+
+		if (args[0] && args[args.length-1].toLowerCase() === "--flags") embed.addField("User Flags", `${qUserDB.flags.join(", ")}`);
+
 
 		if (qUserDB.ack) embed.setDescription(qUserDB.ack);
 		else if (!hasAcks) embed.setDescription("This user has no acknowledgements");

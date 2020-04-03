@@ -45,12 +45,8 @@ module.exports = {
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
+		if (qUserDB && qUserDB.flags.includes("GLOBAL_PERMISSIONS")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (client.guilds.cache.get(config.main_guild)
-			&& client.guilds.cache.get(config.main_guild).available
-			&& client.guilds.cache.get(config.main_guild).roles.cache.get(config.global_override).members.get(member.id)) {
-			return 1;
-		}
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
 		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
 		let hasAdminRole = false;
