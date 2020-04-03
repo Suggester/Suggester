@@ -1,6 +1,8 @@
 const core = require("../coreFunctions.js");
 const { dbQuery, checkConfig } = require("../coreFunctions");
 const { emoji, colors, prefix } = require("../config.json");
+const { Collection } = require("discord.js");
+
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
 		let dmEmbed = new Discord.MessageEmbed()
@@ -68,6 +70,30 @@ module.exports = async (Discord, client, message) => {
 				});
 			}
 		}
+	}
+
+	if (command.controls.cooldown && command.controls.cooldown > 0) {
+		/*
+			Cooldown collection:
+			[
+				[command-name, [[user-id, time-used]]]
+			]
+			*/
+		//TODO: bypass with global permissions?
+		if (!client.cooldowns.has(command.controls.name)) client.cooldowns.set(command.controls.name, new Collection());
+
+		const now = Date.now();
+		const times = client.cooldowns.get(command.controls.name);
+		const lengthMs = command.controls.cooldown * 1000;
+
+		if (times.has(message.author.id)) {
+			const expires = times.get(message.author.id) + lengthMs;
+
+			if (expires > now) return message.channel.send(`:clock: This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more seconds.`);
+		}
+
+		times.set(message.author.id, now);
+		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
 	try {
