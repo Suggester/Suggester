@@ -35,6 +35,7 @@ connection.on("error", (err) => {
 });
 
 client.commands = new Discord.Collection();
+client.cooldowns = new Discord.Collection();
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {

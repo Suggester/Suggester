@@ -22,6 +22,7 @@
     "node-emoji": "^1.10.0",
     "numbered": "^1.1.0",
     "request": "^2.88.2",
+    "string-similarity": "^4.0.1",
     "valid-url": "1.0.9"
   },
   "devDependencies": {
