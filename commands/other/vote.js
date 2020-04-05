@@ -1,5 +1,3 @@
-let { dbQuery } = require("../../coreFunctions");
-const { prefix } = require("../../config.json");
 module.exports = {
 	controls: {
 		name: "vote",
@@ -11,7 +9,6 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async message => {
-		let server = await dbQuery("Server",{ id: message.guild.id });
-		return message.reply(`You can find more info about voting and the cool perks here: https://suggester.js.org/#/supporting/info`);
+		return message.reply("You can find more info about voting and the cool perks here: https://suggester.js.org/#/supporting/info");
 	}
 };
