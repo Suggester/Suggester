@@ -1,4 +1,4 @@
-const { emoji, colors, prefix, main_guild } = require("../../config.json");
+const { emoji, colors, prefix } = require("../../config.json");
 const { dbQuery, dbModify, serverLog, checkConfig, checkPermissions, fetchUser } = require("../../coreFunctions.js");
 module.exports = {
 	controls: {
@@ -43,6 +43,7 @@ module.exports = {
 
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid user!");
+		let qUserDB = await dbQuery("User", {id: user.id});
 
 		let reason;
 		if (args[1]) {
@@ -51,15 +52,12 @@ module.exports = {
 		}
 
 		await message.guild.members.fetch(user.id).catch(() => {});
-		await client.guilds.cache.get(main_guild).members.fetch(user.id).catch(() => {});
 
 		if (user.bot) return message.channel.send(`<:${emoji.x}> This user is a bot, and therefore cannot be blacklisted.`);
+		if (qUserDB.flags.includes("STAFF")) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a global Suggester staff member.`);
 		if (message.guild.members.cache.get(user.id)) {
 			let memberPermission = await checkPermissions(message.guild.members.cache.get(user.id), client);
-			if (memberPermission < 3) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a staff member.`);
-		} else if (client.guilds.cache.get(main_guild).members.cache.get(user.id)) {
-			let permissionInMainGuild = await checkPermissions(client.guilds.cache.get(main_guild).members.cache.get(user.id), client);
-			if (permissionInMainGuild <= 1) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a global Suggester staff member.`);
+			if (memberPermission <= 2) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a staff member.`);
 		}
 
 		if (qServerDB.config.blacklist.includes(user.id)) return message.channel.send(`<:${emoji.x}> This user is already blacklisted from using the bot on this server!`);

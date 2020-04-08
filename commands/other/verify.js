@@ -1,4 +1,4 @@
-const { colors, developer, main_guild } = require("../../config.json");
+const { colors, developer } = require("../../config.json");
 const { dbQuery, checkPermissions, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
@@ -23,17 +23,12 @@ module.exports = {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 
 		await message.guild.members.fetch(id).catch(() => {});
-		await client.guilds.cache.get(main_guild).members.fetch(id).catch(() => {});
 
 		let globalPosArr = [];
 		let posArr = [];
 		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer", "<:suggesteradmin:689138045122773006> Global Administrator");
 
-		if (qUserDB) {
-			if (qUserDB.flags.includes("GLOBAL_PERMISSIONS")) globalPosArr.push("<:suggesterglobal:689121762952216625> Global Permissions");
-			if (qUserDB.flags.includes("STAFF")) globalPosArr.push("<:suggestermod:689138045328293974> Suggester Staff Team");
-			if (qUserDB.flags.includes("BEANS")) globalPosArr.push("<:bean:657650134502604811> Global Bean Permissions");
-		}
+		if (qUserDB && qUserDB.flags.includes("STAFF")) globalPosArr.push("<:suggesterglobal:689121762952216625> Suggester Staff Team");
 
 		if (qUserDB.blocked) globalPosArr.push(":no_entry_sign: Blacklisted Globally");
 

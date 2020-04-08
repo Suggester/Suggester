@@ -3,8 +3,6 @@
       "0123",
       "0123"
   ],
-  "global_override": "0123", //Role ID of the Global Permissions role on the main_guild, gives access to usage of non-developer commands globally
-  "main_guild": "0123", //Server ID of the main guild used for logging and the Global Permissions role
   "prefix": "./", //Default prefix
   "support_invite": "G5pEdUp", //Invite to support server
   "colors": {

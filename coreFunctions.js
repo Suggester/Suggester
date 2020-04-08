@@ -18,10 +18,10 @@ function sendWebhook (cfg, input, embed) {
 	if (!input) return;
 	if (typeof input === "string") input = Discord.Util.removeMentions(input);
 	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
-		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
+		return null;
 	});
 	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
-		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
+		return null;
 	});
 }
 
@@ -46,7 +46,7 @@ module.exports = {
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
-		if (qUserDB && qUserDB.flags.includes("GLOBAL_PERMISSIONS")) return 1;
+		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
 		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;

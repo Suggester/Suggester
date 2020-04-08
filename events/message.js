@@ -72,7 +72,7 @@ module.exports = async (Discord, client, message) => {
 		}
 	}
 
-	if (command.controls.cooldown && command.controls.cooldown > 0) {
+	if (command.controls.cooldown && command.controls.cooldown > 0 && permission <= 1) {
 		/*
 			Cooldown collection:
 			[
@@ -89,7 +89,7 @@ module.exports = async (Discord, client, message) => {
 		if (times.has(message.author.id)) {
 			const expires = times.get(message.author.id) + lengthMs;
 
-			if (expires > now) return message.channel.send(`:clock: This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more seconds.`);
+			if (expires > now) return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more seconds.`);
 		}
 
 		times.set(message.author.id, now);

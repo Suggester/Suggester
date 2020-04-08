@@ -3,7 +3,7 @@ const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "flags",
-		permission: 1,
+		permission: 0,
 		usage: "flags <user> (add|remove) (flag)",
 		aliases: ["flag"],
 		description: "Sets internal flags for a user",
