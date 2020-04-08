@@ -1,18 +1,17 @@
-const core = require("../coreFunctions.js");
-const { dbQuery, checkConfig } = require("../coreFunctions");
-const { emoji, colors, prefix } = require("../config.json");
+const { dbQuery, dbModify, checkConfig, coreLog, commandLog, checkPermissions, errorLog } = require("../coreFunctions");
+const { emoji, colors, prefix, log_hooks, support_invite } = require("../config.json");
 const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
 		let dmEmbed = new Discord.MessageEmbed()
 			.setDescription(message.content);
-		if (message.channel.type === "dm" && client.user.id !== message.author.id) return core.coreLog(`:e_mail: **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, dmEmbed);
+		if (message.channel.type === "dm" && client.user.id !== message.author.id) return coreLog(`:e_mail: **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, dmEmbed);
 		return;
 	}
 	if (message.author.bot === true) return;
 
-	let permission = await core.checkPermissions(message.member, client);
+	let permission = await checkPermissions(message.member, client);
 
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
@@ -36,14 +35,14 @@ module.exports = async (Discord, client, message) => {
 		.setDescription(message.content);
 
 	if (command.controls.enabled === false) {
-		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, contentEmbed);
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, contentEmbed);
 		return message.channel.send("This command is currently disabled globally.");
 	}
 	if (permission > command.controls.permission) {
-		core.commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
 		return message.react("🚫");
 	}
-	core.commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
+	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
 
 	if (command.controls.permissions) {
 		let channelPermissions = message.channel.permissionsFor(client.user.id);
@@ -72,15 +71,16 @@ module.exports = async (Discord, client, message) => {
 		}
 	}
 
-	if (command.controls.cooldown && command.controls.cooldown > 0 && permission <= 1) {
+	let qUserDB = await dbQuery("User", { id: message.author.id });
+	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && !qUserDB.flags.includes("NO_COOLDOWN")) {
 		/*
 			Cooldown collection:
 			[
 				[command-name, [[user-id, time-used]]]
 			]
 			*/
-		//TODO: bypass with global permissions?
 		if (!client.cooldowns.has(command.controls.name)) client.cooldowns.set(command.controls.name, new Collection());
+		if (!client.cooldowns.has("_counts")) client.cooldowns.set("_counts", new Collection());
 
 		const now = Date.now();
 		const times = client.cooldowns.get(command.controls.name);
@@ -88,8 +88,24 @@ module.exports = async (Discord, client, message) => {
 
 		if (times.has(message.author.id)) {
 			const expires = times.get(message.author.id) + lengthMs;
+			const counts = client.cooldowns.get("_counts");
+			let userCount = counts.get(message.author.id) || null;
+			userCount ? userCount += 1 : userCount = 1;
 
-			if (expires > now) return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more seconds.`);
+			counts.set(message.author.id, userCount);
+			let cooldownLimit = 30;
+			if (userCount > cooldownLimit) {
+				//If more than 30 cooldown breaches occur over the duration of the bot being up, auto-blacklist the user and notify the developers
+				qUserDB.blocked = true;
+				await dbModify("User", { id: message.author.id }, qUserDB);
+
+				message.channel.send(`<@${message.author.id}> ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join https://discord.gg/${support_invite} and contact our Support Team.`);
+
+				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
+				hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
+			}
+
+			if (expires > now) return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more second${((expires - now) / 1000).toFixed(0) !== "1" ? "s" : ""}. ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
 		}
 
 		times.set(message.author.id, now);
@@ -100,6 +116,6 @@ module.exports = async (Discord, client, message) => {
 		return command.do(message, client, args, Discord);
 	} catch (err) {
 		message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
-		core.errorLog(err, "Command Handler", `Message Content: ${message.content}`);
+		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 	}
 };

@@ -7,7 +7,8 @@ module.exports = {
 		description: "Shows the link to the support server",
 		enabled: true,
 		docs: "all/support",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+		cooldown: 5
 	},
 	do: message => {
 		return message.reply(`Need help with the bot? Join our support server at https://discord.gg/${support_invite} 😉`);

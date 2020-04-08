@@ -25,7 +25,8 @@ module.exports = {
 		description: "Submits a suggestion",
 		enabled: true,
 		docs: "all/suggest",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 30
 	},
 	do: async (message, client, args, Discord) => {
 		let missingConfigs = [];

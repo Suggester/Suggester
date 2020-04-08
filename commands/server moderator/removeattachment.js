@@ -9,7 +9,8 @@ module.exports = {
 		description: "Removes a file from a suggestion",
 		enabled: true,
 		docs: "staff/removeattachment",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });

@@ -8,7 +8,8 @@ module.exports = {
 		description: "Adds a comment to an approved suggestion",
 		enabled: true,
 		docs: "staff/comment",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 

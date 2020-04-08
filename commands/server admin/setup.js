@@ -9,7 +9,8 @@ module.exports = {
 		description: "Initiates a walkthrough for server configuration",
 		enabled: true,
 		docs: "admin/setup",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
+		cooldown: 45
 	},
 	do: async (message, client, args, Discord) => {
 		async function setup (through)  {

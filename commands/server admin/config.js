@@ -10,7 +10,8 @@ module.exports = {
 		description: "Shows/edits server configuration",
 		enabled: true,
 		docs: "admin/config",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
 		let checkQServerDB = await dbQueryNoNew("Server", {id: message.guild.id});

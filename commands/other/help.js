@@ -10,7 +10,8 @@ module.exports = {
 		description: "Shows command information",
 		enabled: true,
 		docs: "all/help",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
 		let permission = await checkPermissions(message.member, client);

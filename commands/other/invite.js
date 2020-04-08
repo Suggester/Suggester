@@ -8,7 +8,8 @@ module.exports = {
 		description: "Shows the link to invite the bot",
 		enabled: true,
 		docs: "all/invite",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 5
 	},
 	do: async (message, client) => {
 		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=604367937>";
