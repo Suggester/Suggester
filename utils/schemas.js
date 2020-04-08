@@ -14,10 +14,13 @@ const settings = new Schema({
 			suggestions: { type: String },
 			staff: { type: String },
 			log: { type: String },
-			denied: { type: String }
+			denied: { type: String },
+			archive: { type: String }
 		},
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
+		clean_suggestion_command: { type: Boolean, default: false },
+		approved_role: { type: String },
 		mode: { type: String, default: "review" },
 		blacklist: [String],
 		emojis: {
