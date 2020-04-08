@@ -19,7 +19,7 @@ module.exports = {
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
-				.setDescription("Please see https://suggester.gitbook.io/ for a command list and usage information!")
+				.setDescription("Please see https://suggester.js.org/ for a command list and usage information!")
 				.setFooter(`My prefix in this server is ${serverPrefix}`)
 				.setColor(colors.default);
 			return message.channel.send(embed);
@@ -43,7 +43,7 @@ module.exports = {
 			.setAuthor(`Command: ${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
 		commandInfo.aliases ? returnEmbed.addField(commandInfo.aliases.length > 1 ? "Aliases" : "Alias", commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.gitbook.io/docs/${commandInfo.docs}`);
+		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.js.org/#/${commandInfo.docs}`);
 		if (!commandInfo.enabled) returnEmbed.addField("Additional Information", "⚠️ This command is currently disabled");
 
 		return message.channel.send(returnEmbed);

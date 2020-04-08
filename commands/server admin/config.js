@@ -51,7 +51,7 @@ module.exports = {
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed();
-			embed.setDescription(`Please see https://suggester.gitbook.io/docs/admin/config for information about the config command. You can use \`${qServerDB.config.prefix || prefix}setup\` to walkthrough setting up your server.`);
+			embed.setDescription(`Please see https://suggester.js.org/#/admin/config for information about the config command. You can use \`${qServerDB.config.prefix || prefix}setup\` to walkthrough setting up your server.`);
 			embed.setColor(colors.default);
 			return message.channel.send(embed);
 		}

@@ -65,7 +65,7 @@ module.exports = {
 			case 1: {
 				let staffRolesEmbed = new Discord.MessageEmbed()
 					.setColor(colors.default)
-					.setDescription("Any member with a server staff role can use all [staff commands](https://suggester.gitbook.io/docs/) to manage suggestions.")
+					.setDescription("Any member with a server staff role can use all [staff commands](https://suggester.js.org/) to manage suggestions.")
 					.addField("Inputs", "You can send a role name, role ID, or role @mention in this channel")
 					.setFooter("You have 2 minutes to enter a role");
 				if (qServerDB.config.staff_roles.length >= 1) staffRolesEmbed.addField("Done setting up staff roles?", "Type `done` to go to the next step\nIf you're not done, just specify another staff role!");
@@ -379,7 +379,7 @@ module.exports = {
 					.setTitle("Setup Complete!")
 					.setColor(colors.default)
 					.setDescription(`Suggester should now work in your server, try it out with **${Discord.escapeMarkdown(qServerDB.config.prefix)}suggest**!`)
-					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.gitbook.io/docs/admin/config for more information.");
+					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.js.org/#/admin/config for more information.");
 				message.channel.send(doneEmbed);
 				break;
 			}
