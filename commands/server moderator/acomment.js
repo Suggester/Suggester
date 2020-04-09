@@ -48,7 +48,8 @@ module.exports = {
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: 0,
-			id: qSuggestionDB.comments.length+1
+			id: qSuggestionDB.comments.length+1,
+			created: new Date()
 		});
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 

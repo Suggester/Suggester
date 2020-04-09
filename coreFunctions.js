@@ -6,6 +6,7 @@ const { promises } = require("fs");
 const { resolve } = require("path");
 const nodeEmoji = require("node-emoji");
 const { findBestMatch } = require("string-similarity");
+const timestampToDate = require("timestamp-to-date");
 
 /**
  * Send a message from a webhook
@@ -141,7 +142,7 @@ module.exports = {
 				if (!comment.deleted || comment.deleted !== true) {
 					let user = await fetchUser(comment.author, client);
 					let title;
-					!user ? title = `Staff Comment (ID: ${suggestion.suggestionId}_${comment.id})` : title = `Comment from ${user.tag} (ID: ${suggestion.suggestionId}_${comment.id})`;
+					!user ? title = `Staff Comment (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `Comment from ${user.tag} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}`;
 					embed.addField(title, comment.comment);
 				}
 			}

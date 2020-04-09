@@ -57,6 +57,7 @@ const suggestion = new Schema({
 			comment: String,
 			author: String,
 			id: { type: String, min: 1, max: 23 },
+			created: { type: Date },
 			deleted: Boolean,
 		}
 	],
