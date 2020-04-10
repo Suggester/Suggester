@@ -1,6 +1,6 @@
 const { emoji, colors } = require("../../config.json");
 const core = require("../../coreFunctions.js");
-const { dbQuery, dbModify, serverLog, suggestionEmbed } = require("../../coreFunctions");
+const { dbQuery, dbModify, serverLog, suggestionEmbed, checkPermissions } = require("../../coreFunctions");
 const { Suggestion } = require("../../utils/schemas");
 const validUrl = require("valid-url");
 
@@ -56,6 +56,48 @@ module.exports = {
 				.addField("Missing Elements", `<:${emoji.x}> ${missingConfigs.join(`\n<:${emoji.x}> `)}`)
 				.setColor(colors.red);
 			return message.channel.send(embed);
+		}
+
+		let permission = await checkPermissions(message.member, client);
+
+		if (qServerDB.config.allowed_roles && qServerDB.config.allowed_roles.length > 0 && permission > 3) {
+			let hasAllowedRole = false;
+			qServerDB.config.allowed_roles.forEach(roleId => {
+				if (message.member.roles.cache.has(roleId)) hasAllowedRole = true;
+			});
+			if (!hasAllowedRole) {
+				let allowedRoleList = [];
+				let removed = false;
+				qServerDB.config.allowed_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+						qServerDB.config.allowed_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				qServerDB.config.staff_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.staff_roles.findIndex(r => r === roleId);
+						qServerDB.config.staff_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				qServerDB.config.admin_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.admin_roles.findIndex(r => r === roleId);
+						qServerDB.config.admin_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				if (removed) await dbModify("Server", { id: message.guild.id }, qServerDB);
+				return message.channel.send(`<:${emoji.x}> You do not have the role necessary to submit suggestions.\nThe following roles can submit suggestions: ${allowedRoleList.join(", ")}`, {disableMentions: "everyone"});
+			}
 		}
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
