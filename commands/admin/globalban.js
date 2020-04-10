@@ -23,7 +23,7 @@ module.exports = {
 				let { blocked } = qUserDB;
 				return message.channel.send(`<:${emoji.check}> \`${foundUser.tag}\`is ${blocked ? "" : "not "}globally blocked.`);
 			}
-
+			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(`<:${emoji.x}> This user is protected and cannot be blacklisted.`);
 			if (args[1] === "true") qUserDB.blocked = true;
 			else if (args[1] === "false") qUserDB.blocked = false;
 			await dbModifyId("User", foundUser.id, qUserDB);
@@ -39,6 +39,7 @@ module.exports = {
 				let { blocked } = qServerDB;
 				return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${blocked ? "" : "not "}globally blocked.`);
 			}
+			if (qServerDB.flags && qServerDB.flags.includes("PROTECTED")) return message.channel.send(`<:${emoji.x}> This guild is protected and cannot be blacklisted.`);
 			if (args[1] === "true") qServerDB.blocked = true;
 			else if (args[1] === "false") qServerDB.blocked = false;
 			await dbModifyId("Server", args[0], qServerDB);

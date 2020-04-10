@@ -72,7 +72,7 @@ module.exports = async (Discord, client, message) => {
 	}
 
 	let qUserDB = await dbQuery("User", { id: message.author.id });
-	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && !qUserDB.flags.includes("NO_COOLDOWN")) {
+	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && (!qUserDB.flags || (!qUserDB.flags.includes("NO_COOLDOWN") && !qUserDB.flags.includes("PROTECTED"))) && (!qServerDB.flags || !qServerDB.flags.includes("NO_COOLDOWN"))) {
 		/*
 			Cooldown collection:
 			[

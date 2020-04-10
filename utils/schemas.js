@@ -6,6 +6,7 @@ const settings = new Schema({
 	id: { type: String, required: true }, // server id
 	blocked: { type: Boolean, default: false },
 	whitelist: { type: Boolean, default: false },
+	flags: [ String ],
 	config: {
 		prefix: { type: String, default: prefix },
 		admin_roles: [String],
