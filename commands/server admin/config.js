@@ -151,7 +151,7 @@ module.exports = {
 				let role = await findRole(input, message.guild.roles.cache);
 				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
 				if (!qServerDB.config.staff_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently a staff role.`);
-				qServerDB.config.staff_roles.splice(qServerDB.config.admin_roles.findIndex(r => r === role.id), 1);
+				qServerDB.config.staff_roles.splice(qServerDB.config.staff_roles.findIndex(r => r === role.id), 1);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server staff roles.`, {disableMentions: "everyone"});
 			}
@@ -193,6 +193,77 @@ module.exports = {
 						});
 						if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
 						return message.channel.send(`**Staff Roles:**\n>>> ${staffRoleList.join("\n")}`, {disableMentions: "everyone"});
+					}
+				}
+			}
+			}
+		}
+		case "allowed":
+		case "allowedrole":
+		case "suggestrole": {
+			switch (args[1]) {
+			case "add":
+			case "+": {
+				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
+				let input = args.splice(2).join(" ");
+				let role = await findRole(input, message.guild.roles.cache);
+				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+				if (qServerDB.config.allowed_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role has already been given permission to submit suggestions.`);
+				qServerDB.config.allowed_roles.push(role.id);
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Members with the **${role.name}** role can now submit suggestions.`, {disableMentions: "everyone"});
+			}
+			case "remove":
+			case "-":
+			case "rm":
+			case "delete": {
+				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
+				let input = args.splice(2).join(" ");
+				let role = await findRole(input, message.guild.roles.cache);
+				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+				if (!qServerDB.config.allowed_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently able to submit suggestions.`);
+				qServerDB.config.allowed_roles.splice(qServerDB.config.allowed_roles.findIndex(r => r === role.id), 1);
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Members with the **${role.name}** role can no longer submit suggestions.`, {disableMentions: "everyone"});
+			}
+			case "list": {
+				if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+					return message.channel.send("**Allowed Suggesting Roles:** None Configured (all users can submit suggestions)");
+				} else {
+					let allowedRoleList = [];
+					let removed = 0;
+					qServerDB.config.allowed_roles.forEach(roleId => {
+						if (message.guild.roles.cache.get(roleId)) {
+							allowedRoleList.push(`${message.guild.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+						} else {
+							let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+							qServerDB.config.allowed_roles.splice(index, 1);
+							removed++;
+						}
+					});
+					if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`**Allowed Suggesting Roles:**\n>>> ${allowedRoleList.join("\n")}`, {disableMentions: "everyone"});
+				}
+			}
+			default: {
+				if (args[1]) return message.channel.send("Please specify either `add`, `remove` or `list`.");
+				else {
+					if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+						return message.channel.send("**Allowed Suggesting Roles:** None Configured (all users can submit suggestions)");
+					} else {
+						let allowedRoleList = [];
+						let removed = 0;
+						qServerDB.config.allowed_roles.forEach(roleId => {
+							if (message.guild.roles.cache.get(roleId)) {
+								allowedRoleList.push(`${message.guild.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+							} else {
+								let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+								qServerDB.config.allowed_roles.splice(index, 1);
+								removed++;
+							}
+						});
+						if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
+						return message.channel.send(`**Allowed Suggesting Roles:**\n>>> ${allowedRoleList.join("\n")}`, {disableMentions: "everyone"});
 					}
 				}
 			}
@@ -522,6 +593,22 @@ module.exports = {
 				});
 				await dbModify("Server", {id: server.id}, qServerDB);
 				cfgArr.push(`<:${emoji.check}> **Staff Roles:**\n> ${staffRoleList.join("\n > ")}`);
+			}
+			// Allowed roles
+			if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+				cfgArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:** None Configured (all users can submit suggestions)`);
+			} else {
+				let allowedRoleList = [];
+				qServerDB.config.allowed_roles.forEach(roleId => {
+					if (server.roles.cache.get(roleId)) {
+						allowedRoleList.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+					} else {
+						let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+						qServerDB.config.allowed_roles.splice(index, 1);
+					}
+				});
+				await dbModify("Server", {id: server.id}, qServerDB);
+				cfgArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:**\n> ${allowedRoleList.join("\n > ")}`);
 			}
 			// Staff review channel
 			if (!qServerDB.config.channels.staff) {
