@@ -1,4 +1,4 @@
-const { dbQuery, checkPermissions, permLevelToRole, checkConfig } = require("../../coreFunctions");
+const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
 
 const { colors, prefix } = require("../../config.json");
 
@@ -6,7 +6,7 @@ module.exports = {
 	controls: {
 		name: "help",
 		permission: 10,
-		aliases: ["command", "howto"],
+		aliases: ["command", "howto", "prefix"],
 		usage: "help (command name)",
 		description: "Shows command information",
 		enabled: true,
@@ -15,7 +15,6 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let permission = await checkPermissions(message.member, client);
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		let missingConfig = checkConfig(qServerDB);
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
@@ -26,13 +25,7 @@ module.exports = {
 				.setFooter(`My prefix in this server is ${serverPrefix}`)
 				.setColor(colors.default);
 
-			if (missingConfig) {
-				embed.addField(
-					"Missing Config!",
-					"This server has an incomplete configuration.\n" +
-						`A server manager should run \`${serverPrefix}setup\` and configure it.`
-				);
-			}
+			if (missingConfig.length >= 1) embed.addField("Missing Config!", `This server has an incomplete configuration.\nA server manager can run \`${serverPrefix}setup\` to configure it.`);
 			return message.channel.send(embed);
 		}
 

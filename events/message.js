@@ -16,16 +16,18 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
-	const match = message.content.match(new RegExp(`^<@!?${client.user.id}>`));
+	const match = message.content.match(new RegExp(`^<@!?${client.user.id}> ?`));
 	if (match) serverPrefix = match[0];
 	else if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) serverPrefix = "suggester:";
 	else if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) serverPrefix = `${client.user.id}:`;
 
-
-
 	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	let args = message.content.split(" ");
-	let commandName = args.shift().slice(serverPrefix.length).toLowerCase();
+	serverPrefix.endsWith(" ") ? args = args.splice(2) : args = args.splice(1);
+	let commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
+
+	if (!commandName || !commandName[1]) return;
+	else commandName = commandName[1];
 
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 	if (!command) return;
