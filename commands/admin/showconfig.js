@@ -147,6 +147,8 @@ module.exports = {
 		cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 		// Notify
 		cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
+		//Clean Suggestion Command
+		cfgArr.push(`<:${emoji.check}> **Clean Suggestion Command:** ${qServerDB.config.clean_suggestion_command ? "Suggestion commands are removed from the channel after a few seconds" : "Suggestion commands are not removed automatically"}`);
 
 		let cfgEmbed = new Discord.MessageEmbed()
 			.setTitle(`Server Configuration for **${server.name}**`)

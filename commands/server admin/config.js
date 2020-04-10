@@ -430,23 +430,58 @@ module.exports = {
 			if (!args[1]) return message.channel.send(`DM notifications on suggestion changes are currently **${qServerDB.config.notify ? "enabled" : "disabled"}**.`);
 			switch (args[1].toLowerCase()) {
 			case "enable":
+			case "on": {
 				if (!qServerDB.config.notify) {
 					qServerDB.config.notify = true;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already enabled!`);
+			}
 			case "disable":
+			case "off": {
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Disabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already disabled!`);
+			}
 			case "toggle":
 				qServerDB.config.notify = !qServerDB.config.notify;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} user notifications.`);
+			default:
+				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
 			}
-			break;
+		}
+		case "clear":
+		case "clean":
+		case "cleancommands":
+		case "cleancommand": {
+			if (!args[1]) return message.channel.send(`Auto-cleaning of suggestion commands is currently **${qServerDB.config.clean_suggestion_command ? "enabled" : "disabled"}**.`);
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.clean_suggestion_command) {
+					qServerDB.config.clean_suggestion_command = true;
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`<:${emoji.check}> Enabled auto-cleaning of suggestion commands.`);
+				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already enabled!`);
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.clean_suggestion_command) {
+					qServerDB.config.clean_suggestion_command = false;
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`<:${emoji.check}> Disabled auto-cleaning of suggestion commands.`);
+				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already disabled!`);
+			}
+			case "toggle":
+				qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
+			default:
+				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
+			}
 		}
 		case "list": {
 			let server = message.guild;
@@ -577,6 +612,8 @@ module.exports = {
 			cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
 			cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
+			//Clean Suggestion Command
+			cfgArr.push(`<:${emoji.check}> **Clean Suggestion Command:** ${qServerDB.config.clean_suggestion_command ? "Suggestion commands are removed from the channel after a few seconds" : "Suggestion commands are not removed automatically"}`);
 
 			let cfgEmbed = new Discord.MessageEmbed()
 				.setTitle(`Server Configuration for **${server.name}**`)

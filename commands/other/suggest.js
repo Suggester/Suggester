@@ -100,7 +100,12 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.default)
 				.setImage(attachment);
-			message.channel.send("Your suggestion has been submitted for review!", replyEmbed);
+			message.channel.send("Your suggestion has been submitted for review!", replyEmbed).then(sent => {
+				if (qServerDB.config.clean_suggestion_command) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
 			let reviewEmbed = new Discord.MessageEmbed()
 				.setTitle("Suggestion Awaiting Review (#" + id.toString() + ")")
@@ -199,7 +204,12 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.default)
 				.setImage(attachment);
-			message.channel.send(`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`, replyEmbed);
+			message.channel.send(`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`, replyEmbed).then(sent => {
+				if (qServerDB.config.clean_suggestion_command) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
 			if (qServerDB.config.channels.log) {
 				let logEmbed = new Discord.MessageEmbed()
