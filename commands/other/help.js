@@ -31,8 +31,6 @@ module.exports = {
 
 		if (!command) return;
 
-		if (permission > command.controls.permission) return;
-
 		let commandInfo = command.controls;
 
 		let returnEmbed = new Discord.MessageEmbed()
