@@ -11,6 +11,8 @@ const settings = new Schema({
 		prefix: { type: String, default: prefix },
 		admin_roles: [String],
 		staff_roles: [String],
+		allowed_roles: [String],
+		approved_role: { type: String },
 		channels: {
 			suggestions: { type: String },
 			staff: { type: String },
@@ -21,7 +23,6 @@ const settings = new Schema({
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
 		clean_suggestion_command: { type: Boolean, default: false },
-		approved_role: { type: String },
 		mode: { type: String, default: "review" },
 		blacklist: [String],
 		emojis: {
