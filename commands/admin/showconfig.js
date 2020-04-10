@@ -58,6 +58,22 @@ module.exports = {
 			await dbModify("Server", {id: server.id}, qServerDB);
 			cfgArr.push(`<:${emoji.check}> **Staff Roles:**\n> ${staffRoleList.join("\n > ")}`);
 		}
+		// Allowed roles
+		if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+			cfgArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:** None Configured (all users can submit suggestions)`);
+		} else {
+			let allowedRoleList = [];
+			qServerDB.config.allowed_roles.forEach(roleId => {
+				if (server.roles.cache.get(roleId)) {
+					allowedRoleList.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+				} else {
+					let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+					qServerDB.config.allowed_roles.splice(index, 1);
+				}
+			});
+			await dbModify("Server", {id: server.id}, qServerDB);
+			cfgArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:**\n> ${allowedRoleList.join("\n > ")}`);
+		}
 		// Staff review channel
 		if (!qServerDB.config.channels.staff) {
 			cfgArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
