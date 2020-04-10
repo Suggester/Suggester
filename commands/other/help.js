@@ -1,12 +1,13 @@
-const { dbQuery, checkPermissions, permLevelToRole } = require("../../coreFunctions");
+const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
+
 const { colors, prefix } = require("../../config.json");
 
 module.exports = {
 	controls: {
 		name: "help",
 		permission: 10,
-		aliases: ["command", "howto"],
-		usage: "help <command name>",
+		aliases: ["command", "howto", "prefix"],
+		usage: "help (command name)",
 		description: "Shows command information",
 		enabled: true,
 		docs: "all/help",
@@ -14,14 +15,17 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let permission = await checkPermissions(message.member, client);
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		let missingConfig = checkConfig(qServerDB);
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
+
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setDescription("Please see https://suggester.js.org/ for a command list and usage information!")
 				.setFooter(`My prefix in this server is ${serverPrefix}`)
 				.setColor(colors.default);
+
+			if (missingConfig.length >= 1) embed.addField("Missing Config!", `This server has an incomplete configuration.\nA server manager can run \`${serverPrefix}setup\` to configure it.`);
 			return message.channel.send(embed);
 		}
 

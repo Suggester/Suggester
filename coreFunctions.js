@@ -6,7 +6,6 @@ const { promises } = require("fs");
 const { resolve } = require("path");
 const nodeEmoji = require("node-emoji");
 const { findBestMatch } = require("string-similarity");
-const timestampToDate = require("timestamp-to-date");
 
 /**
  * Send a message from a webhook
@@ -18,12 +17,8 @@ function sendWebhook (cfg, input, embed) {
 	if (!cfg || !cfg.id || !cfg.token) return;
 	if (!input) return;
 	if (typeof input === "string") input = Discord.Util.removeMentions(input);
-	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
-		return null;
-	});
-	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
-		return null;
-	});
+	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(() => { /* noop */ });
+	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(() => { /* noop */ });
 }
 
 module.exports = {
@@ -464,7 +459,7 @@ module.exports = {
 };
 /**
  * Find something in a collection with near matching strings
- * @param collection - Call .cache on it first 
+ * @param collection - Call .cache on it first
  * @param words - The string containing a potential string match
  */
 function nearMatchCollection (collection, words) {
