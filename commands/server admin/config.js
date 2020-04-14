@@ -269,6 +269,31 @@ module.exports = {
 			}
 			}
 		}
+		case "approvedrole":
+		case "approverole": {
+			if (!args[1]) {
+				if (!qServerDB.config.approved_role) return message.channel.send("**Approved Suggestion Role:** None Configured");
+				if (message.guild.roles.cache.get(qServerDB.config.approved_role)) {
+					return message.channel.send(`**Approved Suggestion Role:** ${message.guild.roles.cache.get(qServerDB.config.approved_role).name} (ID: \`${qServerDB.config.approved_role}\`)`);
+				} else {
+					qServerDB.config.approved_role = "";
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send("**Approved Suggestion Role:** None Configured");
+				}
+			}
+			let input = args.splice(1).join(" ");
+			if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+				qServerDB.config.approved_role = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully reset the approved suggestion role.`);
+			}
+			let role = await findRole(input, message.guild.roles.cache);
+			if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+			if (qServerDB.config.approved_role && qServerDB.config.approved_role === role.id) return message.channel.send(`<:${emoji.x}> This role is already set to be given when a user's suggestion is approved.`);
+			qServerDB.config.approved_role = role.id;
+			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			return message.channel.send(`<:${emoji.check}> Members who have their suggestion approved will now receive the **${role.name}** role.`, {disableMentions: "everyone"});
+		}
 		case "review":
 		case "reviewchannel": {
 			if (!args[1]) return message.channel.send(qServerDB.config.channels.staff ? `The suggestion review channel is currently configured to <#${qServerDB.config.channels.staff}>` : "This server has no suggestion review channel set!");
@@ -638,6 +663,18 @@ module.exports = {
 				});
 				await dbModify("Server", {id: server.id}, qServerDB);
 				cfgArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:**\n> ${allowedRoleList.join("\n > ")}`);
+			}
+			// Approved suggestion role
+			if (!qServerDB.config.approved_role) cfgArr.push(`<:${emoji.check}> **Approved Suggestion Role:** None Configured`);
+			else {
+				let role = server.roles.cache.get(qServerDB.config.approved_role);
+				if (role) {
+					cfgArr.push(`<:${emoji.check}> **Approved Suggestion Role:** ${role.name} (ID: \`${role.id}\`)`);
+				} else {
+					qServerDB.config.approved_role = "";
+					await dbModify("Server", {id: server.id}, qServerDB);
+					cfgArr.push(`<:${emoji.check}> **Approved Suggestion Role:** None Configured`);
+				}
 			}
 			// Staff review channel
 			if (!qServerDB.config.channels.staff) {

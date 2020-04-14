@@ -132,6 +132,8 @@ module.exports = {
 			}
 		});
 
+		if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id)) message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, "Suggestion approved");
+
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${message.author.tag} approved #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
