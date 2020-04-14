@@ -146,6 +146,18 @@ module.exports = {
 				cfgArr.push(`<:${emoji.check}> **Log Channel:** <#${channel.id}> (${channel.id})`);
 			}
 		}
+		// Archive channel
+		if (!qServerDB.config.channels.archive) cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+		else {
+			let channel = server.channels.cache.get(qServerDB.config.channels.archive);
+			if (!channel || channel.type !== "text") {
+				qServerDB.config.channels.archive = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+			} else {
+				cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** <#${channel.id}> (${channel.id})`);
+			}
+		}
 		// Commands channel
 		if (!qServerDB.config.channels.commands) cfgArr.push(`<:${emoji.check}> **Suggestion Command Channel:** None Configured (Suggestions can be made in all channels)`);
 		else {

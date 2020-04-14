@@ -37,6 +37,8 @@ module.exports = {
 
 		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Attachments can only be added to approved suggestions!`);
 
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
+
 		if (qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
 
 		if (!args[1] && !message.attachments.first()) return message.channel.send(`<:${emoji.x}> Please provide an attachment!`);

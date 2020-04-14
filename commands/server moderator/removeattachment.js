@@ -33,6 +33,8 @@ module.exports = {
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
 		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
 
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
+
 		let id = qSuggestionDB.suggestionId;
 
 		if (!qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> This suggestion does not have an attachment!`);

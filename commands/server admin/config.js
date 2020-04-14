@@ -433,6 +433,32 @@ module.exports = {
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
 		}
+		case "archive":
+		case "archivechannel":
+		case "implementedchannel":
+		case "implemented": {
+			if (!args[1]) return qServerDB.config.channels.archive ? message.channel.send(`The implemented suggestions archive channel is currently configured to <#${qServerDB.config.channels.archive}>`) : message.channel.send("This server has no implemented suggestions archive channel set!");
+			let archiveInput = args.splice(1).join(" ").toLowerCase();
+			if (archiveInput === "none" || archiveInput === "reset") {
+				qServerDB.config.channels.archive = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully reset the implemented suggestions archive channel.`);
+			}
+			let archiveChannel = await findChannel(archiveInput, message.guild.channels.cache);
+			if (!archiveChannel || archiveChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			let archivePerms = channelPermissions(archiveChannel.permissionsFor(client.user.id), "denied", client); //Denied checks for all needed permissions
+			if (archivePerms.length > 0) {
+				let embed = new Discord.MessageEmbed()
+					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${archiveChannel.id}> channel:`)
+					.addField("Missing Elements", `<:${emoji.x}> ${archivePerms.join(`\n<:${emoji.x}> `)}`)
+					.addField("How to Fix", `In the channel settings for <#${archiveChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+					.setColor(colors.red);
+				return message.channel.send(embed);
+			}
+			qServerDB.config.channels.archive = archiveChannel.id;
+			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			return message.channel.send(`<:${emoji.check}> Successfully set <#${archiveChannel.id}> as the implemented suggestions archive channel.`);
+		}
 		case "mode": {
 			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
 			switch (args[1].toLowerCase()) {
@@ -736,6 +762,18 @@ module.exports = {
 					cfgArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
 				} else {
 					cfgArr.push(`<:${emoji.check}> **Log Channel:** <#${channel.id}> (${channel.id})`);
+				}
+			}
+			// Archive channel
+			if (!qServerDB.config.channels.archive) cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+			else {
+				let channel = server.channels.cache.get(qServerDB.config.channels.archive);
+				if (!channel || channel.type !== "text") {
+					qServerDB.config.channels.archive = "";
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+				} else {
+					cfgArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** <#${channel.id}> (${channel.id})`);
 				}
 			}
 			// Commands channel

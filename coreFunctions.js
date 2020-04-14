@@ -168,7 +168,7 @@ module.exports = {
 			});
 			return list;
 		case "denied":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
 			list = [];
 			required.forEach(permission => {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);

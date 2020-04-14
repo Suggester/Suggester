@@ -64,7 +64,8 @@ const suggestion = new Schema({
 			deleted: Boolean,
 		}
 	],
-	attachment: String
+	attachment: String,
+	implemented: Boolean
 });
 
 const user = new Schema({

@@ -53,7 +53,7 @@ module.exports = {
 		let msg = await message.channel.send("Processing... this may take a moment");
 
 		let preDeny = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
-		let alreadyDenied = preDeny.filter((s) => s.status === "denied");
+		let alreadyDenied = preDeny.filter((s) => s.status === "denied" || s.implemented);
 
 		let notDeniedId = alreadyDenied.map((s) => s.suggestionId);
 
