@@ -18,7 +18,8 @@ const settings = new Schema({
 			staff: { type: String },
 			log: { type: String },
 			denied: { type: String },
-			archive: { type: String }
+			archive: { type: String },
+			commands: { type: String }
 		},
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },

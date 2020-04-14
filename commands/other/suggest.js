@@ -100,6 +100,8 @@ module.exports = {
 			}
 		}
 
+		if (qServerDB.config.channels.commands && message.channel.id !== qServerDB.config.channels.commands) return message.channel.send(`<:${emoji.x}> Suggestions can only be submitted in the <#${qServerDB.config.channels.commands}> channel.`);
+
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
 		if (!args[0] && !attachment) return message.channel.send("Please provide a suggestion!");
 		if (attachment && !(checkURL(attachment))) return message.channel.send(`<:${emoji.x}> Please provide a valid attachment! Attachments can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``);

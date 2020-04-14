@@ -181,6 +181,13 @@ module.exports = {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
 			});
 			return list;
+		case "commands":
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"];
+			list = [];
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
 		}
 	},
 	/**

@@ -134,6 +134,18 @@ module.exports = {
 				cfgArr.push(`<:${emoji.check}> **Log Channel:** <#${channel.id}> (${channel.id})`);
 			}
 		}
+		// Commands channel
+		if (!qServerDB.config.channels.commands) cfgArr.push(`<:${emoji.check}> **Suggestion Command Channel:** None Configured (Suggestions can be made in all channels)`);
+		else {
+			let channel = server.channels.cache.get(qServerDB.config.channels.commands);
+			if (!channel || channel.type !== "text") {
+				qServerDB.config.channels.commands = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				cfgArr.push(`<:${emoji.check}> **Suggestion Command Channel:** None Configured (Suggestions can be made in all channels)`);
+			} else {
+				cfgArr.push(`<:${emoji.check}> **Suggestion Command Channel:** <#${channel.id}> (${channel.id})`);
+			}
+		}
 		// Emojis
 		const checkEmoji = function(emoji) {
 			if (emoji === "none") return "Disabled";
