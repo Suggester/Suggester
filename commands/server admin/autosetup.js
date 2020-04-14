@@ -1,5 +1,5 @@
-const { colors, emoji, prefix } = require("../../config.json");
-const { dbQueryNoNew, dbQuery, dbModify, channelPermissions, findRole, findChannel, findEmoji } = require("../../coreFunctions.js");
+const { emoji } = require("../../config.json");
+const { dbQuery, dbModify } = require("../../coreFunctions.js");
 module.exports = {
 	controls: {
 		name: "autosetup",
