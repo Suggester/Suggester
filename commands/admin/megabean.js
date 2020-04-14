@@ -1,4 +1,4 @@
-const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "megabean",
@@ -20,6 +20,8 @@ module.exports = {
 			.setColor("#AAD136")
 			.setDescription(reason)
 			.setImage("https://media.tenor.com/images/be3750a3b77c26295ae4bc16d9543d63/tenor.gif");
+
+		let qMemberDB = await dbQuery("User", {id: member.id});
 
 		message.channel.send(`<:hyperbean:666099809668694066> Megabeaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
 		if (qMemberDB.notify) member.user.send(`<:hyperbean:666099809668694066> **You have been megabeaned from ${message.guild.name}**`, beanSendEmbed).catch(()=> {});

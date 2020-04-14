@@ -1,4 +1,4 @@
-const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "nukebean",
@@ -32,6 +32,8 @@ module.exports = {
 				global.beans[member.id].count++;
 			}
 		});
+
+		let qMemberDB = await dbQuery("User", {id: member.id});
 
 		message.channel.send(`<:nukebean:666102191895085087> Nukebeaned ${user.tag} (\`${member.id}\`)`, beanSendEmbed);
 		if (qMemberDB.notify) member.user.send(`<:nukebean:666102191895085087> **You have been nukebeaned from ${message.guild.name}**`, beanSendEmbed).catch(() => {});

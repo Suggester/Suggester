@@ -1,5 +1,5 @@
 const { developer } = require("../../config.json");
-const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { dbQuery, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
 		name: "bean",
@@ -26,6 +26,8 @@ module.exports = {
 		}
 		beanSendEmbed.setColor("#AAD136")
 			.setDescription(reason);
+
+		let qMemberDB = await dbQuery("User", {id: member.id});
 
 		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
 		if (qMemberDB.notify) member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed).catch(() => {});
