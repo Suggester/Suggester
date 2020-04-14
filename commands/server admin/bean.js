@@ -27,13 +27,6 @@ module.exports = {
 		beanSendEmbed.setColor("#AAD136")
 			.setDescription(reason);
 
-		let qMemberDB = await dbQuery("User", { id: user.id });
-		let qSenderDB = await dbQuery("User", { id: message.author.id });
-		qMemberDB.beans.received.bean ? qMemberDB.beans.received.bean++ : qMemberDB.beans.received.bean = 1;
-		qSenderDB.beans.sent.bean ? qSenderDB.beans.sent.bean++ : qSenderDB.beans.sent.bean = 1;
-		await dbModifyId("User", user.id, qMemberDB);
-		await dbModifyId("User", message.author.id, qSenderDB);
-
 		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
 		if (qMemberDB.notify) member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed).catch(() => {});
 	}

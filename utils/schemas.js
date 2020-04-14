@@ -74,19 +74,7 @@ const user = new Schema({
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
 	selfnotify: { type: Boolean, default: true},
-	flags: [ String ],
-	beans: {
-		sent: {
-			bean: { type: Number, default: 0 },
-			megabean: { type: Number, default: 0 },
-			nukebean: { type: Number, default: 0 }
-		},
-		received: {
-			bean: { type: Number, default: 0 },
-			megabean: { type: Number, default: 0 },
-			nukebean: { type: Number, default: 0 }
-		}
-	}
+	flags: [ String ]
 });
 
 module.exports = {
