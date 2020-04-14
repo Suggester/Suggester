@@ -53,9 +53,9 @@ module.exports = {
 				});
 		} else return evalCode(code);
 
-		function evalCode (code) {
+		async function evalCode (code) {
 			try {
-				let evaled = eval(code);
+				let evaled = await eval(code);
 
 				if (typeof evaled !== "string") {
 					evaled = require("util").inspect(evaled);
@@ -65,7 +65,7 @@ module.exports = {
 					if (evaled.includes(process.env.TOKEN)) {
 						return message.channel.send(":rotating_light: `CENSORED: TOKEN` :rotating_light:");
 					} else {
-						message.channel.send(clean(evaled), { code: "xl" });
+						message.channel.send(clean(evaled).substring(0, 1900), { code: "xl" });
 					}
 				}
 			} catch (err) {
