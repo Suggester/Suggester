@@ -3,6 +3,7 @@ require("dotenv").config();
 // init the extended structures
 require("./utils/Structures/GuildMember");
 require("./utils/Structures/User");
+require("./utils/Structures/Guild");
 
 const Discord = require("discord.js");
 const { errorLog, fileLoader } = require("./coreFunctions.js");
