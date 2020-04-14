@@ -145,7 +145,7 @@ module.exports = {
 				.setColor(colors.default)
 				.setImage(attachment);
 			message.channel.send("Your suggestion has been submitted for review!", replyEmbed).then(sent => {
-				if (qServerDB.config.clean_suggestion_command) setTimeout(function() {
+				if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
 					message.delete();
 					sent.delete();
 				}, 7500);

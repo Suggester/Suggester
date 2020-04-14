@@ -287,9 +287,11 @@ module.exports = {
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully reset the approved suggestion role.`);
 			}
+			if (!message.guild.me.permissions.has("MANAGE_ROLES")) return message.channel.send(`<:${emoji.x}> Please give <@${client.user.id}> the **Manage Roles** permission in order for the approved suggestion role to work.`);
 			let role = await findRole(input, message.guild.roles.cache);
 			if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
 			if (qServerDB.config.approved_role && qServerDB.config.approved_role === role.id) return message.channel.send(`<:${emoji.x}> This role is already set to be given when a user's suggestion is approved.`);
+			if (!role.editable || role.managed) return message.channel.send(`<:${emoji.x}> I am not able to give members this role. Please ensure my highest role is __above__ the **${role.name}** role.`, {disableMentions: "everyone"});
 			qServerDB.config.approved_role = role.id;
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Members who have their suggestion approved will now receive the **${role.name}** role.`, {disableMentions: "everyone"});
