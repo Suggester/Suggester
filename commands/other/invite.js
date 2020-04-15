@@ -12,7 +12,7 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client) => {
-		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=604367937>";
+		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=872803417>";
 		let stableId = "564426594144354315";
 		if (config.release === "stable") return message.reply(`You can invite Suggester to your server with this link: ${url.replace("[ID]", client.user.id)}`);
 		if (config.release === "canary") {
