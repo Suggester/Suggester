@@ -631,7 +631,7 @@ module.exports = {
 			case "toggle":
 				qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
+				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.clean_suggestion_command ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
 			default:
 				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
 			}
