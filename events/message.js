@@ -100,6 +100,8 @@ module.exports = async (Discord, client, message) => {
 				qUserDB.blocked = true;
 				await dbModify("User", { id: message.author.id }, qUserDB);
 
+				counts.set(message.author.id, 0);
+
 				message.channel.send(`<@${message.author.id}> ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join https://discord.gg/${support_invite} and contact our Support Team.`);
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
