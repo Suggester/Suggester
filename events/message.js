@@ -92,9 +92,11 @@ module.exports = async (Discord, client, message) => {
 			userCount ? userCount += 1 : userCount = 1;
 
 			counts.set(message.author.id, userCount);
-			let cooldownLimit = 30;
-			if (userCount > cooldownLimit) {
-				//If more than 30 cooldown breaches occur over the duration of the bot being up, auto-blacklist the user and notify the developers
+			let preLimit = 10;
+			let cooldownLimit = 15;
+			if (userCount > preLimit) {
+				if (userCount < cooldownLimit) return;
+				//If more than 15 cooldown breaches occur over the duration of the bot being up, auto-blacklist the user and notify the developers
 				qUserDB.blocked = true;
 				await dbModify("User", { id: message.author.id }, qUserDB);
 
@@ -104,6 +106,7 @@ module.exports = async (Discord, client, message) => {
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
 				hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
+				return;
 			}
 
 			if (expires > now) return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more second${((expires - now) / 1000).toFixed(0) !== "1" ? "s" : ""}. ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
