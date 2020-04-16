@@ -9,7 +9,8 @@ module.exports = {
 		description: "Adds a comment to an approved suggestion anonymously",
 		enabled: true,
 		docs: "staff/acomment",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -36,6 +37,8 @@ module.exports = {
 
 		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
 
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
+
 		if (!args[1]) return message.channel.send(`<:${emoji.x}> You must provide a comment!`);
 
 		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(`<:${emoji.x}> Suggestions can only have up to 23 comments.`);
@@ -47,7 +50,8 @@ module.exports = {
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: 0,
-			id: qSuggestionDB.comments.length+1
+			id: qSuggestionDB.comments.length+1,
+			created: new Date()
 		});
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 

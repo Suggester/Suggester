@@ -1,5 +1,10 @@
 require("dotenv").config();
 
+// init the extended structures
+require("./utils/Structures/GuildMember");
+require("./utils/Structures/User");
+require("./utils/Structures/Guild");
+
 const Discord = require("discord.js");
 const { errorLog, fileLoader } = require("./coreFunctions.js");
 const { connect, connection } = require("mongoose");
@@ -35,6 +40,7 @@ connection.on("error", (err) => {
 });
 
 client.commands = new Discord.Collection();
+client.cooldowns = new Discord.Collection();
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {

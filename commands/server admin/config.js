@@ -10,7 +10,8 @@ module.exports = {
 		description: "Shows/edits server configuration",
 		enabled: true,
 		docs: "admin/config",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
 		let checkQServerDB = await dbQueryNoNew("Server", {id: message.guild.id});
@@ -50,7 +51,7 @@ module.exports = {
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed();
-			embed.setDescription(`Please see https://suggester.gitbook.io/docs/admin/config for information about the config command. You can use \`${qServerDB.config.prefix || prefix}setup\` to walkthrough setting up your server.`);
+			embed.setDescription(`Please see https://suggester.js.org/#/admin/config for information about the config command. You can use \`${qServerDB.config.prefix || prefix}setup\` to walkthrough setting up your server.`);
 			embed.setColor(colors.default);
 			return message.channel.send(embed);
 		}
@@ -150,7 +151,7 @@ module.exports = {
 				let role = await findRole(input, message.guild.roles.cache);
 				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
 				if (!qServerDB.config.staff_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently a staff role.`);
-				qServerDB.config.staff_roles.splice(qServerDB.config.admin_roles.findIndex(r => r === role.id), 1);
+				qServerDB.config.staff_roles.splice(qServerDB.config.staff_roles.findIndex(r => r === role.id), 1);
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Removed **${role.name}** from the list of server staff roles.`, {disableMentions: "everyone"});
 			}
@@ -197,6 +198,104 @@ module.exports = {
 			}
 			}
 		}
+		case "allowed":
+		case "allowedrole":
+		case "suggestrole": {
+			switch (args[1]) {
+			case "add":
+			case "+": {
+				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
+				let input = args.splice(2).join(" ");
+				let role = await findRole(input, message.guild.roles.cache);
+				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+				if (qServerDB.config.allowed_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role has already been given permission to submit suggestions.`);
+				qServerDB.config.allowed_roles.push(role.id);
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Members with the **${role.name}** role can now submit suggestions.`, {disableMentions: "everyone"});
+			}
+			case "remove":
+			case "-":
+			case "rm":
+			case "delete": {
+				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
+				let input = args.splice(2).join(" ");
+				let role = await findRole(input, message.guild.roles.cache);
+				if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+				if (!qServerDB.config.allowed_roles.includes(role.id)) return message.channel.send(`<:${emoji.x}> This role is not currently able to submit suggestions.`);
+				qServerDB.config.allowed_roles.splice(qServerDB.config.allowed_roles.findIndex(r => r === role.id), 1);
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Members with the **${role.name}** role can no longer submit suggestions.`, {disableMentions: "everyone"});
+			}
+			case "list": {
+				if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+					return message.channel.send("**Allowed Suggesting Roles:** None Configured (all users can submit suggestions)");
+				} else {
+					let allowedRoleList = [];
+					let removed = 0;
+					qServerDB.config.allowed_roles.forEach(roleId => {
+						if (message.guild.roles.cache.get(roleId)) {
+							allowedRoleList.push(`${message.guild.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+						} else {
+							let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+							qServerDB.config.allowed_roles.splice(index, 1);
+							removed++;
+						}
+					});
+					if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`**Allowed Suggesting Roles:**\n>>> ${allowedRoleList.join("\n")}`, {disableMentions: "everyone"});
+				}
+			}
+			default: {
+				if (args[1]) return message.channel.send("Please specify either `add`, `remove` or `list`.");
+				else {
+					if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+						return message.channel.send("**Allowed Suggesting Roles:** None Configured (all users can submit suggestions)");
+					} else {
+						let allowedRoleList = [];
+						let removed = 0;
+						qServerDB.config.allowed_roles.forEach(roleId => {
+							if (message.guild.roles.cache.get(roleId)) {
+								allowedRoleList.push(`${message.guild.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+							} else {
+								let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+								qServerDB.config.allowed_roles.splice(index, 1);
+								removed++;
+							}
+						});
+						if (removed) await dbModify("Server", {id: message.guild.id}, qServerDB);
+						return message.channel.send(`**Allowed Suggesting Roles:**\n>>> ${allowedRoleList.join("\n")}`, {disableMentions: "everyone"});
+					}
+				}
+			}
+			}
+		}
+		case "approvedrole":
+		case "approverole": {
+			if (!args[1]) {
+				if (!qServerDB.config.approved_role) return message.channel.send("**Approved Suggestion Role:** None Configured");
+				if (message.guild.roles.cache.get(qServerDB.config.approved_role)) {
+					return message.channel.send(`**Approved Suggestion Role:** ${message.guild.roles.cache.get(qServerDB.config.approved_role).name} (ID: \`${qServerDB.config.approved_role}\`)`);
+				} else {
+					qServerDB.config.approved_role = "";
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send("**Approved Suggestion Role:** None Configured");
+				}
+			}
+			let input = args.splice(1).join(" ");
+			if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+				qServerDB.config.approved_role = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully reset the approved suggestion role.`);
+			}
+			if (!message.guild.me.permissions.has("MANAGE_ROLES")) return message.channel.send(`<:${emoji.x}> Please give <@${client.user.id}> the **Manage Roles** permission in order for the approved suggestion role to work.`);
+			let role = await findRole(input, message.guild.roles.cache);
+			if (!role) return message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.`);
+			if (qServerDB.config.approved_role && qServerDB.config.approved_role === role.id) return message.channel.send(`<:${emoji.x}> This role is already set to be given when a user's suggestion is approved.`);
+			if (!role.editable || role.managed) return message.channel.send(`<:${emoji.x}> I am not able to give members this role. Please ensure my highest role is __above__ the **${role.name}** role.`, {disableMentions: "everyone"});
+			qServerDB.config.approved_role = role.id;
+			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			return message.channel.send(`<:${emoji.check}> Members who have their suggestion approved will now receive the **${role.name}** role.`, {disableMentions: "everyone"});
+		}
 		case "review":
 		case "reviewchannel": {
 			if (!args[1]) return message.channel.send(qServerDB.config.channels.staff ? `The suggestion review channel is currently configured to <#${qServerDB.config.channels.staff}>` : "This server has no suggestion review channel set!");
@@ -225,11 +324,11 @@ module.exports = {
 			let suggestionInput = args.splice(1).join(" ").toLowerCase();
 			let suggestionChannel = await findChannel(suggestionInput, message.guild.channels.cache);
 			if (!suggestionChannel || suggestionChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let reviewPerms = channelPermissions(suggestionChannel.permissionsFor(client.user.id), "suggestions", client);
-			if (reviewPerms.length > 0) {
+			let suggestionPerms = channelPermissions(suggestionChannel.permissionsFor(client.user.id), "suggestions", client);
+			if (suggestionPerms.length > 0) {
 				let embed = new Discord.MessageEmbed()
 					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${suggestionChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${reviewPerms.join(`\n<:${emoji.x}> `)}`)
+					.addField("Missing Elements", `<:${emoji.x}> ${suggestionPerms.join(`\n<:${emoji.x}> `)}`)
 					.addField("How to Fix", `In the channel settings for <#${suggestionChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
 					.setColor(colors.red);
 				return message.channel.send(embed);
@@ -295,6 +394,35 @@ module.exports = {
 			});
 			break;
 		}
+		case "commands":
+		case "command":
+		case "commandchannel":
+		case "commandschannel": {
+			if (!args[1]) {
+				qServerDB.config.channels.commands ? message.channel.send(`The suggestion command channel is currently configured to <#${qServerDB.config.channels.commands}>`) : message.channel.send("This server has no suggestion command channel set!");
+				return;
+			}
+			let commandsInput = args.splice(1).join(" ").toLowerCase();
+			if (commandsInput === "none" || commandsInput === "reset") {
+				qServerDB.config.channels.commands = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully reset the suggestion command channel.`);
+			}
+			let commandChannel = await findChannel(commandsInput, message.guild.channels.cache);
+			if (!commandChannel || commandChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			let commandPerms = channelPermissions(commandChannel.permissionsFor(client.user.id), "commands", client);
+			if (commandPerms.length > 0) {
+				let embed = new Discord.MessageEmbed()
+					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${commandChannel.id}> channel:`)
+					.addField("Missing Elements", `<:${emoji.x}> ${commandPerms.join(`\n<:${emoji.x}> `)}`)
+					.addField("How to Fix", `In the channel settings for <#${commandChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+					.setColor(colors.red);
+				return message.channel.send(embed);
+			}
+			qServerDB.config.channels.commands = commandChannel.id;
+			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			return message.channel.send(`<:${emoji.check}> Successfully set <#${commandChannel.id}> as the suggestion command channel.`);
+		}
 		case "prefix": {
 			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
 			let prefix = args[1];
@@ -304,6 +432,32 @@ module.exports = {
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
+		}
+		case "archive":
+		case "archivechannel":
+		case "implementedchannel":
+		case "implemented": {
+			if (!args[1]) return qServerDB.config.channels.archive ? message.channel.send(`The implemented suggestions archive channel is currently configured to <#${qServerDB.config.channels.archive}>`) : message.channel.send("This server has no implemented suggestions archive channel set!");
+			let archiveInput = args.splice(1).join(" ").toLowerCase();
+			if (archiveInput === "none" || archiveInput === "reset") {
+				qServerDB.config.channels.archive = "";
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> Successfully reset the implemented suggestions archive channel.`);
+			}
+			let archiveChannel = await findChannel(archiveInput, message.guild.channels.cache);
+			if (!archiveChannel || archiveChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
+			let archivePerms = channelPermissions(archiveChannel.permissionsFor(client.user.id), "denied", client); //Denied checks for all needed permissions
+			if (archivePerms.length > 0) {
+				let embed = new Discord.MessageEmbed()
+					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${archiveChannel.id}> channel:`)
+					.addField("Missing Elements", `<:${emoji.x}> ${archivePerms.join(`\n<:${emoji.x}> `)}`)
+					.addField("How to Fix", `In the channel settings for <#${archiveChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+					.setColor(colors.red);
+				return message.channel.send(embed);
+			}
+			qServerDB.config.channels.archive = archiveChannel.id;
+			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			return message.channel.send(`<:${emoji.check}> Successfully set <#${archiveChannel.id}> as the implemented suggestions archive channel.`);
 		}
 		case "mode": {
 			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
@@ -429,33 +583,72 @@ module.exports = {
 			if (!args[1]) return message.channel.send(`DM notifications on suggestion changes are currently **${qServerDB.config.notify ? "enabled" : "disabled"}**.`);
 			switch (args[1].toLowerCase()) {
 			case "enable":
+			case "on": {
 				if (!qServerDB.config.notify) {
 					qServerDB.config.notify = true;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already enabled!`);
+			}
 			case "disable":
+			case "off": {
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Disabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already disabled!`);
+			}
 			case "toggle":
 				qServerDB.config.notify = !qServerDB.config.notify;
 				await dbModify("Server", {id: message.guild.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} user notifications.`);
+			default:
+				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
 			}
-			break;
+		}
+		case "clear":
+		case "clean":
+		case "cleancommands":
+		case "cleancommand": {
+			if (!args[1]) return message.channel.send(`Auto-cleaning of suggestion commands is currently **${qServerDB.config.clean_suggestion_command ? "enabled" : "disabled"}**.`);
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.clean_suggestion_command) {
+					if (!message.guild.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+					qServerDB.config.clean_suggestion_command = true;
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`<:${emoji.check}> Enabled auto-cleaning of suggestion commands.`);
+				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already enabled!`);
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.clean_suggestion_command) {
+					qServerDB.config.clean_suggestion_command = false;
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					return message.channel.send(`<:${emoji.check}> Disabled auto-cleaning of suggestion commands.`);
+				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already disabled!`);
+			}
+			case "toggle":
+				if (!qServerDB.config.clean_suggestion_command && !message.guild.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+				qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
+				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.clean_suggestion_command ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
+			default:
+				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
+			}
 		}
 		case "list": {
 			let server = message.guild;
-			let cfgArr = [];
+			let cfgRolesArr = [];
+			let cfgChannelsArr = [];
+			let cfgOtherArr = [];
 			let issuesCountFatal = 0;
 			let issuesCountMinor = 0;
 
 			// Admin roles
 			if (!qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) {
-				cfgArr.push(`<:${emoji.x}> **Admin Roles:** None Configured`);
+				cfgRolesArr.push(`<:${emoji.x}> **Admin Roles:** None Configured`);
 				issuesCountFatal++;
 			} else {
 				let adminRoleList = [];
@@ -468,11 +661,11 @@ module.exports = {
 					}
 				});
 				await dbModify("Server", {id: server.id}, qServerDB);
-				cfgArr.push(`<:${emoji.check}> **Admin Roles:**\n> ${adminRoleList.join("\n> ")}`);
+				cfgRolesArr.push(`<:${emoji.check}> **Admin Roles:**\n> ${adminRoleList.join("\n> ")}`);
 			}
 			// Staff roles
 			if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) {
-				cfgArr.push(`<:${emoji.x}> **Staff Roles:** None Configured`);
+				cfgRolesArr.push(`<:${emoji.x}> **Staff Roles:** None Configured`);
 				issuesCountFatal++;
 			} else {
 				let staffRoleList = [];
@@ -485,11 +678,39 @@ module.exports = {
 					}
 				});
 				await dbModify("Server", {id: server.id}, qServerDB);
-				cfgArr.push(`<:${emoji.check}> **Staff Roles:**\n> ${staffRoleList.join("\n > ")}`);
+				cfgRolesArr.push(`<:${emoji.check}> **Staff Roles:**\n> ${staffRoleList.join("\n > ")}`);
+			}
+			// Allowed roles
+			if (!qServerDB.config.allowed_roles || qServerDB.config.allowed_roles.length < 1) {
+				cfgRolesArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:** None Configured (all users can submit suggestions)`);
+			} else {
+				let allowedRoleList = [];
+				qServerDB.config.allowed_roles.forEach(roleId => {
+					if (server.roles.cache.get(roleId)) {
+						allowedRoleList.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);
+					} else {
+						let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+						qServerDB.config.allowed_roles.splice(index, 1);
+					}
+				});
+				await dbModify("Server", {id: server.id}, qServerDB);
+				cfgRolesArr.push(`<:${emoji.check}> **Allowed Suggesting Roles:**\n> ${allowedRoleList.join("\n > ")}`);
+			}
+			// Approved suggestion role
+			if (!qServerDB.config.approved_role) cfgRolesArr.push(`<:${emoji.check}> **Approved Suggestion Role:** None Configured`);
+			else {
+				let role = server.roles.cache.get(qServerDB.config.approved_role);
+				if (role) {
+					cfgRolesArr.push(`<:${emoji.check}> **Approved Suggestion Role:** ${role.name} (ID: \`${role.id}\`)`);
+				} else {
+					qServerDB.config.approved_role = "";
+					await dbModify("Server", {id: server.id}, qServerDB);
+					cfgRolesArr.push(`<:${emoji.check}> **Approved Suggestion Role:** None Configured`);
+				}
 			}
 			// Staff review channel
 			if (!qServerDB.config.channels.staff) {
-				cfgArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
+				cfgChannelsArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
 				qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.staff);
@@ -497,14 +718,14 @@ module.exports = {
 					qServerDB.config.channels.staff = "";
 					qServerDB.config.mode === "review" ? issuesCountFatal++ : issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					cfgArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
+					cfgChannelsArr.push(`<:${emoji.x}> **Suggestion Review Channel:** None Configured`);
 				} else {
-					cfgArr.push(`<:${emoji.check}> **Suggestion Review Channel:** <#${channel.id}> (${channel.id})`);
+					cfgChannelsArr.push(`<:${emoji.check}> **Suggestion Review Channel:** <#${channel.id}> (${channel.id})`);
 				}
 			}
 			// Suggestions channel
 			if (!qServerDB.config.channels.suggestions) {
-				cfgArr.push(`<:${emoji.x}> **Approved Suggestions Channel:** None Configured`);
+				cfgChannelsArr.push(`<:${emoji.x}> **Approved Suggestions Channel:** None Configured`);
 				issuesCountFatal++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.suggestions);
@@ -512,14 +733,14 @@ module.exports = {
 					qServerDB.config.channels.suggestions = "";
 					issuesCountFatal++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					cfgArr.push(`<:${emoji.x}> **Approved Suggestions Channel:** None Configured`);
+					cfgChannelsArr.push(`<:${emoji.x}> **Approved Suggestions Channel:** None Configured`);
 				} else {
-					cfgArr.push(`<:${emoji.check}> **Approved Suggestions Channel:** <#${channel.id}> (${channel.id})`);
+					cfgChannelsArr.push(`<:${emoji.check}> **Approved Suggestions Channel:** <#${channel.id}> (${channel.id})`);
 				}
 			}
 			// Denied channel
 			if (!qServerDB.config.channels.denied) {
-				cfgArr.push(`<:${emoji.x}> **Denied Suggestions Channel:** None Configured`);
+				cfgChannelsArr.push(`<:${emoji.x}> **Denied Suggestions Channel:** None Configured`);
 				issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.denied);
@@ -527,14 +748,14 @@ module.exports = {
 					qServerDB.config.channels.denied = "";
 					issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					cfgArr.push(`<:${emoji.x}> **Denied Suggestions Channel:** None Configured`);
+					cfgChannelsArr.push(`<:${emoji.x}> **Denied Suggestions Channel:** None Configured`);
 				} else {
-					cfgArr.push(`<:${emoji.check}> **Denied Suggestions Channel:** <#${channel.id}> (${channel.id})`);
+					cfgChannelsArr.push(`<:${emoji.check}> **Denied Suggestions Channel:** <#${channel.id}> (${channel.id})`);
 				}
 			}
 			// Log channel
 			if (!qServerDB.config.channels.log) {
-				cfgArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
+				cfgChannelsArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
 				issuesCountMinor++;
 			} else {
 				let channel = server.channels.cache.get(qServerDB.config.channels.log);
@@ -542,9 +763,33 @@ module.exports = {
 					qServerDB.config.channels.log = "";
 					issuesCountMinor++;
 					await dbModify("Server", {id: message.guild.id}, qServerDB);
-					cfgArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
+					cfgChannelsArr.push(`<:${emoji.x}> **Log Channel:** None Configured`);
 				} else {
-					cfgArr.push(`<:${emoji.check}> **Log Channel:** <#${channel.id}> (${channel.id})`);
+					cfgChannelsArr.push(`<:${emoji.check}> **Log Channel:** <#${channel.id}> (${channel.id})`);
+				}
+			}
+			// Archive channel
+			if (!qServerDB.config.channels.archive) cfgChannelsArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+			else {
+				let channel = server.channels.cache.get(qServerDB.config.channels.archive);
+				if (!channel || channel.type !== "text") {
+					qServerDB.config.channels.archive = "";
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					cfgChannelsArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** None Configured`);
+				} else {
+					cfgChannelsArr.push(`<:${emoji.check}> **Implemented Suggestions Archive Channel:** <#${channel.id}> (${channel.id})`);
+				}
+			}
+			// Commands channel
+			if (!qServerDB.config.channels.commands) cfgChannelsArr.push(`<:${emoji.check}> **Suggestion Command Channel:** None Configured (Suggestions can be made in all channels)`);
+			else {
+				let channel = server.channels.cache.get(qServerDB.config.channels.commands);
+				if (!channel || channel.type !== "text") {
+					qServerDB.config.channels.commands = "";
+					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					cfgChannelsArr.push(`<:${emoji.check}> **Suggestion Command Channel:** None Configured (Suggestions can be made in all channels)`);
+				} else {
+					cfgChannelsArr.push(`<:${emoji.check}> **Suggestion Command Channel:** <#${channel.id}> (${channel.id})`);
 				}
 			}
 			// Emojis
@@ -558,28 +803,32 @@ module.exports = {
 			let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? "(Shrug/No Opinion Reaction Disabled)" : "🤷");
 			let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? "(Downvote Reaction Disabled)" : "👎");
 
-			cfgArr.push(`<:${emoji.check}> **Reaction Emojis:** ${upEmoji}, ${midEmoji}, ${downEmoji}`);
-			cfgArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** ${qServerDB.config.react ? "Enabled" : "Disabled"}`);
+			cfgOtherArr.push(`<:${emoji.check}> **Reaction Emojis:** ${upEmoji}, ${midEmoji}, ${downEmoji}`);
+			cfgOtherArr.push(`<:${emoji.check}> **Suggestion Feed Reactions:** ${qServerDB.config.react ? "Enabled" : "Disabled"}`);
 			// Mode
 			switch (qServerDB.config.mode) {
 			case "review":
-				cfgArr.push(`<:${emoji.check}> **Mode:** All suggestions are held for review`);
+				cfgOtherArr.push(`<:${emoji.check}> **Mode:** All suggestions are held for review`);
 				break;
 			case "autoapprove":
-				cfgArr.push(`<:${emoji.check}> **Mode:** All suggestions are automatically approved`);
+				cfgOtherArr.push(`<:${emoji.check}> **Mode:** All suggestions are automatically approved`);
 				break;
 			default:
-				cfgArr.push(`<:${emoji.x}> **Mode:** Broken mode configuration, please reconfigure the mode.`);
+				cfgOtherArr.push(`<:${emoji.x}> **Mode:** Broken mode configuration, please reconfigure the mode.`);
 				issuesCountFatal++;
 			}
 			// Prefix
-			cfgArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
+			cfgOtherArr.push(`<:${emoji.check}> **Prefix:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
-			cfgArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
+			cfgOtherArr.push(`<:${emoji.check}> **Notifications:** ${qServerDB.config.notify ? "All suggestion actions DM the suggesting user" : "Suggestion actions do not DM the suggesting user"}`);
+			//Clean Suggestion Command
+			cfgOtherArr.push(`<:${emoji.check}> **Clean Suggestion Command:** ${qServerDB.config.clean_suggestion_command ? "Suggestion commands are removed from the channel after a few seconds" : "Suggestion commands are not removed automatically"}`);
 
 			let cfgEmbed = new Discord.MessageEmbed()
 				.setTitle(`Server Configuration for **${server.name}**`)
-				.setDescription(cfgArr.join("\n"));
+				.addField("Role Configuration", cfgRolesArr.join("\n"))
+				.addField("Channel Configuration", cfgChannelsArr.join("\n"))
+				.addField("Other Configuration", cfgOtherArr.join("\n"));
 			if (issuesCountFatal > 0) {
 				cfgEmbed.setColor(colors.red)
 					.addField("Config Status", `<:${emoji.x}> Not Fully Configured, Bot Will Not Work`);

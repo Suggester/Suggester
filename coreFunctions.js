@@ -5,6 +5,7 @@ let models = require("./utils/schemas");
 const { promises } = require("fs");
 const { resolve } = require("path");
 const nodeEmoji = require("node-emoji");
+const { findBestMatch } = require("string-similarity");
 
 /**
  * Send a message from a webhook
@@ -16,12 +17,8 @@ function sendWebhook (cfg, input, embed) {
 	if (!cfg || !cfg.id || !cfg.token) return;
 	if (!input) return;
 	if (typeof input === "string") input = Discord.Util.removeMentions(input);
-	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(hookMessage => {
-		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
-	});
-	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(hookMessage => {
-		return `https://discordapp.com/channels/${config.main_guild}/${hookMessage.channel_id}/${hookMessage.id}`;
-	});
+	if (embed) (new Discord.WebhookClient(cfg.id, cfg.token)).send(input, embed).then(() => { /* noop */ });
+	else (new Discord.WebhookClient(cfg.id, cfg.token)).send(input).then(() => { /* noop */ });
 }
 
 module.exports = {
@@ -45,12 +42,8 @@ module.exports = {
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
+		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (client.guilds.cache.get(config.main_guild)
-			&& client.guilds.cache.get(config.main_guild).available
-			&& client.guilds.cache.get(config.main_guild).roles.cache.get(config.global_override).members.get(member.id)) {
-			return 1;
-		}
 		if (member.hasPermission("MANAGE_GUILD")) return 2;
 		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
 		let hasAdminRole = false;
@@ -144,7 +137,7 @@ module.exports = {
 				if (!comment.deleted || comment.deleted !== true) {
 					let user = await fetchUser(comment.author, client);
 					let title;
-					!user ? title = `Staff Comment (ID: ${suggestion.suggestionId}_${comment.id})` : title = `Comment from ${user.tag} (ID: ${suggestion.suggestionId}_${comment.id})`;
+					!user ? title = `Staff Comment (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `Comment from ${user.tag} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}`;
 					embed.addField(title, comment.comment);
 				}
 			}
@@ -175,7 +168,7 @@ module.exports = {
 			});
 			return list;
 		case "denied":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
 			list = [];
 			required.forEach(permission => {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
@@ -183,6 +176,13 @@ module.exports = {
 			return list;
 		case "log":
 			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
+			list = [];
+			required.forEach(permission => {
+				if (!permissions.has(permission)) list.push(permissionNames[permission]);
+			});
+			return list;
+		case "commands":
+			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"];
 			list = [];
 			required.forEach(permission => {
 				if (!permissions.has(permission)) list.push(permissionNames[permission]);
@@ -261,6 +261,10 @@ module.exports = {
 		if (!matches) {
 			let roleFromNonMention = roles.find(role => role.name.toLowerCase() === input.toLowerCase()) || roles.get(input) || null;
 			if (roleFromNonMention) foundId = roleFromNonMention.id;
+			else {
+				let nearMatch = nearMatchCollection(roles, input);
+				if (nearMatch) return nearMatch;
+			}
 		} else foundId = matches[1];
 
 		return roles.get(foundId) || null;
@@ -278,6 +282,10 @@ module.exports = {
 		if (!matches) {
 			let channelFromNonMention = channels.find(channel => channel.name.toLowerCase() === input.toLowerCase()) || channels.get(input) || null;
 			if (channelFromNonMention) foundId = channelFromNonMention.id;
+			else {
+				let nearMatch = nearMatchCollection(channels, input);
+				if (nearMatch) return nearMatch;
+			}
 		} else foundId = matches[1];
 
 		return channels.get(foundId) || null;
@@ -454,12 +462,24 @@ module.exports = {
 				await res.deleteOne();
 				return res;
 			});
-	},
-
+	}
 };
-
 /**
- * Like readdir but recursive :eyes:
+ * Find something in a collection with near matching strings
+ * @param collection - Call .cache on it first
+ * @param words - The string containing a potential string match
+ */
+function nearMatchCollection (collection, words) {
+	let array = collection.array();
+	let nameArray = array.map((r) => r.name.toLowerCase());
+
+	let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), nameArray);
+
+	if (rating < .3) return null;
+	return array[bestMatchIndex];
+}
+/**
+ * Like readdir but recursive 👀
  * @param {string} dir
  * @returns {Promise<string[]>} - Array of paths
  */

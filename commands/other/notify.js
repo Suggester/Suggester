@@ -9,7 +9,8 @@ module.exports = {
 		description: "Changes your notification settings",
 		enabled: true,
 		docs: "all/notify",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });

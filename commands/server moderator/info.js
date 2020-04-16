@@ -8,7 +8,8 @@ module.exports = {
 		description: "Shows information about a suggestion",
 		enabled: true,
 		docs: "staff/info",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -88,28 +89,30 @@ module.exports = {
 			let approver = await fetchUser(qSuggestionDB.staff_member, client);
 			embed.addField("Internal Status", `Approved by ${approver.tag} (${approver.id})`);
 
-			let upCount = "Unknown";
-			let downCount = "Unknown";
-			let messageFetched;
-			await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-				if (qSuggestionDB.emojis.up !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.up)) {
-					f.reactions.cache.get(qSuggestionDB.emojis.up).me ? upCount = f.reactions.cache.get(qSuggestionDB.emojis.up).count-1 : upCount = f.reactions.cache.get(qSuggestionDB.emojis.up);
-				}
-				if (qSuggestionDB.emojis.down !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.down)) {
-					f.reactions.cache.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.cache.get(qSuggestionDB.emojis.down).count-1 : downCount = f.reactions.cache.get(qSuggestionDB.emojis.down);
-				}
-				messageFetched = true;
-			}).catch(() => messageFetched = false);
+			if (!qSuggestionDB.implemented) {
+				let upCount = "Unknown";
+				let downCount = "Unknown";
+				let messageFetched;
+				await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+					if (qSuggestionDB.emojis.up !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.up)) {
+						f.reactions.cache.get(qSuggestionDB.emojis.up).me ? upCount = f.reactions.cache.get(qSuggestionDB.emojis.up).count - 1 : upCount = f.reactions.cache.get(qSuggestionDB.emojis.up);
+					}
+					if (qSuggestionDB.emojis.down !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.down)) {
+						f.reactions.cache.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.cache.get(qSuggestionDB.emojis.down).count - 1 : downCount = f.reactions.cache.get(qSuggestionDB.emojis.down);
+					}
+					messageFetched = true;
+				}).catch(() => messageFetched = false);
 
-			if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+				if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
 
-			if (!isNaN(upCount) && !isNaN(downCount)) {
-				let opinion = upCount - downCount;
-				opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
-				embed.addField("Upvotes", upCount.toString(), true)
-					.addField("Downvotes", downCount.toString(), true);
-			}
-			embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+				if (!isNaN(upCount) && !isNaN(downCount)) {
+					let opinion = upCount - downCount;
+					opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
+					embed.addField("Upvotes", upCount.toString(), true)
+						.addField("Downvotes", downCount.toString(), true);
+				}
+				embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+			} else embed.addField("Additional Information", "This suggestion was transferred to the implemented suggestion archive channel");
 			break;
 		}
 		}

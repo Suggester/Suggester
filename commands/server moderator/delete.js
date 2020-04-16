@@ -8,7 +8,9 @@ module.exports = {
 		description: "Deletes a suggestion",
 		enabled: true,
 		docs: "staff/delete",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10,
+		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!"
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -46,6 +48,8 @@ module.exports = {
 		}
 
 		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Only approved suggestions can be deleted!`);
+
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);

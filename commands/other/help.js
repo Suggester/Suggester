@@ -1,26 +1,31 @@
-const { dbQuery, checkPermissions, permLevelToRole } = require("../../coreFunctions");
+const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
+
 const { colors, prefix } = require("../../config.json");
 
 module.exports = {
 	controls: {
 		name: "help",
 		permission: 10,
-		aliases: ["command", "howto"],
-		usage: "help <command name>",
+		aliases: ["command", "howto", "prefix"],
+		usage: "help (command name)",
 		description: "Shows command information",
 		enabled: true,
 		docs: "all/help",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let permission = await checkPermissions(message.member, client);
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		let missingConfig = checkConfig(qServerDB);
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
+
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
-				.setDescription("Please see https://suggester.gitbook.io/ for a command list and usage information!")
+				.setDescription("Please see https://suggester.js.org/ for a command list and usage information!")
 				.setFooter(`My prefix in this server is ${serverPrefix}`)
 				.setColor(colors.default);
+
+			if (missingConfig.length >= 1) embed.addField("Missing Config!", `This server has an incomplete configuration.\nA server manager can run \`${serverPrefix}setup\` to configure it.`);
 			return message.channel.send(embed);
 		}
 
@@ -29,8 +34,6 @@ module.exports = {
 		const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 
 		if (!command) return;
-
-		if (permission > command.controls.permission) return;
 
 		let commandInfo = command.controls;
 
@@ -42,7 +45,7 @@ module.exports = {
 			.setAuthor(`Command: ${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
 		commandInfo.aliases ? returnEmbed.addField(commandInfo.aliases.length > 1 ? "Aliases" : "Alias", commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.gitbook.io/docs/${commandInfo.docs}`);
+		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.js.org/#/${commandInfo.docs}`);
 		if (!commandInfo.enabled) returnEmbed.addField("Additional Information", "⚠️ This command is currently disabled");
 
 		return message.channel.send(returnEmbed);

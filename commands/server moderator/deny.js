@@ -8,7 +8,9 @@ module.exports = {
 		description: "Denies a suggestion",
 		enabled: true,
 		docs: "staff/deny",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10,
+		cooldownMessage: "Need to deny multiple suggestions? Try the `mdeny` command!"
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
