@@ -17,14 +17,26 @@ module.exports = async (Discord, client, message) => {
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 	const match = message.content.match(new RegExp(`^<@!?${client.user.id}> ?`));
-	if (match) serverPrefix = match[0];
-	else if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) serverPrefix = "suggester:";
-	else if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) serverPrefix = `${client.user.id}:`;
+	let specialPrefix = false;
+	if (match) {
+		serverPrefix = match[0];
+		specialPrefix = true;
+	}
+	else if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) {
+		serverPrefix = "suggester:";
+		specialPrefix = true;
+	}
+	else if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) {
+		serverPrefix = `${client.user.id}:`;
+		specialPrefix = true;
+	}
 
 	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	let args = message.content.split(" ");
 	serverPrefix.endsWith(" ") ? args = args.splice(2) : args = args.splice(1);
-	let commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
+	let commandName;
+	if (!specialPrefix) commandName = message.content.toLowerCase().match(new RegExp(`^${"\\" + serverPrefix.split("").join("\\")}([a-z]+)`));
+	else commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
 
 	if (!commandName || !commandName[1]) return;
 	else commandName = commandName[1];
