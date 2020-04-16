@@ -24,7 +24,7 @@ module.exports = async (Discord, client, message) => {
 
 	const prefix = prefixes.find(p => lcContent.startsWith(p));
 
-	if (!message.content.toLowerCase().startsWith(prefix)) return;
+	if (!lcContent.startsWith(prefix)) return;
 
 	const [commandName, ...args] = message.content.slice(prefix.length).trim().split(" ");
 
