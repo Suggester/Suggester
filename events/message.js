@@ -1,5 +1,5 @@
 const { dbQuery, dbModify, coreLog, commandLog, checkPermissions, errorLog } = require("../coreFunctions");
-const { emoji, colors, prefix, log_hooks, support_invite } = require("../config.json");
+const { emoji, colors, prefix: defaultPrefix, log_hooks, support_invite } = require("../config.json");
 const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
@@ -11,35 +11,22 @@ module.exports = async (Discord, client, message) => {
 	}
 	if (message.author.bot === true) return;
 
-	let permission = await checkPermissions(message.member, client);
+	const permission = await checkPermissions(message.member, client);
 
-	let qServerDB = await dbQuery("Server", { id: message.guild.id });
-	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
+	const qServerDB = await dbQuery("Server", { id: message.guild.id });
+	const serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || defaultPrefix;
 
-	const match = message.content.match(new RegExp(`^<@!?${client.user.id}> ?`));
-	let specialPrefix = false;
-	if (match) {
-		serverPrefix = match[0];
-		specialPrefix = true;
-	}
-	else if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) {
-		serverPrefix = "suggester:";
-		specialPrefix = true;
-	}
-	else if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) {
-		serverPrefix = `${client.user.id}:`;
-		specialPrefix = true;
-	}
+	const publicPrefixes = [serverPrefix, `<@${client.user.id}>`, `<@!${client.user.id}>`];
+	const staffPrefixes = ["suggester:", `${client.user.id}:`];
 
-	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
-	let args = message.content.split(" ");
-	serverPrefix.endsWith(" ") ? args = args.splice(2) : args = args.splice(1);
-	let commandName;
-	if (!specialPrefix) commandName = message.content.toLowerCase().match(new RegExp(`^${"\\" + serverPrefix.split("").join("\\")}([a-z]+)`));
-	else commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
+	const prefixes = publicPrefixes.concat(permission <= 1 ? staffPrefixes : []).map(p => p.toLowerCase());
+	const lcContent = message.content.toLowerCase();
 
-	if (!commandName || !commandName[1]) return;
-	else commandName = commandName[1];
+	const prefix = prefixes.find(p => lcContent.startsWith(p));
+
+	if (!lcContent.startsWith(prefix)) return;
+
+	const [commandName, ...args] = message.content.slice(prefix.length).trim().split(" ");
 
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 	if (!command) return;
