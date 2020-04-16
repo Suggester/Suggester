@@ -17,7 +17,7 @@ module.exports = async (Discord, client, message) => {
 	const serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || defaultPrefix;
 
 	const publicPrefixes = [serverPrefix, `<@${client.user.id}>`, `<@!${client.user.id}>`];
-	const staffPrefixes = ["suggester:", `${client.user.id}`];
+	const staffPrefixes = ["suggester:", `${client.user.id}:`];
 
 	const prefixes = publicPrefixes.concat(permission <= 1 ? staffPrefixes : []).map(p => p.toLowerCase());
 	const lcContent = message.content.toLowerCase();
