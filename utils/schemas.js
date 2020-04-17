@@ -6,18 +6,24 @@ const settings = new Schema({
 	id: { type: String, required: true }, // server id
 	blocked: { type: Boolean, default: false },
 	whitelist: { type: Boolean, default: false },
+	flags: [ String ],
 	config: {
 		prefix: { type: String, default: prefix },
 		admin_roles: [String],
 		staff_roles: [String],
+		allowed_roles: [String],
+		approved_role: { type: String },
 		channels: {
 			suggestions: { type: String },
 			staff: { type: String },
 			log: { type: String },
-			denied: { type: String }
+			denied: { type: String },
+			archive: { type: String },
+			commands: { type: String }
 		},
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
+		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
 		blacklist: [String],
 		emojis: {
@@ -54,10 +60,12 @@ const suggestion = new Schema({
 			comment: String,
 			author: String,
 			id: { type: String, min: 1, max: 23 },
+			created: { type: Date },
 			deleted: Boolean,
 		}
 	],
-	attachment: String
+	attachment: String,
+	implemented: Boolean
 });
 
 const user = new Schema({
@@ -66,18 +74,7 @@ const user = new Schema({
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
 	selfnotify: { type: Boolean, default: true},
-	beans: {
-		sent: {
-			bean: { type: Number, default: 0 },
-			megabean: { type: Number, default: 0 },
-			nukebean: { type: Number, default: 0 }
-		},
-		received: {
-			bean: { type: Number, default: 0 },
-			megabean: { type: Number, default: 0 },
-			nukebean: { type: Number, default: 0 }
-		}
-	}
+	flags: [ String ]
 });
 
 module.exports = {

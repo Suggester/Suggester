@@ -9,7 +9,8 @@ module.exports = {
 		description: "Attaches a file to an approved suggestion",
 		enabled: true,
 		docs: "staff/attach",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -35,6 +36,8 @@ module.exports = {
 		let id = qSuggestionDB.suggestionId;
 
 		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Attachments can only be added to approved suggestions!`);
+
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
 
 		if (qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> Due to Discord embed limitations, suggestions can only have 1 attachment.`);
 

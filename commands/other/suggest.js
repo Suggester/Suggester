@@ -1,6 +1,6 @@
 const { emoji, colors } = require("../../config.json");
 const core = require("../../coreFunctions.js");
-const { dbQuery, dbModify, serverLog, suggestionEmbed } = require("../../coreFunctions");
+const { dbQuery, dbModify, serverLog, suggestionEmbed, checkPermissions } = require("../../coreFunctions");
 const { Suggestion } = require("../../utils/schemas");
 const validUrl = require("valid-url");
 
@@ -25,7 +25,8 @@ module.exports = {
 		description: "Submits a suggestion",
 		enabled: true,
 		docs: "all/suggest",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 30
 	},
 	do: async (message, client, args, Discord) => {
 		let missingConfigs = [];
@@ -56,6 +57,50 @@ module.exports = {
 				.setColor(colors.red);
 			return message.channel.send(embed);
 		}
+
+		let permission = await checkPermissions(message.member, client);
+
+		if (qServerDB.config.allowed_roles && qServerDB.config.allowed_roles.length > 0 && permission > 3) {
+			let hasAllowedRole = false;
+			qServerDB.config.allowed_roles.forEach(roleId => {
+				if (message.member.roles.cache.has(roleId)) hasAllowedRole = true;
+			});
+			if (!hasAllowedRole) {
+				let allowedRoleList = [];
+				let removed = false;
+				qServerDB.config.allowed_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
+						qServerDB.config.allowed_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				qServerDB.config.staff_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.staff_roles.findIndex(r => r === roleId);
+						qServerDB.config.staff_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				qServerDB.config.admin_roles.forEach(roleId => {
+					if (message.guild.roles.cache.get(roleId)) {
+						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+					} else {
+						let index = qServerDB.config.admin_roles.findIndex(r => r === roleId);
+						qServerDB.config.admin_roles.splice(index, 1);
+						removed = true;
+					}
+				});
+				if (removed) await dbModify("Server", { id: message.guild.id }, qServerDB);
+				return message.channel.send(`<:${emoji.x}> You do not have the role necessary to submit suggestions.\nThe following roles can submit suggestions: ${allowedRoleList.join(", ")}`, {disableMentions: "everyone"});
+			}
+		}
+
+		if (qServerDB.config.channels.commands && message.channel.id !== qServerDB.config.channels.commands) return message.channel.send(`<:${emoji.x}> Suggestions can only be submitted in the <#${qServerDB.config.channels.commands}> channel.`);
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
 		if (!args[0] && !attachment) return message.channel.send("Please provide a suggestion!");
@@ -99,7 +144,12 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.default)
 				.setImage(attachment);
-			message.channel.send("Your suggestion has been submitted for review!", replyEmbed);
+			message.channel.send("Your suggestion has been submitted for review!", replyEmbed).then(sent => {
+				if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
 			let reviewEmbed = new Discord.MessageEmbed()
 				.setTitle("Suggestion Awaiting Review (#" + id.toString() + ")")
@@ -198,7 +248,12 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.default)
 				.setImage(attachment);
-			message.channel.send(`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`, replyEmbed);
+			message.channel.send(`Your suggestion has been added to the <#${qServerDB.config.channels.suggestions}> channel!`, replyEmbed).then(sent => {
+				if (qServerDB.config.clean_suggestion_command) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
 			if (qServerDB.config.channels.log) {
 				let logEmbed = new Discord.MessageEmbed()

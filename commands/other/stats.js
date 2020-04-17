@@ -11,7 +11,8 @@ module.exports = {
 		description: "Shows server/global suggestion stats",
 		enabled: true,
 		docs: "all/stats",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 20
 	},
 	do: async (message, client, args, Discord) => {
 		let server;

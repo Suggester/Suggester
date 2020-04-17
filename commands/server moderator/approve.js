@@ -4,11 +4,13 @@ module.exports = {
 	controls: {
 		name: "approve",
 		permission: 3,
-		usage: "approve <suggestion id>",
+		usage: "approve <suggestion id> (comment)",
 		description: "Approves a suggestion",
 		enabled: true,
 		docs: "staff/approve",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10,
+		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -129,6 +131,8 @@ module.exports = {
 				});
 			}
 		});
+
+		if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, "Suggestion approved");
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()

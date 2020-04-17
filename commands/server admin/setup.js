@@ -9,7 +9,8 @@ module.exports = {
 		description: "Initiates a walkthrough for server configuration",
 		enabled: true,
 		docs: "admin/setup",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
+		cooldown: 45
 	},
 	do: async (message, client, args, Discord) => {
 		async function setup (through)  {
@@ -64,7 +65,7 @@ module.exports = {
 			case 1: {
 				let staffRolesEmbed = new Discord.MessageEmbed()
 					.setColor(colors.default)
-					.setDescription("Any member with a server staff role can use all [staff commands](https://suggester.gitbook.io/docs/) to manage suggestions.")
+					.setDescription("Any member with a server staff role can use all [staff commands](https://suggester.js.org/) to manage suggestions.")
 					.addField("Inputs", "You can send a role name, role ID, or role @mention in this channel")
 					.setFooter("You have 2 minutes to enter a role");
 				if (qServerDB.config.staff_roles.length >= 1) staffRolesEmbed.addField("Done setting up staff roles?", "Type `done` to go to the next step\nIf you're not done, just specify another staff role!");
@@ -378,7 +379,7 @@ module.exports = {
 					.setTitle("Setup Complete!")
 					.setColor(colors.default)
 					.setDescription(`Suggester should now work in your server, try it out with **${Discord.escapeMarkdown(qServerDB.config.prefix)}suggest**!`)
-					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.gitbook.io/docs/admin/config for more information.");
+					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.js.org/#/admin/config for more information.");
 				message.channel.send(doneEmbed);
 				break;
 			}
@@ -388,7 +389,7 @@ module.exports = {
 		let qServerDB = await dbQuery("Server", {id: message.guild.id});
 
 		if (qServerDB) {
-			message.channel.send(`:warning: Your server already has some configuration elements specified. :warning:\n**This setup will overwrite your previous configuration, and this choice is final.**\n\nIf you would still like to continue with setup, click the <:${emoji.check}> reaction. If you would like to abort setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
+			message.channel.send(`⚠️ Your server already has some configuration elements specified. ⚠️\n**This setup will overwrite your previous configuration, and this choice is final.**\n\nIf you would still like to continue with setup, click the <:${emoji.check}> reaction. If you would like to abort setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
 				await checkMsg.react(emoji.check);
 				await checkMsg.react(emoji.x);
 				let checkMatches = emoji.check.match(/[a-z0-9~-]+:([0-9]+)/i)[1] || null;

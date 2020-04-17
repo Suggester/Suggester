@@ -9,7 +9,8 @@ module.exports = {
 		description: "Deletes a comment on a suggestion",
 		enabled: true,
 		docs: "staff/deletecomment",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -34,6 +35,9 @@ module.exports = {
 		if (!idsections[0] || !idsections[1]) return message.channel.send(`<:${emoji.x}> You must specify a valid comment ID!`);
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
 		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
+
+		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
+
 		let id = qSuggestionDB.suggestionId;
 
 		let comment = qSuggestionDB.comments.find(comment => comment.id === idsections[1]) || null;

@@ -5,12 +5,13 @@ module.exports = {
 	controls: {
 		name: "massapprove",
 		permission: 3,
-		usage: "massapprove <suggestion ids> -r (reason)",
+		usage: "massapprove <suggestion ids> -r (comment)",
 		aliases: ["mapprove", "multiapprove"],
 		description: "Approves all specified suggestions",
 		enabled: true,
 		docs: "staff/massapprove",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		cooldown: 20
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -47,7 +48,7 @@ module.exports = {
 		let suggestions = reasonSplit[0].split(" ");
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(`<:${emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers.`);
+		if (suggestions.some(isNaN)) return message.channel.send(`<:${emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers. If you're trying to specify a comment, add \`-r\` between the suggestion IDs and the comment.`);
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send("Processing... this may take a moment");
 
