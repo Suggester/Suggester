@@ -16,6 +16,9 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
+	let regexEscape = "^$.|?*+()[{".split("");
+	regexEscape.push("\\");
+
 	const match = message.content.match(new RegExp(`^<@!?${client.user.id}> ?`));
 	let specialPrefix = false;
 	if (match) {
@@ -34,9 +37,15 @@ module.exports = async (Discord, client, message) => {
 	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
 	let args = message.content.split(" ");
 	serverPrefix.endsWith(" ") ? args = args.splice(2) : args = args.splice(1);
-	let commandName;
-	if (!specialPrefix) commandName = message.content.toLowerCase().match(new RegExp(`^${"\\" + serverPrefix.split("").join("\\")}([a-z]+)`));
-	else commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
+
+	if (!specialPrefix) {
+		let splitPrefix = serverPrefix.split("");
+		for (let i = 0; i < splitPrefix.length; i++) {
+			if (regexEscape.includes(splitPrefix[i])) splitPrefix[i] = "\\" + splitPrefix[i];
+		}
+		serverPrefix = splitPrefix.join("")
+	}
+	let commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
 
 	if (!commandName || !commandName[1]) return;
 	else commandName = commandName[1];
