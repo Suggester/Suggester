@@ -8,7 +8,6 @@ module.exports = async (Discord, client, guild) => {
 	}
 
 	let enforceWhitelist = [
-		"canary",
 		"special",
 		"premium"
 	];
