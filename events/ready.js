@@ -149,25 +149,6 @@ module.exports = async (Discord, client) => {
 				console.log("Server statistics posted to discord.bots.gg!");
 			}
 		});
-		//Divine Discord Bot List
-		let divineoptions = {
-			url: "https://divinediscordbots.com/bot/564426594144354315/stats",
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": process.env.DIVINE_TOKEN
-			},
-			json: true,
-			body: {
-				server_count: serverCount
-			}
-		};
-
-		request(divineoptions, (error, response) => {
-			if (!error && response.statusCode === 200) {
-				console.log("Server statistics posted to divinediscordbots.com!");
-			}
-		});
 
 		//Bots on Discord
 		let bodoptions = {
