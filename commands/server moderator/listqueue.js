@@ -49,13 +49,14 @@ module.exports = {
 			if (!(content instanceof Array)) throw new TypeError("Content is not an array");
 			if (!content.length) throw new Error("Content array is empty");
 			let removeReaction = options.removeReaction;
+			const savedContent = content;
 
 			if (!message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 
 			const emojis = {
-				left: "⬅",
-				end: "⏹",
-				right: "➡"
+				left: "⬅️",
+				end: "⏹️",
+				right: "➡️"
 			};
 			const time = options.time;
 			const hideControlsSinglePage = options.hideControlsSinglePage;
@@ -67,6 +68,8 @@ module.exports = {
 			const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 			let page = options.startPage;
+
+			content[page].title = `Suggestions Pending Review (Page ${page+1}/${content.length})`;
 
 			const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
@@ -88,6 +91,7 @@ module.exports = {
 					return;
 				}
 				if (msg) {
+					content[page].title = `Suggestions Pending Review (Page ${page+1}/${content.length})`;
 					if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 					else msg.edit(content[page]);
 				}
@@ -122,11 +126,10 @@ module.exports = {
 		});
 		if (!listarray[0]) return message.channel.send("There are no suggestions awaiting approval!");
 
-		let chunks = listarray.chunk(25);
+		let chunks = listarray.chunk(10);
 		let embeds = [];
 		for await (let chunk of chunks) {
 			let embed = new Discord.MessageEmbed()
-				.setTitle("Suggestions Pending Review")
 				.setColor(colors.yellow);
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);

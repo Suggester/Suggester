@@ -53,9 +53,9 @@ module.exports = {
 			if (!message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 
 			const emojis = {
-				left: "⬅",
-				end: "⏹",
-				right: "➡"
+				left: "⬅️",
+				end: "⏹️",
+				right: "➡️"
 			};
 			const time = options.time;
 			const hideControlsSinglePage = options.hideControlsSinglePage;
@@ -67,6 +67,7 @@ module.exports = {
 			const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 			let page = options.startPage;
+			content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
 
 			const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
@@ -88,6 +89,7 @@ module.exports = {
 					return;
 				}
 				if (msg) {
+					content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
 					if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 					else msg.edit(content[page]);
 				}
@@ -118,7 +120,6 @@ module.exports = {
 					.setURL(release.html_url)
 					.setColor(colors.default)
 					.setTimestamp(release.created_at)
-					.setFooter("Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nChangelog released at")
 				);
 			}
 

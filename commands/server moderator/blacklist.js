@@ -52,10 +52,11 @@ module.exports = {
 			if (!message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 
 			const emojis = {
-				left: "⬅",
-				end: "⏹",
-				right: "➡"
+				left: "⬅️",
+				end: "⏹️",
+				right: "➡️"
 			};
+
 			const time = options.time;
 			const hideControlsSinglePage = options.hideControlsSinglePage;
 
@@ -66,7 +67,7 @@ module.exports = {
 			const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 			let page = options.startPage;
-
+			content[page].title = `Page ${page+1}/${content.length}`;
 			const msg = await message.channel.send("These users are blacklisted from using Suggester on this server:", content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
 			for (const emoji in emojis) await msg.react(emojis[emoji]);
@@ -87,6 +88,7 @@ module.exports = {
 					return;
 				}
 				if (msg) {
+					content[page].title = `Page ${page+1}/${content.length}`;
 					if (content[page] instanceof Discord.MessageEmbed) msg.edit("These users are blacklisted from using Suggester on this server:", { embed: content[page] });
 					else msg.edit("These users are blacklisted from using Suggester on this server:", content[page]);
 				}
@@ -113,7 +115,7 @@ module.exports = {
 
 		if (args[0].toLowerCase() === "list") {
 			if (qServerDB.config.blacklist.length < 1) return message.channel.send("There are no users blacklisted from using the bot on this server!");
-			let chunks = qServerDB.config.blacklist.chunk(21);
+			let chunks = qServerDB.config.blacklist.chunk(20);
 			let embeds = [];
 			for await (let chunk of chunks) {
 				let list = [];
