@@ -59,7 +59,6 @@ module.exports = {
 			};
 			const time = options.time;
 			const hideControlsSinglePage = options.hideControlsSinglePage;
-			const timeoutRemoveReactions = options.timeoutRemoveReactions;
 
 			if (hideControlsSinglePage && content.length === 1) {
 				await message.channel.send(content instanceof Discord.MessageEmbed ? { embed: content[0] } : content[0]);
@@ -93,7 +92,7 @@ module.exports = {
 					else msg.edit(content[page]);
 				}
 			});
-			collector.on("end", (_) => {
+			collector.on("end", () => {
 				msg.reactions.removeAll();
 			});
 		}
@@ -119,7 +118,7 @@ module.exports = {
 					.setURL(release.html_url)
 					.setColor(colors.default)
 					.setTimestamp(release.created_at)
-					.setFooter("Use the arrow reactions to navigate pages, and the stop reaction to close the changelog | Changelog released at")
+					.setFooter("Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nChangelog released at")
 				);
 			}
 
