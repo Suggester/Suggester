@@ -70,7 +70,10 @@ module.exports = {
 				let removed = false;
 				qServerDB.config.allowed_roles.forEach(roleId => {
 					if (message.guild.roles.cache.get(roleId)) {
-						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
+						allowedRoleList.push({
+							name: message.guild.roles.cache.get(roleId).name,
+							id: message.guild.roles.cache.get(roleId).id
+						});
 					} else {
 						let index = qServerDB.config.allowed_roles.findIndex(r => r === roleId);
 						qServerDB.config.allowed_roles.splice(index, 1);
@@ -78,37 +81,67 @@ module.exports = {
 					}
 				});
 				qServerDB.config.staff_roles.forEach(roleId => {
-					if (message.guild.roles.cache.get(roleId)) {
-						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
-					} else {
-						let index = qServerDB.config.staff_roles.findIndex(r => r === roleId);
-						qServerDB.config.staff_roles.splice(index, 1);
-						removed = true;
+					if (!allowedRoleList.find(r => r.id === roleId)) {
+						if (message.guild.roles.cache.get(roleId)) {
+							allowedRoleList.push({
+								name: message.guild.roles.cache.get(roleId).name,
+								id: message.guild.roles.cache.get(roleId).id
+							});
+						} else {
+							let index = qServerDB.config.staff_roles.findIndex(r => r === roleId);
+							qServerDB.config.staff_roles.splice(index, 1);
+							removed = true;
+						}
 					}
 				});
 				qServerDB.config.admin_roles.forEach(roleId => {
-					if (message.guild.roles.cache.get(roleId)) {
-						allowedRoleList.push(message.guild.roles.cache.get(roleId).name);
-					} else {
-						let index = qServerDB.config.admin_roles.findIndex(r => r === roleId);
-						qServerDB.config.admin_roles.splice(index, 1);
-						removed = true;
+					if (!allowedRoleList.find(r => r.id === roleId)) {
+						if (message.guild.roles.cache.get(roleId)) {
+							allowedRoleList.push({
+								name: message.guild.roles.cache.get(roleId).name,
+								id: message.guild.roles.cache.get(roleId).id
+							});
+						} else {
+							let index = qServerDB.config.admin_roles.findIndex(r => r === roleId);
+							qServerDB.config.admin_roles.splice(index, 1);
+							removed = true;
+						}
 					}
 				});
 				if (removed) await dbModify("Server", { id: message.guild.id }, qServerDB);
-				return message.channel.send(`<:${emoji.x}> You do not have the role necessary to submit suggestions.\nThe following roles can submit suggestions: ${allowedRoleList.join(", ")}`, {disableMentions: "everyone"});
+				return message.channel.send(`<:${emoji.x}> You do not have the role necessary to submit suggestions.\nThe following roles can submit suggestions: ${allowedRoleList.map(r => r.name).join(", ")}`, {disableMentions: "everyone"}).then(sent => {
+					if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+						message.delete();
+						sent.delete();
+					}, 7500);
+				});
 			}
 		}
 
 		if (qServerDB.config.channels.commands && message.channel.id !== qServerDB.config.channels.commands) return message.channel.send(`<:${emoji.x}> Suggestions can only be submitted in the <#${qServerDB.config.channels.commands}> channel.`);
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
-		if (!args[0] && !attachment) return message.channel.send("Please provide a suggestion!");
-		if (attachment && !(checkURL(attachment))) return message.channel.send(`<:${emoji.x}> Please provide a valid attachment! Attachments can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``);
+		if (!args[0] && !attachment) return message.channel.send("Please provide a suggestion!").then(sent => {
+			if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+				message.delete();
+				sent.delete();
+			}, 7500);
+		});
+		if (attachment && !(checkURL(attachment))) return message.channel.send(`<:${emoji.x}> Please provide a valid attachment! Attachments can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``).then(sent => {
+			if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+				message.delete();
+				sent.delete();
+			}, 7500);
+		});
 
 		let suggestion = args.join(" ");
 
-		if (suggestion.length > 1024) return message.channel.send(`<:${emoji.x}> Suggestions cannot be longer than 1024 characters.`);
+		if (suggestion.length > 1024) return message.channel.send(`<:${emoji.x}> Suggestions cannot be longer than 1024 characters.`).then(sent => {
+			if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+				message.delete();
+				sent.delete();
+			}, 7500);
+		});
 
 		let id = await Suggestion.countDocuments() + 1;
 
