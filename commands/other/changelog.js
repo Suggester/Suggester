@@ -120,6 +120,7 @@ module.exports = {
 					.setURL(release.html_url)
 					.setColor(colors.default)
 					.setTimestamp(release.created_at)
+					.setFooter("Changelog released at")
 				);
 			}
 

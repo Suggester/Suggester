@@ -130,7 +130,8 @@ module.exports = {
 		let embeds = [];
 		for await (let chunk of chunks) {
 			let embed = new Discord.MessageEmbed()
-				.setColor(colors.yellow);
+				.setColor(colors.yellow)
+				.setTitle("Suggestions Pending Review");
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);
 			});
