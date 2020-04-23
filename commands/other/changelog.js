@@ -1,16 +1,16 @@
-const { prefix, colors, emoji } = require("../../config.json");
-const { dbQueryAll, dbQuery, checkConfig } = require("../../coreFunctions.js");
+const { emoji, colors } = require("../../config.json");
+const request = require("request");
 
 module.exports = {
 	controls: {
-		name: "listqueue",
-		permission: 3,
-		aliases: ["queue", "showqueue"],
-		usage: "listqueue",
-		description: "Shows the queue of suggestions awaiting review",
+		name: "changelog",
+		permission: 10,
+		aliases: ["changes"],
+		usage: "changelog",
+		description: "Shows the latest Suggester release",
 		enabled: true,
-		docs: "staff/listqueue",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		docs: "all/changelog",
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
 		cooldown: 25
 	},
 	do: async (message, client, args, Discord) => {
@@ -49,7 +49,6 @@ module.exports = {
 			if (!(content instanceof Array)) throw new TypeError("Content is not an array");
 			if (!content.length) throw new Error("Content array is empty");
 			let removeReaction = options.removeReaction;
-			const savedContent = content;
 
 			if (!message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 
@@ -68,8 +67,7 @@ module.exports = {
 			const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 			let page = options.startPage;
-
-			content[page].title = `Suggestions Pending Review (Page ${page+1}/${content.length})`;
+			content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
 
 			const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
@@ -86,12 +84,12 @@ module.exports = {
 					if (removeReaction) users.remove(user.id);
 				}
 				else if (emojis.end && (id === emojis.end || name === emojis.end)) {
-					msg.edit("Queue exited.", {embed: null});
+					msg.edit("Changelog exited.", {embed: null});
 					collector.stop();
 					return;
 				}
 				if (msg) {
-					content[page].title = `Suggestions Pending Review (Page ${page+1}/${content.length})`;
+					content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
 					if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 					else msg.edit(content[page]);
 				}
@@ -101,44 +99,32 @@ module.exports = {
 			});
 		}
 
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
-
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(`<:${emoji.x}> This command is disabled when the suggestion mode is set to \`autoapprove\`.`);
-
-		let missing = checkConfig(qServerDB);
-
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let listarray = [];
-		let queuedSuggestions = await dbQueryAll("Suggestion", { status: "awaiting_review", id: message.guild.id });
-		queuedSuggestions.forEach(suggestion => {
-			listarray.push({
-				"fieldTitle": `Suggestion #${suggestion.suggestionId.toString()}`,
-				"fieldDescription": `[Queue Post](https://discordapp.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
+		request({
+			url: "https://api.github.com/repos/Suggester-Bot/Suggester/releases/latest",
+			method: "GET",
+			headers: {
+				"User-Agent": "Suggester-Bot"
+			}
+		}, (err, res) => {
+			if (err) return message.channel.send(`<:${emoji.x}> The GitHub fetch failed! Please try again later.`);
+			let release = JSON.parse(res.body);
+			let split_body = Discord.Util.splitMessage(release.body, {
+				char: " "
 			});
+
+			let embeds = [];
+			for (const chunk of split_body) {
+				embeds.push(new Discord.MessageEmbed()
+					.setTitle(`Changelog: ${release.name}`)
+					.setDescription(chunk)
+					.setURL(release.html_url)
+					.setColor(colors.default)
+					.setTimestamp(release.created_at)
+					.setFooter("Changelog released at")
+				);
+			}
+
+			pages(message, embeds);
 		});
-		if (!listarray[0]) return message.channel.send("There are no suggestions awaiting approval!");
-
-		let chunks = listarray.chunk(10);
-		let embeds = [];
-		for await (let chunk of chunks) {
-			let embed = new Discord.MessageEmbed()
-				.setColor(colors.yellow)
-				.setTitle("Suggestions Pending Review");
-			chunk.forEach(smallchunk => {
-				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);
-			});
-			if (chunks.length > 1) embed.setFooter("Use the arrow reactions to navigate pages, and the ⏹ reaction to close the queue embed");
-			embeds.push(embed);
-		}
-
-		pages(message, embeds);
 	}
 };
