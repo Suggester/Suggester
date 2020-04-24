@@ -16,7 +16,7 @@ extend("User", (GM) => {
 			})();
 		}
 
-		get flags () {
+		get db_flags () {
 			return (async () => {
 				const user = await dbQueryNoNew("User", { id: this.data.id });
 				return user.flags || null;
