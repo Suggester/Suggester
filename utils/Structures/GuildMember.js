@@ -17,7 +17,7 @@ extend("GuildMember", (GM) => {
 			})();
 		}
 
-		get flags () {
+		get db_flags () {
 			return (async () => {
 				const user = await dbQueryNoNew("User", { id: this.data.user.id });
 				return user.flags || null;

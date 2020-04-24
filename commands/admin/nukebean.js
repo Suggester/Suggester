@@ -11,8 +11,9 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0], client);
 		if (!user) return message.channel.send("You must specify a valid member!");
-		let member = await message.guild.members.fetch(user.id).catch(() => message.channel.send("You must specify a valid member!"));
-		if (!member) return message.channel.send("You must specify a valid member!");
+		let foundMember = true;
+		let member = await message.guild.members.fetch(user.id).catch(() => foundMember = false);
+		if (!member || !foundMember) return message.channel.send("You must specify a valid member!");
 
 		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
 
