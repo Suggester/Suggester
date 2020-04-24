@@ -43,7 +43,7 @@ const suggestion = new Schema({
 	suggester: String,
 	suggestion: String,
 	status: String,
-	submitted: { type: Date, default: new Date() },
+	submitted: { type: Date },
 	suggestionId: Number,
 	displayStatus: String,
 	reviewMessage: String,

@@ -167,7 +167,8 @@ module.exports = {
 				suggestion: suggestion,
 				status: "awaiting_review",
 				suggestionId: id,
-				attachment: attachment
+				attachment: attachment,
+				submitted: new Date()
 			}).save();
 
 			let replyEmbed = new Discord.MessageEmbed()
@@ -238,7 +239,8 @@ module.exports = {
 				status: "approved",
 				suggestionId: id,
 				staff_member: client.user.id,
-				attachment: attachment
+				attachment: attachment,
+				submitted: new Date()
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
