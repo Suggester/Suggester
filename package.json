@@ -9,22 +9,18 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@sentry/node": "^5.15.4",
+    "@sentry/node": "^5.15.5",
     "chalk": "^3.0.0",
-    "decache": "^4.5.1",
-    "discord.js": "^12.1.1",
+    "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
-    "express": "^4.16.4",
     "humanize-duration": "^3.22.0",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.9.10",
     "mongoose-sequence": "^5.2.2",
     "ms": "^2.1.2",
     "node-emoji": "^1.10.0",
-    "numbered": "^1.1.0",
     "request": "^2.88.2",
     "string-similarity": "^4.0.1",
-    "valid-url": "1.0.9",
-    "timestamp-to-date": "1.1.0"
+    "valid-url": "1.0.9"
   },
   "devDependencies": {
     "eslint": "^6.8.0"
