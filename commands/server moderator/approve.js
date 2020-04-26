@@ -49,13 +49,6 @@ module.exports = {
 			}
 		}
 
-		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
-
-		qSuggestionDB.status = "approved";
-		qSuggestionDB.staff_member = message.author.id;
-		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
-
 		let isComment = args[1];
 
 		let comment;
@@ -70,6 +63,13 @@ module.exports = {
 			}];
 			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 		}
+
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
+
+		qSuggestionDB.status = "approved";
+		qSuggestionDB.staff_member = message.author.id;
+		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Suggestion Approved")
