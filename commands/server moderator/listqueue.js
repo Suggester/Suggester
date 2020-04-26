@@ -49,7 +49,6 @@ module.exports = {
 			if (!(content instanceof Array)) throw new TypeError("Content is not an array");
 			if (!content.length) throw new Error("Content array is empty");
 			let removeReaction = options.removeReaction;
-			const savedContent = content;
 
 			if (!message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 

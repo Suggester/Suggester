@@ -43,7 +43,7 @@ module.exports = async (Discord, client, message) => {
 		for (let i = 0; i < splitPrefix.length; i++) {
 			if (regexEscape.includes(splitPrefix[i])) splitPrefix[i] = "\\" + splitPrefix[i];
 		}
-		serverPrefix = splitPrefix.join("")
+		serverPrefix = splitPrefix.join("");
 	}
 	let commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
 
