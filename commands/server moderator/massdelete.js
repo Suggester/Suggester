@@ -80,8 +80,8 @@ module.exports = {
 					.addField("Result", `**Deleted**: ${deniedId.length > 0 ? deniedId.join(", ") : "No suggestions were deleted."}\n${notDeniedId.length > 0 ? "**Could Not Delete**: " + notDeniedId.join(", ") : ""}`)
 					.setColor(colors.green)
 					.setFooter(nModified !== su.length
-						? "One or more of your suggestions could not be deleted. Please make sure the suggestion IDs you have provided exist and have not already been deleted."
-						: "All of your suggestions have been denied."
+						? "One or more of these suggestions could not be deleted. Please make sure the suggestion IDs you have provided exist and have not already been deleted."
+						: "All of these suggestions have been deleted."
 					)
 			);
 		} else {
