@@ -61,7 +61,6 @@ module.exports = {
 				id: 1,
 				created: new Date()
 			}];
-			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 		}
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
