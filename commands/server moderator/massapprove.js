@@ -80,8 +80,8 @@ module.exports = {
 					.addField("Result", `**Approved**: ${approvedId.length > 0 ? approvedId.join(", ") : "No suggestions were approved."}\n${notApprovedId.length > 0 ? "**Could Not Approve**: " + notApprovedId.join(", ") : ""}`)
 					.setColor(colors.green)
 					.setFooter(nModified !== su.length
-						? "One or more of your suggestions could not be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved."
-						: "All of your suggestions have been approved."
+						? "One or more of these suggestions could not be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved."
+						: "All of these suggestions have been approved."
 					)
 			);
 		} else {
