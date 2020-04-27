@@ -251,7 +251,7 @@ module.exports = {
 				}
 			}
 		},
-		"INVALID_GUILD_ID": {
+		"INVALID_GUILD_ID_ERROR": {
 			string: "Invalid guild ID",
 			context: "String used when a specified guild ID is invalid"
 		},
@@ -297,7 +297,7 @@ module.exports = {
 				}
 			}
 		},
-		"INVALID_FLAG_TYPE": {
+		"INVALID_FLAG_TYPE_ERROR": {
 			string: "You must specify either `user` or `guild`",
 			context: "Error produced when the flag command is used with an invalid entry type"
 		}

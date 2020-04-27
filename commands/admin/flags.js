@@ -50,7 +50,7 @@ module.exports = {
 			}
 		case "guild":
 		case "server":
-			if (!args[1]) return message.channel.send(string("INVALID_GUILD_ID", {}, "error"));
+			if (!args[1]) return message.channel.send(string("INVALID_GUILD_ID_ERROR", {}, "error"));
 			// eslint-disable-next-line no-case-declarations
 			let guild = args[1];
 			// eslint-disable-next-line no-case-declarations
@@ -84,7 +84,7 @@ module.exports = {
 				return message.channel.send(string("FLAG_INVALID_ACTION_ERROR", {}, "error"));
 			}
 		default:
-			return message.channel.send(string("INVALID_FLAG_TYPE", {}, "error"));
+			return message.channel.send(string("INVALID_FLAG_TYPE_ERROR", {}, "error"));
 		}
 	}
 };
