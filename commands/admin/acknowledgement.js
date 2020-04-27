@@ -1,5 +1,5 @@
-const { emoji } = require("../../config.json");
 const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "acknowledgement",
@@ -16,16 +16,16 @@ module.exports = {
 		if (!user || !args[1]) {
 			if (!user) user = message.author;
 			let dbUser = await dbQuery("User", { id: user.id });
-			let ack = dbUser ? dbUser.ack : "No Acknowledgement Set";
-			return message.channel.send(`\`${user.tag || user.user.tag}\`'s acknowledgement is: \`${ack || "no acknowledgement set"}\``);
+			let ack = dbUser && dbUser.ack ? dbUser.ack : string("NO_ACK_SET");
+			return message.channel.send(string("ACK_FILLER_TEXT", { user: user.tag, acknowledgement: ack }));
 		}
 
 		let ack = args.slice(1).join(" ");
 		if (ack.toLowerCase() === "reset") {
 			await dbModifyId("User", user.id, { ack: undefined });
-			return message.channel.send(`<:${emoji.check}> \`${user.user.tag}\`'s acknowledgement has been reset.`);
+			return message.channel.send(string("ACK_RESET_SUCCESS", { user: user.tag }, "success"));
 		}
 		await dbModifyId("User", user.id, { ack: ack });
-		return message.channel.send(`<:${emoji.check}> Set \`${user.tag || user.user.tag}\`'s acknowledgement to **${ack}**`);
+		return message.channel.send(string("ACK_SET_SUCCESS", { user: user.tag, acknowledgement: ack }, "success"));
 	}
 };

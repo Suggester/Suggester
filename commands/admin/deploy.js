@@ -1,6 +1,7 @@
-const { emoji, release } = require("../../config.json");
+const { release } = require("../../config.json");
 const { coreLog } = require("../../coreFunctions.js");
 const exec = (require("util").promisify((require("child_process").exec)));
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "deploy",
@@ -11,8 +12,8 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args, Discord) => {
-		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(`<:${emoji.x}> I am not running in the production environment. You probably don't want to deploy now.`); // Don't deploy if the bot isn't running in the production environment
-		let m = await message.channel.send("Loading...");
+		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(string("DEPLOY_NOT_PRODUCTION", {}, "error")); // Don't deploy if the bot isn't running in the production environment
+		let m = await message.channel.send(string("PROCESSING"));
 		await coreLog("📥 Deploy initiated");
 		await generateEmbed("Deploy command received");
 		await generateEmbed("Updating code");

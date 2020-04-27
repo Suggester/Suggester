@@ -1,6 +1,7 @@
-const { colors, emoji } = require("../../config.json");
+const { colors } = require("../../config.json");
 const Persist = require("../../utils/Persistent");
 const validUrl = require("valid-url");
+const { string } = require("../../utils/strings");
 /**
  * Check a URL to see if it makes a valid attachment
  * @param {string} url - The string to be checked
@@ -22,7 +23,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		const persistent = new Persist();
-		if (!args[0]) return message.channel.send("⚠️ Correct usage is `config game <playing|listening|watching> <status>`");
+		if (!args[0]) return message.channel.send(string("NO_PLAYING_STATUS_ERROR", {}, "error"));
 		switch (args[0]) {
 		case "game": {
 			let activity;
@@ -68,10 +69,10 @@ module.exports = {
 			let gameEmbed = new Discord.MessageEmbed()
 				.setDescription(full)
 				.setColor(colors.default);
-			return message.channel.send("👤 Presence set!", gameEmbed);
+			return message.channel.send(string("PLAYING_STATUS_SET_SUCCESS", {}, "success"), gameEmbed);
 		}
 		case "status": {
-			if (!args[1]) return message.channel.send("Invalid parameters!");
+			if (!args[1]) return message.channel.send(string("NO_STATUS_ERROR", {}, "error"));
 			let statusEmbed = new Discord.MessageEmbed();
 			let status;
 			switch (args[1].toLowerCase()) {
@@ -101,7 +102,7 @@ module.exports = {
 				break;
 			}
 			default: {
-				return message.channel.send("Invalid parameters! Valid status types are `online`, `idle`, `dnd`, and `invisible`.");
+				return message.channel.send(string("NO_STATUS_ERROR", {}, "error"));
 			}
 			}
 			await client.user.setStatus(status);
@@ -109,61 +110,20 @@ module.exports = {
 			persistent.save("presence", {
 				status: status
 			});
-			return message.channel.send("🎮 Status set!", statusEmbed);
-		}
-		case "username": {
-			if (!args[1]) {
-				return message.channel.send("Invalid parameters! You must specify a username!");
-			} else {
-				message.channel.startTyping();
-				await client.user.setUsername(args.splice(1).join(" "));
-				let usernameEmbed = new Discord.MessageEmbed()
-					.setDescription(client.user.username)
-					.setColor(colors.default);
-				await message.channel.send("📛 Username set!", usernameEmbed);
-				await message.channel.stopTyping();
-			}
-			break;
-		}
-		case "nick":
-		case "nickname": {
-			if (!args[1]) {
-				return message.channel.send("Invalid parameters! You must specify a nickname!");
-			} else {
-				let nick = args.splice(1).join(" ");
-				if (nick.length > 32) return message.channel.send("Nicknames have a length limit of 32 characters.");
-				await message.guild.me.setNickname(nick).then(member => {
-					let nickEmbed = new Discord.MessageEmbed()
-						.setDescription(member.nickname)
-						.setColor(colors.default);
-					message.channel.send("📛 Nickname set!", nickEmbed);
-				}).catch(() => message.channel.send("An error occurred setting the nickname. Please make sure I have permissions."));
-				return;
-			}
+			return message.channel.send(string("STATUS_SET_SUCCESS", {}, "success"), statusEmbed);
 		}
 		case "avatar":
 		case "pfp":
 		case "av":
 		case "picture": {
-			if (!args[1]) return message.channel.send("Invalid parameters! You must specify an avatar!");
-			if (!(checkURL(args[1]))) return message.channel.send(`<:${emoji.x}> Please provide a valid image URL! Images can have extensions of \`jpeg\`, \`jpg\`, \`png\`, or \`gif\``);
+			if (!args[1]) return message.channel.send(string("NO_AVATAR_ERROR", {}, "error"));
+			if (!(checkURL(args[1]))) return message.channel.send(string("INVALID_AVATAR_ERROR", {}, "error"));
 			else {
-				message.channel.startTyping();
 				await client.user.setAvatar(args[1]);
 				let avatarEmbed = new Discord.MessageEmbed()
 					.setImage(client.user.displayAvatarURL({format: "png"}))
 					.setColor(colors.default);
-				await message.channel.send("👤 Avatar set!", avatarEmbed);
-				return message.channel.stopTyping();
-			}
-		}
-		case "version": {
-			if (!args[1]) return message.channel.send("Invalid parameters!");
-			else {
-				persistent.save("core", {
-					"version": args[1]
-				});
-				return message.channel.send(`Bot version set to ${args[1]}. Initiate a reboot to see this change take effect.`);
+				message.channel.send(string("AVATAR_SET_SUCCESS", {}, "success"), avatarEmbed);
 			}
 		}
 		}
