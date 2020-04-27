@@ -82,8 +82,8 @@ module.exports = {
 					.addField("Result", `**Denied**: ${deniedId.length > 0 ? deniedId.join(", ") : "No suggestions were denied."}\n${notDeniedId.length > 0 ? "**Could Not Deny**: " + notDeniedId.join(", ") : ""}`)
 					.setColor(colors.green)
 					.setFooter(nModified !== su.length
-						? "One or more of your suggestions could not be denied. Please make sure the suggestion IDs you have provided exist and have not already been denied."
-						: "All of your suggestions have been denied."
+						? "One or more of these suggestions could not be denied. Please make sure the suggestion IDs you have provided exist and have not already been denied."
+						: "All of these suggestions have been denied."
 					)
 			);
 		} else {
