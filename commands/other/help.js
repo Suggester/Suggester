@@ -1,6 +1,6 @@
 const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
-
 const { colors, prefix } = require("../../config.json");
+const { string } = require("../../utils/strings");
 
 module.exports = {
 	controls: {
@@ -21,11 +21,11 @@ module.exports = {
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
-				.setDescription("Please see https://suggester.js.org/ for a command list and usage information!")
-				.setFooter(`My prefix in this server is ${serverPrefix}`)
+				.setDescription(string("HELP_BASE_DESCRIPTION"))
+				.setFooter(string("HELP_PREFIX_INFO", { prefix: serverPrefix }))
 				.setColor(colors.default);
 
-			if (missingConfig.length >= 1) embed.addField("Missing Config!", `This server has an incomplete configuration.\nA server manager can run \`${serverPrefix}setup\` to configure it.`);
+			if (missingConfig.length >= 1) embed.addField(string("MISSING_CONFIG_TITLE"), string("MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
 			return message.channel.send(embed);
 		}
 
@@ -40,13 +40,13 @@ module.exports = {
 		let returnEmbed = new Discord.MessageEmbed()
 			.setColor(colors.default)
 			.setDescription(commandInfo.description)
-			.addField("Permission Level", permLevelToRole(commandInfo.permission), true)
-			.addField("Usage", `\`${serverPrefix}${commandInfo.usage}\``, true)
-			.setAuthor(`Command: ${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
+			.addField(string("HELP_PERMISSION_LEVEL"), permLevelToRole(commandInfo.permission), true)
+			.addField(string("HELP_USAGE"), `\`${serverPrefix}${commandInfo.usage}\``, true)
+			.setAuthor(commandName, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
-		commandInfo.aliases ? returnEmbed.addField(commandInfo.aliases.length > 1 ? "Aliases" : "Alias", commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField("Documentation", `https://suggester.js.org/#/${commandInfo.docs}`);
-		if (!commandInfo.enabled) returnEmbed.addField("Additional Information", "⚠️ This command is currently disabled");
+		commandInfo.aliases ? returnEmbed.addField(string(commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
+		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField(string("HELP_DOCUMENTATION"), `https://suggester.js.org/#/${commandInfo.docs}`);
+		if (!commandInfo.enabled) returnEmbed.addField(string("HELP_ADDITIONAL_INFO"), `⚠️ ${string("COMMAND_DISABLED")}`);
 
 		return message.channel.send(returnEmbed);
 

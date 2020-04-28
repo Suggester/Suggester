@@ -507,5 +507,93 @@ module.exports = {
 			string: "Server Flags",
 			context: "Title for the Server Flags field of the configuration list"
 		},
+		"PAGINATION_NAV_INSTRUCTIONS": {
+			string: "Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed",
+			context: "Included in pagination embeds to give instructions on how to navigate pages"
+		},
+		"PAGINATION_PAGE_COUNT": {
+			string: "Page {{current}}/{{total}}",
+			context: "Included in pagination embeds to show the number of pages and the current page",
+			replaced: {
+				current: {
+					to_replace: "{{current}}",
+					description: "The current page number"
+				},
+				total: {
+					to_replace: "{{total}}",
+					description: "The total number of pages"
+				}
+			}
+		},
+		"CHANGELOG_RELEASED_FOOTER": {
+			string: "Changelog released at",
+			context: "Included in pagination embeds to give instructions on how to navigate pages"
+		},
+		"CHANGELOG_EMBED_HEADER": {
+			string: "Changelog: {{version}}",
+			context: "The title of the changelog embed",
+			replaced: {
+				version: {
+					to_replace: "{{version}}",
+					description: "The version number of the latest release"
+				}
+			}
+		},
+		"HELP_BASE_DESCRIPTION": {
+			string: "Please see https://suggester.js.org/ for a command list and usage information!",
+			context: "Help command description directing to the documentation"
+		},
+		"HELP_PREFIX_INFO": {
+			string: "My prefix in this server is {{prefix}}",
+			context: "Shows prefix in the help command",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
+		},
+		"HELP_PERMISSION_LEVEL": {
+			string: "Permission Level",
+			context: "Permission Level field name in help command"
+		},
+		"HELP_USAGE": {
+			string: "Usage",
+			context: "Usage field name in help command"
+		},
+		"HELP_DOCUMENTATION": {
+			string: "Documentation",
+			context: "Documentation field name in help command"
+		},
+		"HELP_ADDITIONAL_INFO": {
+			string: "Additional Information",
+			context: "Additional Information field name in help command"
+		},
+		"HELP_ALIAS": {
+			string: "Alias",
+			context: "Alias field name in help command"
+		},
+		"HELP_ALIAS_PLURAL": {
+			string: "Aliases",
+			context: "Aliases field name in help command"
+		},
+		"COMMAND_DISABLED": {
+			string: "This command is currently disabled globally.",
+			context: "Used when a command is disabled globally"
+		},
+		"MISSING_CONFIG_TITLE": {
+			string: "Missing Config!",
+			context: "Title to any missing configuration warning embed"
+		},
+		"MISSING_CONFIG_DESCRIPTION": {
+			string: "This server has an incomplete configuration.\nA server manager can run `{{prefix}}setup` to configure it.",
+			context: "Description to any missing configuration warning embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
+		}
 	}
 };

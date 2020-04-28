@@ -1,6 +1,6 @@
-const { emoji, colors } = require("../../config.json");
+const { colors } = require("../../config.json");
 const request = require("request");
-
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "changelog",
@@ -67,7 +67,7 @@ module.exports = {
 			const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 			let page = options.startPage;
-			content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
+			content[page].setFooter(`${string("PAGINATION_NAV_INSTRUCTIONS")}\n${string("PAGINATION_PAGE_COUNT", { current: page+1, total: content.length })}\n${string("CHANGELOG_RELEASED_FOOTER")}`);
 
 			const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
@@ -89,7 +89,7 @@ module.exports = {
 					return;
 				}
 				if (msg) {
-					content[page].setFooter(`Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed\nPage ${page+1}/${content.length}\nChangelog released at`);
+					content[page].setFooter(`${string("PAGINATION_NAV_INSTRUCTIONS")}\n${string("PAGINATION_PAGE_COUNT", { current: page+1, total: content.length })}\n${string("CHANGELOG_RELEASED_FOOTER")}`);
 					if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 					else msg.edit(content[page]);
 				}
@@ -106,7 +106,7 @@ module.exports = {
 				"User-Agent": "Suggester-Bot"
 			}
 		}, (err, res) => {
-			if (err) return message.channel.send(`<:${emoji.x}> The GitHub fetch failed! Please try again later.`);
+			if (err) return message.channel.send(string("ERROR", {}, "error"));
 			let release = JSON.parse(res.body);
 			let split_body = Discord.Util.splitMessage(release.body, {
 				char: " "
@@ -115,12 +115,12 @@ module.exports = {
 			let embeds = [];
 			for (const chunk of split_body) {
 				embeds.push(new Discord.MessageEmbed()
-					.setTitle(`Changelog: ${release.name}`)
+					.setTitle(string("CHANGELOG_EMBED_HEADER", { version: release.name }))
 					.setDescription(chunk)
 					.setURL(release.html_url)
 					.setColor(colors.default)
 					.setTimestamp(release.created_at)
-					.setFooter("Changelog released at")
+					.setFooter(string("CHANGELOG_RELEASED_FOOTER"))
 				);
 			}
 
