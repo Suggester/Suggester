@@ -12,7 +12,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args) => {
-		if (!args[0]) return message.channel.send(string("INVALID_FLAG_TYPE_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string("SPECIFY_USER_OR_GUILD_ERROR", {}, "error"));
 		switch (args[0].toLowerCase()) {
 		case "user":
 			// eslint-disable-next-line no-case-declarations
@@ -46,7 +46,7 @@ module.exports = {
 				return message.channel.send(string("FLAG_REMOVED_USER_SUCCESS", { user: user.tag, flag: flag }, "success"));
 			}
 			default:
-				return message.channel.send(string("FLAG_INVALID_ACTION_ERROR", {}, "error"));
+				return message.channel.send(string("ADD_REMOVE_INVALID_ACTION_ERROR", {}, "error"));
 			}
 		case "guild":
 		case "server":
@@ -81,10 +81,10 @@ module.exports = {
 				return message.channel.send(string("FLAG_REMOVED_GUILD_SUCCESS", { flag: guildFlag, guild: guild }, "success"));
 			}
 			default:
-				return message.channel.send(string("FLAG_INVALID_ACTION_ERROR", {}, "error"));
+				return message.channel.send(string("ADD_REMOVE_INVALID_ACTION_ERROR", {}, "error"));
 			}
 		default:
-			return message.channel.send(string("INVALID_FLAG_TYPE_ERROR", {}, "error"));
+			return message.channel.send(string("SPECIFY_USER_OR_GUILD_ERROR", {}, "error"));
 		}
 	}
 };

@@ -1,5 +1,6 @@
 const { emoji } = require("../../config.json");
 const { dbQuery, dbModifyId, fetchUser } = require("../../coreFunctions");
+const { string } = require("../../utils/strings")
 
 module.exports = {
 	controls: {
@@ -14,40 +15,40 @@ module.exports = {
 		let type = args.shift();
 		switch (type) {
 		case "user": {
-			if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a user!`);
+			if (!args[0]) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 			let foundUser = await fetchUser(args[0], client);
-			if (!foundUser) return message.channel.send(`<:${emoji.x}> User not found. If this is a valid ID, please try again.`);
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Invalid setting. Specify \`true\` to block the user and \`false\` to unblock the user.`);
+			if (!foundUser) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string("INVALID_GLOBALBAN_PARAMS_ERROR", {}, "error"));
 			let qUserDB = await dbQuery("User", { id: foundUser.id });
 			if (!args[1]) {
 				let { blocked } = qUserDB;
-				return message.channel.send(`<:${emoji.check}> \`${foundUser.tag}\`is ${blocked ? "" : "not "}globally blocked.`);
+				return message.channel.send(string(blocked ? "IS_GLOBALLY_BANNED" : "IS_NOT_GLOBALLY_BANNED", { banned: foundUser.tag }));
 			}
-			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(`<:${emoji.x}> This user is protected and cannot be blacklisted.`);
+			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(string("USER_PROTECTED_ERROR", {}, "error"));
 			if (args[1] === "true") qUserDB.blocked = true;
 			else if (args[1] === "false") qUserDB.blocked = false;
 			await dbModifyId("User", foundUser.id, qUserDB);
-			return message.channel.send(`<:${emoji.check}> \`${foundUser.tag}\`is ${!qUserDB.blocked ? "no longer" : "now"} globally blocked.`);
+			return message.channel.send(string(qUserDB.blocked ? "IS_GLOBALLY_BANNED" : "IS_NOT_GLOBALLY_BANNED", { banned: foundUser.tag }, "success"));
 		}
 		case "server":
 		case "guild": {
-			if (!args[0]) return message.channel.send(`<:${emoji.x}> Please specify a guild!`);
+			if (!args[0]) return message.channel.send(string("INVALID_GUILD_ID_ERROR", {}, "error"));
 			let foundGuild = client.guilds.cache.get(args[0]);
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(`<:${emoji.x}> Invalid setting. Specify \`true\` to block the server and \`false\` to unblock the server.`);
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string("INVALID_GLOBALBAN_PARAMS_ERROR", {}, "error"));
 			let qServerDB = await dbQuery("Server", { id: args[0] });
 			if (!args[1]) {
 				let { blocked } = qServerDB;
-				return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${blocked ? "" : "not "}globally blocked.`);
+				return message.channel.send(blocked ? string("IS_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }) : string("IS_NOT_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }));
 			}
-			if (qServerDB.flags && qServerDB.flags.includes("PROTECTED")) return message.channel.send(`<:${emoji.x}> This guild is protected and cannot be blacklisted.`);
+			if (qServerDB.flags && qServerDB.flags.includes("PROTECTED")) return message.channel.send(string("GUILD_PROTECTED_ERROR", {}, "error"));
 			if (args[1] === "true") qServerDB.blocked = true;
 			else if (args[1] === "false") qServerDB.blocked = false;
 			await dbModifyId("Server", args[0], qServerDB);
 			if (foundGuild && qServerDB.blocked) foundGuild.leave();
-			return message.channel.send(`<:${emoji.check}> \`${foundGuild ? foundGuild.name : args[0]}\`is ${qServerDB.blocked ? "now" : "no longer"} globally blocked.`);
+			return message.channel.send(qServerDB.blocked ? string("IS_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }, "success") : string("IS_NOT_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }, "success"));
 		}
 		default: {
-			return message.channel.send(`<:${emoji.x}> You must specify either \`user\` or \`guild\`.`);
+			return message.channel.send(string("SPECIFY_USER_OR_GUILD_ERROR", {}, "error"));
 		}
 		}
 

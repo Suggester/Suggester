@@ -173,7 +173,7 @@ module.exports = {
 			string: "This command has been flagged as possibly destructive. Please recheck your command and confirm you would like to execute it.",
 			description: "Confirmation sent when an eval is flagged as possibly destructive"
 		},
-		"INVALID_FLAG_TYPE_ERROR": {
+		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
 			context: "Error sent when the specified flag type is invalid"
 		},
@@ -219,7 +219,7 @@ module.exports = {
 				}
 			}
 		},
-		"FLAG_INVALID_ACTION_ERROR": {
+		"ADD_REMOVE_INVALID_ACTION_ERROR": {
 			string: "You must specify `add` or `remove`.",
 			context: "Error shown when an invalid action is specified in the flag command"
 		},
@@ -297,9 +297,215 @@ module.exports = {
 				}
 			}
 		},
-		"INVALID_FLAG_TYPE_ERROR": {
-			string: "You must specify either `user` or `guild`",
-			context: "Error produced when the flag command is used with an invalid entry type"
-		}
+		"INVALID_USER_ERROR": {
+			string: "You must specify a valid user!",
+			context: "String used when no/an invalid user is specified in a command"
+		},
+		"INVALID_GLOBALBAN_PARAMS_ERROR": {
+			string: "Invalid blacklist setting. Use `true` to blacklist and `false` to unblacklist.",
+			context: "Error produced when globalban is run with an invalid blacklist setting"
+		},
+		"IS_GLOBALLY_BANNED": {
+			string: "{{banned}} is globally blocked.",
+			context: "String used when a user/guild is globally blocked",
+			replaced: {
+				banned: {
+					to_replace: "{{banned}}",
+					description: "The user/guild identifier"
+				}
+			}
+		},
+		"IS_NOT_GLOBALLY_BANNED": {
+			string: "{{banned}} is not globally blocked.",
+			context: "String used when a user/guild is not globally blocked",
+			replaced: {
+				banned: {
+					to_replace: "{{banned}}",
+					description: "The user/guild identifier"
+				}
+			}
+		},
+		"USER_PROTECTED_ERROR": {
+			string: "This user is protected and cannot be blacklisted.",
+			context: "Error shown when a user is protected and someone attempts to globally blacklist them"
+		},
+		"GUILD_PROTECTED_ERROR": {
+			string: "This guild is protected and cannot be blacklisted.",
+			context: "Error shown when a guild is protected and someone attempts to globally blacklist it"
+		},
+		"GUILD_WHITELIST_ADD_SUCCESS": {
+			string: "Whitelisted guild with ID `{{guild}}`",
+			context: "Success message when a guild is whitelisted",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The ID of a guild"
+				}
+			}
+		},
+		"GUILD_WHITELIST_REMOVE_SUCCESS": {
+			string: "Unwhitelisted guild with ID `{{guild}}`",
+			context: "Success message when a guild is unwhitelisted",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The ID of a guild"
+				}
+			}
+		},
+		"NO_GUILD_DATABASE_ENTRY_ERROR": {
+			string: "This guild does not have a database entry!",
+			context: "String used when a guild does not have a database entry for fetching data through global commands"
+		},
+		"NONE_CONFIGURED": {
+			string: "None Configured",
+			context: "Used when a configuration element is not configured"
+		},
+		"CFG_ADMIN_ROLES_TITLE": {
+			string: "**Admin Roles:**",
+			context: "Denotes the list of admin roles when configuration is listed"
+		},
+		"CFG_STAFF_ROLES_TITLE": {
+			string: "**Staff Roles:**",
+			context: "Denotes the list of staff roles when configuration is listed"
+		},
+		"CFG_ALLOWED_ROLES_TITLE": {
+			string: "**Allowed Suggesting Roles:**",
+			context: "Denotes the list of allowed suggesting roles when configuration is listed"
+		},
+		"CFG_ALLOWED_ROLES_APPEND": {
+			string: "(all users can submit suggestions)",
+			context: "Appended to the end of the configuration value for allowed suggesting roles if none are configured"
+		},
+		"CFG_APPROVED_ROLE_TITLE": {
+			string: "**Approved Suggestion Role:**",
+			context: "Denotes the approved suggestion role when configuration is listed"
+		},
+		"CFG_SUGGESTION_CHANNEL_TITLE": {
+			string: "**Approved Suggestions Channel:**",
+			context: "Denotes the approved suggestion channel when configuration is listed"
+		},
+		"CFG_REVIEW_CHANNEL_TITLE": {
+			string: "**Suggestion Review Channel:**",
+			context: "Denotes the suggestion review channel when configuration is listed"
+		},
+		"CFG_REVIEW_NOT_NECESSARY_APPEND": {
+			string: "(Unnecessary because the mode is set to autoapprove)",
+			context: "Appended to the end of the review channel configuration element when none is set and the mode is set to autoapprove"
+		},
+		"CFG_DENIED_CHANNEL_TITLE": {
+			string: "**Denied Suggestions Channel:**",
+			context: "Denotes the denied suggestions channel when configuration is listed"
+		},
+		"CFG_LOG_CHANNEL_TITLE": {
+			string: "**Log Channel:**",
+			context: "Denotes the log channel when configuration is listed"
+		},
+		"CFG_ARCHIVE_CHANNEL_TITLE": {
+			string: "**Implemented Suggestions Archive Channel:**",
+			context: "Denotes the implemented suggestions archive channel when configuration is listed"
+		},
+		"CFG_COMMANDS_CHANNEL_TITLE": {
+			string: "**Suggestion Command Channel:**",
+			context: "Denotes the implemented suggestions archive channel when configuration is listed"
+		},
+		"CFG_COMMANDS_CHANNEL_APPEND": {
+			string: "(Suggestions can be made in all channels)",
+			context: "Appended to the end of the commands channel configuration value if none is specified"
+		},
+		"CFG_UPVOTE_REACTION_DISABLED": {
+			string: "(Upvote Reaction Disabled)",
+			context: "Shown when the upvote reaction config element is disabled"
+		},
+		"CFG_MID_REACTION_DISABLED": {
+			string: "(Shrug/No Opinion Reaction Disabled)",
+			context: "Shown when the shrug/no opinion reaction config element is disabled"
+		},
+		"CFG_DOWNVOTE_REACTION_DISABLED": {
+			string: "(Downvote Reaction Disabled)",
+			context: "Shown when the downvote reaction config element is disabled"
+		},
+		"CFG_REACTION_EMOJIS_TITLE": {
+			string: "**Suggestion Feed Reactions:**",
+			context: "Denotes the suggestion feed reactions when configuration is listed"
+		},
+		"ENABLED": {
+			string: "Enabled",
+			context: "Used when something is enabled"
+		},
+		"DISABLED": {
+			string: "Disabled",
+			context: "Used when something is disabled"
+		},
+		"CFG_MODE_TITLE": {
+			string: "**Mode:**",
+			context: "Denotes the mode when configuration is listed"
+		},
+		"CFG_MODE_REVIEW": {
+			string: "All suggestions are held for review",
+			context: "Shown when the mode is set to review"
+		},
+		"CFG_MODE_AUTOAPPROVE": {
+			string: "All suggestions are automatically approved",
+			context: "Shown when the mode is set to autoapprove"
+		},
+		"ERROR": {
+			string: "An error occurred. Please try again.",
+			context: "Used when an unknown error occurs."
+		},
+		"CFG_PREFIX_TITLE": {
+			string: "**Prefix:**",
+			context: "Denotes the prefix when configuration is listed"
+		},
+		"CFG_NOTIFICATIONS_TITLE": {
+			string: "**DM Notifications:**",
+			context: "Denotes the notification setting when configuration is listed"
+		},
+		"CFG_CLEANCOMMANDS_TITLE": {
+			string: "**Clean Suggestion Command:**",
+			context: "Denotes the clean commands setting when configuration is listed"
+		},
+		"SERVER_CONFIGURATION_TITLE": {
+			string: "Server Configuration for {{server}}",
+			context: "Title for the configuration list embed",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "A server name"
+				}
+			}
+		},
+		"ROLE_CONFIGURATION_TITLE": {
+			string: "Role Configuration",
+			context: "Title for the Role Configuration field of the configuration list"
+		},
+		"CHANNEL_CONFIGURATION_TITLE": {
+			string: "Channel Configuration",
+			context: "Title for the Channel Configuration field of the configuration list"
+		},
+		"OTHER_CONFIGURATION_TITLE": {
+			string: "Other Configuration",
+			context: "Title for the Other Configuration field of the configuration list"
+		},
+		"CFG_STATUS_TITLE": {
+			string: "Config Status",
+			context: "Title for the Config Status field of the configuration list"
+		},
+		"CFG_STATUS_GOOD": {
+			string: "Bot Configured, Commands Will Work",
+			context: "Shown when the bot is configured enough to work"
+		},
+		"CFG_STATUS_BAD": {
+			string: "Not Fully Configured, Bot Will Not Work",
+			context: "Shown when the bot is not configured enough to work"
+		},
+		"CFG_PERMISSIONS_TITLE": {
+			string: "Bot Permissions",
+			context: "Title for the Bot Permissions field of the configuration list"
+		},
+		"CFG_FLAGS_TITLE": {
+			string: "Server Flags",
+			context: "Title for the Server Flags field of the configuration list"
+		},
 	}
 };

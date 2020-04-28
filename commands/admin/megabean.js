@@ -1,4 +1,5 @@
 const { dbQuery, fetchUser } = require("../../coreFunctions");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "megabean",
@@ -10,21 +11,20 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0], client);
-		if (!user) return message.channel.send("You must specify a valid member!");
+		if (!user) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 		let foundMember = true;
 		let member = await message.guild.members.fetch(user.id).catch(() => foundMember = false);
-		if (!member || !foundMember) return message.channel.send("You must specify a valid member!");
-
-		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
+		if (!member || !foundMember) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 
 		let beanSendEmbed = new Discord.MessageEmbed()
 			.setColor("#AAD136")
-			.setDescription(reason)
 			.setImage("https://media.tenor.com/images/be3750a3b77c26295ae4bc16d9543d63/tenor.gif");
 
-		let qMemberDB = await dbQuery("User", {id: member.id});
+		if (args[1]) beanSendEmbed.setDescription(args.splice(1).join(" "));
+
+		let qUserDB = await dbQuery("User", {id: user.id});
 
 		message.channel.send(`<:hyperbean:666099809668694066> Megabeaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
-		if (qMemberDB.notify) member.user.send(`<:hyperbean:666099809668694066> **You have been megabeaned from ${message.guild.name}**`, beanSendEmbed).catch(()=> {});
+		if (qUserDB.notify) member.user.send(`<:hyperbean:666099809668694066> **You have been megabeaned from ${message.guild.name}**`, beanSendEmbed).catch(()=> {});
 	}
 };

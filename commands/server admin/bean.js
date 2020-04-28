@@ -1,5 +1,6 @@
 const { developer } = require("../../config.json");
 const { dbQuery, fetchUser } = require("../../coreFunctions");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "bean",
@@ -12,25 +13,22 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0], client);
-		if (!user) return message.channel.send("You must specify a valid member!");
+		if (!user) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 		let foundMember = true;
 		let member = await message.guild.members.fetch(user.id).catch(() => foundMember = false);
-		if (!member || !foundMember) return message.channel.send("You must specify a valid member!");
+		if (!member || !foundMember) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 
-		let reason = args[1] ? args.splice(1).join(" ") : "No reason specified";
-
-		let beanSendEmbed = new Discord.MessageEmbed();
-		if (developer.includes(member.id) && !developer.includes(message.author.id)) {
-			member = message.member;
+		let beanSendEmbed = new Discord.MessageEmbed()
+			.setColor("#AAD136");
+		if (developer.includes(user.id) && !developer.includes(message.author.id)) {
 			user = message.author;
 			beanSendEmbed.setImage("https://media.tenor.com/images/fdc481469f2c9deb220b1e986e40a39d/tenor.gif");
 		}
-		beanSendEmbed.setColor("#AAD136")
-			.setDescription(reason);
+		if (args[1]) beanSendEmbed.setDescription(args.splice(1).join(" "));
 
-		let qMemberDB = await dbQuery("User", {id: member.id});
+		let qUserDB = await dbQuery("User", {id: user.id});
 
-		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, beanSendEmbed);
-		if (qMemberDB.notify) member.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, beanSendEmbed).catch(() => {});
+		message.channel.send(`<:bean:657650134502604811> Beaned ${user.tag} (\`${user.id}\`)`, (beanSendEmbed.description || beanSendEmbed.image) ? beanSendEmbed : null);
+		if (qUserDB.notify) user.send(`<:bean:657650134502604811> **You have been beaned from ${message.guild.name}**`, (beanSendEmbed.description || beanSendEmbed.image) ? beanSendEmbed : null).catch(() => {});
 	}
 };
