@@ -1,11 +1,13 @@
 require("dotenv").config();
 
 // init the extended structures
-require("./utils/Structures/GuildMember");
-require("./utils/Structures/User");
-require("./utils/Structures/Guild");
+//require("./utils/Structures/GuildMember");
+//require("./utils/Structures/User");
+//require("./utils/Structures/Guild");
 
 const Discord = require("discord.js");
+const Client = require("./utils/Client");
+const chalk = require("chalk");
 const { errorLog, fileLoader } = require("./coreFunctions.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
@@ -18,7 +20,7 @@ if (process.env.SENTRY_DSN) {
 
 const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
 
-const client = new Discord.Client({
+const client = new Client({
 	ws: { intents: intents},
 	disableMentions: "everyone",
 	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
@@ -29,18 +31,21 @@ connect(process.env.MONGO, {
 	useUnifiedTopology: true
 })
 	.catch((err) => {
-		throw new Error(err);
+    console.log(chalk`{red [{bold DATABASE}] Connection error: ${err.stack}}`);
 	});
+
 autoIncrement(connection);
+
 connection.on("open", () => {
-	console.log("Connected to MongoDB!");
-});
-connection.on("error", (err) => {
-	console.error("Connection error: ", err);
+	console.log(chalk`{gray [{bold DATABASE}] {bold Connected} to {bold MongoDB}!}`);
 });
 
-client.commands = new Discord.Collection();
-client.cooldowns = new Discord.Collection();
+connection.on("error", (err) => {
+  console.log(chalk`{red [{bold DATABASE}] Error: ${err.stack}}`);
+});
+
+//client.commands = new Discord.Collection();
+//client.cooldowns = new Discord.Collection();
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {
@@ -57,7 +62,7 @@ client.cooldowns = new Discord.Collection();
 				errorLog(err, "Event Handler", `Event: ${eventName}`);
 			}
 		});
-		console.log("[Event] Loaded", eventName);
+		console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${eventName}}}`);
 	}
 
 	let commandFiles = await fileLoader("commands");
@@ -68,12 +73,12 @@ client.cooldowns = new Discord.Collection();
 		let commandName = basename(file).split(".")[0];
 
 		client.commands.set(commandName, command);
-		console.log("[Command] Loaded", commandName);
+		console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${commandName}}}`);
 	}
 })();
 
 client.login(process.env.TOKEN)
-	.catch(console.error);
+	.catch((err) => console.log(chalk`{cyan [{bold DISCORD}] Error logging in: ${err.stack}}`));
 
 client.on("error", (err) => {
 	errorLog(err, "error", "something happened and idk what");

@@ -1,4 +1,4 @@
-const { colors, developer } = require("../../config.json");
+const { colors } = require("../../config.json");
 const { dbQuery, checkPermissions, fetchUser } = require("../../coreFunctions");
 module.exports = {
 	controls: {
@@ -27,7 +27,7 @@ module.exports = {
 
 		let globalPosArr = [];
 		let posArr = [];
-		if (developer.includes(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer", "<:suggesteradmin:689138045122773006> Global Administrator");
+		if (client.admins.has(id)) globalPosArr.push("<:suggesterdev:689121648099459078> Developer", "<:suggesteradmin:689138045122773006> Global Administrator");
 
 		if (qUserDB && qUserDB.flags.includes("STAFF")) globalPosArr.push("<:suggesterglobal:689121762952216625> Suggester Staff Team");
 
