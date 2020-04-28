@@ -1,4 +1,4 @@
-const { colors, developer } = require("../../config.json");
+const { colors } = require("../../config.json");
 const { core } = require("../../persistent.json");
 const { fetchUser } = require("../../coreFunctions.js");
 const humanizeDuration = require("humanize-duration");
@@ -17,9 +17,9 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let developerArray = [];
-		for await (let developerId of developer) {
+		for (let developerId of client.admins) {
 			let user = await fetchUser(developerId, client);
-			user ? developerArray.push(`${user.tag} (${user.id})`) : developerArray.push(`Unknown User (${developerId})`);
+			user ? developerArray.push(`${Discord.Util.escapeMarkdown(user.tag)} (${user.id})`) : developerArray.push(`Unknown User (${developerId})`);
 		}
 		let embed = new Discord.MessageEmbed()
 			.addField("Developers", developerArray.join("\n"))

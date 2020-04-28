@@ -1,4 +1,3 @@
-const { developer } = require("../../config.json");
 const { dbQuery, fetchUser } = require("../../coreFunctions");
 const { string } = require("../../utils/strings");
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
 
 		let beanSendEmbed = new Discord.MessageEmbed()
 			.setColor("#AAD136");
-		if (developer.includes(user.id) && !developer.includes(message.author.id)) {
+		if (client.admins.has(user.id) && !client.admins.has(message.author.id)) {
 			user = message.author;
 			beanSendEmbed.setImage("https://media.tenor.com/images/fdc481469f2c9deb220b1e986e40a39d/tenor.gif");
 		}

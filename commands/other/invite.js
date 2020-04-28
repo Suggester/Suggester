@@ -24,7 +24,7 @@ module.exports = {
 			}
 		}
 		if (config.release === "special") {
-			if (config.developer.includes(message.author.id)) {
+			if (client.admins.has(message.author.id)) {
 				return message.channel.send(`You can invite this instance of the bot to your server with this link: ${url.replace("[ID]", client.user.id)}`);
 			}
 			return message.channel.send(`This instance of Suggester is a private version.\nYou can invite the **public** version of Suggester at ${url.replace("[ID]", stableId)}`);
