@@ -26,12 +26,16 @@ const client = new Client({
 	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
 });
 
+if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);
+if (!process.env.MONGO) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.MONGO}}\n{red {bold Shutting Down}}`);
+
+
 connect(process.env.MONGO, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 })
 	.catch((err) => {
-    console.log(chalk`{red [{bold DATABASE}] Connection error: ${err.stack}}`);
+		console.log(chalk`{red [{bold DATABASE}] Connection error: ${err.stack}}`);
 	});
 
 autoIncrement(connection);
@@ -41,7 +45,7 @@ connection.on("open", () => {
 });
 
 connection.on("error", (err) => {
-  console.log(chalk`{red [{bold DATABASE}] Error: ${err.stack}}`);
+	console.log(chalk`{red [{bold DATABASE}] Error: ${err.stack}}`);
 });
 
 //client.commands = new Discord.Collection();

@@ -594,6 +594,87 @@ module.exports = {
 					description: "The server's prefix"
 				}
 			}
-		}
+		},
+		"INVITE_BOT": {
+			string: "You can invite {{name}} to your server with this link: {{link}}",
+			context: "The response to the invite command",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The bot name"
+				},
+				link: {
+					to_replace: "{{link}}",
+					description: "The bot invite link"
+				}
+			}
+		},
+		"INVITE_RESTRICTED": {
+			string: "This bot cannot be invited publicly. You can invite the public version with this link: {{link}}",
+			context: "Used when the invite command is run on a private instance",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The bot invite link"
+				}
+			}
+		},
+		"NOTIFICATIONS_ENABLED": {
+			string: "Notifications are **enabled**. You will receive a DM when an action is taken on any of your suggestions.",
+			context: "Shown when a user has enabled notifications"
+		},
+		"NOTIFICATIONS_DISABLED": {
+			string: "Notifications are **disabled**. You will not receive a DM when an action is taken on any of your suggestions.",
+			context: "Shown when a user has disabled notifications"
+		},
+		"NOTIFICATIONS_ALREADY_ENABLED": {
+			string: "DM Notifications are already enabled.",
+			context: "Shown when notifications are enabled and a user tries to enable them"
+		},
+		"NOTIFICATIONS_ALREADY_DISABLED": {
+			string: "DM Notifications are already disabled.",
+			context: "Shown when notifications are disabled and a user tries to disable them"
+		},
+		"SELF_NOTIFICATIONS_ENABLED": {
+			string: "Self Change Notifications are **enabled**. You will receive a DM when you take action on any of your own suggestions.",
+			context: "Shown when a user has enabled self notifications"
+		},
+		"SELF_NOTIFICATIONS_DISABLED": {
+			string: "Self Change Notifications are **disabled**. You will not receive a DM when you take action on any of your own suggestions.",
+			context: "Shown when a user has disabled notifications"
+		},
+		"SELF_NOTIFICATIONS_ALREADY_ENABLED": {
+			string: "Self Change Notifications are already enabled.",
+			context: "Shown when self notifications are enabled and a user tries to enable them"
+		},
+		"SELF_NOTIFICATIONS_ALREADY_DISABLED": {
+			string: "Self Change Notifications are already disabled.",
+			context: "Shown when self notifications are disabled and a user tries to disable them"
+		},
+		"ON_OFF_TOGGLE_ERROR": {
+			string: "You must specify `on`, `off`, or `toggle`.",
+			context: "Used when a configuration element requires on, off, or toggle parameters"
+		},
+		"PING_DEVELOPERS_HEADER": {
+			string: "Developers",
+			context: "Developers header for the ping command"
+		},
+		"PING_GUILD_COUNT_HEADER": {
+			string: "Guild Count",
+			context: "Guild Count header for the ping command"
+		},
+		"PING_UPTIME_HEADER": {
+			string: "Uptime",
+			context: "Uptime header for the ping command"
+		},
+		"PING_CLIENT_PING_HEADER": {
+			string: "Client Ping",
+			context: "Client Ping header for the ping command"
+		},
+		"PING_EDIT_TIME_HEADER": {
+			string: "Edit Time",
+			context: "Edit Time header for the ping command"
+		},
+
 	}
 };

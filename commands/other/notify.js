@@ -1,5 +1,5 @@
-const { emoji } = require("../../config.json");
 const { dbQuery, dbModify } = require("../../coreFunctions.js");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "notify",
@@ -14,66 +14,66 @@ module.exports = {
 	},
 	do: async (message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
-		if (!args[0]) return message.channel.send(`You currently have notifications ${qUserDB.notify ? "**enabled**.\nYou will receive a DM when an action is taken on any of your suggestions": "**disabled**.\nYou will not receive a DM when an action is taken on any of your suggestions."}`);
+		if (!args[0]) return message.channel.send(string(qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED"));
 		switch (args[0].toLowerCase()) {
 		case "enable":
 		case "on":
 		case "true":
 		case "yes": {
-			if (qUserDB.notify) return message.channel.send(`<:${emoji.x}> You already have notifications enabled!`);
+			if (qUserDB.notify) return message.channel.send(string("NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
 			qUserDB.notify = true;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(`<:${emoji.check}> Notifications have been **enabled**. You will receive a DM when an action is taken on any of your suggestions.`);
+			return message.channel.send(string("NOTIFICATIONS_ENABLED", {}, "success"));
 		}
 		case "disable":
 		case "off":
 		case "false":
 		case "no": {
-			if (!qUserDB.notify) return message.channel.send(`<:${emoji.x}> You already have notifications disabled!`);
+			if (!qUserDB.notify) return message.channel.send(string("NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
 			qUserDB.notify = false;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(`<:${emoji.check}> Notifications have been **disabled**. You will not receive a DM when an action is taken on any of your suggestions.`);
+			return message.channel.send(string("NOTIFICATIONS_DISABLED", {}, "success"));
 		}
 		case "toggle":
 		case "switch": {
 			qUserDB.notify = !qUserDB.notify;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(`<:${emoji.check}> Notifications have been ${qUserDB.notify ? "**enabled**. You will receive a DM when an action is taken on any of your suggestions": "**disabled**. You will not receive a DM when an action is taken on any of your suggestions."}`);
+			return message.channel.send(string(qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED", {}, "success"));
 		}
 		case "self": {
-			if (!args[1]) return message.channel.send(`You currently have self change notifications ${qUserDB.selfnotify ? "**enabled**.\nYou will receive a DM when you take action on any of your suggestions": "**disabled**.\nYou will not receive a DM when you take action on any of your suggestions."}`);
+			if (!args[1]) return message.channel.send(string(qUserDB.selfnotify ? "SELF_NOTIFICATIONS_ENABLED" : "SELF_NOTIFICATIONS_DISABLED"));
 			switch (args[1].toLowerCase()) {
 			case "enable":
 			case "on":
 			case "true":
 			case "yes": {
-				if (qUserDB.selfnotify) return message.channel.send(`<:${emoji.x}> You already have notifications for actions on your own suggestions enabled!`);
+				if (qUserDB.selfnotify) return message.channel.send(string("SELF_NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
 				qUserDB.selfnotify = true;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(`<:${emoji.check}> Self change notifications have been **enabled**. You will receive a DM when you take action on any of your own suggestions.`);
+				return message.channel.send(string("SELF_NOTIFICATIONS_ENABLED", {}, "success"));
 			}
 			case "disable":
 			case "off":
 			case "false":
 			case "no": {
-				if (!qUserDB.selfnotify) return message.channel.send(`<:${emoji.x}> You already have notifications for actions on your own suggestions disabled!`);
+				if (!qUserDB.selfnotify) return message.channel.send(string("SELF_NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
 				qUserDB.selfnotify = false;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(`<:${emoji.check}> Self change notifications have been **disabled**. You will not receive a DM when you take action on any of your own suggestions.`);
+				return message.channel.send(string("SELF_NOTIFICATIONS_DISABLED", {}, "success"));
 			}
 			case "toggle":
 			case "switch": {
 				qUserDB.selfnotify = !qUserDB.selfnotify;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(`<:${emoji.check}> Self change notifications have been ${qUserDB.selfnotify ? "**enabled**. You will receive a DM when you take action on any of your own suggestions": "**disabled**. You will not receive a DM when you take action on any of your own suggestions."}`);
+				return message.channel.send(string(qUserDB.notify ? "SELF_NOTIFICATIONS_ENABLED" : "SELF_NOTIFICATIONS_DISABLED", {}, "success"));
 			}
 			default:
-				return message.channel.send(`<:${emoji.x}> You must specify \`on\`, \`off\`, or \`toggle\`.`);
+				return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
 
 		}
 		default:
-			return message.channel.send(`<:${emoji.x}> You must specify \`on\`, \`off\`, or \`toggle\`.`);
+			return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
 		}
 	}
 };
