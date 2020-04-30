@@ -661,7 +661,7 @@ module.exports = {
 		},
 		"PING_GUILD_COUNT_HEADER": {
 			string: "Guild Count",
-			context: "Guild Count header for the ping command"
+			context: "Guild Count header for the ping command (also used in stats)"
 		},
 		"PING_UPTIME_HEADER": {
 			string: "Uptime",
@@ -675,6 +675,36 @@ module.exports = {
 			string: "Edit Time",
 			context: "Edit Time header for the ping command"
 		},
+		"STATS_TITLE": {
+			string: "Suggestion Statistics",
+			context: "Title for the stats command embed"
+		},
+		"GLOBAL_STATS_TITLE": {
+			string: "Global Statistics",
+			context: "Title for the global stats portion of the stats command embed"
+		},
+		"SERVER_STATS_TITLE": {
+			string: "Server Statistics for **{{server}}**",
+			context: "Title for the server stats portion of the stats command embed",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "A server name"
+				}
+			}
+		},
+		"USER_STATS_TITLE": {
+			string: "Your Statistics",
+			context: "Title for the user stats portion of the stats command embed"
+		},
+		"TOTAL_CONFIGS_STATS": {
+			string: "Server Configurations",
+			context: "Indicator for total server configurations in the stats command"
+		},
+		"TOTAL_SUBMITTED_STATS": {
+			string: "Suggestions Submitted Globally",
+			context: "Indicator for total suggestions submitted globally in the stats command"
+		}
 
 	}
 };
