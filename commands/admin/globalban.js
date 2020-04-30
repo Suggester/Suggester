@@ -1,6 +1,5 @@
-const { emoji } = require("../../config.json");
 const { dbQuery, dbModifyId, fetchUser } = require("../../coreFunctions");
-const { string } = require("../../utils/strings")
+const { string } = require("../../utils/strings");
 
 module.exports = {
 	controls: {

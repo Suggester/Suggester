@@ -1,6 +1,6 @@
-const { emoji } = require("../../config.json");
 const { dbModifyId, dbQuery } = require("../../coreFunctions");
 const { string } = require("../../utils/strings");
+
 module.exports = {
 	controls: {
 		name: "whitelist",
@@ -31,7 +31,7 @@ module.exports = {
 			return message.channel.send(string("GUILD_WHITELIST_REMOVE_SUCCESS", { guild: qServerDB.id }, "success"));
 		}
 		default:
-			return message.channel.send(string("ADD_REMOVE_INVALID_ACTION_ERROR", {}, "error"))
+			return message.channel.send(string("ADD_REMOVE_INVALID_ACTION_ERROR", {}, "error"));
 		}
 	}
 };

@@ -38,7 +38,7 @@ module.exports = {
 	 */
 	checkPermissions: async (member, client) => {
 		if (!member || !member.id || !client) return 10;
-    if (client.admins.has(member.id)) return 0;
+		if (client.admins.has(member.id)) return 0;
 		//if (config.developer.includes(member.id)) return 0;
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
