@@ -2,7 +2,7 @@ require("./Structures/GuildMember");
 require("./Structures/User");
 require("./Structures/Guild");
 
-const { Client, Team, TeamMember, Collection } = require("discord.js");
+const { Client, Team, TeamMember, Collection, User } = require("discord.js");
 const config = require("../config.json");
 const chalk = require("chalk");
 
@@ -26,12 +26,15 @@ module.exports = class extends Client {
   async fetchTeam () {
     const { owner } = await super.fetchApplication();
 
-    if (owner instanceof Team) {
-      return owner.members.map(({ user }) => user);
-    }
-    if (owner instanceof TeamMember) {
-      return [owner.user];
-    }
-    throw new Error("Error fetching team members");
-  }
-}
+		if (owner instanceof Team) {
+			return owner.members.map(({ user }) => user);
+		}
+		if (owner instanceof TeamMember) {
+			return [owner.user];
+		}
+		if (owner instanceof User) {
+			return [owner];
+		}
+		throw new Error("Error fetching team members");
+	}
+};
