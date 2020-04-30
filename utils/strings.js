@@ -704,6 +704,10 @@ module.exports = {
 		"TOTAL_SUBMITTED_STATS": {
 			string: "Suggestions Submitted Globally",
 			context: "Indicator for total suggestions submitted globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_APPROVED_STATS": {
+			string: "Suggestions Approved Globally",
+			context: "Indicator for total suggestions approved globally in the stats command"
 		}
 
 	}

@@ -35,7 +35,7 @@ module.exports = {
 		let suggestionsUserServer = suggestions.filter(s => s.suggester === message.author.id && s.id === server.id);
 		let statEmbed = new Discord.MessageEmbed()
 			.setTitle(string("STATS_TITLE"))
-			.addField(string("GLOBAL_STATS_TITLE"), `${string("PING_GUILD_COUNT_HEADER")}: **${client.guilds.cache.size}**\n${string("TOTAL_CONFIGS_STATS")}: **${totalConfiguredServers}**\n${string("TOTAL_SUBMITTED_STATS")}: **${suggestions.length.toString()}**\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
+			.addField(string("GLOBAL_STATS_TITLE"), `${string("PING_GUILD_COUNT_HEADER")}: **${client.guilds.cache.size}**\n${string("TOTAL_CONFIGS_STATS")}: **${totalConfiguredServers}**\n${string("TOTAL_SUBMITTED_STATS")}: **${suggestions.length.toString()}**\n${string("TOTAL_SUBMITTED_APPROVED_STATS")}: **${approvedSuggestionsGlobal.length}**\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
 			.addField(string("SERVER_STATS_TITLE", { server: server.name }), `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
 			.addField(string("USER_STATS_TITLE"), `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server`)
 			.setColor(colors.default);
