@@ -155,23 +155,23 @@ module.exports = {
 		},
 		"RESULT_FIELD_TITLE": {
 			string: "Result",
-			description: "The result of a command"
+			context: "The result of a command"
 		},
 		"DEPLOY_NOT_PRODUCTION": {
 			string: "I am not running in the production environment. You probably don't want to deploy now.",
-			description: "Error produced when the bot is not running in the production environment and a deploy is attempted"
+			context: "Error produced when the bot is not running in the production environment and a deploy is attempted"
 		},
 		"PROCESSING": {
 			string: "Processing... this may take a moment",
-			description: "String used when the bot is processing an input"
+			context: "String used when the bot is processing an input"
 		},
 		"CANCELLED": {
 			string: "Cancelled",
-			description: "String used when an action is cancelled"
+			context: "String used when an action is cancelled"
 		},
 		"EVAL_FLAGGED_DESTRUCTIVE": {
 			string: "This command has been flagged as possibly destructive. Please recheck your command and confirm you would like to execute it.",
-			description: "Confirmation sent when an eval is flagged as possibly destructive"
+			context: "Confirmation sent when an eval is flagged as possibly destructive"
 		},
 		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
@@ -698,16 +698,40 @@ module.exports = {
 			context: "Title for the user stats portion of the stats command embed"
 		},
 		"TOTAL_CONFIGS_STATS": {
-			string: "Server Configurations",
+			string: "Server configurations",
 			context: "Indicator for total server configurations in the stats command"
 		},
+		"TOTAL_GUILD_COUNT_STATS": {
+			string: "Guild count",
+			context: "Indicator for total servers in the stats command"
+		},
 		"TOTAL_SUBMITTED_STATS": {
-			string: "Suggestions Submitted Globally",
+			string: "Suggestions submitted globally",
 			context: "Indicator for total suggestions submitted globally in the stats command"
 		},
 		"TOTAL_SUBMITTED_APPROVED_STATS": {
-			string: "Suggestions Approved Globally",
+			string: "Suggestions approved globally",
 			context: "Indicator for total suggestions approved globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_DENIED_STATS": {
+			string: "Suggestions denied globally",
+			context: "Indicator for total suggestions denied globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_SERVER_STATS": {
+			string: "Suggestions submitted on this server",
+			context: "Indicator for total suggestions submitted on a server in the stats command"
+		},
+		"TOTAL_DENIED_SERVER_STATS": {
+			string: "Suggestions denied on this server",
+			context: "Indicator for total suggestions denied on a server in the stats command"
+		},
+		"TOTAL_APPROVED_SERVER_STATS": {
+			string: "Suggestions approved on this server",
+			context: "Indicator for total suggestions approved on a server in the stats command"
+		},
+		"BOT_TIME_SERVER_STATS": {
+			string: "Time in server",
+			context: "Indicator for time the bot has spent on a server in the stats command"
 		}
 
 	}

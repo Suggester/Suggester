@@ -35,9 +35,9 @@ module.exports = {
 		let suggestionsUserServer = suggestions.filter(s => s.suggester === message.author.id && s.id === server.id);
 		let statEmbed = new Discord.MessageEmbed()
 			.setTitle(string("STATS_TITLE"))
-			.addField(string("GLOBAL_STATS_TITLE"), `${string("PING_GUILD_COUNT_HEADER")}: **${client.guilds.cache.size}**\n${string("TOTAL_CONFIGS_STATS")}: **${totalConfiguredServers}**\n${string("TOTAL_SUBMITTED_STATS")}: **${suggestions.length.toString()}**\n${string("TOTAL_SUBMITTED_APPROVED_STATS")}: **${approvedSuggestionsGlobal.length}**\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
-			.addField(string("SERVER_STATS_TITLE", { server: server.name }), `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
-			.addField(string("USER_STATS_TITLE"), `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server`)
+			.addField(string("GLOBAL_STATS_TITLE"), `${string("TOTAL_GUILD_COUNT_STATS")}: **${client.guilds.cache.size}**\n${string("TOTAL_CONFIGS_STATS")}: **${totalConfiguredServers}**\n${string("TOTAL_SUBMITTED_STATS")}: **${suggestions.length.toString()}**\n${string("TOTAL_SUBMITTED_APPROVED_STATS")}: **${approvedSuggestionsGlobal.length}**\n${string("TOTAL_SUBMITTED_DENIED_STATS")}: **${deniedSuggestionsGlobal.length}**`)
+			.addField(string("SERVER_STATS_TITLE", { server: server.name }), `${string("TOTAL_SUBMITTED_SERVER_STATS")}: **${totalSuggestionsServer.length}**\n${string("TOTAL_APPROVED_SERVER_STATS")}: **${approvedSuggestionsServer.length}**\n${string("TOTAL_DENIED_SERVER_STATS")}: **${deniedSuggestionsServer.length}**\n${string("BOT_TIME_SERVER_STATS")}: **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
+			.addField(string("USER_STATS_TITLE"), `${string("TOTAL_SUBMITTED_STATS")}: **${suggestionsUserGlobal.length}**\n${string("TOTAL_SUBMITTED_SERVER_STATS")}: **${suggestionsUserServer.length}**`)
 			.setColor(colors.default);
 		message.channel.send(statEmbed);
 		message.channel.stopTyping();
