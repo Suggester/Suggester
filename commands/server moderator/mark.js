@@ -100,7 +100,7 @@ module.exports = {
 			client.channels.cache.get(qServerDB.config.channels.archive).send(suggestionEditEmbed).then(async sent => {
 				let replyEmbed = new Discord.MessageEmbed()
 					.setTitle("Status Edited")
-					.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
+					.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
 					.setColor(statusInfo[0])
 					.setFooter(`Suggestion ID: ${id.toString()}`)
 					.addField("Status", statusInfo[1]);
