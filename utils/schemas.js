@@ -73,7 +73,6 @@ const user = new Schema({
 	ack: String,
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
-	selfnotify: { type: Boolean, default: true},
 	flags: [ String ]
 });
 

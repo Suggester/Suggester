@@ -9,7 +9,7 @@ module.exports = {
 		enabled: true,
 		docs: "staff/deny",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10,
+		cooldown: 5,
 		cooldownMessage: "Need to deny multiple suggestions? Try the `mdeny` command!"
 	},
 	do: async (message, client, args, Discord) => {
@@ -93,10 +93,7 @@ module.exports = {
 		await message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		let selfNotify;
-		if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-		else selfNotify = true;
-		if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
+		if (qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`Your Suggestion in **${message.guild.name}** Was Denied`)
 				.setFooter(`Suggestion ID: ${id.toString()}`)

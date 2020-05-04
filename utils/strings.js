@@ -7,7 +7,8 @@ module.exports = {
 		let newString = string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
-				if (replaced[r]) newString = newString.replace(string.replaced[r].to_replace, replaced[r]);
+				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
+				//if (replaced[r]) newString.replace(new RegExp(string.replaced[r].to_replace.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "g"), replaced[r]);
 			});
 		}
 		switch (prefix_with) {
@@ -107,7 +108,7 @@ module.exports = {
 		},
 		"NO_MODIFICATION_PARAMS_ERROR": {
 			string: "You must specify modification parameters!",
-			context: "Shows when trying to modify the database with no modification parameters"
+			context: "Shown when trying to modify the database with no modification parameters"
 		},
 		"DB_EMBED_TITLE_MODIFIED": {
 			string: "Database Modified",
@@ -492,11 +493,11 @@ module.exports = {
 			context: "Title for the Config Status field of the configuration list"
 		},
 		"CFG_STATUS_GOOD": {
-			string: "Bot Configured, Commands Will Work",
+			string: "Bot configured, commands will work",
 			context: "Shown when the bot is configured enough to work"
 		},
 		"CFG_STATUS_BAD": {
-			string: "Not Fully Configured, Bot Will Not Work",
+			string: "Not fully configured, bot will not work",
 			context: "Shown when the bot is not configured enough to work"
 		},
 		"CFG_PERMISSIONS_TITLE": {
@@ -635,22 +636,6 @@ module.exports = {
 			string: "DM Notifications are already disabled.",
 			context: "Shown when notifications are disabled and a user tries to disable them"
 		},
-		"SELF_NOTIFICATIONS_ENABLED": {
-			string: "Self Change Notifications are **enabled**. You will receive a DM when you take action on any of your own suggestions.",
-			context: "Shown when a user has enabled self notifications"
-		},
-		"SELF_NOTIFICATIONS_DISABLED": {
-			string: "Self Change Notifications are **disabled**. You will not receive a DM when you take action on any of your own suggestions.",
-			context: "Shown when a user has disabled notifications"
-		},
-		"SELF_NOTIFICATIONS_ALREADY_ENABLED": {
-			string: "Self Change Notifications are already enabled.",
-			context: "Shown when self notifications are enabled and a user tries to enable them"
-		},
-		"SELF_NOTIFICATIONS_ALREADY_DISABLED": {
-			string: "Self Change Notifications are already disabled.",
-			context: "Shown when self notifications are disabled and a user tries to disable them"
-		},
 		"ON_OFF_TOGGLE_ERROR": {
 			string: "You must specify `on`, `off`, or `toggle`.",
 			context: "Used when a configuration element requires on, off, or toggle parameters"
@@ -732,7 +717,177 @@ module.exports = {
 		"BOT_TIME_SERVER_STATS": {
 			string: "Time in server",
 			context: "Indicator for time the bot has spent on a server in the stats command"
+		},
+		"UNCONFIGURED_ERROR": {
+			string: "You must configure your server to use this command. Please use the `setup` command.",
+			context: "Used when a server does not have a database entry"
+		},
+		"NO_ALLOWED_ROLE_ERROR": {
+			string: "You do not have a role with permission to submit suggestions.\nThe following roles can submit suggestions: {{roleList}}",
+			context: "Error when a user tries to suggest without an approved role",
+			replaced: {
+				roleList: {
+					to_replace: "{{roleList}}",
+					description: "A list of roles that are allowed to submit suggestions"
+				}
+			}
+		},
+		"NOT_COMMAND_CHANNEL_ERROR": {
+			string: "Suggestions can only be submitted in the {{channel}} channel.",
+			context: "Error when a user uses suggest in a non-command channel",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The mention of the commands channel"
+				}
+			}
+		},
+		"NO_SUGGESTION_ERROR": {
+			string: "Please provide a suggestion!",
+			context: "Error when a user does not provide a suggestion in the suggest command"
+		},
+		"TOO_LONG_SUGGESTION_ERROR": {
+			string: "Suggestions cannot be longer than 1024 characters.",
+			context: "Error when a suggestion is too long"
+		},
+		"NO_REVIEW_CHANNEL_ERROR": {
+			string: "I could not find your suggestion review channel! Please make sure you have configured one.",
+			context: "Error when the configured staff review channel is not found"
+		},
+		"NO_SUGGESTION_CHANNEL_ERROR": {
+			string: "I could not find your approved suggestions channel! Please make sure you have configured one.",
+			context: "Error when the configured suggestions channel is not found"
+		},
+		"SUGGESTION_FROM_TITLE": {
+			string: "Suggestion from {{user}}",
+			context: "Title for embeds showing who the suggesting user is",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user's tag"
+				}
+			}
+		},
+		"SUGGESTION_FOOTER": {
+			string: "Suggestion ID: {{id}} | Submitted at",
+			context: "Footer for suggestion embeds",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_SUBMITTED_REVIEW_SUCCESS": {
+			string: "Your suggestion has been submitted for review!",
+			context: "Success message when a suggestion is sent for review"
+		},
+		"SUGGESTION_REVIEW_EMBED_TITLE": {
+			string: "Suggestion Awaiting Review (#{{id}})",
+			context: "Title for the suggestion review embed",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				}
+			}
+		},
+		"USER_INFO_HEADER": {
+			string: "{{user}} (ID: {{id}})",
+			context: "Used when a header using the user's tag and ID is present",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A user ID"
+				}
+			}
+		},
+		"APPROVE_DENY_HEADER": {
+			string: "Approve/Deny",
+			context: "Header for the approve/deny field of the review embed"
+		},
+		"REVIEW_COMMAND_INFO": {
+			string: "Use **{{prefix}}approve {{id}}** to send to {{channel}}\nUse **{{prefix}}deny {{id}}** to deny",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The suggestions channel mention"
+				}
+			}
+		},
+		"WITH_ATTACHMENT_HEADER": {
+			string: "With Attachment",
+			context: "Header used when a suggestion has an attachment"
+		},
+		"SUGGESTION_HEADER": {
+			string: "Suggestion",
+			context: "Header used for the suggestion content"
+		},
+		"LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE": {
+			string: "{{user}} submitted a suggestion for review",
+			context: "Title in the log embed when a suggestion is submitted for review",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE": {
+			string: "{{user}} submitted a suggestion",
+			context: "Title in the log embed when a suggestion is submitted in autoapprove mode",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"LOG_SUGGESTION_SUBMITTED_FOOTER": {
+			string: "Suggestion ID: {{id}} | User ID: {{user}}",
+			context: "Description of the log embed when a suggestion is submitted for review",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				},
+				user: {
+					to_replace: "{{user}}",
+					description: "A user ID"
+				}
+			}
+		},
+		"SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS": {
+			string: "Your suggestion has been added to the {{channel}} channel!",
+			context: "Success message when a suggestion is submitted in the autoapprove mode",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "Mention of the suggestion channel"
+				}
+			}
+		},
+		"SUPPORT_INVITE": {
+			string: "Need help with the bot? Join our support server at {{link}} 😉",
+			context: "Response to the support command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the support server"
+				}
+			}
 		}
-
 	}
 };

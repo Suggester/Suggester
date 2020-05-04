@@ -25,7 +25,7 @@ module.exports = {
 				return !role ? `${string(title, {}, fatal ? "error" : "success")} ${string("NONE_CONFIGURED")}` : role;
 			} else {
 				let roles = [];
-				if (roleList.length < 1) {
+				if (roleList.length > 0) {
 					roleList.forEach(roleId => {
 						if (server.roles.cache.get(roleId)) {
 							roles.push(`${server.roles.cache.get(roleId).name} (ID: \`${roleId}\`)`);

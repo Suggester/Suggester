@@ -10,7 +10,7 @@ module.exports = {
 		enabled: true,
 		docs: "all/notify",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 5
 	},
 	do: async (message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
@@ -39,38 +39,6 @@ module.exports = {
 			qUserDB.notify = !qUserDB.notify;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
 			return message.channel.send(string(qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED", {}, "success"));
-		}
-		case "self": {
-			if (!args[1]) return message.channel.send(string(qUserDB.selfnotify ? "SELF_NOTIFICATIONS_ENABLED" : "SELF_NOTIFICATIONS_DISABLED"));
-			switch (args[1].toLowerCase()) {
-			case "enable":
-			case "on":
-			case "true":
-			case "yes": {
-				if (qUserDB.selfnotify) return message.channel.send(string("SELF_NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
-				qUserDB.selfnotify = true;
-				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string("SELF_NOTIFICATIONS_ENABLED", {}, "success"));
-			}
-			case "disable":
-			case "off":
-			case "false":
-			case "no": {
-				if (!qUserDB.selfnotify) return message.channel.send(string("SELF_NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
-				qUserDB.selfnotify = false;
-				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string("SELF_NOTIFICATIONS_DISABLED", {}, "success"));
-			}
-			case "toggle":
-			case "switch": {
-				qUserDB.selfnotify = !qUserDB.selfnotify;
-				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string(qUserDB.notify ? "SELF_NOTIFICATIONS_ENABLED" : "SELF_NOTIFICATIONS_DISABLED", {}, "success"));
-			}
-			default:
-				return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
-			}
-
 		}
 		default:
 			return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
