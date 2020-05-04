@@ -812,6 +812,7 @@ module.exports = {
 		},
 		"REVIEW_COMMAND_INFO": {
 			string: "Use **{{prefix}}approve {{id}}** to send to {{channel}}\nUse **{{prefix}}deny {{id}}** to deny",
+			context: "Information in the review embed showing instructions on how to approve/deny",
 			replaced: {
 				prefix: {
 					to_replace: "{{prefix}}",
