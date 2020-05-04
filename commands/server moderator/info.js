@@ -55,7 +55,7 @@ module.exports = {
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":
 			embed.setColor(colors.yellow)
-				.addField("Internal Status", `Awaiting Staff Review ([Queue Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
+				.addField("Internal Status", `Awaiting Staff Review ([Queue Post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
 		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
@@ -111,7 +111,7 @@ module.exports = {
 					embed.addField("Upvotes", upCount.toString(), true)
 						.addField("Downvotes", downCount.toString(), true);
 				}
-				embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+				embed.addField("Suggestions Feed Post", `[Jump to post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
 			} else embed.addField("Additional Information", "This suggestion was transferred to the implemented suggestion archive channel");
 			break;
 		}
