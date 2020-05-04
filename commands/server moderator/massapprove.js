@@ -130,7 +130,7 @@ module.exports = {
 						.setTitle(`Your Suggestion in **${message.guild.name}** Was Approved!`)
 						.setFooter(`Suggestion ID: ${approved[s].suggestionId}`)
 						.setDescription(approved[s].suggestion || "[No Suggestion Content]")
-						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discordapp.com/channels/${message.guild.id}/${qServerDB.config.channels.suggestions}/${msg.id})`)
+						.addField("Suggestions Feed Post", `[Jump to Suggestion](https://discord.com/channels/${message.guild.id}/${qServerDB.config.channels.suggestions}/${msg.id})`)
 						.setColor(colors.green);
 					if (reason) dmEmbed.addField("Comment Added", reason);
 
