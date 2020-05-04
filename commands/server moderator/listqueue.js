@@ -121,7 +121,7 @@ module.exports = {
 		queuedSuggestions.forEach(suggestion => {
 			listarray.push({
 				"fieldTitle": `Suggestion #${suggestion.suggestionId.toString()}`,
-				"fieldDescription": `[Queue Post](https://discordapp.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
+				"fieldDescription": `[Queue Post](https://discord.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
 			});
 		});
 		if (!listarray[0]) return message.channel.send("There are no suggestions awaiting approval!");
