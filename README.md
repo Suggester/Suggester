@@ -1,4 +1,4 @@
-![Suggester Banner](https://cdn.discord.com/attachments/654421515646795784/671360271930884096/suggester_banner.png)
+![Suggester Banner](https://cdn.discordapp.com/attachments/654421515646795784/671360271930884096/suggester_banner.png)
 
 [![Discord](https://canary.discord.com/api/guilds/566002482166104066/widget.png)](https://discord.gg/a3NuakW)
 
