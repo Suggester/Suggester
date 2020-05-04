@@ -69,7 +69,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Comment Added")
-			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(`Official Comment from ${message.author.tag}`, comment)
 			.setColor(colors.blue)
 			.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -82,7 +82,7 @@ module.exports = {
 		if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
-				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField(`Official Comment from ${message.author.tag}`, comment)
 				.setColor(colors.blue)
 				.setFooter(`Suggestion ID: ${id.toString()}`);
