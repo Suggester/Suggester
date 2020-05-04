@@ -100,7 +100,7 @@ module.exports = {
 			client.channels.cache.get(qServerDB.config.channels.archive).send(suggestionEditEmbed).then(async sent => {
 				let replyEmbed = new Discord.MessageEmbed()
 					.setTitle("Status Edited")
-					.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
+					.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
 					.setColor(statusInfo[0])
 					.setFooter(`Suggestion ID: ${id.toString()}`)
 					.addField("Status", statusInfo[1]);
@@ -113,7 +113,7 @@ module.exports = {
 				if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify && selfNotify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
-						.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
+						.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
 						.addField("Status", statusInfo[1])
 						.setColor(statusInfo[0])
 						.setFooter(`Suggestion ID: ${id.toString()}`);
@@ -147,7 +147,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle("Status Edited")
-			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setColor(statusInfo[0])
 			.setFooter(`Suggestion ID: ${id.toString()}`)
 			.addField("Status", statusInfo[1]);
@@ -160,7 +160,7 @@ module.exports = {
 		if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify && selfNotify) {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
-				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 				.addField("Status", statusInfo[1])
 				.setColor(statusInfo[0])
 				.setFooter(`Suggestion ID: ${id.toString()}`);
