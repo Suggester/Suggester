@@ -8,7 +8,6 @@ module.exports = {
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
 				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
-				//if (replaced[r]) newString.replace(new RegExp(string.replaced[r].to_replace.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), "g"), replaced[r]);
 			});
 		}
 		switch (prefix_with) {
@@ -887,6 +886,74 @@ module.exports = {
 				link: {
 					to_replace: "{{link}}",
 					description: "The link to the support server"
+				}
+			}
+		},
+		"VERIFY_ACK_DEVELOPER": {
+			string: "Developer",
+			context: "Verify acknowledgement for Developer"
+		},
+		"VERIFY_ACK_GLOBAL_ADMIN": {
+			string: "Global Administrator",
+			context: "Verify acknowledgement for Global Administrator"
+		},
+		"VERIFY_ACK_GLOBAL_STAFF": {
+			string: "Suggester Staff Team",
+			context: "Verify acknowledgement for Suggester Staff Team"
+		},
+		"VERIFY_ACK_GLOBAL_BLACKLIST": {
+			string: "Blacklisted Globally",
+			context: "Verify acknowledgement for Blacklisted Globally"
+		},
+		"VERIFY_ACK_SERVER_ADMIN": {
+			string: "Server Admin",
+			context: "Verify acknowledgement for Server Admin"
+		},
+		"VERIFY_ACK_SERVER_STAFF": {
+			string: "Server Staff",
+			context: "Verify acknowledgement for Server Staff"
+		},
+		"VERIFY_ACK_SERVER_BLACKLIST": {
+			string: "Blacklisted on this server",
+			context: "Verify acknowledgement for Blacklisted on this server"
+		},
+		"VERIFY_TITLE_GLOBAL_ACKS": {
+			string: "Global Acknowledgements",
+			context: "Header for the global acknowledgements section of the verify command"
+		},
+		"VERIFY_TITLE_SERVER_ACKS": {
+			string: "Server Acknowledgements",
+			context: "Header for the server acknowledgements section of the verify command"
+		},
+		"VERIFY_FLAGS_TITLE": {
+			string: "User Flags",
+			context: "Header for the user flags section of the verify embed"
+		},
+		"VERIFY_NO_ACKS": {
+			string: "This user has no acknowledgements",
+			context: "Shown in the verify command when a user has no acknowledgements"
+		},
+		"VERIFY_PERMISSION_LEVEL_FOOTER": {
+			string: "Permission Level: {{level}}",
+			context: "The footer of the verify embed showing permission level",
+			replaced: {
+				level: {
+					to_replace: "{{level}}",
+					description: "The permission level of the user"
+				}
+			}
+		},
+		"VOTE_INFO": {
+			string: "You can vote for Suggester on various bot lists, which is a great way to support the bot! If you're in the Suggester support server ({{link}}), you can get special rewards for voting 🤩\n>>> __Links to Vote:__\n{{links}}",
+			context: "Response to the vote command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "Link to the support server"
+				},
+				links: {
+					to_replace: "{{links}}",
+					description: "Links to vote for the bot (takes up multiple lines)"
 				}
 			}
 		}

@@ -38,27 +38,15 @@ module.exports = {
 	 */
 	checkPermissions: async (member, client) => {
 		if (!member || !member.id || !client) return 10;
-    if (client.admins.has(member.id)) return 0;
-		//if (config.developer.includes(member.id)) return 0;
+		if (client.admins.has(member.id)) return 0;
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (member.hasPermission("MANAGE_GUILD")) return 2;
-		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
-		let hasAdminRole = false;
-		qServerDB.config.admin_roles.forEach(roleId => {
-			if (member.roles.cache.has(roleId)) hasAdminRole = true;
-		});
-		if (hasAdminRole) return 2;
-		if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) return 10;
-		let hasStaffRole = false;
-		qServerDB.config.staff_roles.forEach(roleId => {
-			if (member.roles.cache.has(roleId)) hasStaffRole = true;
-		});
-		if (hasStaffRole) return 3;
-		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;
+		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
+		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
+		if (qServerDB.config.blacklist.includes(member.id)) return 11;
 		return 10;
 	},
 	guildLog: (input, embed) => {
