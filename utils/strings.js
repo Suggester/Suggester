@@ -956,6 +956,180 @@ module.exports = {
 					description: "Links to vote for the bot (takes up multiple lines)"
 				}
 			}
+		},
+		"AUTOSETUP_WARNING": {
+			string: "⚠️ Automatic Setup Warning ⚠️\n**This setup will overwrite any previous configuration and add channels to your server.**\n\nIf you would like to continue with automatic setup, click the {{check}} reaction. If you would like to abort automatic setup, click the {{x}} reaction.",
+			context: "Warning when automatic setup is initiated",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"SETUP_CANCELLED": {
+			string: "**Setup Cancelled**",
+			context: "Message when setup is cancelled"
+		},
+		"AUTOMATIC_SETUP": {
+			string: "Automatic setup",
+			context: "Audit log reason for automatic setup"
+		},
+		"CREATE_LOG_CHANNEL": {
+			string: "Create suggestion log channel",
+			context: "Audit log reason for log channel webhook creation"
+		},
+		"AUTOMATIC_SETUP_COMPLETE": {
+			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command: https://suggester.js.org/#/admin/config",
+			context: "Message sent when automatic setup is complete",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
+		},
+		"CONFIG_HELP": {
+			string: "Please see https://suggester.js.org/#/admin/config for information about the config command. You can use `{{prefix}}autosetup` or `{{prefix}}setup` to automatically setup or walkthrough setting up your server",
+			context: "General help when the config command is used with no parameters"
+		},
+		"CFG_NO_ROLE_SPECIFIED_ERROR": {
+			string: "You must specify a role name, @mention, or ID!",
+			context: "Error when no role is specified for configuration"
+		},
+		"CFG_INVALID_ROLE_ERROR": {
+			string: "I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.",
+			context: "Error when an invalid role is specified for configuration"
+		},
+		"CFG_ALREADY_ADMIN_ROLE_ERROR": {
+			string: "This role has already been added as an admin role!",
+			context: "Error when a role has already been added as an admin role"
+		},
+		"CFG_ADMIN_ROLE_ADD_SUCCESS": {
+			string: "Added **{{role}}** to the list of server admin roles.",
+			context: "Success message when a role is added to the server admin role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_ADMIN_ROLE_ERROR": {
+			string: "This role is not currently an admin role.",
+			context: "Error when a role has not already been added as an admin role"
+		},
+		"CFG_ADMIN_ROLE_REMOVE_SUCCESS": {
+			string: "Removed **{{role}}** from the list of server admin roles.",
+			context: "Success message when a role is removed from the server admin role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_STAFF_ROLE_ERROR": {
+			string: "This role has already been added as a staff role!",
+			context: "Error when a role has already been added as a staff role"
+		},
+		"CFG_STAFF_ROLE_ADD_SUCCESS": {
+			string: "Added **{{role}}** to the list of server staff roles.",
+			context: "Success message when a role is added to the server staff role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_STAFF_ROLE_ERROR": {
+			string: "This role is not currently a staff role.",
+			context: "Error when a role has not already been added as a staff role"
+		},
+		"CFG_STAFF_ROLE_REMOVE_SUCCESS": {
+			string: "Removed **{{role}}** from the list of server staff roles.",
+			context: "Success message when a role is removed from the server staff role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_ALLOWED_ROLE_ERROR": {
+			string: "This role has already been given permission to submit suggestions.",
+			context: "Error when a role has already been added as an allowed suggesting role"
+		},
+		"CFG_ALLOWED_ROLE_ADD_SUCCESS": {
+			string: "Members with the **{{role}}** role can now submit suggestions.",
+			context: "Success message when a role is added to the allowed suggesting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_ALLOWED_ROLE_ERROR": {
+			string: "This role is not currently able to submit suggestions.",
+			context: "Error when a role has not already been added as an allowed suggestion role"
+		},
+		"CFG_ALLOWED_ROLE_REMOVE_SUCCESS": {
+			string: "Members with the **{{role}}** can no longer submit suggestions.",
+			context: "Success message when a role is removed from the allowed suggesting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_INVALID_ROLE_PARAM_ERROR": {
+			string: "Please specify `add`, `remove`, or `list`.",
+			context: "Error when a user specifies an invalid action for role configuration"
+		},
+		"CFG_RESET_APPROVED_ROLE_SUCCESS": {
+			string: "Successfully reset the approved suggestion role.",
+			context: "Success message when the approved suggestion role is reset"
+		},
+		"CFG_NO_MANAGE_ROLES_ERROR": {
+			string: "Please give {{bot}} the **Manage Roles** permission in order for the approved suggestion role to work.",
+			context: "Error when an approved suggestion role is configured but the bot does not have the Manage Roles permission",
+			replaced: {
+				bot: {
+					to_replace: "{{bot}}",
+					description: "The bot mention"
+				}
+			}
+		},
+		"CFG_ALREADY_APPROVED_ROLE_ERROR": {
+			string: "This role is already set to be given when a member's suggestion is approved!",
+			context: "Error when the specified approved suggestion role is already set"
+		},
+		"CFG_UNMANAGEABLE_ROLE_ERROR": {
+			string: "I am not able to give members this role. Please ensure my highest role is __above__ the **{{role}}** role and that it is not a managed role.",
+			context: "Error when the bot cannot give members an approved role",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_APPROVED_ROLE_SUCCESS": {
+			string: "Members who have their suggestion approved will now receive the **{{role}}** role.",
+			context: "Success message when the approved suggestion role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
 		}
 	}
 };

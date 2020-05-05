@@ -1,5 +1,6 @@
 const { emoji } = require("../../config.json");
 const { dbQuery, dbModify } = require("../../coreFunctions.js");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "autosetup",
@@ -13,7 +14,7 @@ module.exports = {
 		cooldown: 60
 	},
 	do: async (message, client, args, Discord) => {
-		message.channel.send(`⚠️ Automatic Setup Warning ⚠️\n**This setup will overwrite any previous configuration and add channels to your server.**\n\nIf you would like to continue with automatic setup, click the <:${emoji.check}> reaction. If you would like to abort automatic setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
+		message.channel.send(string("AUTOSETUP_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`})).then(async (checkMsg) => {
 			await checkMsg.react(emoji.check);
 			await checkMsg.react(emoji.x);
 			let checkMatches = emoji.check.match(/[a-z0-9~-]+:([0-9]+)/i)[1] || null;
@@ -30,15 +31,15 @@ module.exports = {
 				})
 				.then(async (collected) => {
 					if (collected.first().emoji.id === xMatches) {
-						return checkMsg.edit(`<:${emoji.x}> **Setup Cancelled**`);
+						return checkMsg.edit(string("SETUP_CANCELLED", {}, "error"));
 					} else {
 						checkMsg.delete();
 						//Start auto setup
 						let qServerDB = await dbQuery("Server", {id: message.guild.id});
 
 						let roles = message.guild.roles.cache.filter(role => role.permissions.has("MANAGE_GUILD") && !role.managed).map(r => r.id);
-						let category = await message.guild.channels.create("Suggester", { type: "category", reason: "Automatic setup" });
-						let suggestions = await message.guild.channels.create("suggestions", { type: "text", reason: "Automatic setup", parent: category.id, permissionOverwrites: [{
+						let category = await message.guild.channels.create("Suggester", { type: "category", reason: string("AUTOMATIC_SETUP") });
+						let suggestions = await message.guild.channels.create("suggestions", { type: "text", reason: string("AUTOMATIC_SETUP"), parent: category.id, permissionOverwrites: [{
 							id: client.user.id, 
 							allow: ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"]
 						}, 
@@ -47,7 +48,7 @@ module.exports = {
 							deny: ["ADD_REACTIONS", "SEND_MESSAGES"]
 						}]
 						});
-						let denied = await message.guild.channels.create("denied-suggestions", { type: "text", reason: "Automatic setup", parent: category.id, permissionOverwrites: [{
+						let denied = await message.guild.channels.create("denied-suggestions", { type: "text", reason: string("AUTOMATIC_SETUP"), parent: category.id, permissionOverwrites: [{
 							id: client.user.id,
 							allow: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"]
 						},
@@ -67,7 +68,7 @@ module.exports = {
 							id: r,
 							allow: ["VIEW_CHANNEL"]
 						}));
-						let review = await message.guild.channels.create("suggestion-review", { type: "text", reason: "Automatic setup", parent: category.id, permissionOverwrites: reviewPerms });
+						let review = await message.guild.channels.create("suggestion-review", { type: "text", reason: string("AUTOMATIC_SETUP"), parent: category.id, permissionOverwrites: reviewPerms });
 						let logPerms = [{
 							id: client.user.id,
 							allow: ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"]
@@ -79,8 +80,8 @@ module.exports = {
 							id: r,
 							allow: ["VIEW_CHANNEL"]
 						}));
-						let log = await message.guild.channels.create("suggestion-log", { type: "text", reason: "Automatic setup", parent: category.id, permissionOverwrites: logPerms });
-						let webhook = await log.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel"});
+						let log = await message.guild.channels.create("suggestion-log", { type: "text", reason: string("AUTOMATIC_SETUP"), parent: category.id, permissionOverwrites: logPerms });
+						let webhook = await log.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: string("CREATE_LOG_CHANNEL")});
 						qServerDB.config.loghook = {};
 						qServerDB.config.loghook.id = webhook.id;
 						qServerDB.config.loghook.token = webhook.token;
@@ -91,7 +92,7 @@ module.exports = {
 						qServerDB.config.channels.denied = denied.id;
 						qServerDB.config.channels.log = log.id;
 						await dbModify("Server", {id: message.guild.id}, qServerDB);
-						return message.channel.send(`<:${emoji.check}> Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command: https://suggester.js.org/#/admin/config`);
+						return message.channel.send(string("AUTOMATIC_SETUP_COMPLETE", { prefix: Discord.escapeMarkdown(qServerDB.config.prefix) }, "check"));
 					}
 				});
 		});

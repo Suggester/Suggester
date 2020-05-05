@@ -23,7 +23,9 @@ const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES",
 const client = new Client({
 	ws: { intents: intents},
 	disableMentions: "everyone",
-	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
+	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" },
+	messageCacheLifetime: 120,
+	messageSweepInterval: 300
 });
 
 if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);
@@ -48,8 +50,6 @@ connection.on("error", (err) => {
 	console.log(chalk`{red [{bold DATABASE}] Error: ${err.stack}}`);
 });
 
-//client.commands = new Discord.Collection();
-//client.cooldowns = new Discord.Collection();
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {
