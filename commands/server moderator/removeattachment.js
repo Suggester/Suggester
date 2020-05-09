@@ -5,7 +5,7 @@ module.exports = {
 		name: "removeattachment",
 		permission: 3,
 		aliases: ["rmattachment", "rmattach", "delattachment", "deleteattachment"],
-		usage: "removeattachment <suggestion id>",
+		usage: "removeattachment [suggestion id]",
 		description: "Removes a file from a suggestion",
 		enabled: true,
 		docs: "staff/removeattachment",

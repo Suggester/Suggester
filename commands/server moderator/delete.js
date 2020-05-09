@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "delete",
 		permission: 3,
-		usage: "delete <suggestion id> (reason)",
+		usage: "delete [suggestion id] (reason)",
 		description: "Deletes a suggestion",
 		enabled: true,
 		docs: "staff/delete",

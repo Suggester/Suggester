@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "deny",
 		permission: 3,
-		usage: "deny <suggestion id> (reason)",
+		usage: "deny [suggestion id] (reason)",
 		description: "Denies a suggestion",
 		enabled: true,
 		docs: "staff/deny",

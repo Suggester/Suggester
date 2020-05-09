@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		name: "massdelete",
 		permission: 3,
-		usage: "massdelete <suggestion ids> -r (reason)",
+		usage: "massdelete [suggestion ids] -r (reason)",
 		aliases: ["mdelete", "multidelete"],
 		description: "Deletes all specified suggestions",
 		enabled: true,

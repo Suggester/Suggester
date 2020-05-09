@@ -40,9 +40,9 @@ module.exports = {
 						let roles = message.guild.roles.cache.filter(role => role.permissions.has("MANAGE_GUILD") && !role.managed).map(r => r.id);
 						let category = await message.guild.channels.create("Suggester", { type: "category", reason: string("AUTOMATIC_SETUP") });
 						let suggestions = await message.guild.channels.create("suggestions", { type: "text", reason: string("AUTOMATIC_SETUP"), parent: category.id, permissionOverwrites: [{
-							id: client.user.id, 
+							id: client.user.id,
 							allow: ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"]
-						}, 
+						},
 						{
 							id: message.guild.id,
 							deny: ["ADD_REACTIONS", "SEND_MESSAGES"]

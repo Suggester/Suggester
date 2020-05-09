@@ -5,7 +5,7 @@ module.exports = {
 		name: "mark",
 		permission: 3,
 		aliases: ["status"],
-		usage: "mark <suggestion id> <status>",
+		usage: "mark [suggestion id] [status]",
 		description: "Marks a status for a suggestion",
 		enabled: true,
 		docs: "staff/mark",

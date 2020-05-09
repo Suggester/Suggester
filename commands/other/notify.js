@@ -5,7 +5,7 @@ module.exports = {
 		name: "notify",
 		permission: 10,
 		aliases: ["notifications"],
-		usage: "notify <on|off|toggle>",
+		usage: "notify [on|off|toggle]",
 		description: "Changes your notification settings",
 		enabled: true,
 		docs: "all/notify",

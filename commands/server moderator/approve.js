@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "approve",
 		permission: 3,
-		usage: "approve <suggestion id> (comment)",
+		usage: "approve [suggestion id] (comment)",
 		description: "Approves a suggestion",
 		enabled: true,
 		docs: "staff/approve",

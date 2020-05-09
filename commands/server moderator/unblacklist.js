@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "unblacklist",
 		permission: 3,
-		usage: "unblacklist <user>",
+		usage: "unblacklist [user]",
 		aliases: ["allow", "unbl"],
 		description: "Unblacklists a server member from using the bot",
 		enabled: true,

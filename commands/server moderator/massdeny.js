@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		name: "massdeny",
 		permission: 3,
-		usage: "massdeny <suggestion ids> -r (reason)",
+		usage: "massdeny [suggestion ids] -r (reason)",
 		aliases: ["mdeny", "multideny"],
 		description: "Denies all specified suggestions",
 		enabled: true,

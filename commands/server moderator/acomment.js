@@ -5,7 +5,7 @@ module.exports = {
 		name: "acomment",
 		permission: 3,
 		aliases: ["anonymouscomment"],
-		usage: "acomment <suggestion id> <comment>",
+		usage: "acomment [suggestion id] [comment]",
 		description: "Adds a comment to an approved suggestion anonymously",
 		enabled: true,
 		docs: "staff/acomment",

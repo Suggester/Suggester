@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "silentdeny",
 		permission: 3,
-		usage: "silentdeny <suggestion id> (reason)",
+		usage: "silentdeny [suggestion id] (reason)",
 		description: "Denies a suggestion without posting it to the denied suggestions feed",
 		enabled: true,
 		docs: "staff/silentdeny",

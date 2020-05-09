@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "info",
 		permission: 3,
-		usage: "info <suggestion id>",
+		usage: "info [suggestion id]",
 		description: "Shows information about a suggestion",
 		enabled: true,
 		docs: "staff/info",

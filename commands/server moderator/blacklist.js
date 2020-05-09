@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "blacklist",
 		permission: 3,
-		usage: "blacklist <user>",
+		usage: "blacklist [user]",
 		aliases: ["disallow", "bl"],
 		description: "Blacklists a user from using the bot in the server",
 		enabled: true,

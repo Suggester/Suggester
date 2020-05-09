@@ -5,7 +5,7 @@ module.exports = {
 		name: "deletecomment",
 		permission: 3,
 		aliases: ["delcomment", "dcomment", "rmcomment"],
-		usage: "deletecomment <comment id>",
+		usage: "deletecomment [comment id]",
 		description: "Deletes a comment on a suggestion",
 		enabled: true,
 		docs: "staff/deletecomment",

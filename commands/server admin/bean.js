@@ -4,7 +4,7 @@ module.exports = {
 	controls: {
 		name: "bean",
 		permission: 2,
-		usage: "bean <member> (reason)",
+		usage: "bean [member] (reason)",
 		description: "Beans a member from the server",
 		enabled: true,
 		docs: "",

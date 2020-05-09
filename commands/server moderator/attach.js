@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		name: "attach",
 		permission: 3,
-		usage: "attach <suggestion id> <attachment link>",
+		usage: "attach [suggestion id] [attachment link]",
 		description: "Attaches a file to an approved suggestion",
 		enabled: true,
 		docs: "staff/attach",

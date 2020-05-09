@@ -21,7 +21,7 @@ module.exports = {
 		name: "suggest",
 		permission: 10,
 		aliases: ["submit"],
-		usage: "suggest <suggestion>",
+		usage: "suggest [suggestion]",
 		description: "Submits a suggestion",
 		enabled: true,
 		docs: "all/suggest",
