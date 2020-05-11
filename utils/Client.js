@@ -2,7 +2,7 @@ require("./Structures/GuildMember");
 require("./Structures/User");
 require("./Structures/Guild");
 
-const { Client, Team, TeamMember, User, Collection } = require("discord.js");
+const { Client, Team, Collection, User } = require("discord.js");
 const config = require("../config.json");
 const chalk = require("chalk");
 
@@ -13,6 +13,8 @@ module.exports = class extends Client {
 		this.admins = new Set();
 		this.commands = new Collection();
 		this.cooldowns = new Collection();
+		this.config = config;
+
 
 		// add admins from the config to the team
 		if (config.developer && config.developer.length > 0) {
@@ -29,11 +31,8 @@ module.exports = class extends Client {
 		if (owner instanceof Team) {
 			return owner.members.map(({ user }) => user);
 		}
-		if (owner instanceof TeamMember) {
-			return [owner.user];
-		}
 		if (owner instanceof User) {
-			return [owner];
+			return [owner.user];
 		}
 		throw new Error("Error fetching team members");
 	}
