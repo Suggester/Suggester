@@ -103,10 +103,7 @@ module.exports = {
 					.catch();
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				let selfNotify;
-				if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-				else selfNotify = true;
-				if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
+				if (qServerDB.config.notify && qUserDB.notify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your Suggestion In **${message.guild.name}** Was Deleted`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)

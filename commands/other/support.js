@@ -1,4 +1,5 @@
 const { support_invite } = require("../../config.json");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "support",
@@ -11,6 +12,6 @@ module.exports = {
 		cooldown: 5
 	},
 	do: message => {
-		return message.reply(`Need help with the bot? Join our support server at https://discord.gg/${support_invite} 😉`);
+		return message.channel.send(string("SUPPORT_INVITE", { link: `https://discord.gg/${support_invite}` }));
 	}
 };

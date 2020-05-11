@@ -15,6 +15,7 @@ module.exports = class extends Client {
 		this.cooldowns = new Collection();
 		this.config = config;
 
+
 		// add admins from the config to the team
 		if (config.developer && config.developer.length > 0) {
 			for (const admin of config.developer) {

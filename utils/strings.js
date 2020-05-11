@@ -7,7 +7,7 @@ module.exports = {
 		let newString = string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
-				if (replaced[r]) newString = newString.replace(string.replaced[r].to_replace, replaced[r]);
+				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
 			});
 		}
 		switch (prefix_with) {
@@ -107,7 +107,7 @@ module.exports = {
 		},
 		"NO_MODIFICATION_PARAMS_ERROR": {
 			string: "You must specify modification parameters!",
-			context: "Shows when trying to modify the database with no modification parameters"
+			context: "Shown when trying to modify the database with no modification parameters"
 		},
 		"DB_EMBED_TITLE_MODIFIED": {
 			string: "Database Modified",
@@ -155,23 +155,23 @@ module.exports = {
 		},
 		"RESULT_FIELD_TITLE": {
 			string: "Result",
-			description: "The result of a command"
+			context: "The result of a command"
 		},
 		"DEPLOY_NOT_PRODUCTION": {
 			string: "I am not running in the production environment. You probably don't want to deploy now.",
-			description: "Error produced when the bot is not running in the production environment and a deploy is attempted"
+			context: "Error produced when the bot is not running in the production environment and a deploy is attempted"
 		},
 		"PROCESSING": {
 			string: "Processing... this may take a moment",
-			description: "String used when the bot is processing an input"
+			context: "String used when the bot is processing an input"
 		},
 		"CANCELLED": {
 			string: "Cancelled",
-			description: "String used when an action is cancelled"
+			context: "String used when an action is cancelled"
 		},
 		"EVAL_FLAGGED_DESTRUCTIVE": {
 			string: "This command has been flagged as possibly destructive. Please recheck your command and confirm you would like to execute it.",
-			description: "Confirmation sent when an eval is flagged as possibly destructive"
+			context: "Confirmation sent when an eval is flagged as possibly destructive"
 		},
 		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
@@ -492,11 +492,11 @@ module.exports = {
 			context: "Title for the Config Status field of the configuration list"
 		},
 		"CFG_STATUS_GOOD": {
-			string: "Bot Configured, Commands Will Work",
+			string: "Bot configured, commands will work",
 			context: "Shown when the bot is configured enough to work"
 		},
 		"CFG_STATUS_BAD": {
-			string: "Not Fully Configured, Bot Will Not Work",
+			string: "Not fully configured, bot will not work",
 			context: "Shown when the bot is not configured enough to work"
 		},
 		"CFG_PERMISSIONS_TITLE": {
@@ -592,6 +592,542 @@ module.exports = {
 				prefix: {
 					to_replace: "{{prefix}}",
 					description: "The server's prefix"
+				}
+			}
+		},
+		"INVITE_BOT": {
+			string: "You can invite {{name}} to your server with this link: {{link}}",
+			context: "The response to the invite command",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The bot name"
+				},
+				link: {
+					to_replace: "{{link}}",
+					description: "The bot invite link"
+				}
+			}
+		},
+		"INVITE_RESTRICTED": {
+			string: "This bot cannot be invited publicly. You can invite the public version with this link: {{link}}",
+			context: "Used when the invite command is run on a private instance",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The bot invite link"
+				}
+			}
+		},
+		"NOTIFICATIONS_ENABLED": {
+			string: "Notifications are **enabled**. You will receive a DM when an action is taken on any of your suggestions.",
+			context: "Shown when a user has enabled notifications"
+		},
+		"NOTIFICATIONS_DISABLED": {
+			string: "Notifications are **disabled**. You will not receive a DM when an action is taken on any of your suggestions.",
+			context: "Shown when a user has disabled notifications"
+		},
+		"NOTIFICATIONS_ALREADY_ENABLED": {
+			string: "DM Notifications are already enabled.",
+			context: "Shown when notifications are enabled and a user tries to enable them"
+		},
+		"NOTIFICATIONS_ALREADY_DISABLED": {
+			string: "DM Notifications are already disabled.",
+			context: "Shown when notifications are disabled and a user tries to disable them"
+		},
+		"ON_OFF_TOGGLE_ERROR": {
+			string: "You must specify `on`, `off`, or `toggle`.",
+			context: "Used when a configuration element requires on, off, or toggle parameters"
+		},
+		"PING_DEVELOPERS_HEADER": {
+			string: "Developers",
+			context: "Developers header for the ping command"
+		},
+		"PING_GUILD_COUNT_HEADER": {
+			string: "Guild Count",
+			context: "Guild Count header for the ping command (also used in stats)"
+		},
+		"PING_UPTIME_HEADER": {
+			string: "Uptime",
+			context: "Uptime header for the ping command"
+		},
+		"PING_CLIENT_PING_HEADER": {
+			string: "Client Ping",
+			context: "Client Ping header for the ping command"
+		},
+		"PING_EDIT_TIME_HEADER": {
+			string: "Edit Time",
+			context: "Edit Time header for the ping command"
+		},
+		"STATS_TITLE": {
+			string: "Suggestion Statistics",
+			context: "Title for the stats command embed"
+		},
+		"GLOBAL_STATS_TITLE": {
+			string: "Global Statistics",
+			context: "Title for the global stats portion of the stats command embed"
+		},
+		"SERVER_STATS_TITLE": {
+			string: "Server Statistics for **{{server}}**",
+			context: "Title for the server stats portion of the stats command embed",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "A server name"
+				}
+			}
+		},
+		"USER_STATS_TITLE": {
+			string: "Your Statistics",
+			context: "Title for the user stats portion of the stats command embed"
+		},
+		"TOTAL_CONFIGS_STATS": {
+			string: "Server configurations",
+			context: "Indicator for total server configurations in the stats command"
+		},
+		"TOTAL_GUILD_COUNT_STATS": {
+			string: "Guild count",
+			context: "Indicator for total servers in the stats command"
+		},
+		"TOTAL_SUBMITTED_STATS": {
+			string: "Suggestions submitted globally",
+			context: "Indicator for total suggestions submitted globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_APPROVED_STATS": {
+			string: "Suggestions approved globally",
+			context: "Indicator for total suggestions approved globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_DENIED_STATS": {
+			string: "Suggestions denied globally",
+			context: "Indicator for total suggestions denied globally in the stats command"
+		},
+		"TOTAL_SUBMITTED_SERVER_STATS": {
+			string: "Suggestions submitted on this server",
+			context: "Indicator for total suggestions submitted on a server in the stats command"
+		},
+		"TOTAL_DENIED_SERVER_STATS": {
+			string: "Suggestions denied on this server",
+			context: "Indicator for total suggestions denied on a server in the stats command"
+		},
+		"TOTAL_APPROVED_SERVER_STATS": {
+			string: "Suggestions approved on this server",
+			context: "Indicator for total suggestions approved on a server in the stats command"
+		},
+		"BOT_TIME_SERVER_STATS": {
+			string: "Time in server",
+			context: "Indicator for time the bot has spent on a server in the stats command"
+		},
+		"UNCONFIGURED_ERROR": {
+			string: "You must configure your server to use this command. Please use the `setup` command.",
+			context: "Used when a server does not have a database entry"
+		},
+		"NO_ALLOWED_ROLE_ERROR": {
+			string: "You do not have a role with permission to submit suggestions.\nThe following roles can submit suggestions: {{roleList}}",
+			context: "Error when a user tries to suggest without an approved role",
+			replaced: {
+				roleList: {
+					to_replace: "{{roleList}}",
+					description: "A list of roles that are allowed to submit suggestions"
+				}
+			}
+		},
+		"NOT_COMMAND_CHANNEL_ERROR": {
+			string: "Suggestions can only be submitted in the {{channel}} channel.",
+			context: "Error when a user uses suggest in a non-command channel",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The mention of the commands channel"
+				}
+			}
+		},
+		"NO_SUGGESTION_ERROR": {
+			string: "Please provide a suggestion!",
+			context: "Error when a user does not provide a suggestion in the suggest command"
+		},
+		"TOO_LONG_SUGGESTION_ERROR": {
+			string: "Suggestions cannot be longer than 1024 characters.",
+			context: "Error when a suggestion is too long"
+		},
+		"NO_REVIEW_CHANNEL_ERROR": {
+			string: "I could not find your suggestion review channel! Please make sure you have configured one.",
+			context: "Error when the configured staff review channel is not found"
+		},
+		"NO_SUGGESTION_CHANNEL_ERROR": {
+			string: "I could not find your approved suggestions channel! Please make sure you have configured one.",
+			context: "Error when the configured suggestions channel is not found"
+		},
+		"SUGGESTION_FROM_TITLE": {
+			string: "Suggestion from {{user}}",
+			context: "Title for embeds showing who the suggesting user is",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user's tag"
+				}
+			}
+		},
+		"SUGGESTION_FOOTER": {
+			string: "Suggestion ID: {{id}} | Submitted at",
+			context: "Footer for suggestion embeds",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_SUBMITTED_REVIEW_SUCCESS": {
+			string: "Your suggestion has been submitted for review!",
+			context: "Success message when a suggestion is sent for review"
+		},
+		"SUGGESTION_REVIEW_EMBED_TITLE": {
+			string: "Suggestion Awaiting Review (#{{id}})",
+			context: "Title for the suggestion review embed",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				}
+			}
+		},
+		"USER_INFO_HEADER": {
+			string: "{{user}} (ID: {{id}})",
+			context: "Used when a header using the user's tag and ID is present",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A user ID"
+				}
+			}
+		},
+		"APPROVE_DENY_HEADER": {
+			string: "Approve/Deny",
+			context: "Header for the approve/deny field of the review embed"
+		},
+		"REVIEW_COMMAND_INFO": {
+			string: "Use **{{prefix}}approve {{id}}** to send to {{channel}}\nUse **{{prefix}}deny {{id}}** to deny",
+			context: "Information in the review embed showing instructions on how to approve/deny",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The suggestions channel mention"
+				}
+			}
+		},
+		"WITH_ATTACHMENT_HEADER": {
+			string: "With Attachment",
+			context: "Header used when a suggestion has an attachment"
+		},
+		"SUGGESTION_HEADER": {
+			string: "Suggestion",
+			context: "Header used for the suggestion content"
+		},
+		"LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE": {
+			string: "{{user}} submitted a suggestion for review",
+			context: "Title in the log embed when a suggestion is submitted for review",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE": {
+			string: "{{user}} submitted a suggestion",
+			context: "Title in the log embed when a suggestion is submitted in autoapprove mode",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"LOG_SUGGESTION_SUBMITTED_FOOTER": {
+			string: "Suggestion ID: {{id}} | User ID: {{user}}",
+			context: "Description of the log embed when a suggestion is submitted for review",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				},
+				user: {
+					to_replace: "{{user}}",
+					description: "A user ID"
+				}
+			}
+		},
+		"SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS": {
+			string: "Your suggestion has been added to the {{channel}} channel!",
+			context: "Success message when a suggestion is submitted in the autoapprove mode",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "Mention of the suggestion channel"
+				}
+			}
+		},
+		"SUPPORT_INVITE": {
+			string: "Need help with the bot? Join our support server at {{link}} 😉",
+			context: "Response to the support command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"VERIFY_ACK_DEVELOPER": {
+			string: "Developer",
+			context: "Verify acknowledgement for Developer"
+		},
+		"VERIFY_ACK_GLOBAL_ADMIN": {
+			string: "Global Administrator",
+			context: "Verify acknowledgement for Global Administrator"
+		},
+		"VERIFY_ACK_GLOBAL_STAFF": {
+			string: "Suggester Staff Team",
+			context: "Verify acknowledgement for Suggester Staff Team"
+		},
+		"VERIFY_ACK_GLOBAL_BLACKLIST": {
+			string: "Blacklisted Globally",
+			context: "Verify acknowledgement for Blacklisted Globally"
+		},
+		"VERIFY_ACK_SERVER_ADMIN": {
+			string: "Server Admin",
+			context: "Verify acknowledgement for Server Admin"
+		},
+		"VERIFY_ACK_SERVER_STAFF": {
+			string: "Server Staff",
+			context: "Verify acknowledgement for Server Staff"
+		},
+		"VERIFY_ACK_SERVER_BLACKLIST": {
+			string: "Blacklisted on this server",
+			context: "Verify acknowledgement for Blacklisted on this server"
+		},
+		"VERIFY_TITLE_GLOBAL_ACKS": {
+			string: "Global Acknowledgements",
+			context: "Header for the global acknowledgements section of the verify command"
+		},
+		"VERIFY_TITLE_SERVER_ACKS": {
+			string: "Server Acknowledgements",
+			context: "Header for the server acknowledgements section of the verify command"
+		},
+		"VERIFY_FLAGS_TITLE": {
+			string: "User Flags",
+			context: "Header for the user flags section of the verify embed"
+		},
+		"VERIFY_NO_ACKS": {
+			string: "This user has no acknowledgements",
+			context: "Shown in the verify command when a user has no acknowledgements"
+		},
+		"VERIFY_PERMISSION_LEVEL_FOOTER": {
+			string: "Permission Level: {{level}}",
+			context: "The footer of the verify embed showing permission level",
+			replaced: {
+				level: {
+					to_replace: "{{level}}",
+					description: "The permission level of the user"
+				}
+			}
+		},
+		"VOTE_INFO": {
+			string: "You can vote for Suggester on various bot lists, which is a great way to support the bot! If you're in the Suggester support server ({{link}}), you can get special rewards for voting 🤩\n>>> __Links to Vote:__\n{{links}}",
+			context: "Response to the vote command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "Link to the support server"
+				},
+				links: {
+					to_replace: "{{links}}",
+					description: "Links to vote for the bot (takes up multiple lines)"
+				}
+			}
+		},
+		"AUTOSETUP_WARNING": {
+			string: "⚠️ Automatic Setup Warning ⚠️\n**This setup will overwrite any previous configuration and add channels to your server.**\n\nIf you would like to continue with automatic setup, click the {{check}} reaction. If you would like to abort automatic setup, click the {{x}} reaction.",
+			context: "Warning when automatic setup is initiated",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"SETUP_CANCELLED": {
+			string: "**Setup Cancelled**",
+			context: "Message when setup is cancelled"
+		},
+		"AUTOMATIC_SETUP": {
+			string: "Automatic setup",
+			context: "Audit log reason for automatic setup"
+		},
+		"CREATE_LOG_CHANNEL": {
+			string: "Create suggestion log channel",
+			context: "Audit log reason for log channel webhook creation"
+		},
+		"AUTOMATIC_SETUP_COMPLETE": {
+			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command: https://suggester.js.org/#/admin/config",
+			context: "Message sent when automatic setup is complete",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
+		},
+		"CONFIG_HELP": {
+			string: "Please see https://suggester.js.org/#/admin/config for information about the config command. You can use `{{prefix}}autosetup` or `{{prefix}}setup` to automatically setup or walkthrough setting up your server",
+			context: "General help when the config command is used with no parameters"
+		},
+		"CFG_NO_ROLE_SPECIFIED_ERROR": {
+			string: "You must specify a role name, @mention, or ID!",
+			context: "Error when no role is specified for configuration"
+		},
+		"CFG_INVALID_ROLE_ERROR": {
+			string: "I could not find a role based on your input! Make sure to specify a **role name**, **role @mention**, or **role ID**.",
+			context: "Error when an invalid role is specified for configuration"
+		},
+		"CFG_ALREADY_ADMIN_ROLE_ERROR": {
+			string: "This role has already been added as an admin role!",
+			context: "Error when a role has already been added as an admin role"
+		},
+		"CFG_ADMIN_ROLE_ADD_SUCCESS": {
+			string: "Added **{{role}}** to the list of server admin roles.",
+			context: "Success message when a role is added to the server admin role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_ADMIN_ROLE_ERROR": {
+			string: "This role is not currently an admin role.",
+			context: "Error when a role has not already been added as an admin role"
+		},
+		"CFG_ADMIN_ROLE_REMOVE_SUCCESS": {
+			string: "Removed **{{role}}** from the list of server admin roles.",
+			context: "Success message when a role is removed from the server admin role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_STAFF_ROLE_ERROR": {
+			string: "This role has already been added as a staff role!",
+			context: "Error when a role has already been added as a staff role"
+		},
+		"CFG_STAFF_ROLE_ADD_SUCCESS": {
+			string: "Added **{{role}}** to the list of server staff roles.",
+			context: "Success message when a role is added to the server staff role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_STAFF_ROLE_ERROR": {
+			string: "This role is not currently a staff role.",
+			context: "Error when a role has not already been added as a staff role"
+		},
+		"CFG_STAFF_ROLE_REMOVE_SUCCESS": {
+			string: "Removed **{{role}}** from the list of server staff roles.",
+			context: "Success message when a role is removed from the server staff role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_ALLOWED_ROLE_ERROR": {
+			string: "This role has already been given permission to submit suggestions.",
+			context: "Error when a role has already been added as an allowed suggesting role"
+		},
+		"CFG_ALLOWED_ROLE_ADD_SUCCESS": {
+			string: "Members with the **{{role}}** role can now submit suggestions.",
+			context: "Success message when a role is added to the allowed suggesting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_ALLOWED_ROLE_ERROR": {
+			string: "This role is not currently able to submit suggestions.",
+			context: "Error when a role has not already been added as an allowed suggestion role"
+		},
+		"CFG_ALLOWED_ROLE_REMOVE_SUCCESS": {
+			string: "Members with the **{{role}}** can no longer submit suggestions.",
+			context: "Success message when a role is removed from the allowed suggesting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_INVALID_ROLE_PARAM_ERROR": {
+			string: "Please specify `add`, `remove`, or `list`.",
+			context: "Error when a user specifies an invalid action for role configuration"
+		},
+		"CFG_RESET_APPROVED_ROLE_SUCCESS": {
+			string: "Successfully reset the approved suggestion role.",
+			context: "Success message when the approved suggestion role is reset"
+		},
+		"CFG_NO_MANAGE_ROLES_ERROR": {
+			string: "Please give {{bot}} the **Manage Roles** permission in order for the approved suggestion role to work.",
+			context: "Error when an approved suggestion role is configured but the bot does not have the Manage Roles permission",
+			replaced: {
+				bot: {
+					to_replace: "{{bot}}",
+					description: "The bot mention"
+				}
+			}
+		},
+		"CFG_ALREADY_APPROVED_ROLE_ERROR": {
+			string: "This role is already set to be given when a member's suggestion is approved!",
+			context: "Error when the specified approved suggestion role is already set"
+		},
+		"CFG_UNMANAGEABLE_ROLE_ERROR": {
+			string: "I am not able to give members this role. Please ensure my highest role is __above__ the **{{role}}** role and that it is not a managed role.",
+			context: "Error when the bot cannot give members an approved role",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_APPROVED_ROLE_SUCCESS": {
+			string: "Members who have their suggestion approved will now receive the **{{role}}** role.",
+			context: "Success message when the approved suggestion role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
 				}
 			}
 		}

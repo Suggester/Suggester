@@ -107,10 +107,7 @@ module.exports = {
 				message.channel.send(replyEmbed);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				let selfNotify;
-				if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-				else selfNotify = true;
-				if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify && selfNotify) {
+				if (qSuggestionDB.displayStatus !== "default" && qServerDB.config.notify && qUserDB.notify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`The status of your suggestion in **${message.guild.name}** has been edited!`)
 						.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Implemented Archive Post](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)

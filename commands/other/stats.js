@@ -1,7 +1,8 @@
-const { colors, emoji } = require("../../config.json");
+const { colors, } = require("../../config.json");
 const { dbQueryAll, checkPermissions } = require("../../coreFunctions");
 const { Server } = require("../../utils/schemas");
 const humanizeDuration = require("humanize-duration");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "stats",
@@ -19,7 +20,9 @@ module.exports = {
 		let permission = await checkPermissions(message.member, client);
 		if (!args[0] || permission > 1) server = message.guild;
 		else if (client.guilds.cache.get(args[0])) server = client.guilds.cache.get(args[0]);
-		if (!server) return message.channel.send(`<:${emoji.x}> I couldn't find a guild with ID \`${args[0]}\``);
+		if (!server) return message.channel.send(string("INVALID_GUILD_ID_ERROR", {}, "error"));
+
+		message.channel.startTyping();
 		let totalConfiguredServers = await Server.countDocuments();
 
 		let suggestions = await dbQueryAll("Suggestion", {});
@@ -31,12 +34,13 @@ module.exports = {
 		let suggestionsUserGlobal = suggestions.filter(s => s.suggester === message.author.id);
 		let suggestionsUserServer = suggestions.filter(s => s.suggester === message.author.id && s.id === server.id);
 		let statEmbed = new Discord.MessageEmbed()
-			.setTitle("Suggestion Statistics")
-			.addField("Global Statistics", `**${client.guilds.cache.size}** servers\n**${totalConfiguredServers}** server configurations\n**${suggestions.length.toString()}** suggestions submitted globally\n**${approvedSuggestionsGlobal.length}** suggestions approved globally\n**${deniedSuggestionsGlobal.length}** suggestions denied globally`)
-			.addField(`Server Statistics for **${server.name}**`, `**${totalSuggestionsServer.length}** suggestions submitted on this server\n**${approvedSuggestionsServer.length}** suggestions approved on this server\n**${deniedSuggestionsServer.length}** suggestions denied on this server\nThe bot has been in this server for **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
-			.addField("Your Statistics", `**${suggestionsUserGlobal.length}** suggestions submitted globally\n**${suggestionsUserServer.length}** suggestions submitted on this server`)
+			.setTitle(string("STATS_TITLE"))
+			.addField(string("GLOBAL_STATS_TITLE"), `${string("TOTAL_GUILD_COUNT_STATS")}: **${client.guilds.cache.size}**\n${string("TOTAL_CONFIGS_STATS")}: **${totalConfiguredServers}**\n${string("TOTAL_SUBMITTED_STATS")}: **${suggestions.length.toString()}**\n${string("TOTAL_SUBMITTED_APPROVED_STATS")}: **${approvedSuggestionsGlobal.length}**\n${string("TOTAL_SUBMITTED_DENIED_STATS")}: **${deniedSuggestionsGlobal.length}**`)
+			.addField(string("SERVER_STATS_TITLE", { server: server.name }), `${string("TOTAL_SUBMITTED_SERVER_STATS")}: **${totalSuggestionsServer.length}**\n${string("TOTAL_APPROVED_SERVER_STATS")}: **${approvedSuggestionsServer.length}**\n${string("TOTAL_DENIED_SERVER_STATS")}: **${deniedSuggestionsServer.length}**\n${string("BOT_TIME_SERVER_STATS")}: **${humanizeDuration(Date.now()-server.me.joinedTimestamp)}**`)
+			.addField(string("USER_STATS_TITLE"), `${string("TOTAL_SUBMITTED_STATS")}: **${suggestionsUserGlobal.length}**\n${string("TOTAL_SUBMITTED_SERVER_STATS")}: **${suggestionsUserServer.length}**`)
 			.setColor(colors.default);
 		message.channel.send(statEmbed);
+		message.channel.stopTyping();
 		return;
 	}
 };

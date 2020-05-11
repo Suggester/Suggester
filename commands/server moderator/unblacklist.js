@@ -10,7 +10,7 @@ module.exports = {
 		enabled: true,
 		docs: "staff/unblacklist",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });

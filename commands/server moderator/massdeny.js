@@ -100,10 +100,7 @@ module.exports = {
 				let suggester = await fetchUser(denied[s].suggester, client);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				let selfNotify;
-				if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-				else selfNotify = true;
-				if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
+				if (qServerDB.config.notify && qUserDB.notify) {
 					let dmEmbed = new Discord.MessageEmbed()
 						.setTitle(`Your suggestion in **${message.guild.name}** was denied`)
 						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)

@@ -1,6 +1,6 @@
 const { colors } = require("../../config.json");
-const { core } = require("../../persistent.json");
 const { fetchUser } = require("../../coreFunctions.js");
+const { string } = require("../../utils/strings");
 const humanizeDuration = require("humanize-duration");
 const ms = require("ms");
 module.exports = {
@@ -19,19 +19,19 @@ module.exports = {
 		let developerArray = [];
 		for (let developerId of client.admins) {
 			let user = await fetchUser(developerId, client);
-			user ? developerArray.push(`${Discord.Util.escapeMarkdown(user.tag)} (${user.id})`) : developerArray.push(`Unknown User (${developerId})`);
+			user ? developerArray.push(`${Discord.Util.escapeMarkdown(user.tag)} (${user.id})`) : developerArray.push(`${developerId}`);
 		}
 		let embed = new Discord.MessageEmbed()
-			.addField("Developers", developerArray.join("\n"))
-			.addField("Guild Count", client.guilds.cache.size)
-			.addField("Uptime", humanizeDuration(client.uptime))
-			.addField("Client Ping", `${Math.round(client.ws.ping)} ms`)
-			.setFooter(`${client.user.tag} v3.2.3`, client.user.displayAvatarURL)
-			.setThumbnail(client.user.displayAvatarURL)
+			.addField(string("PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
+			.addField(string("PING_GUILD_COUNT_HEADER"), client.guilds.cache.size)
+			.addField(string("PING_UPTIME_HEADER"), humanizeDuration(client.uptime))
+			.addField(string("PING_CLIENT_PING_HEADER"), `${Math.round(client.ws.ping)} ms`)
+			.setFooter(`${client.user.tag} v3.2.3`, client.user.displayAvatarURL({format: "png"}))
+			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(colors.default);
-		message.reply("👋 Hi there! Here's some info:", embed).then((sent) => {
-			embed.addField("Edit Time", ms(new Date().getTime() - sent.createdTimestamp));
-			sent.edit(`<@${message.author.id}>, 👋 Hi there! Here's some info:`, embed);
+		message.channel.send(embed).then((sent) => {
+			embed.addField(string("PING_EDIT_TIME_HEADER"), ms(new Date().getTime() - sent.createdTimestamp));
+			sent.edit(embed);
 		});
 	}
 };

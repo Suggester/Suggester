@@ -38,27 +38,15 @@ module.exports = {
 	 */
 	checkPermissions: async (member, client) => {
 		if (!member || !member.id || !client) return 10;
-    if (client.admins.has(member.id)) return 0;
-		//if (config.developer.includes(member.id)) return 0;
+		if (client.admins.has(member.id)) return 0;
 		let { dbQueryNoNew } = require("./coreFunctions.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
-		if (member.hasPermission("MANAGE_GUILD")) return 2;
-		if (!qServerDB || !qServerDB.config.admin_roles || qServerDB.config.admin_roles.length < 1) return 10;
-		let hasAdminRole = false;
-		qServerDB.config.admin_roles.forEach(roleId => {
-			if (member.roles.cache.has(roleId)) hasAdminRole = true;
-		});
-		if (hasAdminRole) return 2;
-		if (!qServerDB.config.staff_roles || qServerDB.config.staff_roles.length < 1) return 10;
-		let hasStaffRole = false;
-		qServerDB.config.staff_roles.forEach(roleId => {
-			if (member.roles.cache.has(roleId)) hasStaffRole = true;
-		});
-		if (hasStaffRole) return 3;
-		if (qServerDB && qServerDB.config.blacklist && qServerDB.config.blacklist.includes(member.id)) return 11;
+		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
+		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
+		if (qServerDB.config.blacklist.includes(member.id)) return 11;
 		return 10;
 	},
 	guildLog: (input, embed) => {
@@ -148,48 +136,38 @@ module.exports = {
 
 		return embed;
 	},
-	channelPermissions: (permissions, type) => {
+	channelPermissions: (permissionCheckFor, channel, client) => {
 		const permissionNames = require("./utils/permissions.json");
-		let required = [];
-		let list = [];
-		switch (type) {
+		let permissionCheckArr = [];
+		switch (permissionCheckFor) {
 		case "suggestions":
-			required = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+			permissionCheckArr = ["ADD_REACTIONS", "VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			break;
 		case "staff":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+			permissionCheckArr = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			break;
 		case "denied":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+			permissionCheckArr = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "USE_EXTERNAL_EMOJIS"];
+			break;
 		case "log":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+			permissionCheckArr = ["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_WEBHOOKS"];
+			break;
 		case "commands":
-			required = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"];
-			list = [];
-			required.forEach(permission => {
-				if (!permissions.has(permission)) list.push(permissionNames[permission]);
-			});
-			return list;
+			permissionCheckArr = ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"];
+			break;
+		default:
+			permissionCheckArr = permissionCheckFor;
 		}
+		let channelPermissions = channel.permissionsFor(client.user.id);
+		let missing = permissionCheckArr.filter(p => !channelPermissions.has(p)).map(p => permissionNames[p]);
+		if (missing.length < 1) return null;
+
+		let embed = new Discord.MessageEmbed()
+			.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
+			.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+			.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+			.setColor(colors.red);
+		return embed;
 	},
 	/**
 	 * Logs an input to the specified server's log channel
@@ -306,23 +284,25 @@ module.exports = {
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
 		else return [null, null];
 	},
-	/**
-	 * Checks configuration for most commands
-	 * @param db - qServerDB.config
-	 * @returns {null|[]} - Array of missing permissions
-	 */
-	checkConfig(db) {
+	async checkConfig(db) {
 		if (!db) return null;
 
 		let config = db.config;
 		let missing = [];
 
-		if (!config.admin_roles || config.admin_roles < 1) missing.push("Server Admin Roles");
-		if (!config.staff_roles || config.staff_roles < 1) missing.push("Server Staff Roles");
+		if (!config.admin_roles || config.admin_roles.length < 1) missing.push("Server Admin Roles");
+		if (!config.staff_roles || config.staff_roles.length < 1) missing.push("Server Staff Roles");
 		if (!config.channels.suggestions) missing.push("Approved Suggestions Channel");
 		if (config.mode === "review" && !config.channels.staff) missing.push("Suggestion Review Channel");
 
-		return missing;
+		if (missing.length > 0) {
+			let embed = new Discord.MessageEmbed()
+				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${db.config.prefix}config\` command.`)
+				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.setColor(colors.red);
+			return embed;
+		}
+		return null;
 	},
 	/**
 	 * Checks permissions for a channel of a certain type
