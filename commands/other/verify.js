@@ -44,7 +44,7 @@ module.exports = {
 		if (globalPosArr.length > 0) embed.addField(string("VERIFY_TITLE_GLOBAL_ACKS"), `${globalPosArr.join("\n")}`);
 		if (posArr.length > 0) embed.addField(string("VERIFY_TITLE_SERVER_ACKS"), `${posArr.join("\n")}`);
 
-		if (args[0] && args[args.length-1].toLowerCase() === "--flags") embed.addField(string("VERIFY_FLAGS_TITLE"), `${qUserDB.flags.length > 0 ? qUserDB.flags.join(", ") : string("NO_FLAGS_SET")}`);
+		if (args[0] && args[args.length-1].toLowerCase() === "--flags" && permissionLevel <= 1) embed.addField(string("VERIFY_FLAGS_TITLE"), `${qUserDB.flags.length > 0 ? qUserDB.flags.join(", ") : string("NO_FLAGS_SET")}`);
 		if (qUserDB.ack) embed.setDescription(qUserDB.ack);
 		if (!embed.description && embed.fields.length < 1) embed.setDescription(string("VERIFY_NO_ACKS"));
 

@@ -1,5 +1,5 @@
 const { colors, emoji } = require("../../config.json");
-const { dbQueryNoNew, dbQuery, dbModify, channelPermissions, findRole, findChannel, findEmoji } = require("../../coreFunctions.js");
+const { dbQueryNoNew, dbQuery, dbModify, channelPermissions, checkPermissions, findRole, findChannel, findEmoji } = require("../../coreFunctions.js");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
 module.exports = {
@@ -15,14 +15,23 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", {id: message.guild.id});
-
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed();
 			embed.setDescription(string("CONFIG_HELP", { prefix: qServerDB.config.prefix }));
 			embed.setColor(colors.default);
 			return message.channel.send(embed);
 		}
+
+		let server;
+		let permission = await checkPermissions(message.member, client);
+		if (!args[0] || permission > 1) server = message.guild;
+		else if (client.guilds.cache.get(args[0])) {
+			server = client.guilds.cache.get(args[0]);
+			args = args.splice(1);
+		}
+		if (!server) server = message.guild;
+		
+		let qServerDB = await dbQuery("Server", {id: server.id});
 
 		async function handleRoleInput (action, input, roles, current, present_string, success_string) {
 			if (!input) return string("CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
@@ -32,12 +41,12 @@ module.exports = {
 			case "add":
 				if (current.includes(role.id)) return string(present_string, {}, "error");
 				current.push(role.id);
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return string(success_string, { role: role.name }, "success");
 			case "remove":
 				if (!current.includes(role.id)) return string(present_string, {}, "error");
 				current.splice(current.findIndex(r => r === role.id), 1);
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return string(success_string, { role: role.name }, "success");
 			}
 		}
@@ -124,20 +133,20 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.admin_roles, "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.admin_roles, "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.admin_roles, "CFG_NOT_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.admin_roles, "CFG_NOT_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
-				return message.channel.send((await listRoles(qServerDB.config.admin_roles, message.guild, "CFG_ADMIN_ROLES_TITLE", true))[0]);
+				return message.channel.send((await listRoles(qServerDB.config.admin_roles, server, "CFG_ADMIN_ROLES_TITLE", true))[0]);
 			}
 			default: {
 				if (args[1]) return message.channel.send(string("CFG_INVALID_ROLE_PARAM_ERROR"));
-				else return message.channel.send((await listRoles(qServerDB.config.admin_roles, message.guild, "CFG_ADMIN_ROLES_TITLE", true))[0]);
+				else return message.channel.send((await listRoles(qServerDB.config.admin_roles, server, "CFG_ADMIN_ROLES_TITLE", true))[0]);
 			}
 			}
 		}
@@ -147,20 +156,20 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.staff_roles, "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.staff_roles, "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.staff_roles, "CFG_NOT_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.staff_roles, "CFG_NOT_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
-				return message.channel.send((await listRoles(qServerDB.config.staff_roles, message.guild, "CFG_STAFF_ROLES_TITLE", true))[0]);
+				return message.channel.send((await listRoles(qServerDB.config.staff_roles, server, "CFG_STAFF_ROLES_TITLE", true))[0]);
 			}
 			default: {
 				if (args[1]) return message.channel.send(string("CFG_INVALID_ROLE_PARAM_ERROR"));
-				else return message.channel.send((await listRoles(qServerDB.config.staff_roles, message.guild, "CFG_STAFF_ROLES_TITLE", true))[0]);
+				else return message.channel.send((await listRoles(qServerDB.config.staff_roles, server, "CFG_STAFF_ROLES_TITLE", true))[0]);
 			}
 			}
 		}
@@ -170,75 +179,75 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.allowed_roles, "CFG_ALREADY_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.allowed_roles, "CFG_ALREADY_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), message.guild.roles.cache, qServerDB.config.allowed_roles, "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.allowed_roles, "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
-				return message.channel.send((await listRoles(qServerDB.config.allowed_roles, message.guild, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
+				return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
 			}
 			default: {
 				if (args[1]) return message.channel.send(string("CFG_INVALID_ROLE_PARAM_ERROR"));
-				else return message.channel.send((await listRoles(qServerDB.config.allowed_roles, message.guild, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
+				else return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
 			}
 			}
 		}
 		case "approvedrole":
 		case "approverole": {
-			if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.approved_role, message.guild, "CFG_APPROVED_ROLE_TITLE", false)));
+			if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.approved_role, server, "CFG_APPROVED_ROLE_TITLE", false)));
 			let input = args.splice(1).join(" ");
 			if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
 				qServerDB.config.approved_role = "";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string("CFG_RESET_APPROVED_ROLE_SUCCESS", {}, "success"));
 			}
-			if (!message.guild.me.permissions.has("MANAGE_ROLES")) return message.channel.send(string("CFG_NO_MANAGE_ROLES_ERROR", { bot: `<@${client.user.id}>` }, "error"));
-			let role = await findRole(input, message.guild.roles.cache);
+			if (!server.me.permissions.has("MANAGE_ROLES")) return message.channel.send(string("CFG_NO_MANAGE_ROLES_ERROR", { bot: `<@${client.user.id}>` }, "error"));
+			let role = await findRole(input, server.roles.cache);
 			if (!role) return message.channel.send(string("CFG_INVALID_ROLE_ERROR", {}, "error"));
 			if (qServerDB.config.approved_role === role.id) return message.channel.send(string("CFG_ALREADY_APPROVED_ROLE_ERROR", {}, "error"));
 			if (!role.editable || role.managed) return message.channel.send(string("CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
 			qServerDB.config.approved_role = role.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			await dbModify("Server", {id: server.id}, qServerDB);
 			return message.channel.send(string("CFG_APPROVED_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
 		}
 		case "review":
 		case "reviewchannel": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, message.guild, "CFG_REVIEW_CHANNEL_TITLE", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string("CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, server, "CFG_REVIEW_CHANNEL_TITLE", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string("CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
 		}
 		case "suggestions":
 		case "suggestionschannel": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.suggestions, message.guild, "CFG_SUGGESTION_CHANNEL_TITLE", true))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.suggestions, server, "CFG_SUGGESTION_CHANNEL_TITLE", true))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
 		}
 		case "denied":
 		case "deniedchannel": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.denied, message.guild, "CFG_DENIED_CHANNEL_TITLE", false))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "denied", "denied", "CFG_DENIED_SET_SUCCESS", "CFG_DENIED_RESET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.denied, server, "CFG_DENIED_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "denied", "denied", "CFG_DENIED_SET_SUCCESS", "CFG_DENIED_RESET_SUCCESS")));
 		}
 		case "log":
 		case "logs":
 		case "logchannel": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.log, message.guild, "CFG_LOG_CHANNEL_TITLE", false))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "log", "log", "CFG_LOG_SET_SUCCESS", "CFG_LOG_RESET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.log, server, "CFG_LOG_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "log", "log", "CFG_LOG_SET_SUCCESS", "CFG_LOG_RESET_SUCCESS")));
 		}
 		case "commands":
 		case "command":
 		case "commandchannel":
 		case "commandschannel": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.commands, message.guild, "CFG_COMMANDS_CHANNEL_TITLE", false, string("CFG_COMMANDS_CHANNEL_APPEND")))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "commands", "commands", "CFG_COMMANDS_SET_SUCCESS", "CFG_COMMANDS_RESET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.commands, server, "CFG_COMMANDS_CHANNEL_TITLE", false, string("CFG_COMMANDS_CHANNEL_APPEND")))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_SET_SUCCESS", "CFG_COMMANDS_RESET_SUCCESS")));
 		}
 		case "archive":
 		case "archivechannel":
 		case "implementedchannel":
 		case "implemented": {
-			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.archive, message.guild, "CFG_ARCHIVE_CHANNEL_TITLE", false))[0]);
-			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.archive, server, "CFG_ARCHIVE_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
 		}
 		case "prefix": {
 			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
@@ -247,7 +256,7 @@ module.exports = {
 			let disallowed = ["suggester:", `${client.user.id}:`];
 			if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different prefix.`);
 			qServerDB.config.prefix = prefix.toLowerCase();
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
+			await dbModify("Server", {id: server.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
 		}
 		case "mode": {
@@ -255,16 +264,16 @@ module.exports = {
 			switch (args[1].toLowerCase()) {
 			case "review":
 				qServerDB.config.mode = "review";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **review**.`);
 			case "autoapprove":
 			case "auto-approve":
 			case "auto_approve":
 			case "auto": {
-				let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: message.guild.id});
+				let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id});
 				if (suggestionsAwaitingReview) return message.channel.send(`<:${emoji.x}> All suggestions awaiting review must be cleared before the autoapprove mode is set.`);
 				qServerDB.config.mode = "autoapprove";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **autoapprove**.`);
 			}
 			default:
@@ -287,9 +296,9 @@ module.exports = {
 			if (!args[1]) {
 				let reactEmbed = new Discord.MessageEmbed()
 					.setDescription(`Suggestion feed reactions are currently ${qServerDB.config.react ? "enabled" : "disabled"}`)
-					.addField("Upvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.up), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? "Disabled" : "👍"))
-					.addField("Shrug/No Opinion", (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? "Disabled" : "🤷"))
-					.addField("Downvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.down), message.guild.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? "Disabled" : "👎"))
+					.addField("Upvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? "Disabled" : "👍"))
+					.addField("Shrug/No Opinion", (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? "Disabled" : "🤷"))
+					.addField("Downvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? "Disabled" : "👎"))
 					.setColor(qServerDB.config.react ? colors.default : colors.orange);
 				return message.channel.send("Current server emoji settings:", reactEmbed);
 			}
@@ -302,13 +311,13 @@ module.exports = {
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
 					if (qServerDB.config.emojis.up === "none") return message.channel.send(`<:${emoji.x}> The upvote emoji is already disabled.`);
 					qServerDB.config.emojis.up = "none";
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the upvote reaction.`);
 				}
-				let upEmote = await findEmoji(args[2], message.guild.emojis.cache);
+				let upEmote = await findEmoji(args[2], server.emojis.cache);
 				if (upEmote[0]) {
 					qServerDB.config.emojis.up = upEmote[0];
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully set the upvote emoji for this server to ${upEmote[1]}.`);
 				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
 			}
@@ -320,13 +329,13 @@ module.exports = {
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
 					if (qServerDB.config.emojis.mid === "none") return message.channel.send(`<:${emoji.x}> The shrug/no opinion emoji is already disabled.`);
 					qServerDB.config.emojis.mid = "none";
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the shrug/no opinion reaction.`);
 				}
-				let midEmote = await findEmoji(args[2], message.guild.emojis.cache);
+				let midEmote = await findEmoji(args[2], server.emojis.cache);
 				if (midEmote[0]) {
 					qServerDB.config.emojis.mid = midEmote[0];
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully set the shrug/no opinion emoji for this server to ${midEmote[1]}.`);
 				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
 			}
@@ -337,31 +346,31 @@ module.exports = {
 				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
 					if (qServerDB.config.emojis.down === "none") return message.channel.send(`<:${emoji.x}> The downvote emoji is already disabled.`);
 					qServerDB.config.emojis.down = "none";
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully disabled the downvote reaction.`);
 				}
-				let downEmote = await findEmoji(args[2], message.guild.emojis.cache);
+				let downEmote = await findEmoji(args[2], server.emojis.cache);
 				if (downEmote[0]) {
 					qServerDB.config.emojis.down = downEmote[0];
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Successfully set the downvote emoji for this server to ${downEmote[1]}.`);
 				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
 			}
 			case "enable":
 				if (!qServerDB.config.react) {
 					qServerDB.config.react = true;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled suggestion feed reactions.`);
 				} else return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already enabled!`);
 			case "disable":
 				if (qServerDB.config.react) {
 					qServerDB.config.react = false;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Disabled suggestion feed reactions.`);
 				} else return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already disabled!`);
 			case "toggle":
 				qServerDB.config.react = !qServerDB.config.react;
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.react ? "Enabled": "Disabled"} suggestion feed reactions.`);
 			default:
 				return message.channel.send("Please specify a valid emoji setting (`up`, `mid`, `down`, or `toggle`).");
@@ -377,7 +386,7 @@ module.exports = {
 			case "on": {
 				if (!qServerDB.config.notify) {
 					qServerDB.config.notify = true;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already enabled!`);
 			}
@@ -385,13 +394,13 @@ module.exports = {
 			case "off": {
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Disabled user notifications.`);
 				} else return message.channel.send(`<:${emoji.x}> User notifications are already disabled!`);
 			}
 			case "toggle":
 				qServerDB.config.notify = !qServerDB.config.notify;
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} user notifications.`);
 			default:
 				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
@@ -406,9 +415,9 @@ module.exports = {
 			case "enable":
 			case "on": {
 				if (!qServerDB.config.clean_suggestion_command) {
-					if (!message.guild.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+					if (!server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
 					qServerDB.config.clean_suggestion_command = true;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Enabled auto-cleaning of suggestion commands.`);
 				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already enabled!`);
 			}
@@ -416,25 +425,20 @@ module.exports = {
 			case "off": {
 				if (qServerDB.config.clean_suggestion_command) {
 					qServerDB.config.clean_suggestion_command = false;
-					await dbModify("Server", {id: message.guild.id}, qServerDB);
+					await dbModify("Server", {id: server.id}, qServerDB);
 					return message.channel.send(`<:${emoji.check}> Disabled auto-cleaning of suggestion commands.`);
 				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already disabled!`);
 			}
 			case "toggle":
-				if (!qServerDB.config.clean_suggestion_command && !message.guild.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+				if (!qServerDB.config.clean_suggestion_command && !server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
 				qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
+				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.clean_suggestion_command ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
 			default:
 				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
 			}
 		}
 		case "list": {
-			let server = message.guild;
-
-			let qServerDB = await dbQueryNoNew("Server", {id: server.id});
-			if (!qServerDB || !qServerDB.config) return message.channel.send(string("NO_GUILD_DATABASE_ENTRY_ERROR", {}, "error"));
-
 			let cfgRolesArr = [];
 			let cfgChannelsArr = [];
 			let cfgOtherArr = [];
@@ -534,6 +538,16 @@ module.exports = {
 			cfgEmbed.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
 				.addField(string("CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string("CFG_STATUS_BAD", {}, "error") : string("CFG_STATUS_GOOD", {}, "success"));
 
+			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
+				const permissions = require("../../utils/permissions");
+				let hasPermissionList = [];
+				Object.keys(permissions).forEach(perm => {
+					server.me.permissions.has(perm) ? hasPermissionList.push(permissions[perm]) : "";
+				});
+
+				cfgEmbed.addField(string("CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None");
+				if (qServerDB.flags && qServerDB.flags.length > 0) cfgEmbed.addField(string("CFG_FLAGS_TITLE"), qServerDB.flags.join(", "));
+			}
 			return message.channel.send(cfgEmbed);
 		}
 		default:
