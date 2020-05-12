@@ -180,7 +180,7 @@ module.exports = async (Discord, client) => {
 		});
 	}
 
-	if (process.env.NODE_ENV === "production") {
+	if (client.user.id === "564426594144354315") {
 		//Post on startup and every hour
 		postToBotLists();
 		setInterval(function() {

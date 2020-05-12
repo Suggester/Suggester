@@ -983,6 +983,10 @@ module.exports = {
 			string: "Create suggestion log channel",
 			context: "Audit log reason for log channel webhook creation"
 		},
+		"REMOVE_LOG_CHANNEL": {
+			string: "Remove old log channel",
+			context: "Audit log reason for log channel webhook deletion"
+		},
 		"AUTOMATIC_SETUP_COMPLETE": {
 			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command: https://suggester.js.org/#/admin/config",
 			context: "Message sent when automatic setup is complete",
@@ -1130,6 +1134,94 @@ module.exports = {
 					description: "A role name"
 				}
 			}
+		},
+		"CFG_NO_CHANNEL_SPECIFIED_ERROR": {
+			string: "You must specify a channel #mention, channel ID, or channel name.",
+			context: "Error when no channel is specified for configuration"
+		},
+		"CFG_INVALID_CHANNEL_ERROR": {
+			string: "I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.",
+			context: "Error when an invalid channel is specified for configuration"
+		},
+		"CFG_REVIEW_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the suggestion review channel.",
+			context: "Success message when the review channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_SUGGESTIONS_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the approved suggestions channel.",
+			context: "Success message when the suggestions channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_DENIED_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the denied suggestions channel.",
+			context: "Success message when the denied channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_DENIED_RESET_SUCCESS": {
+			string: "Successfully reset the denied suggestions channel.",
+			context: "Success message when the denied channel is reset"
+		},
+		"CFG_WEBHOOK_CREATION_ERROR": {
+			string: "A webhook could not be created in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.",
+			context: "Error shown when a webhook cannot be created in a log channel"
+		},
+		"CFG_LOG_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the log channel.",
+			context: "Success message when the log channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_LOG_RESET_SUCCESS": {
+			string: "Successfully reset the log channel.",
+			context: "Success message when the log channel is reset"
+		},
+		"CFG_COMMANDS_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the suggestion commands channel.",
+			context: "Success message when the suggestion commands channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_COMMANDS_RESET_SUCCESS": {
+			string: "Successfully reset the suggestion commands channel.",
+			context: "Success message when the suggestion commands channel is reset"
+		},
+		"CFG_ARCHIVE_SET_SUCCESS": {
+			string: "Successfully set {{channel}} as the implemented suggestions archive channel.",
+			context: "Success message when the implemented suggestions archive channel is configured",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_ARCHIVE_RESET_SUCCESS": {
+			string: "Successfully reset the implemented suggestions archive channel.",
+			context: "Success message when the implemented suggestions archive channel is reset"
 		}
 	}
 };

@@ -42,6 +42,46 @@ module.exports = {
 			}
 		}
 
+		async function handleChannelInput (input, server, current_name, check_perms, done_str, reset_str) {
+			if (!input) return string("CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
+			if (reset_str && (input === "none" || input === "reset")) {
+				qServerDB.config.channels[current_name] = "";
+				if (current_name === "log" && qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
+					client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+					qServerDB.config.loghook = {};
+				}
+				await dbModify("Server", {id: server.id}, qServerDB);
+
+				return string(reset_str, {}, "success");
+			}
+			let channel = await findChannel(input, server.channels.cache);
+			if (!channel || channel.type !== "text") return string("CFG_INVALID_CHANNEL_ERROR", {}, "error");
+			let permissions = await channelPermissions(check_perms, channel, client);
+			if (permissions) return permissions;
+			qServerDB.config.channels[current_name] = channel.id;
+			if (current_name === "log") {
+				if (qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
+					client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+					qServerDB.config.loghook = {};
+				}
+				try {
+					let webhook = await channel.createWebhook("Suggester Logs", {
+						avatar: client.user.displayAvatarURL({format: "png"}),
+						reason: string("CREATE_LOG_CHANNEL")
+					});
+
+					qServerDB.config.loghook = {
+						id: webhook.id,
+						token: webhook.token
+					};
+				} catch (err) {
+					return string("CFG_WEBHOOK_CREATION_ERROR", {}, "error");
+				}
+			}
+			await dbModify("Server", {id: server.id}, qServerDB);
+			return string(done_str, { channel: `<#${channel.id}>` }, "success");
+		}
+
 		async function listRoles (roleList, server, title, fatal, append) {
 			if (!roleList) return `${string(title, {}, fatal ? "error" : "success")} ${string("NONE_CONFIGURED")}`;
 			if (typeof roleList === "string") {
@@ -167,130 +207,38 @@ module.exports = {
 		}
 		case "review":
 		case "reviewchannel": {
-			if (!args[1]) return message.channel.send(qServerDB.config.channels.staff ? `The suggestion review channel is currently configured to <#${qServerDB.config.channels.staff}>` : "This server has no suggestion review channel set!");
-			let reviewInput = args.splice(1).join(" ").toLowerCase();
-			let reviewChannel = await findChannel(reviewInput, message.guild.channels.cache);
-			if (!reviewChannel || reviewChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let reviewPerms = channelPermissions(reviewChannel.permissionsFor(client.user.id), "staff", client);
-			if (reviewPerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${reviewChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${reviewPerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${reviewChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			qServerDB.config.channels.staff = reviewChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${reviewChannel.id}> as the suggestion review channel.`);
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, message.guild, "CFG_REVIEW_CHANNEL_TITLE", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string("CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
 		}
 		case "suggestions":
 		case "suggestionschannel": {
-			if (!args[1]) {
-				qServerDB.config.channels.suggestions ? message.channel.send(`The approved suggestions channel is currently configured to <#${qServerDB.config.channels.staff}>`) : message.channel.send("This server has no approved suggestions channel set!");
-				return;
-			}
-			let suggestionInput = args.splice(1).join(" ").toLowerCase();
-			let suggestionChannel = await findChannel(suggestionInput, message.guild.channels.cache);
-			if (!suggestionChannel || suggestionChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let suggestionPerms = channelPermissions(suggestionChannel.permissionsFor(client.user.id), "suggestions", client);
-			if (suggestionPerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${suggestionChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${suggestionPerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${suggestionChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			qServerDB.config.channels.suggestions = suggestionChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${suggestionChannel.id}> as the approved suggestions channel.`);
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.suggestions, message.guild, "CFG_SUGGESTION_CHANNEL_TITLE", true))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
 		}
 		case "denied":
 		case "deniedchannel": {
-			if (!args[1]) return qServerDB.config.channels.denied ? message.channel.send(`The denied suggestions channel is currently configured to <#${qServerDB.config.channels.denied}>`) : message.channel.send("This server has no denied suggestions channel set!");
-			let deniedInput = args.splice(1).join(" ").toLowerCase();
-			if (deniedInput === "none" || deniedInput === "reset") {
-				qServerDB.config.channels.denied = "";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully reset the denied suggestions channel.`);
-			}
-			let deniedChannel = await findChannel(deniedInput, message.guild.channels.cache);
-			if (!deniedChannel || deniedChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let deniedPerms = channelPermissions(deniedChannel.permissionsFor(client.user.id), "denied", client);
-			if (deniedPerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${deniedChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${deniedPerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${deniedChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			qServerDB.config.channels.denied = deniedChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${deniedChannel.id}> as the denied suggestions channel.`);
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.denied, message.guild, "CFG_DENIED_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "denied", "denied", "CFG_DENIED_SET_SUCCESS", "CFG_DENIED_RESET_SUCCESS")));
 		}
 		case "log":
 		case "logs":
 		case "logchannel": {
-			if (!args[1]) return qServerDB.config.channels.log ? message.channel.send(`The log channel is currently configured to <#${qServerDB.config.channels.log}>`) : message.channel.send("This server has no log channel set!");
-			let logInput = args.splice(1).join(" ").toLowerCase();
-			if (logInput === "none" || logInput === "reset") {
-				qServerDB.config.channels.log = "";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully reset the log channel.`);
-			}
-			let logChannel = await findChannel(logInput, message.guild.channels.cache);
-			if (!logChannel || logChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let logPerms = channelPermissions(logChannel.permissionsFor(client.user.id), "log", client);
-			if (logPerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${logChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${logPerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${logChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			await logChannel.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel"}).then(async (webhook) => {
-				qServerDB.config.loghook = {};
-				qServerDB.config.loghook.id = webhook.id;
-				qServerDB.config.loghook.token = webhook.token;
-				qServerDB.config.channels.log = logChannel.id;
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully set <#${logChannel.id}> as the log channel.`);
-			}).catch(() => {
-				return message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
-			});
-			break;
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.log, message.guild, "CFG_LOG_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "log", "log", "CFG_LOG_SET_SUCCESS", "CFG_LOG_RESET_SUCCESS")));
 		}
 		case "commands":
 		case "command":
 		case "commandchannel":
 		case "commandschannel": {
-			if (!args[1]) {
-				qServerDB.config.channels.commands ? message.channel.send(`The suggestion command channel is currently configured to <#${qServerDB.config.channels.commands}>`) : message.channel.send("This server has no suggestion command channel set!");
-				return;
-			}
-			let commandsInput = args.splice(1).join(" ").toLowerCase();
-			if (commandsInput === "none" || commandsInput === "reset") {
-				qServerDB.config.channels.commands = "";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully reset the suggestion command channel.`);
-			}
-			let commandChannel = await findChannel(commandsInput, message.guild.channels.cache);
-			if (!commandChannel || commandChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let commandPerms = channelPermissions(commandChannel.permissionsFor(client.user.id), "commands", client);
-			if (commandPerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${commandChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${commandPerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${commandChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			qServerDB.config.channels.commands = commandChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${commandChannel.id}> as the suggestion command channel.`);
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.commands, message.guild, "CFG_COMMANDS_CHANNEL_TITLE", false, string("CFG_COMMANDS_CHANNEL_APPEND")))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "commands", "commands", "CFG_COMMANDS_SET_SUCCESS", "CFG_COMMANDS_RESET_SUCCESS")));
+		}
+		case "archive":
+		case "archivechannel":
+		case "implementedchannel":
+		case "implemented": {
+			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.archive, message.guild, "CFG_ARCHIVE_CHANNEL_TITLE", false))[0]);
+			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), message.guild, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
 		}
 		case "prefix": {
 			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
@@ -301,32 +249,6 @@ module.exports = {
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
 			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
-		}
-		case "archive":
-		case "archivechannel":
-		case "implementedchannel":
-		case "implemented": {
-			if (!args[1]) return qServerDB.config.channels.archive ? message.channel.send(`The implemented suggestions archive channel is currently configured to <#${qServerDB.config.channels.archive}>`) : message.channel.send("This server has no implemented suggestions archive channel set!");
-			let archiveInput = args.splice(1).join(" ").toLowerCase();
-			if (archiveInput === "none" || archiveInput === "reset") {
-				qServerDB.config.channels.archive = "";
-				await dbModify("Server", {id: message.guild.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully reset the implemented suggestions archive channel.`);
-			}
-			let archiveChannel = await findChannel(archiveInput, message.guild.channels.cache);
-			if (!archiveChannel || archiveChannel.type !== "text") return message.channel.send(`<:${emoji.x}> I could not find a text channel on this server based on this input! Make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-			let archivePerms = channelPermissions(archiveChannel.permissionsFor(client.user.id), "denied", client); //Denied checks for all needed permissions
-			if (archivePerms.length > 0) {
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${archiveChannel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${archivePerms.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${archiveChannel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-				return message.channel.send(embed);
-			}
-			qServerDB.config.channels.archive = archiveChannel.id;
-			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set <#${archiveChannel.id}> as the implemented suggestions archive channel.`);
 		}
 		case "mode": {
 			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
