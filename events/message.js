@@ -1,8 +1,9 @@
-const { dbQuery, dbModify, coreLog, commandLog, checkPermissions, errorLog } = require("../coreFunctions");
+const { commandExecuted, dbQuery, dbModify, coreLog, commandLog, checkPermissions, errorLog } = require("../coreFunctions");
 const { emoji, colors, prefix, log_hooks, support_invite } = require("../config.json");
 const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
+	const pre = new Date();
 	if (message.channel.type !== "text") {
 		let dmEmbed = new Discord.MessageEmbed()
 			.setDescription(message.content);
@@ -58,9 +59,13 @@ module.exports = async (Discord, client, message) => {
 
 	if (command.controls.enabled === false) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, contentEmbed);
+		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send("This command is currently disabled globally.");
 	}
-	if (permission > command.controls.permission) return commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
+	if (permission > command.controls.permission) {
+		await commandExecuted(command, message, { pre, post: new Date(), success: false });
+		return commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
+	}
 
 	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
 
@@ -79,11 +84,16 @@ module.exports = async (Discord, client, message) => {
 					.addField("Missing Elements", `<:${emoji.x}> ${list.join(`\n<:${emoji.x}> `)}`)
 					.addField("How to Fix", `In the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
 					.setColor(colors.red);
+
+				await commandExecuted(command, message, { pre, post: new Date(), success: false });
+
 				return message.channel.send(embed).catch(() => {
 					message.author.send(`Your command \`${commandName}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`).catch(() => {});
 				});
 			} else {
 				//Cannot embed
+				await commandExecuted(command, message, { pre, post: new Date(), success: false });
+
 				return message.channel.send(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${message.channel.id}> channel:\n - ${list.join("\n- ")}\nIn the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has the following permissions allowed.`).catch(() => {
 					message.author.send(`Your command \`${commandName}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`).catch(() => {});
 				});
@@ -121,6 +131,8 @@ module.exports = async (Discord, client, message) => {
 				qUserDB.blocked = true;
 				await dbModify("User", { id: message.author.id }, qUserDB);
 
+				await commandExecuted(command, message, { pre, post: new Date(), success: false });
+
 				counts.set(message.author.id, 0);
 
 				message.channel.send(`<@${message.author.id}> ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join https://discord.gg/${support_invite} and contact our Support Team.`);
@@ -130,17 +142,40 @@ module.exports = async (Discord, client, message) => {
 				return;
 			}
 
-			if (expires > now) return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more second${((expires - now) / 1000).toFixed(0) !== "1" ? "s" : ""}. ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
+			if (expires > now) {
+				await commandExecuted(command, message, { pre, post: new Date(), success: false });
+				return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more second${((expires - now) / 1000).toFixed(0) !== "1" ? "s" : ""}. ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
+			}
 		}
 
 		times.set(message.author.id, now);
 		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
+	if (qServerDB.config.blacklist && qServerDB.config.blacklist.includes(message.author.id)) {
+		await commandExecuted(command, message, { pre, post: new Date(), success: false });
+		return;
+	}
+
 	try {
-		return command.do(message, client, args, Discord);
+		command.do(message, client, args, Discord)
+			.then(() => {
+				commandExecuted(command, message, { pre, post: new Date(), success: true });
+			})
+			.catch((err) => {
+				message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
+				errorLog(err, "Command Handler", `Message Content: ${message.content}`);
+
+				console.log(err);
+				commandExecuted(command, message, { pre, post: new Date(), success: false });
+			});
+
 	} catch (err) {
 		message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
 		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
+
+		console.log(err);
+
+		commandExecuted(command, message, { pre, post: new Date(), success: false });
 	}
 };

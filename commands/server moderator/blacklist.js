@@ -145,6 +145,7 @@ module.exports = {
 
 		await message.guild.members.fetch(user.id).catch(() => {});
 
+		if (user.id === message.author.id) return message.channel.send(`<:${emoji.x}> You cannot blacklist yourself.`)
 		if (user.bot) return message.channel.send(`<:${emoji.x}> This user is a bot, and therefore cannot be blacklisted.`);
 		if (qUserDB.flags.includes("STAFF")) return message.channel.send(`<:${emoji.x}> This user would not be affected by a blacklist because they are a global Suggester staff member.`);
 		if (message.guild.members.cache.get(user.id)) {

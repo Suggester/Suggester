@@ -76,8 +76,32 @@ const user = new Schema({
 	flags: [ String ]
 });
 
+const command = new Schema({
+	command: { type: String, required: true },
+	fullCommand: { type: String, required: true },
+	success: { type: Boolean, required: false },
+
+	user: { type: String, required: true },
+	guild: { type: String, required: true },
+	channel: { type: String, required: true },
+	message: { type: String, required: true },
+
+	date: { type: Date, required: true, default: new Date() },
+	executionTime: { type: Number, required: true }
+}/*, { capped: { size: 10000000 }}*/); // can be made into a capped collection if needed
+
+const serverLog = new Schema({
+	id: { type: String, required: true },
+	action: { type: String, required: true },
+	joinedAt: { type: Date, required: false }, // if the bot left a server, when did it join?
+	timesJoined: { type: Number, required: false },
+	date: { type: Date, required: true, default: new Date() }
+}/*, { capped: true, size: 10000000 }*/); // can be made into a capped collection if needed.
+
 module.exports = {
 	Server: model("servers", settings, "settings"),
 	Suggestion: model("suggestions", suggestion, "suggestions"),
-	User: model("user", user, "users")
+	User: model("user", user, "users"),
+	Command: model("commands", command, "commands"),
+	ServerLog: model("serverlog", serverLog, "serverLogs")
 };

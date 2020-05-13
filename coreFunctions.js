@@ -477,3 +477,43 @@ const fileLoader = async function* (dir) {
 };
 
 module.exports.fileLoader = fileLoader;
+
+function commandExecuted (command, message, { pre, post, success } = { pre: 0, post: 0, success: false }) {
+	if (/*process.env.NODE_ENV !== "production" || */!message.client.config.logCommands) return;
+	return new models.Command({
+		command: command.controls.name,
+		fullCommand: message.content,
+
+		user: message.author.id,
+		guild: message.guild.id,
+		channel: message.channel.id,
+		message: message.id,
+
+		executionTime: Number(post) - Number(pre),
+		success: success
+	}).save();
+}
+
+module.exports.commandExecuted = commandExecuted;
+
+async function joinLeaveLog (guild, action) {
+	let document = {
+		id: guild.id,
+		action
+	};
+
+	if (action === "leave") document.joinedAt = guild.joinedAt;
+
+	const g = await models.ServerLog.find({ id: guild.id });
+
+	const maxJoins = g.length ? Math.max.apply(Math, g.map((gu) => gu.timesJoined)) : 0;
+	//document.timesJoined = action === "join" ? maxJoins + 1 : maxJoins;
+	if (action === "join") document.timesJoined = maxJoins + 1;
+	else if (action === "leave" && maxJoins === 0) document.timesJoined = 1;
+	else document.timesJoined = maxJoins;
+
+	console.log(document)
+	return new models.ServerLog(document).save();
+}
+
+module.exports.joinLeaveLog = joinLeaveLog;

@@ -1,10 +1,5 @@
 require("dotenv").config();
 
-// init the extended structures
-//require("./utils/Structures/GuildMember");
-//require("./utils/Structures/User");
-//require("./utils/Structures/Guild");
-
 const Discord = require("discord.js");
 const Client = require("./utils/Client");
 const chalk = require("chalk");
@@ -53,6 +48,11 @@ connection.on("error", (err) => {
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {
+		const exclude = []
+		if (exclude.includes(basename(file))) {
+			console.log("Skipping excluded file:", file);
+			continue;
+		}
 		if (!file.endsWith(".js")) continue;
 
 		let event = require(file);

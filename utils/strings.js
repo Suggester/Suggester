@@ -1,7 +1,7 @@
 const { emoji } = require("../config.json");
 module.exports = {
 	string: function (string_name, replaced, prefix_with) {
-		const list = (require("./strings.js").list);
+		const list = module.exports.list;
 		const string = list[string_name];
 		if (!string) return `String ${string_name} Not Found`;
 		let newString = string.string;
@@ -655,9 +655,9 @@ module.exports = {
 			string: "Client Ping",
 			context: "Client Ping header for the ping command"
 		},
-		"PING_EDIT_TIME_HEADER": {
-			string: "Edit Time",
-			context: "Edit Time header for the ping command"
+		"PING_BOT_LATENCY_HEADER": {
+			string: "Bot Latency",
+			context: "Bot latency (previously 'Edit Time') header for the ping command"
 		},
 		"STATS_TITLE": {
 			string: "Suggestion Statistics",

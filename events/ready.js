@@ -180,11 +180,11 @@ module.exports = async (Discord, client) => {
 		});
 	}
 
-	if (client.user.id === "564426594144354315") {
-		//Post on startup and every hour
-		postToBotLists();
-		setInterval(function() {
-			postToBotLists();
-		}, 3600000);
-	}
+	//if (client.user.id === "564426594144354315") {
+		////Post on startup and every hour
+		//postToBotLists();
+		//setInterval(function() {
+			//postToBotLists();
+		//}, 3600000);
+	//}
 };

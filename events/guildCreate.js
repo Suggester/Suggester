@@ -1,6 +1,10 @@
-const { dbQuery, guildLog } = require("../coreFunctions.js");
+const { joinLeaveLog, dbQuery, guildLog } = require("../coreFunctions.js");
 const { release, prefix, support_invite, colors } = require("../config.json");
 module.exports = async (Discord, client, guild) => {
+	if (client.config.logServers) {
+		joinLeaveLog(guild, "join");
+	};
+
 	let qServerDB = await dbQuery("Server", { id: guild.id });
 	if (qServerDB && qServerDB.blocked) {
 		await guild.leave();

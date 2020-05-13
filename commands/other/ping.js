@@ -30,7 +30,7 @@ module.exports = {
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(colors.default);
 		message.channel.send(embed).then((sent) => {
-			embed.addField(string("PING_EDIT_TIME_HEADER"), ms(new Date().getTime() - sent.createdTimestamp));
+			embed.addField(string("PING_BOT_LATENCY_HEADER"), ms(new Date().getTime() - sent.createdTimestamp));
 			sent.edit(embed);
 		});
 	}
