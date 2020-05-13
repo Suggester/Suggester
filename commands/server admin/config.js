@@ -528,7 +528,7 @@ module.exports = {
 			return message.channel.send(cfgEmbed);
 		}
 		default:
-			return message.channel.send(`<:${emoji.x}> Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.`);
+			return message.channel.send(string("CFG_NO_PARAMS_ERROR", {}, "error"));
 		}
 
 	}

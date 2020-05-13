@@ -1378,6 +1378,10 @@ module.exports = {
 		"CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES": {
 			string: "Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
 			context: "Error shown when the bot does not have Manage Messages and cleaning of suggestions commands is enabled"
+		},
+		"CFG_NO_PARAMS_ERROR": {
+			string: "Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.",
+			context: "Error if no configuration element is specified"
 		}
 	}
 };
