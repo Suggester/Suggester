@@ -73,7 +73,7 @@ module.exports = {
 		case 10:
 			return "All Users";
 		default:
-			return "Undefined, permission level not mapped in `core.permLevelToRole()`";
+			return "Undefined";
 		}
 	},
 	/**

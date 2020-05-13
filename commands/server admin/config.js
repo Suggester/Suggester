@@ -127,6 +127,29 @@ module.exports = {
 			return [`${string(title, {}, "success")} <#${foundChannel.id}> (${foundChannel.id})`];
 		}
 
+		function checkEmoji(emoji) {
+			if (emoji === "none") return string("DISABLED");
+			else if (nodeEmoji.find(emoji)) return emoji;
+			else if (emoji.startsWith("a")) return `<${emoji}>`;
+			else return `<:${emoji}>`;
+		}
+
+		async function handleEmojiInput (input, server, current_name, disabled_str, success_str) {
+			if (!input) return string("CFG_NO_EMOJI_ERROR", {}, "error");
+			if (["none", "off", "disable"].includes(input.toLowerCase())) {
+				if (qServerDB.config.emojis[current_name] === "none") return string("CFG_EMOJI_DISABLED_ERROR", {}, "error");
+				qServerDB.config.emojis[current_name] = "none";
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return string(disabled_str, {}, "success");
+			}
+			let emote = await findEmoji(input, server.emojis.cache);
+			if (emote[0]) {
+				qServerDB.config.emojis[current_name] = emote[0];
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return string(success_str, { emote: emote[1] }, "success");
+			} else return string("CFG_EMOJI_NOT_FOUND_ERROR", {}, "error");
+		}
+
 		switch (args[0]) {
 		case "admin":
 		case "adminrole": {
@@ -250,34 +273,33 @@ module.exports = {
 			return message.channel.send((await handleChannelInput(args.splice(1).join(" ").toLowerCase(), server, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
 		}
 		case "prefix": {
-			if (!args[1]) return message.channel.send(`The current prefix for this server is ${qServerDB.config.prefix}`);
+			if (!args[1]) return message.channel.send(`${string("CFG_PREFIX_TITLE", {}, "success")} ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			let prefix = args[1];
-			if (prefix.length > 20) return message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
+			if (prefix.length > 20) return message.channel.send(string("CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
 			let disallowed = ["suggester:", `${client.user.id}:`];
-			if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different prefix.`);
+			if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(string("CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
 			qServerDB.config.prefix = prefix.toLowerCase();
 			await dbModify("Server", {id: server.id}, qServerDB);
-			return message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to **${Discord.escapeMarkdown(prefix.toLowerCase())}**`);
+			return message.channel.send(string("CFG_PREFIX_SET_SUCCESS", { prefix: Discord.escapeMarkdown(prefix.toLowerCase()) }, "success"));
 		}
 		case "mode": {
-			if (!args[1]) return message.channel.send(`The current mode for this server is **${qServerDB.config.mode}**.`);
+			if (!args[1]) return message.channel.send(`${string("CFG_MODE_TITLE", {}, "success")} ${qServerDB.config.mode}`);
 			switch (args[1].toLowerCase()) {
 			case "review":
 				qServerDB.config.mode = "review";
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **review**.`);
+				return message.channel.send(string("CFG_MODE_REVIEW_SET_SUCCESS", {}, "success"));
 			case "autoapprove":
 			case "auto-approve":
 			case "auto_approve":
 			case "auto": {
-				let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id});
-				if (suggestionsAwaitingReview) return message.channel.send(`<:${emoji.x}> All suggestions awaiting review must be cleared before the autoapprove mode is set.`);
+				if ((await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id}))) return message.channel.send(string("CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
 				qServerDB.config.mode = "autoapprove";
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **autoapprove**.`);
+				return message.channel.send(string("CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, ""));
 			}
 			default:
-				return message.channel.send(`<:${emoji.x}> Please specify a valid mode (either \`review\` or \`autoapprove\`.`);
+				return message.channel.send(string("CFG_MODE_INVALID_ERROR", {}, "error"));
 			}
 		}
 		case "emoji":
@@ -286,156 +308,117 @@ module.exports = {
 		case "emote":
 		case "react":
 		case "reactions": {
-			const checkEmoji = function(emoji) {
-				if (emoji === "none") return "Disabled";
-				else if (nodeEmoji.find(emoji)) return emoji;
-				else if (emoji.startsWith("a")) return `<${emoji}>`;
-				else return `<:${emoji}>`;
-			};
-
 			if (!args[1]) {
 				let reactEmbed = new Discord.MessageEmbed()
-					.setDescription(`Suggestion feed reactions are currently ${qServerDB.config.react ? "enabled" : "disabled"}`)
-					.addField("Upvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? "Disabled" : "👍"))
-					.addField("Shrug/No Opinion", (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? "Disabled" : "🤷"))
-					.addField("Downvote", (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? "Disabled" : "👎"))
+					.setDescription(string(qServerDB.config.react ? "CFG_FEED_REACTIONS_ENABLED" : "CFG_FEED_REACTIONS_DISABLED"))
+					.addField(string("CFG_EMOJI_UPVOTE_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string("DISABLED") : "👍"))
+					.addField(string("CFG_EMOJI_MID_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? string("DISABLED") : "🤷"))
+					.addField(string("CFG_EMOJI_DOWNVOTE_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string("DISABLED") : "👎"))
 					.setColor(qServerDB.config.react ? colors.default : colors.orange);
-				return message.channel.send("Current server emoji settings:", reactEmbed);
+				return message.channel.send(reactEmbed);
 			}
 
 			switch (args[1].toLowerCase()) {
 			case "up":
 			case "upvote":
 			case "yes": {
-				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
-				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
-					if (qServerDB.config.emojis.up === "none") return message.channel.send(`<:${emoji.x}> The upvote emoji is already disabled.`);
-					qServerDB.config.emojis.up = "none";
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully disabled the upvote reaction.`);
-				}
-				let upEmote = await findEmoji(args[2], server.emojis.cache);
-				if (upEmote[0]) {
-					qServerDB.config.emojis.up = upEmote[0];
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully set the upvote emoji for this server to ${upEmote[1]}.`);
-				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
+				return message.channel.send((await handleEmojiInput(args[2], server, "up", "CFG_EMOJI_UP_DISABLE_SUCCESS", "CFG_EMOJI_UP_SET_SUCCESS")));
 			}
 			case "shrug":
 			case "neutral":
 			case "middle":
 			case "mid": {
-				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
-				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
-					if (qServerDB.config.emojis.mid === "none") return message.channel.send(`<:${emoji.x}> The shrug/no opinion emoji is already disabled.`);
-					qServerDB.config.emojis.mid = "none";
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully disabled the shrug/no opinion reaction.`);
-				}
-				let midEmote = await findEmoji(args[2], server.emojis.cache);
-				if (midEmote[0]) {
-					qServerDB.config.emojis.mid = midEmote[0];
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully set the shrug/no opinion emoji for this server to ${midEmote[1]}.`);
-				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
+				return message.channel.send((await handleEmojiInput(args[2], server, "mid", "CFG_EMOJI_MID_DISABLE_SUCCESS", "CFG_EMOJI_MID_SET_SUCCESS")));
 			}
 			case "down":
 			case "downvote":
 			case "no": {
-				if (!args[2]) return message.channel.send(`<:${emoji.x}> You must specify an emoji.`);
-				if (args[2].toLowerCase() === "none" || args[2].toLowerCase() === "disable" || args[2].toLowerCase() === "off") {
-					if (qServerDB.config.emojis.down === "none") return message.channel.send(`<:${emoji.x}> The downvote emoji is already disabled.`);
-					qServerDB.config.emojis.down = "none";
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully disabled the downvote reaction.`);
-				}
-				let downEmote = await findEmoji(args[2], server.emojis.cache);
-				if (downEmote[0]) {
-					qServerDB.config.emojis.down = downEmote[0];
-					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Successfully set the downvote emoji for this server to ${downEmote[1]}.`);
-				} else return message.channel.send(`<:${emoji.x}> The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.`);
+				return message.channel.send((await handleEmojiInput(args[2], server, "down", "CFG_EMOJI_DOWN_DISABLE_SUCCESS", "CFG_EMOJI_DOWN_SET_SUCCESS")));
 			}
 			case "enable":
+			case "on": {
 				if (!qServerDB.config.react) {
 					qServerDB.config.react = true;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Enabled suggestion feed reactions.`);
-				} else return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already enabled!`);
+					return message.channel.send(string("CFG_FEED_REACTIONS_ENABLED", {}, "success"));
+				} else return message.channel.send(string("CFG_FEED_REACTIONS_ALREADY_ENABLED", {}, "error"));
+			}
 			case "disable":
+			case "off": {
 				if (qServerDB.config.react) {
 					qServerDB.config.react = false;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Disabled suggestion feed reactions.`);
-				} else return message.channel.send(`<:${emoji.x}> Suggestion feed reactions are already disabled!`);
+					return message.channel.send(string("CFG_FEED_REACTIONS_DISABLED", {}, "success"));
+				} else return message.channel.send(string("CFG_FEED_REACTIONS_ALREADY_DISABLED", {}, "error"));
+			}
 			case "toggle":
 				qServerDB.config.react = !qServerDB.config.react;
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.react ? "Enabled": "Disabled"} suggestion feed reactions.`);
+				return message.channel.send(string(qServerDB.config.react ? "CFG_FEED_REACTIONS_ENABLED" : "CFG_FEED_REACTIONS_DISABLED", {}, "success"));
 			default:
-				return message.channel.send("Please specify a valid emoji setting (`up`, `mid`, `down`, or `toggle`).");
+				return message.channel.send(string("CFG_EMOJI_INVALID_SETTING_ERROR", {}, "error"));
 			}
 		}
 		case "notify":
 		case "notifications":
 		case "notification":
 		case "notif": {
-			if (!args[1]) return message.channel.send(`DM notifications on suggestion changes are currently **${qServerDB.config.notify ? "enabled" : "disabled"}**.`);
+			if (!args[1]) return message.channel.send(string(qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED"));
 			switch (args[1].toLowerCase()) {
 			case "enable":
 			case "on": {
 				if (!qServerDB.config.notify) {
 					qServerDB.config.notify = true;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Enabled user notifications.`);
-				} else return message.channel.send(`<:${emoji.x}> User notifications are already enabled!`);
+					return message.channel.send(string("GUILD_NOTIFICATIONS_ENABLED", {}, "success"));
+				} else return message.channel.send(string("GUILD_NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
 			}
 			case "disable":
 			case "off": {
 				if (qServerDB.config.notify) {
 					qServerDB.config.notify = false;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Disabled user notifications.`);
-				} else return message.channel.send(`<:${emoji.x}> User notifications are already disabled!`);
+					return message.channel.send(string("GUILD_NOTIFICATIONS_DISABLED", {}, "success"));
+				} else return message.channel.send(string("GUILD_NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
 			}
 			case "toggle":
 				qServerDB.config.notify = !qServerDB.config.notify;
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.notify ? "Enabled" : "Disabled"} user notifications.`);
+				return message.channel.send(string(qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED", {}, "success"));
 			default:
-				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
+				return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
 		}
 		case "clear":
 		case "clean":
 		case "cleancommands":
 		case "cleancommand": {
-			if (!args[1]) return message.channel.send(`Auto-cleaning of suggestion commands is currently **${qServerDB.config.clean_suggestion_command ? "enabled" : "disabled"}**.`);
+			if (!args[1]) return message.channel.send(string(qServerDB.config.clean_suggestion_command ? "CFG_CLEAN_COMMANDS_ENABLED" : "CFG_CLEAN_COMMANDS_DISABLED"));
 			switch (args[1].toLowerCase()) {
 			case "enable":
 			case "on": {
 				if (!qServerDB.config.clean_suggestion_command) {
-					if (!server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+					if (!server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string("CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
 					qServerDB.config.clean_suggestion_command = true;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Enabled auto-cleaning of suggestion commands.`);
-				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already enabled!`);
+					return message.channel.send(string("CFG_CLEAN_COMMANDS_ENABLED", {}, "success"));
+				} else return message.channel.send(string("CFG_CLEAN_COMMANDS_ALREADY_ENABLED", {}, "error"));
 			}
 			case "disable":
 			case "off": {
 				if (qServerDB.config.clean_suggestion_command) {
 					qServerDB.config.clean_suggestion_command = false;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(`<:${emoji.check}> Disabled auto-cleaning of suggestion commands.`);
-				} else return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands is already disabled!`);
+					return message.channel.send(string("CFG_CLEAN_COMMANDS_DISABLED", {}, "success"));
+				} else return message.channel.send(string("CFG_CLEAN_COMMANDS_ALREADY_DISABLED", {}, "error"));
 			}
 			case "toggle":
-				if (!qServerDB.config.clean_suggestion_command && !server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(`<:${emoji.x}> Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission. Please give the bot this permission and try again.`);
+				if (!qServerDB.config.clean_suggestion_command && !server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string("CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
 				qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(`<:${emoji.check}> ${qServerDB.config.clean_suggestion_command ? "Enabled" : "Disabled"} auto-cleaning of suggestion commands.`);
+				return message.channel.send(string(qServerDB.config.clean_suggestion_command ? "CFG_CLEAN_COMMANDS_ENABLED" : "CFG_CLEAN_COMMANDS_DISABLED", {}, "success"));
 			default:
-				return message.channel.send(`<:${emoji.x}> Please specify a valid setting (\`enable\`, \`disable\`, or \`toggle\`)`);
+				return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
 		}
 		case "list": {
@@ -501,12 +484,6 @@ module.exports = {
 			}
 			cfgChannelsArr.push(commandsChannel[0]);
 			// Emojis
-			const checkEmoji = function(emoji) {
-				if (emoji === "none") return null;
-				else if (nodeEmoji.find(emoji)) return emoji;
-				else if (emoji.startsWith("a")) return `<${emoji}>`;
-				else return `<:${emoji}>`;
-			};
 			let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string("CFG_UPVOTE_REACTION_DISABLED") : "👍");
 			let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? string("CFG_MID_REACTION_DISABLED") : "🤷");
 			let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string("CFG_DOWNVOTE_REACTION_DISABLED") : "👎");
@@ -528,7 +505,7 @@ module.exports = {
 			// Notify
 			cfgOtherArr.push(`${string("CFG_NOTIFICATIONS_TITLE", {}, "success")} ${string(qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
 			//Clean Suggestion Command
-			cfgOtherArr.push(`${string("CFG_CLEANCOMMANDS_TITLE", {}, "success")} ${string(qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
+			cfgOtherArr.push(`${string("CFG_CLEAN_COMMANDS_TITLE", {}, "success")} ${string(qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
 
 			let cfgEmbed = new Discord.MessageEmbed()
 				.setAuthor(string("SERVER_CONFIGURATION_TITLE", { server: server.name }), server.iconURL({ dynamic: true, format: "png" }))

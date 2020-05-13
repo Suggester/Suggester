@@ -461,8 +461,8 @@ module.exports = {
 			string: "**DM Notifications:**",
 			context: "Denotes the notification setting when configuration is listed"
 		},
-		"CFG_CLEANCOMMANDS_TITLE": {
-			string: "**Clean Suggestion Command:**",
+		"CFG_CLEAN_COMMANDS_TITLE": {
+			string: "**Clean Suggestion Commands:**",
 			context: "Denotes the clean commands setting when configuration is listed"
 		},
 		"SERVER_CONFIGURATION_TITLE": {
@@ -1222,6 +1222,162 @@ module.exports = {
 		"CFG_ARCHIVE_RESET_SUCCESS": {
 			string: "Successfully reset the implemented suggestions archive channel.",
 			context: "Success message when the implemented suggestions archive channel is reset"
+		},
+		"CFG_PREFIX_TOO_LONG_ERROR": {
+			string: "Your prefix must be 20 characters or less.",
+			context: "Error shown when a specified prefix is too long"
+		},
+		"CFG_PREFIX_DISALLOWED_ERROR": {
+			string: "This prefix is disallowed, please choose a different prefix.",
+			context: "Error shown when a specified prefix is disallowed"
+		},
+		"CFG_PREFIX_SET_SUCCESS": {
+			string: "Successfully set this server's prefix to **{{prefix}}**",
+			context: "Success message when the prefix is configured",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"CFG_MODE_REVIEW_SET_SUCCESS": {
+			string: "Successfully set the mode for this server to **review**.",
+			context: "Success message when the mode is set to review"
+		},
+		"CFG_MODE_AUTOAPPROVE_SET_SUCCESS": {
+			string: "Successfully set the mode for this server to **autoapprove**.",
+			context: "Success message when the mode is set to autoapprove"
+		},
+		"CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR": {
+			string: "All suggestions awaiting review must be cleared before the autoapprove mode is set.",
+			context: "Error when a user tries to set the autoapprove mode while suggestions are still awaiting review"
+		},
+		"CFG_MODE_INVALID_ERROR": {
+			string: "Please specify a valid mode. (Either `review` or `autoapprove`)",
+			context: "Error shown when the specified mode is invalid."
+		},
+		"CFG_EMOJI_UPVOTE_TITLE": {
+			string: "Upvote",
+			context: "Upvote header when emojis are listed in the config command"
+		},
+		"CFG_EMOJI_MID_TITLE": {
+			string: "Shrug/No Opinion",
+			context: "Middile reaction header when emojis are listed in the config command"
+		},
+		"CFG_EMOJI_DOWNVOTE_TITLE": {
+			string: "Downvote",
+			context: "Downvote header when emojis are listed in the config command"
+		},
+		"CFG_NO_EMOJI_ERROR": {
+			string: "You must specify an emoji.",
+			context: "Error when no emoji is specified for configuration"
+		},
+		"CFG_EMOJI_NOT_FOUND_ERROR": {
+			string: "The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.",
+			context: "Error when the specified emoji is not found"
+		},
+		"CFG_EMOJI_DISABLED_ERROR": {
+			string: "This emoji is already disabled.",
+			context: "Error shown when an emoji is already disabled"
+		},
+		"CFG_EMOJI_UP_DISABLE_SUCCESS": {
+			string: "Successfully disabled the upvote reaction.",
+			context: "Success message when the upvote reaction is disabled"
+		},
+		"CFG_EMOJI_MID_DISABLE_SUCCESS": {
+			string: "Successfully disabled the shrug/no opinion reaction.",
+			context: "Success message when the shrug/no opinion reaction is disabled"
+		},
+		"CFG_EMOJI_DOWN_DISABLE_SUCCESS": {
+			string: "Successfully disabled the downvote reaction.",
+			context: "Success message when the downvote reaction is disabled"
+		},
+		"CFG_EMOJI_UP_SET_SUCCESS": {
+			string: "Successfully set the upvote emoji for this server to {{emote}}.",
+			context: "Success message when the upvote reaction is set",
+			replaced: {
+				emote: {
+					to_replace: "{{emote}}",
+					description: "An emoji"
+				}
+			}
+		},
+		"CFG_EMOJI_MID_SET_SUCCESS": {
+			string: "Successfully set the shrug/no opinion emoji for this server to {{emote}}.",
+			context: "Success message when the shrug/no opinion reaction is set",
+			replaced: {
+				emote: {
+					to_replace: "{{emote}}",
+					description: "An emoji"
+				}
+			}
+		},
+		"CFG_EMOJI_DOWN_SET_SUCCESS": {
+			string: "Successfully set the downvote emoji for this server to {{emote}}.",
+			context: "Success message when the downvote reaction is set",
+			replaced: {
+				emote: {
+					to_replace: "{{emote}}",
+					description: "An emoji"
+				}
+			}
+		},
+		"CFG_FEED_REACTIONS_ENABLED": {
+			string: "Suggestion feed reactions are **enabled**.",
+			context: "Message when suggestion feed reactions are enabled"
+		},
+		"CFG_FEED_REACTIONS_DISABLED": {
+			string: "Suggestion feed reactions are **disabled**.",
+			context: "Message when suggestion feed reactions are disabled"
+		},
+		"CFG_FEED_REACTIONS_ALREADY_ENABLED": {
+			string: "Suggestion feed reactions are already enabled.",
+			context: "Message when suggestion feed reactions are already enabled"
+		},
+		"CFG_FEED_REACTIONS_ALREADY_DISABLED": {
+			string: "Suggestion feed reactions are already disabled.",
+			context: "Message when suggestion feed reactions are already disabled"
+		},
+		"CFG_EMOJI_INVALID_SETTING_ERROR": {
+			string: "You must specify a valid emoji setting. (`up`, `mid`, `down`, `on`, `off`, `toggle`)",
+			context: "Error when a user does not specify a valid emoji config setting"
+		},
+		"GUILD_NOTIFICATIONS_ENABLED": {
+			string: "Notifications are **enabled**. Members will receive a DM when an action is taken on any of their suggestions.",
+			context: "Shown when a guild has enabled notifications"
+		},
+		"GUILD_NOTIFICATIONS_DISABLED": {
+			string: "Notifications are **disabled**. Members will not receive a DM when an action is taken on any of their suggestions.",
+			context: "Shown when a guild has disabled notifications"
+		},
+		"GUILD_NOTIFICATIONS_ALREADY_ENABLED": {
+			string: "Server notifications are already enabled.",
+			context: "Shown when notifications are enabled and a guild tries to enable them"
+		},
+		"GUILD_NOTIFICATIONS_ALREADY_DISABLED": {
+			string: "Server notifications are already disabled.",
+			context: "Shown when notifications are disabled and a guild tries to disable them"
+		},
+		"CFG_CLEAN_COMMANDS_ENABLED": {
+			string: "Auto-cleaning of suggestion commands is **enabled**.",
+			context: "Shown when a guild has enabled cleaning of the suggest command"
+		},
+		"CFG_CLEAN_COMMANDS_DISABLED": {
+			string: "Auto-cleaning of suggestion commands is **disabled**.",
+			context: "Shown when a guild has cleaning of the suggest command"
+		},
+		"CFG_CLEAN_COMMANDS_ALREADY_ENABLED": {
+			string: "Auto-cleaning of suggestion commands is already enabled.",
+			context: "Shown when cleaning of suggestion commands is enabled and a guild tries to enable them"
+		},
+		"CFG_CLEAN_COMMANDS_ALREADY_DISABLED": {
+			string: "Auto-cleaning of suggestion commands is already disabled.",
+			context: "Shown when cleaning of suggestion commands is disabled and a guild tries to disable them"
+		},
+		"CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES": {
+			string: "Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
+			context: "Error shown when the bot does not have Manage Messages and cleaning of suggestions commands is enabled"
 		}
 	}
 };
