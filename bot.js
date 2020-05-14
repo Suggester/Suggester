@@ -16,7 +16,7 @@ if (process.env.SENTRY_DSN) {
 const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
 
 const client = new Client({
-	ws: { intents: intents},
+	ws: { intents: intents },
 	disableMentions: "everyone",
 	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" },
 	messageCacheLifetime: 120,
@@ -48,7 +48,7 @@ connection.on("error", (err) => {
 (async () => {
 	let eventFiles = await fileLoader("events");
 	for await (let file of eventFiles) {
-		const exclude = []
+		const exclude = [];
 		if (exclude.includes(basename(file))) {
 			console.log("Skipping excluded file:", file);
 			continue;

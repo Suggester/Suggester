@@ -1,6 +1,7 @@
 const { coreLog } = require("../coreFunctions.js");
 const { release } = require("../config.json");
 const chalk = require("chalk");
+const request = require("request");
 
 module.exports = async (Discord, client) => {
 	const team = await client.fetchTeam()
@@ -16,7 +17,6 @@ module.exports = async (Discord, client) => {
 
 	//Bot List Posting
 	function postToBotLists() {
-		const request = require("request");
 		let serverCount = client.guilds.cache.size;
 
 		//Botlist.Space
@@ -180,11 +180,11 @@ module.exports = async (Discord, client) => {
 		});
 	}
 
-	//if (client.user.id === "564426594144354315") {
-		////Post on startup and every hour
-		//postToBotLists();
-		//setInterval(function() {
-			//postToBotLists();
-		//}, 3600000);
-	//}
+	if (client.user.id === "564426594144354315") {
+		//Post on startup and every hour
+		postToBotLists();
+		setInterval(function() {
+			postToBotLists();
+		}, 3600000);
+	}
 };
