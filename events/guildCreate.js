@@ -1,7 +1,7 @@
 const { joinLeaveLog, dbQuery, guildLog } = require("../coreFunctions.js");
 const { release, prefix, support_invite, colors } = require("../config.json");
 module.exports = async (Discord, client, guild) => {
-	if (client.config.logServers) {
+	if (process.env.NODE_ENV === "production" || client.config.logServers) {
 		joinLeaveLog(guild, "join");
 	};
 

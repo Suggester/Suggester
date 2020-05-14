@@ -29,8 +29,10 @@ module.exports = {
 			.setFooter(`${client.user.tag} v3.2.3`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(colors.default);
+
+		const before = Date.now();
 		message.channel.send(embed).then((sent) => {
-			embed.addField(string("PING_BOT_LATENCY_HEADER"), ms(new Date().getTime() - sent.createdTimestamp));
+			embed.addField(string("PING_BOT_LATENCY_HEADER"), ms(Date.now() - before));
 			sent.edit(embed);
 		});
 	}

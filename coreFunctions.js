@@ -479,7 +479,7 @@ const fileLoader = async function* (dir) {
 module.exports.fileLoader = fileLoader;
 
 function commandExecuted (command, message, { pre, post, success } = { pre: 0, post: 0, success: false }) {
-	if (/*process.env.NODE_ENV !== "production" || */!message.client.config.logCommands) return;
+	if (process.env.NODE_ENV !== "production" || message.client.config.logCommands === false) return;
 	return new models.Command({
 		command: command.controls.name,
 		fullCommand: message.content,
