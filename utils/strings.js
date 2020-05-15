@@ -659,64 +659,6 @@ module.exports = {
 			string: "Bot Latency",
 			context: "Bot latency (previously 'Edit Time') header for the ping command"
 		},
-		"STATS_TITLE": {
-			string: "Suggestion Statistics",
-			context: "Title for the stats command embed"
-		},
-		"GLOBAL_STATS_TITLE": {
-			string: "Global Statistics",
-			context: "Title for the global stats portion of the stats command embed"
-		},
-		"SERVER_STATS_TITLE": {
-			string: "Server Statistics for **{{server}}**",
-			context: "Title for the server stats portion of the stats command embed",
-			replaced: {
-				server: {
-					to_replace: "{{server}}",
-					description: "A server name"
-				}
-			}
-		},
-		"USER_STATS_TITLE": {
-			string: "Your Statistics",
-			context: "Title for the user stats portion of the stats command embed"
-		},
-		"TOTAL_CONFIGS_STATS": {
-			string: "Server configurations",
-			context: "Indicator for total server configurations in the stats command"
-		},
-		"TOTAL_GUILD_COUNT_STATS": {
-			string: "Guild count",
-			context: "Indicator for total servers in the stats command"
-		},
-		"TOTAL_SUBMITTED_STATS": {
-			string: "Suggestions submitted globally",
-			context: "Indicator for total suggestions submitted globally in the stats command"
-		},
-		"TOTAL_SUBMITTED_APPROVED_STATS": {
-			string: "Suggestions approved globally",
-			context: "Indicator for total suggestions approved globally in the stats command"
-		},
-		"TOTAL_SUBMITTED_DENIED_STATS": {
-			string: "Suggestions denied globally",
-			context: "Indicator for total suggestions denied globally in the stats command"
-		},
-		"TOTAL_SUBMITTED_SERVER_STATS": {
-			string: "Suggestions submitted on this server",
-			context: "Indicator for total suggestions submitted on a server in the stats command"
-		},
-		"TOTAL_DENIED_SERVER_STATS": {
-			string: "Suggestions denied on this server",
-			context: "Indicator for total suggestions denied on a server in the stats command"
-		},
-		"TOTAL_APPROVED_SERVER_STATS": {
-			string: "Suggestions approved on this server",
-			context: "Indicator for total suggestions approved on a server in the stats command"
-		},
-		"BOT_TIME_SERVER_STATS": {
-			string: "Time in server",
-			context: "Indicator for time the bot has spent on a server in the stats command"
-		},
 		"UNCONFIGURED_ERROR": {
 			string: "You must configure your server to use this command. Please use the `setup` command.",
 			context: "Used when a server does not have a database entry"
@@ -1382,6 +1324,16 @@ module.exports = {
 		"CFG_NO_PARAMS_ERROR": {
 			string: "Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.",
 			context: "Error if no configuration element is specified"
+		},
+		"STATS_RESPONSE": {
+			string: "You can find statistics about the bot at {{link}}",
+			context: "Provides link to the chart dashboard of bot stats",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the chart dashboard"
+				}
+			}
 		}
 	}
 };
