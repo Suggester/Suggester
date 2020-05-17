@@ -9,6 +9,7 @@ module.exports = {
 		aliases: ["serverconfig", "cfg", "configure"],
 		usage: "config (element) (additional parameters)",
 		description: "Shows/edits server configuration",
+		image: "images/Config.gif",
 		enabled: true,
 		docs: "admin/config",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

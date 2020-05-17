@@ -8,6 +8,7 @@ module.exports = {
 		usage: "massapprove <suggestion ids> -r (comment)",
 		aliases: ["mapprove", "multiapprove"],
 		description: "Approves all specified suggestions",
+		image: "images/Mapprove.gif",
 		enabled: true,
 		docs: "staff/massapprove",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

@@ -7,6 +7,7 @@ module.exports = {
 		aliases: ["status"],
 		usage: "mark <suggestion id> <status>",
 		description: "Marks a status for a suggestion",
+		image: "images/Mark.gif",
 		enabled: true,
 		docs: "staff/mark",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

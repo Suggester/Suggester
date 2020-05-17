@@ -7,6 +7,7 @@ module.exports = {
 		permission: 3,
 		usage: "attach <suggestion id> <attachment link>",
 		description: "Attaches a file to an approved suggestion",
+		image: "images/Attach.gif",
 		enabled: true,
 		docs: "staff/attach",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"],

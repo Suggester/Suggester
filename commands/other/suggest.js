@@ -23,6 +23,7 @@ module.exports = {
 		aliases: ["submit"],
 		usage: "suggest <suggestion>",
 		description: "Submits a suggestion",
+		image: "images/Suggest.gif",
 		enabled: true,
 		docs: "all/suggest",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

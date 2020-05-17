@@ -6,6 +6,7 @@ module.exports = {
 		permission: 3,
 		usage: "deny <suggestion id> (reason)",
 		description: "Denies a suggestion",
+		image: "images/Deny.gif",
 		enabled: true,
 		docs: "staff/deny",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

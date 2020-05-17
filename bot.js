@@ -47,6 +47,7 @@ connection.on("error", (err) => {
 
 (async () => {
 	let eventFiles = await fileLoader("events");
+	let events = [];
 	for await (let file of eventFiles) {
 		const exclude = [];
 		if (exclude.includes(basename(file))) {
@@ -66,8 +67,10 @@ connection.on("error", (err) => {
 				errorLog(err, "Event Handler", `Event: ${eventName}`);
 			}
 		});
-		console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${eventName}}}`);
+		events.push(eventName);
+		//console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${eventName}}}`);
 	}
+	console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${events.length} events}}`);
 
 	let commandFiles = await fileLoader("commands");
 	for await (let file of commandFiles) {
@@ -77,8 +80,9 @@ connection.on("error", (err) => {
 		let commandName = basename(file).split(".")[0];
 
 		client.commands.set(commandName, command);
-		console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${commandName}}}`);
+		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
 	}
+	console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${client.commands.size} commands}}`);
 })();
 
 client.login(process.env.TOKEN)
@@ -92,20 +96,4 @@ client.on("warn", (warning) => {
 });
 process.on("unhandledRejection", (err) => { // this catches unhandledPromiserejectionWarning and other unhandled rejections
 	errorLog(err, "unhandledRejection", "oof something is broken x.x");
-});
-
-/**
- * Define the chunk method in the prototype of an array
- * that returns an array with arrays of the given size.
- *
- * @param chunkSize {Integer} Size of every group
- */
-Object.defineProperty(Array.prototype, "chunk", {
-	value: function(chunkSize){
-		let temporal = [];
-		for (let i = 0; i < this.length; i+= chunkSize){
-			temporal.push(this.slice(i,i+chunkSize));
-		}
-		return temporal;
-	}
 });

@@ -1,4 +1,5 @@
 const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
+const { MessageAttachment } = require("discord.js");
 const { colors, prefix } = require("../../config.json");
 const { string } = require("../../utils/strings");
 
@@ -9,6 +10,7 @@ module.exports = {
 		aliases: ["command", "howto", "prefix"],
 		usage: "help (command name)",
 		description: "Shows command information",
+		image: "images/Help.gif",
 		enabled: true,
 		docs: "all/help",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
@@ -47,6 +49,8 @@ module.exports = {
 		commandInfo.aliases ? returnEmbed.addField(string(commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
 		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField(string("HELP_DOCUMENTATION"), `https://suggester.js.org/#/${commandInfo.docs}`);
 		if (!commandInfo.enabled) returnEmbed.addField(string("HELP_ADDITIONAL_INFO"), `⚠️ ${string("COMMAND_DISABLED")}`);
+
+		if (commandInfo.image) returnEmbed.attachFiles([new MessageAttachment(commandInfo.image, `image.${commandInfo.image.split(".")[1]}`)]).setImage(`attachment://image.${commandInfo.image.split(".")[1]}`);
 
 		return message.channel.send(returnEmbed);
 

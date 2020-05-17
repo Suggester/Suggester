@@ -21,12 +21,18 @@ module.exports = {
 			let user = await fetchUser(developerId, client);
 			user ? developerArray.push(`${Discord.Util.escapeMarkdown(user.tag)} (${user.id})`) : developerArray.push(`${developerId}`);
 		}
+
+		let guildCount = await client.shard.broadcastEval("this.guilds.cache.size");
+		guildCount = guildCount.reduce((t, c) => t + c, 0);
+
+		const uptime = await client.shard.fetchClientValues("uptime");
+
 		let embed = new Discord.MessageEmbed()
 			.addField(string("PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
-			.addField(string("PING_GUILD_COUNT_HEADER"), client.guilds.cache.size)
-			.addField(string("PING_UPTIME_HEADER"), humanizeDuration(client.uptime))
+			.addField(`${string("PING_GUILD_COUNT_HEADER")}`, guildCount)
+			.addField(string("PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime)}\nAvg: ${humanizeDuration(uptime.reduce((t, c) => t + c)/uptime.length)}`)
 			.addField(string("PING_CLIENT_PING_HEADER"), `${Math.round(client.ws.ping)} ms`)
-			.setFooter(`${client.user.tag} v3.2.3`, client.user.displayAvatarURL({format: "png"}))
+			.setFooter(`Shard: ${client.shard.ids[0]} | ${client.user.tag} v3.2.3`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(colors.default);
 
@@ -37,3 +43,4 @@ module.exports = {
 		});
 	}
 };
+

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node bot.js",
     "lint": "eslint .",
-    "dev": "npx nodemon --exec 'node bot.js' --ignore node_modules/"
+    "dev": "npx nodemon --exec 'node index.js' --ignore node_modules/"
   },
   "dependencies": {
     "@sentry/node": "^5.15.5",

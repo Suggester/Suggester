@@ -8,6 +8,7 @@ module.exports = {
 		usage: "massdeny <suggestion ids> -r (reason)",
 		aliases: ["mdeny", "multideny"],
 		description: "Denies all specified suggestions",
+		image: "images/Mdeny.gif",
 		enabled: true,
 		docs: "staff/massdeny",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

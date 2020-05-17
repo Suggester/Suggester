@@ -12,8 +12,8 @@ module.exports = async (Discord, client) => {
 		console.log(chalk`{blue [{bold INFO}] Found {bold ${admin.tag}}}`);
 	}
 
-	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers!`, client);
-	console.log(chalk`{green [{bold INFO}] Logged in as {bold ${client.user.tag}}! (Release: {bold ${release})}}`);
+	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers! (Shard: ${client.shard.ids[0]})`, client);
+	console.log(chalk`{green [{bold INFO}] Logged in as {bold ${client.user.tag}}! (Release: {bold ${release}, Shard: ${client.shard.ids[0]})}}`);
 
 	//Bot List Posting
 	function postToBotLists() {

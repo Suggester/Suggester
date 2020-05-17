@@ -7,6 +7,7 @@ module.exports = {
 		permission: 2,
 		usage: "setup",
 		description: "Initiates a walkthrough for server configuration",
+		image: "images/Setup.gif",
 		enabled: true,
 		docs: "admin/setup",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],

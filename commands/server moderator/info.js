@@ -6,6 +6,7 @@ module.exports = {
 		permission: 3,
 		usage: "info <suggestion id>",
 		description: "Shows information about a suggestion",
+		image: "images/Info.gif",
 		enabled: true,
 		docs: "staff/info",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

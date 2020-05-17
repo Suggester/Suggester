@@ -8,6 +8,7 @@ module.exports = {
 		aliases: ["queue", "showqueue"],
 		usage: "listqueue",
 		description: "Shows the queue of suggestions awaiting review",
+		image: "images/Listqueue.gif",
 		enabled: true,
 		docs: "staff/listqueue",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

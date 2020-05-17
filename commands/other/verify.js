@@ -7,6 +7,7 @@ module.exports = {
 		permission: 10,
 		usage: "verify",
 		description: "Shows permissions of a user as they relate to the bot",
+		image: "images/Verify.gif",
 		enabled: true,
 		docs: "all/verify",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

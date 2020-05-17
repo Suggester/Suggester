@@ -6,6 +6,7 @@ module.exports = {
 		permission: 3,
 		usage: "approve <suggestion id> (comment)",
 		description: "Approves a suggestion",
+		image: "images/Approve.gif",
 		enabled: true,
 		docs: "staff/approve",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],

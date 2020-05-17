@@ -8,6 +8,7 @@ module.exports = {
 		usage: "massdelete <suggestion ids> -r (reason)",
 		aliases: ["mdelete", "multidelete"],
 		description: "Deletes all specified suggestions",
+		image: "images/Mdelete.gif",
 		enabled: true,
 		docs: "staff/massdelete",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
