@@ -50,7 +50,7 @@ module.exports = {
 			}
 		},
 		"ACK_SET_SUCCESS": {
-			string: "Set {{user}}'s acknowledgement to **{{acknowledgement}}**.",
+			string: "Set `{{user}}`'s acknowledgement to **{{acknowledgement}}**.",
 			context: "Text showing that the acknowledgement has been set for a user",
 			replaced: {
 				user: {
