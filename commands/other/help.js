@@ -27,7 +27,7 @@ module.exports = {
 				.setFooter(string("HELP_PREFIX_INFO", { prefix: serverPrefix }))
 				.setColor(colors.default);
 
-			if (missingConfig.length >= 1) embed.addField(string("MISSING_CONFIG_TITLE"), string("MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
+			if (missingConfig) embed.addField(string("MISSING_CONFIG_TITLE"), string("MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
 			return message.channel.send(embed);
 		}
 

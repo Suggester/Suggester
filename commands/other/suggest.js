@@ -119,14 +119,15 @@ module.exports = {
 			let reviewEmbed = new Discord.MessageEmbed()
 				.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: id.toString() }))
 				.setAuthor(string("USER_INFO_HEADER", { user: message.author.tag, id: message.author.id }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(suggestion)
-				.setColor(colors.yellow)
-				.addField(string("APPROVE_DENY_HEADER"), string("REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
+				.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"))
+				.setColor(colors.yellow);
 
 			if (attachment) {
 				reviewEmbed.addField(string("WITH_ATTACHMENT_HEADER"), attachment)
 					.setImage(attachment);
 			}
+
+			reviewEmbed.addField(string("APPROVE_DENY_HEADER"), string("REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
 			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(reviewEmbed);
 			await dbModify("Suggestion", { suggestionId: id }, { reviewMessage: reviewMessage.id });
@@ -198,7 +199,7 @@ module.exports = {
 
 			let replyEmbed = new Discord.MessageEmbed()
 				.setAuthor(string("SUGGESTION_FROM_TITLE", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(suggestion)
+				.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"))
 				.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp()
 				.setColor(colors.default)
@@ -213,7 +214,7 @@ module.exports = {
 			if (qServerDB.config.channels.log) {
 				let logEmbed = new Discord.MessageEmbed()
 					.setAuthor(string("LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-					.setDescription(suggestion)
+					.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"))
 					.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
 					.setTimestamp()
 					.setColor(colors.green);

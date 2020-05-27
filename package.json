@@ -3,9 +3,9 @@
   "description": "A bot that manages suggestions on Discord",
   "repository": "https://github.com/Suggester-Bot/Suggester",
   "license": "MIT",
-  "main": "bot.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node bot.js",
+    "start": "node index.js",
     "lint": "eslint .",
     "dev": "npx nodemon --exec 'node index.js' --ignore node_modules/"
   },

@@ -219,7 +219,7 @@ module.exports = {
 					return client.users.cache.get(uid);
 				})
 				.catch(() => {
-					return null;
+					return client.user.unknown;
 				});
 		}
 

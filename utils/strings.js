@@ -799,7 +799,7 @@ module.exports = {
 		},
 		"LOG_SUGGESTION_SUBMITTED_FOOTER": {
 			string: "Suggestion ID: {{id}} | User ID: {{user}}",
-			context: "Description of the log embed when a suggestion is submitted for review",
+			context: "Description of the log embed when a user is shown",
 			replaced: {
 				id: {
 					to_replace: "{{id}}",
@@ -1334,6 +1334,156 @@ module.exports = {
 					description: "The link to the chart dashboard"
 				}
 			}
+		},
+		"INVALID_SUGGESTION_ID_ERROR": {
+			string: "Please provide a valid suggestion ID.",
+			context: "Error shown when the specified suggestion ID is invalid"
+		},
+		"SUGGESTION_NOT_APPROVED_ERROR": {
+			string: "You can only perform this action on approved suggestions.",
+			context: "Error shown when a suggestion is not approved and an action like comment/mark is used"
+		},
+		"SUGGESTION_IMPLEMENTED_ERROR": {
+			string: "This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.",
+			context: "Error shown when a suggestion has already been marked as implemented and an action like comment/mark is used"
+		},
+		"NO_COMMENT_ERROR": {
+			string: "You must provide a comment!",
+			context: "Error shown when no comment is specified for the comment command"
+		},
+		"TOO_MANY_COMMENTS_ERROR": {
+			string: "Due to Discord embed limitations, suggestions can only have up to 23 comments.",
+			context: "Error shown when a suggestion has the maximum number of comments"
+		},
+		"COMMENT_TOO_LONG_ERROR": {
+			string: "Comments cannot be longer than 1024 characters.",
+			context: "Error shown when a specified comment is too long"
+		},
+		"SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR": {
+			string: "There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.",
+			context: "Error shown when the suggestion feed embed cannot be edited"
+		},
+		"NO_SUGGESTION_CONTENT": {
+			string: "[No Suggestion Content]",
+			context: "Shown when there is a suggestion with no content"
+		},
+		"SUGGESTION_FEED_LINK": {
+			string: "Suggestions Feed Post",
+			context: "Hyperlink title to the suggestions feed post"
+		},
+		"COMMENT_TITLE_ANONYMOUS": {
+			string: "Staff Comment",
+			context: "Title for an anonymous comment"
+		},
+		"COMMENT_TITLE": {
+			string: "Comment from {{user}} (ID {{id}})",
+			context: "Title for a comment",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A comment ID"
+				}
+			}
+		},
+		"ANONYMOUS_COMMENT_ADDED_TILE": {
+			string: "Anonymous Comment Added",
+			context: "Header for the Anonymous Comment Added embed"
+		},
+		"COMMENT_ADDED_DM_TITLE": {
+			string: "A comment was added to your suggestion in **{{server}}**!",
+			context: "Title for the DM notification of a comment being added to a suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"ANONYMOUS_COMMENT_ADDED_LOG": {
+			string: "{{user}} added an anonymous comment to #{{id}}",
+			context: "Title for the log embed when an anonymous comment is added",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION": {
+			string: "Suggestion",
+			context: "Header used throughout the bot showing the suggestion in question"
+		},
+		"MODE_AUTOAPPROVE_DISABLED_ERROR": {
+			string: "This command is disabled when the mode is set to autoapprove.",
+			context: "Error shown when a command only usable in the review mode is used in the autoapprove mode"
+		},
+		"SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR": {
+			string: "This suggestion has already been approved! Use `{{prefix}}delete {{id}}` to remove it.",
+			context: "Error shown when a suggestion has already been approved and the approve command is used",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_ALREADY_DENIED_APPROVE_ERROR": {
+			string: "This suggestion has already been denied! Previously denied suggestions cannot be approved.",
+			context: "Error shown when a suggestion is already denied and a user attempts to approve it"
+		},
+		"SUGGESTION_APPROVED_TITLE": {
+			string: "Suggestion Approved",
+			context: "Title for the suggestion approved embed"
+		},
+		"APPROVED_BY": {
+			string: "Approved by {{user}}",
+			context: "Details who approved a suggestion",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"APPROVED_DM_TITLE": {
+			string: "Your suggestion was approved in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being approved",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"APPROVED_LOG": {
+			string: "{{user}} approved #{{id}}",
+			context: "Title for the log embed when a suggestion is approved",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_CHANGE_REVIEW_EMBED": {
+			string: "A change was processed on this suggestion",
+			context: "Shown when a suggestion is no longer in review"
 		}
 	}
 };
