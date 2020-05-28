@@ -1,20 +1,11 @@
 const { colors } = require("../../config.json");
-const { dbQuery, dbModify, serverLog, suggestionEmbed, checkPermissions, channelPermissions, checkConfig } = require("../../coreFunctions");
+const { suggestionEmbed } = require("../../utils/misc");
+const { dbQuery, dbModify } = require("../../utils/db");
+const { checkPermissions, channelPermissions, checkConfig } = require("../../utils/checks");
+const { serverLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
-const validUrl = require("valid-url");
+const { checkURL } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
-
-/**
- * Check a URL to see if it makes a valid attachment
- * @param {string} url - The string to be checked
- * @returns {boolean}
- */
-function checkURL (url) {
-	if (validUrl.isUri(url)){
-		let noparams = url.split("?")[0];
-		return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
-	} else return false;
-}
 
 module.exports = {
 	controls: {
@@ -222,7 +213,7 @@ module.exports = {
 					logEmbed.setImage(attachment)
 						.addField(string("WITH_ATTACHMENT_HEADER"), attachment);
 				}
-				serverLog(logEmbed, qServerDB, client);
+				await serverLog(logEmbed, qServerDB, client);
 			}
 		}
 	}

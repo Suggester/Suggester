@@ -1,4 +1,5 @@
-const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { fetchUser } = require("../../utils/misc");
+const { dbModifyId, dbQuery } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
@@ -8,7 +9,6 @@ module.exports = {
 		aliases: ["ack", "setack", "setacknowledgement", "addack"],
 		description: "Sets a verify acknowledgement for a user",
 		enabled: true,
-		docs: "",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (message, client, args) => {

@@ -1,4 +1,4 @@
-const config = require("../../config.json");
+const { release } = require("../../config.json");
 const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
@@ -13,7 +13,7 @@ module.exports = {
 	},
 	do: async (message, client) => {
 		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=805694544>";
-		if (config.release === "special") {
+		if (release === "special") {
 			if (client.admins.has(message.author.id)) {
 				return message.channel.send(string("INVITE_BOT", { name: client.user.username, link: url.replace("[ID]", client.user.id) }));
 			}

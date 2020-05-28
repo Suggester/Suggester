@@ -1,5 +1,5 @@
 const { colors } = require("../../config.json");
-const { fetchUser } = require("../../coreFunctions.js");
+const { fetchUser } = require("../../utils/misc.js");
 const { string } = require("../../utils/strings");
 const humanizeDuration = require("humanize-duration");
 const ms = require("ms");

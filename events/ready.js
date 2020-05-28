@@ -1,4 +1,4 @@
-const { coreLog } = require("../coreFunctions.js");
+const { coreLog } = require("../utils/logs.js");
 const { release } = require("../config.json");
 const chalk = require("chalk");
 const request = require("request");

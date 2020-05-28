@@ -1,5 +1,5 @@
 const { release } = require("../../config.json");
-const { coreLog } = require("../../coreFunctions.js");
+const { coreLog } = require("../../utils/logs.js");
 const exec = (require("util").promisify((require("child_process").exec)));
 const { string } = require("../../utils/strings");
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
 	do: async (message, client, args, Discord) => {
 		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(string("DEPLOY_NOT_PRODUCTION", {}, "error")); // Don't deploy if the bot isn't running in the production environment
 		let m = await message.channel.send(string("PROCESSING"));
-		await coreLog("📥 Deploy initiated");
+		await coreLog("📥 Deploy initiated", client);
 		await generateEmbed("Deploy command received");
 		await generateEmbed("Updating code");
 

@@ -1,14 +1,17 @@
-const { joinLeaveLog, dbQuery, guildLog } = require("../coreFunctions.js");
+const { guildLog, joinLeaveLog } = require("../utils/logs");
+const { dbQuery } = require("../utils/db");
 const { release, prefix, support_invite, colors } = require("../config.json");
 module.exports = async (Discord, client, guild) => {
 	if (process.env.NODE_ENV === "production" || client.config.logServers) {
 		joinLeaveLog(guild, "join");
-	};
+	}
+
+	if (!guild.available) return;
 
 	let qServerDB = await dbQuery("Server", { id: guild.id });
 	if (qServerDB && qServerDB.blocked) {
 		await guild.leave();
-		return guildLog(`:no_entry: I was added to blacklisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
+		return guildLog(`⛔ I was added to blacklisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
 	}
 
 	let enforceWhitelist = [
@@ -17,10 +20,10 @@ module.exports = async (Discord, client, guild) => {
 	];
 	if ((enforceWhitelist.includes(release)) && (!qServerDB || !qServerDB.whitelist)) {
 		await guild.leave();
-		return guildLog(`:no_entry: I was added to non-whitelisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
+		return guildLog(`⛔ I was added to non-whitelisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
 	}
 
-	await guildLog(`:inbox_tray: New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Owner:** ${guild.owner && guild.owner.user ? `${guild.owner.user.tag} (\`${guild.owner.id}\`)` : "Owner Tag Unknown"}\n**Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, client);
+	await guildLog(`📥 New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, client);
 
 	await guild.members.fetch(client.user.id);
 	if (guild.me.joinedTimestamp+60000<Date.now()) return;

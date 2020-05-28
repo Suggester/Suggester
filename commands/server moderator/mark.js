@@ -1,4 +1,4 @@
-const { dbQueryNoNew, dbQuery, dbModify, suggestionEmbed, serverLog, checkConfig, checkChannel, fetchUser } = require("../../coreFunctions.js");
+const { dbQueryNoNew, dbQuery, dbModify, suggestionEmbed, serverLog, checkConfig, checkChannel, fetchUser } = require("../../utils/misc.js");
 const { emoji, colors, prefix } = require("../../config.json");
 module.exports = {
 	controls: {

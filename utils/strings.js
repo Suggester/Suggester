@@ -169,10 +169,6 @@ module.exports = {
 			string: "Cancelled",
 			context: "String used when an action is cancelled"
 		},
-		"EVAL_FLAGGED_DESTRUCTIVE": {
-			string: "This command has been flagged as possibly destructive. Please recheck your command and confirm you would like to execute it.",
-			context: "Confirmation sent when an eval is flagged as possibly destructive"
-		},
 		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
 			context: "Error sent when the specified flag type is invalid"
@@ -1484,6 +1480,32 @@ module.exports = {
 		"SUGGESTION_CHANGE_REVIEW_EMBED": {
 			string: "A change was processed on this suggestion",
 			context: "Shown when a suggestion is no longer in review"
+		},
+		"ALREADY_ATTACHMENT_ERROR": {
+			string: "Due to Discord embed limitations, suggestions can only have 1 attachment.",
+			context: "Error produced when a suggestion already has an attachment and a user attempts to add an attachment"
+		},
+		"NO_ATTACHMENT_ERROR": {
+			string: "Please provide an attachment!",
+			context: "Error shown when a user does not provide an attachment for the attach command"
+		},
+		"ATTACHMENT_ADDED_HEADER": {
+			string: "Attachment Added",
+			context: "Title of the reply embed when an attachment is added"
+		},
+		"ATTACHED_LOG": {
+			string: "{{user}} added an attachment to #{{id}}",
+			context: "Title for the log embed when an attachment is added to a suggestion",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
 		}
 	}
 };

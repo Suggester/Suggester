@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, dbQueryNoNew, checkConfig, checkChannel, dbModify, suggestionEmbed, serverLog } = require("../../coreFunctions.js");
+const { dbQuery, dbQueryNoNew, checkConfig, checkChannel, dbModify, suggestionEmbed, serverLog } = require("../../utils/misc.js");
 module.exports = {
 	controls: {
 		name: "removeattachment",

@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, dbModify, serverLog, checkConfig, checkPermissions, fetchUser } = require("../../coreFunctions.js");
+const { dbQuery, dbModify, serverLog, checkConfig, checkPermissions, fetchUser } = require("../../utils/misc.js");
 module.exports = {
 	controls: {
 		name: "blacklist",

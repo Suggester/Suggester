@@ -1,6 +1,8 @@
 const { emoji, colors } = require("../../config.json");
-const { dbQuery, dbModify, dbQueryNoNew, channelPermissions, findRole, findChannel, dbDeleteOne } = require("../../coreFunctions.js");
+const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
+const { findRole, findChannel } = require("../../utils/config");
 const {Server} = require("../../utils/schemas");
+const { channelPermissions } = require("../../utils/checks");
 module.exports = {
 	controls: {
 		name: "setup",

@@ -1,4 +1,4 @@
-const { coreLog } = require("../../coreFunctions.js");
+const { coreLog } = require("../../utils/logs.js");
 module.exports = {
 	controls: {
 		name: "reboot",

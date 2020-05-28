@@ -1,5 +1,5 @@
 const { Structures: { extend } } = require("discord.js");
-const { dbQueryNoNew } = require("../../coreFunctions");
+const { dbQueryNoNew } = require("../misc");
 
 extend("User", (GM) => {
 	return class extends GM {

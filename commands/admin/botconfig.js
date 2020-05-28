@@ -1,18 +1,7 @@
 const { colors } = require("../../config.json");
 const Persist = require("../../utils/Persistent");
-const validUrl = require("valid-url");
 const { string } = require("../../utils/strings");
-/**
- * Check a URL to see if it makes a valid attachment
- * @param {string} url - The string to be checked
- * @returns {boolean}
- */
-function checkURL (url) {
-	if (validUrl.isUri(url)){
-		let noparams = url.split("?")[0];
-		return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
-	} else return false;
-}
+const { checkURL } = require("../../utils/checks");
 module.exports = {
 	controls: {
 		name: "botconfig",

@@ -1,4 +1,6 @@
-const { commandExecuted, dbQuery, dbModify, coreLog, commandLog, checkPermissions, errorLog } = require("../coreFunctions");
+const { checkPermissions, channelPermissions } = require("../utils/checks");
+const { dbQuery, dbModify } = require("../utils/db");
+const { coreLog, commandLog, errorLog, commandExecuted } = require("../utils/logs");
 const { emoji, colors, prefix, log_hooks, support_invite } = require("../config.json");
 const { Collection } = require("discord.js");
 
@@ -7,7 +9,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.channel.type !== "text") {
 		let dmEmbed = new Discord.MessageEmbed()
 			.setDescription(message.content);
-		if (message.channel.type === "dm" && client.user.id !== message.author.id) return coreLog(`:e_mail: **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, dmEmbed);
+		if (message.channel.type === "dm" && client.user.id !== message.author.id) return coreLog(`📧 **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, { embeds: [dmEmbed] }, client);
 		return;
 	}
 	if (message.author.bot === true) return;
@@ -54,50 +56,23 @@ module.exports = async (Discord, client, message) => {
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 	if (!command) return;
 
-	let contentEmbed = new Discord.MessageEmbed()
-		.setDescription(message.content);
-
 	if (command.controls.enabled === false) {
-		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, contentEmbed);
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send("This command is currently disabled globally.");
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, contentEmbed);
+		return commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, message);
 	}
 
-	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, contentEmbed);
+	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, message);
 
 	if (command.controls.permissions) {
-		let channelPermissions = message.channel.permissionsFor(client.user.id);
-		let list = [];
-		const permissionNames = require("../utils/permissions.json");
-		command.controls.permissions.forEach(permission => {
-			if (!channelPermissions.has(permission)) list.push(permissionNames[permission]);
-		});
-		if (list.length >= 1) {
-			if (channelPermissions.has("EMBED_LINKS")) {
-				//Can embed
-				let embed = new Discord.MessageEmbed()
-					.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${message.channel.id}> channel:`)
-					.addField("Missing Elements", `<:${emoji.x}> ${list.join(`\n<:${emoji.x}> `)}`)
-					.addField("How to Fix", `In the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-					.setColor(colors.red);
-
-				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-
-				return message.channel.send(embed).catch(() => {
-					message.author.send(`Your command \`${commandName}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`).catch(() => {});
-				});
-			} else {
-				//Cannot embed
-				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-
-				return message.channel.send(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${message.channel.id}> channel:\n - ${list.join("\n- ")}\nIn the channel settings for <#${message.channel.id}>, make sure that **${client.user.username}** has the following permissions allowed.`).catch(() => {
-					message.author.send(`Your command \`${commandName}\` used in <#${message.channel.id}> failed to execute because <@${client.user.id}> does not have the **Send Messages** permission in that channel. Please make sure <@${client.user.id}> can send messages and try again.`).catch(() => {});
-				});
-			}
+		let checkPerms = channelPermissions(command.controls.permissions, message.channel, client);
+		if (checkPerms) {
+			await commandExecuted(command, message, { pre, post: new Date(), success: false });
+			return message.channel.send(checkPerms).catch(() => {});
 		}
 	}
 

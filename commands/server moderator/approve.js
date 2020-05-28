@@ -1,6 +1,9 @@
 const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
-const { dbQuery, serverLog, fetchUser, dbModify, suggestionEmbed, dbQueryNoNew, checkConfig, checkChannel, channelPermissions } = require("../../coreFunctions.js");
+const { fetchUser, suggestionEmbed } = require("../../utils/misc");
+const { serverLog } = require("../../utils/logs");
+const { dbQuery, dbModify, dbQueryNoNew } = require("../../utils/db");
+const { checkConfig, channelPermissions } = require("../../utils/checks");
 module.exports = {
 	controls: {
 		name: "approve",

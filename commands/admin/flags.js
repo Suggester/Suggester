@@ -1,4 +1,5 @@
-const { dbModifyId, dbQuery, fetchUser } = require("../../coreFunctions");
+const { fetchUser } = require("../../utils/misc");
+const { dbModifyId, dbQuery } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {

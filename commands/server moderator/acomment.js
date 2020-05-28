@@ -1,6 +1,10 @@
 const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
-const { dbQuery, serverLog, fetchUser, dbModify, suggestionEmbed, dbQueryNoNew, checkConfig, channelPermissions } = require("../../coreFunctions.js");
+const { fetchUser } = require("../../utils/misc");
+const { serverLog } = require("../../utils/logs");
+const { dbQuery, dbModify } = require("../../utils/db");
+const { suggestionEditCommandCheck } = require("../../utils/checks");
+const { editFeedMessage } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "acomment",
@@ -14,25 +18,8 @@ module.exports = {
 		cooldown: 10
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(string("UNCONFIGURED_ERROR", {}, "error"));
-
-		let missingConfig = await checkConfig(qServerDB);
-		if (missingConfig) return message.channel.send(missingConfig);
-
-		if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
-			let perms = channelPermissions( "suggestions", client.channels.cache.get(qServerDB.config.channels.suggestions), client);
-			if (perms) return message.channel.send(perms);
-		} else return message.channel.send(string("NO_SUGGESTION_CHANNEL_ERROR", {}, "error"));
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(string("INVALID_SUGGESTION_ID_ERROR", {}, "error"));
-
-		let id = qSuggestionDB.suggestionId;
-
-		if (qSuggestionDB.status !== "approved") return message.channel.send(string("SUGGESTION_NOT_APPROVED_ERROR", {}, "error"));
-
-		if (qSuggestionDB.implemented) return message.channel.send(string("SUGGESTION_IMPLEMENTED_ERROR", {}, "error"));
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(message, args);
+		if (returned) return message.channel.send(returned);
 
 		if (!args[1]) return message.channel.send(string("NO_COMMENT_ERROR", {}, "error"));
 
@@ -53,14 +40,8 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string("ERROR", {}, "error"));
 
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		let messageEdited;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			f.edit(suggestionEditEmbed);
-			messageEdited = true;
-		}).catch(() => messageEdited = false);
-
-		if (!messageEdited) return message.channel.send(string("SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error"));
+		let editFeed = await editFeedMessage(qSuggestionDB, qServerDB, client);
+		if (editFeed) return message.channel.send(editFeed);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string("ANONYMOUS_COMMENT_ADDED_TILE"))

@@ -1,5 +1,7 @@
-const { colors, emoji } = require("../../config.json");
-const { dbQueryNoNew, dbQuery, dbModify, channelPermissions, checkPermissions, findRole, findChannel, findEmoji } = require("../../coreFunctions.js");
+const { colors } = require("../../config.json");
+const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
+const { findRole, findChannel, findEmoji } = require("../../utils/config");
+const { channelPermissions, checkPermissions } = require("../../utils/checks");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
 module.exports = {

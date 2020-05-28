@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, serverLog, fetchUser, dbModify, dbQueryNoNew, checkConfig, checkChannel } = require("../../coreFunctions.js");
+const { dbQuery, serverLog, fetchUser, dbModify, dbQueryNoNew, checkConfig, checkChannel } = require("../../utils/misc.js");
 module.exports = {
 	controls: {
 		name: "silentdeny",

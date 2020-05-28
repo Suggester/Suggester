@@ -1,4 +1,4 @@
-const { dbQueryNoNew, dbModify } = require("../../coreFunctions.js");
+const { dbQueryNoNew, dbModify } = require("../../utils/db.js");
 const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 module.exports = {

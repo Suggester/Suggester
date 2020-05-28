@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../../config.json");
-const { checkChannel, checkConfig, fetchUser, dbQuery, serverLog } = require("../../coreFunctions.js");
+const { checkChannel, checkConfig, fetchUser, dbQuery, serverLog } = require("../../utils/misc.js");
 const { Suggestion } = require("../../utils/schemas");
 module.exports = {
 	controls: {

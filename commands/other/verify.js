@@ -1,6 +1,8 @@
 const { colors } = require("../../config.json");
-const { dbQuery, checkPermissions, fetchUser } = require("../../coreFunctions");
+const { fetchUser } = require("../../utils/misc");
+const { checkPermissions } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
+const { dbQuery } = require("../../utils/db");
 module.exports = {
 	controls: {
 		name: "verify",

@@ -1,5 +1,5 @@
 const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, checkConfig, serverLog, fetchUser, dbModify, dbQueryNoNew, checkChannel } = require("../../coreFunctions.js");
+const { dbQuery, checkConfig, serverLog, fetchUser, dbModify, dbQueryNoNew, checkChannel } = require("../../utils/misc.js");
 module.exports = {
 	controls: {
 		name: "delete",

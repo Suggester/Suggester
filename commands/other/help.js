@@ -1,4 +1,6 @@
-const { dbQuery, permLevelToRole, checkConfig } = require("../../coreFunctions");
+const { permLevelToRole } = require("../../utils/misc");
+const { dbQuery } = require("../../utils/db");
+const { checkConfig } = require("../../utils/checks");
 const { MessageAttachment } = require("discord.js");
 const { colors, prefix } = require("../../config.json");
 const { string } = require("../../utils/strings");

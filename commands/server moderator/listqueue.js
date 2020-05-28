@@ -1,5 +1,5 @@
 const { prefix, colors, emoji } = require("../../config.json");
-const { dbQueryAll, dbQuery, checkConfig } = require("../../coreFunctions.js");
+const { dbQueryAll, dbQuery, checkConfig } = require("../../utils/misc.js");
 
 module.exports = {
 	controls: {
