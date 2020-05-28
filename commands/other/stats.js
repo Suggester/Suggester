@@ -1,5 +1,4 @@
 const { string } = require("../../utils/strings");
-const { chart_link } = require("../../config.json");
 module.exports = {
 	controls: {
 		name: "stats",
@@ -13,6 +12,7 @@ module.exports = {
 		cooldown: 20
 	},
 	do: async (message) => {
+		let chart_link = "https://suggester.js.org/#/botstats";
 		return message.channel.send(string("STATS_RESPONSE", { link: chart_link }));
 	}
 };

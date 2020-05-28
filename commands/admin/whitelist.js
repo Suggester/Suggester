@@ -5,7 +5,7 @@ module.exports = {
 		name: "whitelist",
 		permission: 1,
 		aliases: ["wl"],
-		usage: "whitelist <guild id>",
+		usage: "whitelist <add/remove> <guild id>",
 		description: "Whitelists a server",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]

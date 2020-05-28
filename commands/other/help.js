@@ -20,7 +20,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		let missingConfig = checkConfig(qServerDB);
+		let missingConfig = await checkConfig(qServerDB);
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 		if (!args[0]) {

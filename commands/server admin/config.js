@@ -18,13 +18,6 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		if (!args[0]) {
-			let embed = new Discord.MessageEmbed();
-			embed.setDescription(string("CONFIG_HELP", { prefix: qServerDB.config.prefix }));
-			embed.setColor(colors.default);
-			return message.channel.send(embed);
-		}
-
 		let server;
 		let permission = await checkPermissions(message.member, client);
 		if (!args[0] || permission > 1) server = message.guild;
@@ -35,6 +28,13 @@ module.exports = {
 		if (!server) server = message.guild;
 		
 		let qServerDB = await dbQuery("Server", {id: server.id});
+
+		if (!args[0]) {
+			let embed = new Discord.MessageEmbed();
+			embed.setDescription(string("CONFIG_HELP", { prefix: qServerDB.config.prefix }));
+			embed.setColor(colors.default);
+			return message.channel.send(embed);
+		}
 
 		async function handleRoleInput (action, input, roles, current, present_string, success_string) {
 			if (!input) return string("CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");

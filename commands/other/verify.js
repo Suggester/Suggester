@@ -17,7 +17,7 @@ module.exports = {
 	},
 	do: async (message, client, args, Discord) => {
 		let user = await fetchUser(args[0] ? args[0] : message.author.id, client);
-		if (!user) user = message.author;
+		if (!user || user.id === "0") user = message.author;
 
 		let qUserDB = await dbQuery("User", { id: user.id });
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });

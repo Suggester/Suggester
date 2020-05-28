@@ -1,17 +1,3 @@
-/**
- * Find something in a collection with near matching strings
- * @param collection - Call .cache on it first
- * @param words - The string containing a potential string match
- */
-function nearMatchCollection (collection, words) {
-	let array = collection.array();
-	let nameArray = array.map((r) => r.name.toLowerCase());
-
-	let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), nameArray);
-
-	if (rating < .3) return null;
-	return array[bestMatchIndex];
-}
 const nodeEmoji = require("node-emoji");
 const { findBestMatch } = require("string-similarity");
 
@@ -72,5 +58,19 @@ module.exports = {
 		let emote = emotes.get(matches[1]) || null;
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
 		else return [null, null];
+	},
+	/**
+	 * Find something in a collection with near matching strings
+	 * @param collection - Call .cache on it first
+	 * @param words - The string containing a potential string match
+	 */
+	nearMatchCollection: function (collection, words) {
+		let array = collection.array();
+		let nameArray = array.map((r) => r.name.toLowerCase());
+
+		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), nameArray);
+
+		if (rating < .3) return null;
+		return array[bestMatchIndex];
 	}
 };

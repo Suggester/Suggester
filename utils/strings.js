@@ -937,7 +937,13 @@ module.exports = {
 		},
 		"CONFIG_HELP": {
 			string: "Please see https://suggester.js.org/#/admin/config for information about the config command. You can use `{{prefix}}autosetup` or `{{prefix}}setup` to automatically setup or walkthrough setting up your server",
-			context: "General help when the config command is used with no parameters"
+			context: "General help when the config command is used with no parameters",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
 		},
 		"CFG_NO_ROLE_SPECIFIED_ERROR": {
 			string: "You must specify a role name, @mention, or ID!",
