@@ -158,5 +158,5 @@ module.exports = async (Discord, client, message) => {
 		console.log(err);
 
 		commandExecuted(command, message, { pre, post: new Date(), success: false });
-	};
+	}
 };

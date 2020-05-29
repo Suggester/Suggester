@@ -503,8 +503,8 @@ module.exports = {
 			string: "Server Flags",
 			context: "Title for the Server Flags field of the configuration list"
 		},
-		"PAGINATION_NAV_INSTRUCTIONS": {
-			string: "Use the arrow reactions to navigate pages, and the ⏹ reaction to close the changelog embed",
+		"PAGINATION_NAVIGATION_INSTRUCTIONS": {
+			string: "Use the arrow reactions to navigate pages, and the ⏹ reaction to close the embed",
 			context: "Included in pagination embeds to give instructions on how to navigate pages"
 		},
 		"PAGINATION_PAGE_COUNT": {
@@ -1690,6 +1690,98 @@ module.exports = {
 		"PING_SHARD_STATS_HEADER": {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
+		},
+		"BLACKLIST_NO_ARGS_ERROR": {
+			string: "You must specify a user or `list` to show a list of blacklisted users.",
+			context: "Error shown when no parameters are speciied for the blacklist command"
+		},
+		"BLACKLIST_EMPTY": {
+			string: "There are no users blacklisted from using the bot on this server.",
+			context: "Shown when no users are blacklisted on a server"
+		},
+		"BLACKLIST_SELF_ERROR": {
+			string: "You cannot blacklist yourself.",
+			context: "Error shown when a user attempts to blacklist themselves"
+		},
+		"BLACKLIST_USER_BOT_ERROR": {
+			string: "This user is a bot, and therefore cannot be blacklisted.",
+			context: "Error shown when a user attempts to blacklist a bot"
+		},
+		"BLACKLIST_REASON_TOO_LONG_ERROR": {
+			string: "Blacklist reasons are limited to a length of 1024 characters.",
+			context: "Error shown when a blacklist reason is too long"
+		},
+		"BLACKLIST_GLOBAL_STAFF_ERROR": {
+			string: "Global Suggester staff members cannot be blacklisted.",
+			context: "Error shown when a user attempts to blacklist a global staff member"
+		},
+		"BLACKLIST_STAFF_ERROR": {
+			string: "Staff members cannot be blacklisted.",
+			context: "Error shown when a user attempts to blacklist a server staff member"
+		},
+		"ALREADY_BLACKLISTED_ERROR": {
+			string: "This user is already blacklisted from using the bot on this server!",
+			context: "Error shown when a user attempts to blacklist a user who has already been blacklisted"
+		},
+		"BLACKLIST_REASON_HEADER": {
+			string: "Reason:",
+			context: "Shown if a reason is specified for the blacklist command"
+		},
+		"BLACKLIST_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been blacklisted from using the bot on this server.",
+			context: "Success message when a user is blacklisted in a guild",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"BLACKLIST_LOG_TITLE": {
+			string: "{{staff}} blacklisted {{user}}",
+			context: "Title of the log embed when a user is blacklisted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The blacklisted user's tag"
+				},
+				staff: {
+					to_replace: "{{staff}}",
+					description: "The staff member's tag"
+				}
+			}
+		},
+		"BLACKLIST_USER_DATA": {
+			string: "Tag: {{tag}}\nID: {{id}}\nMention: {{mention}}",
+			context: "Shows data about the user in the blacklist embed",
+			replaced: {
+				tag: {
+					to_replace: "{{tag}}",
+					description: "The blacklisted user's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The blacklisted user's ID"
+				},
+				mention: {
+					to_replace: "{{mention}}",
+					description: "The blacklisted user's mention"
+				}
+			}
+		},
+		"STAFF_MEMBER_LOG_FOOTER": {
+			string: "Staff Member ID: {{id}}",
+			context: "Shows the staff member ID in the blacklist log embed",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The staff member's ID"
+				}
+			}
 		}
 	}
 };

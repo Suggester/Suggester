@@ -17,7 +17,7 @@ module.exports = {
 		case "user": {
 			if (!args[0]) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 			let foundUser = await fetchUser(args[0], client);
-			if (!foundUser) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+			if (!foundUser || foundUser.id === "0") return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
 			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string("INVALID_GLOBALBAN_PARAMS_ERROR", {}, "error"));
 			let qUserDB = await dbQuery("User", { id: foundUser.id });
 			if (!args[1]) {
@@ -25,7 +25,10 @@ module.exports = {
 				return message.channel.send(string(blocked ? "IS_GLOBALLY_BANNED" : "IS_NOT_GLOBALLY_BANNED", { banned: foundUser.tag }));
 			}
 			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(string("USER_PROTECTED_ERROR", {}, "error"));
-			if (args[1] === "true") qUserDB.blocked = true;
+			if (args[1] === "true") {
+				if (foundUser.bot) return message.channel.send(string("BLACKLIST_USER_BOT_ERROR", {}, "error"));
+				qUserDB.blocked = true;
+			}
 			else if (args[1] === "false") qUserDB.blocked = false;
 			await dbModifyId("User", foundUser.id, qUserDB);
 			return message.channel.send(string(qUserDB.blocked ? "IS_GLOBALLY_BANNED" : "IS_NOT_GLOBALLY_BANNED", { banned: foundUser.tag }, "success"));

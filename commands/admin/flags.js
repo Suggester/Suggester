@@ -18,7 +18,7 @@ module.exports = {
 		case "user":
 			// eslint-disable-next-line no-case-declarations
 			let user = await fetchUser(args[1], client);
-			if (!user) user = message.author;
+			if (!user || user.id === "0") user = message.author;
 			// eslint-disable-next-line no-case-declarations
 			let dbUser = await dbQuery("User", { id: user.id });
 			// eslint-disable-next-line no-case-declarations

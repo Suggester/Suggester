@@ -39,7 +39,7 @@ module.exports = {
 			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
 			.setColor(colors.blue)
-			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
+			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }));
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {

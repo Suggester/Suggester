@@ -1,7 +1,6 @@
 const { coreLog } = require("../utils/logs.js");
 const { release } = require("../config.json");
 const chalk = require("chalk");
-const request = require("request");
 
 module.exports = async (Discord, client) => {
 	const team = await client.fetchTeam()
@@ -14,7 +13,7 @@ module.exports = async (Discord, client) => {
 
 	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers! (Shard: ${client.shard.ids[0]})`, client);
 	console.log(chalk`{green [{bold INFO}] Logged in as {bold ${client.user.tag}}! (Release: {bold ${release}, Shard: ${client.shard.ids[0]})}}`);
-
+/*
 	//Bot List Posting
 	function postToBotLists() {
 		let serverCount = client.guilds.cache.size;
@@ -187,4 +186,6 @@ module.exports = async (Discord, client) => {
 			postToBotLists();
 		}, 3600000);
 	}
+	*/
+
 };

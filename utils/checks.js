@@ -87,7 +87,7 @@ module.exports = {
 		}
 		return null;
 	},
-	async suggestionEditCommandCheck (message, args) {
+	suggestionEditCommandCheck: async function (message, args) {
 		const { dbQuery, dbQueryNoNew } = require("./db");
 		const { checkConfig, channelPermissions } = require("./checks");
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -107,6 +107,16 @@ module.exports = {
 		if (qSuggestionDB.status !== "approved") return [string("SUGGESTION_NOT_APPROVED_ERROR", {}, "error")];
 		if (qSuggestionDB.implemented) return [string("SUGGESTION_IMPLEMENTED_ERROR", {}, "error")];
 		return [null, qServerDB, qSuggestionDB, qSuggestionDB.suggestionId];
+	},
+	baseConfig: async function(guild) {
+		const { dbQuery } = require("./db");
+		const { checkConfig } = require("./checks");
+		let qServerDB = await dbQuery("Server", { id: guild });
+		if (!qServerDB) return [string("UNCONFIGURED_ERROR", {}, "error")];
+
+		let missingConfig = await checkConfig(qServerDB);
+		if (missingConfig) return [missingConfig];
+		return [null, qServerDB];
 	},
 	/**
 	 * Check a URL to see if it makes a valid attachment

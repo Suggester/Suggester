@@ -13,7 +13,7 @@ module.exports = {
 	},
 	do: async (message, client, args) => {
 		let user = await fetchUser(args[0], client);
-		if (!user || !args[1]) {
+		if (!user || user.id === "0" || !args[1]) {
 			if (!user) user = message.author;
 			let dbUser = await dbQuery("User", { id: user.id });
 			let ack = dbUser && dbUser.ack ? dbUser.ack : string("NO_ACK_SET");
