@@ -1,4 +1,5 @@
-const { coreLog } = require("../../utils/logs.js");
+const { coreLog } = require("../../utils/logs");
+const { confirmation } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "reboot",
@@ -9,9 +10,19 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
-	do: async message => {
-		await message.channel.send("Shutting down...");
-		await coreLog(`🔌 ${message.author.tag} (\`${message.author.id}\`) initiated a reboot`);
-		return process.exit(0);
+	do: async (message, client) => {
+		if ((
+			await confirmation(
+				message,
+				`:warning: Are you sure you would like to reboot **${client.user.username}**?`,
+				{
+					deleteAfterReaction: true
+				}
+			)
+		)) {
+			await coreLog(`🔌 ${message.author.tag} (\`${message.author.id}\`) initiated a reboot`, client);
+			await message.channel.send("Shutting down...");
+			return process.exit(0);
+		}
 	}
 };

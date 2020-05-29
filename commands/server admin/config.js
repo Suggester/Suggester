@@ -1,7 +1,8 @@
-const { colors } = require("../../config.json");
+const { colors, emoji } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
-const { findRole, findChannel, findEmoji } = require("../../utils/config");
-const { channelPermissions, checkPermissions } = require("../../utils/checks");
+const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("../../utils/config");
+const { checkPermissions } = require("../../utils/checks");
+const { confirmation } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
 module.exports = {
@@ -34,64 +35,6 @@ module.exports = {
 			embed.setDescription(string("CONFIG_HELP", { prefix: qServerDB.config.prefix }));
 			embed.setColor(colors.default);
 			return message.channel.send(embed);
-		}
-
-		async function handleRoleInput (action, input, roles, current, present_string, success_string) {
-			if (!input) return string("CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
-			let role = await findRole(input, roles);
-			if (!role) return string("CFG_INVALID_ROLE_ERROR", {}, "error");
-			switch (action) {
-			case "add":
-				if (current.includes(role.id)) return string(present_string, {}, "error");
-				current.push(role.id);
-				await dbModify("Server", {id: server.id}, qServerDB);
-				return string(success_string, { role: role.name }, "success");
-			case "remove":
-				if (!current.includes(role.id)) return string(present_string, {}, "error");
-				current.splice(current.findIndex(r => r === role.id), 1);
-				await dbModify("Server", {id: server.id}, qServerDB);
-				return string(success_string, { role: role.name }, "success");
-			}
-		}
-
-		async function handleChannelInput (input, server, current_name, check_perms, done_str, reset_str) {
-			if (!input) return string("CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
-			if (reset_str && (input === "none" || input === "reset")) {
-				qServerDB.config.channels[current_name] = "";
-				if (current_name === "log" && qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
-					client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
-					qServerDB.config.loghook = {};
-				}
-				await dbModify("Server", {id: server.id}, qServerDB);
-
-				return string(reset_str, {}, "success");
-			}
-			let channel = await findChannel(input, server.channels.cache);
-			if (!channel || channel.type !== "text") return string("CFG_INVALID_CHANNEL_ERROR", {}, "error");
-			let permissions = await channelPermissions(check_perms, channel, client);
-			if (permissions) return permissions;
-			qServerDB.config.channels[current_name] = channel.id;
-			if (current_name === "log") {
-				if (qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
-					client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
-					qServerDB.config.loghook = {};
-				}
-				try {
-					let webhook = await channel.createWebhook("Suggester Logs", {
-						avatar: client.user.displayAvatarURL({format: "png"}),
-						reason: string("CREATE_LOG_CHANNEL")
-					});
-
-					qServerDB.config.loghook = {
-						id: webhook.id,
-						token: webhook.token
-					};
-				} catch (err) {
-					return string("CFG_WEBHOOK_CREATION_ERROR", {}, "error");
-				}
-			}
-			await dbModify("Server", {id: server.id}, qServerDB);
-			return string(done_str, { channel: `<#${channel.id}>` }, "success");
 		}
 
 		async function listRoles (roleList, server, title, fatal, append) {
@@ -159,13 +102,26 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.admin_roles, "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				let origRole = args.splice(2).join(" ");
+				let output = await handleRoleInput("add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS");
+				if (output === "CONFIRM") {
+					if ((
+						await confirmation(
+							message,
+							string("EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+							{
+								deleteAfterReaction: true
+							}
+						)
+					)) return message.channel.send((await handleRoleInput("add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					else return message.channel.send(string("CANCELLED", {}, "error"));
+				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.admin_roles, "CFG_NOT_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, "admin_roles", "CFG_NOT_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
 				return message.channel.send((await listRoles(qServerDB.config.admin_roles, server, "CFG_ADMIN_ROLES_TITLE", true))[0]);
@@ -182,13 +138,26 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.staff_roles, "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				let origRole = args.splice(2).join(" ");
+				let output = await handleRoleInput("add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS");
+				if (output === "CONFIRM") {
+					if ((
+						await confirmation(
+							message,
+							string("EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+							{
+								deleteAfterReaction: true
+							}
+						)
+					)) return message.channel.send((await handleRoleInput("add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					else return message.channel.send(string("CANCELLED", {}, "error"));
+				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.staff_roles, "CFG_NOT_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, "staff_roles", "CFG_NOT_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
 				return message.channel.send((await listRoles(qServerDB.config.staff_roles, server, "CFG_STAFF_ROLES_TITLE", true))[0]);
@@ -205,13 +174,13 @@ module.exports = {
 			switch (args[1]) {
 			case "add":
 			case "+": {
-				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, qServerDB.config.allowed_roles, "CFG_ALREADY_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_ALREADY_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "remove":
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, qServerDB.config.allowed_roles, "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
 			}
 			case "list": {
 				return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);

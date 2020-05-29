@@ -1,7 +1,7 @@
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { dbQuery, dbModify } = require("../utils/db");
 const { coreLog, commandLog, errorLog, commandExecuted } = require("../utils/logs");
-const { emoji, colors, prefix, log_hooks, support_invite } = require("../config.json");
+const { emoji, prefix, log_hooks, support_invite } = require("../config.json");
 const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
@@ -138,7 +138,10 @@ module.exports = async (Discord, client, message) => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
 			})
 			.catch((err) => {
-				message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
+				let errorText;
+				if (err.stack) errorText = err.stack;
+				else if (err.error) errorText = err.error;
+				message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later. ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 				errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
@@ -146,11 +149,14 @@ module.exports = async (Discord, client, message) => {
 			});
 
 	} catch (err) {
-		message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later.`);
+		let errorText;
+		if (err.stack) errorText = err.stack;
+		else if (err.error) errorText = err.error;
+		message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later. ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);
 
 		commandExecuted(command, message, { pre, post: new Date(), success: false });
-	}
+	};
 };

@@ -22,16 +22,25 @@ module.exports = {
 			user ? developerArray.push(`${Discord.Util.escapeMarkdown(user.tag)} (${user.id})`) : developerArray.push(`${developerId}`);
 		}
 
-		let guildCount = await client.shard.broadcastEval("this.guilds.cache.size");
-		guildCount = guildCount.reduce((t, c) => t + c, 0);
-
+		let guildCount = await client.shard.fetchClientValues("guilds.cache.size");
+		let pings = await client.shard.fetchClientValues("ws.ping");
 		const uptime = await client.shard.fetchClientValues("uptime");
+		let shardValues = {};
+		for (let i = 0; i < guildCount.length; i++) {
+			shardValues[i] = {
+				guildCount: guildCount[i],
+				ping: pings[i],
+				uptime: uptime[i]
+			};
+		}
+		let guildCountFull = guildCount.reduce((t, c) => t + c, 0);
 
 		let embed = new Discord.MessageEmbed()
 			.addField(string("PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
-			.addField(`${string("PING_GUILD_COUNT_HEADER")}`, guildCount)
+			.addField(`${string("PING_GUILD_COUNT_HEADER")}`, string("PING_COUNT_CONTENT", { guilds: guildCountFull, shards: guildCount.length }))
 			.addField(string("PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime)}\nAvg: ${humanizeDuration(uptime.reduce((t, c) => t + c)/uptime.length)}`)
-			.addField(string("PING_CLIENT_PING_HEADER"), `${Math.round(client.ws.ping)} ms`)
+			.addField(string("PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`)
+			.addField(string("PING_SHARD_STATS_HEADER"), `${Object.keys(shardValues).map(k => `**Shard ${k}:** ${shardValues[k].guildCount} servers, ${Math.round(shardValues[k].ping)} ms ping, up for ${humanizeDuration(shardValues[k].uptime)}`).join("\n")}`)
 			.setFooter(`Shard: ${client.shard.ids[0]} | ${client.user.tag} v3.2.3`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(colors.default);

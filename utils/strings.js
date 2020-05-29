@@ -647,9 +647,9 @@ module.exports = {
 			string: "Uptime",
 			context: "Uptime header for the ping command"
 		},
-		"PING_CLIENT_PING_HEADER": {
-			string: "Client Ping",
-			context: "Client Ping header for the ping command"
+		"PING_SHARD_PING_HEADER": {
+			string: "Shard Ping",
+			context: "Shard Ping header for the ping command"
 		},
 		"PING_BOT_LATENCY_HEADER": {
 			string: "Bot Latency",
@@ -898,6 +898,20 @@ module.exports = {
 		"AUTOSETUP_WARNING": {
 			string: "⚠️ Automatic Setup Warning ⚠️\n**This setup will overwrite any previous configuration and add channels to your server.**\n\nIf you would like to continue with automatic setup, click the {{check}} reaction. If you would like to abort automatic setup, click the {{x}} reaction.",
 			context: "Warning when automatic setup is initiated",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"SETUP_WARNING": {
+			string: "⚠️ Warning ⚠️\n**This setup will overwrite any previous server configuration.**\n\nIf you would like to continue with setup, click the {{check}} reaction. If you would like to abort setup, click the {{x}} reaction.",
+			context: "Warning when setup is initiated",
 			replaced: {
 				check: {
 					to_replace: "{{check}}",
@@ -1512,6 +1526,170 @@ module.exports = {
 					description: "The suggestion ID"
 				}
 			}
+		},
+		"TIME_SETUP_WARNING": {
+			string: "You have 2 minutes to respond",
+			context: "Footer of setup embeds showing the amount of time a user has to respond"
+		},
+		"INPUTS": {
+			string: "Inputs",
+			context: "Header showing valid inputs for the setup command"
+		},
+		"SETUP_TIMED_OUT_ERROR": {
+			string: "Setup has timed out. Please rerun the setup command if you would like to continue.",
+			context: "Error shown when setup times out"
+		},
+		"SETUP_ADMIN_ROLES_DESC": {
+			string: "Any member with a server admin role can use all staff commands, as well as edit bot configuration. Anyone who has the `Manage Server` permission is automatically counted as an admin regardless of server configuration.",
+			context: "Description for the server admin setting in setup"
+		},
+		"SETUP_STAFF_ROLES_DESC": {
+			string: "Any member with a server staff role can use all [staff commands](https://suggester.js.org/) to manage suggestions.",
+			context: "Description for the server staff setting in setup"
+		},
+		"SETUP_ROLES_INPUT": {
+			string: "You can send a **role name**, **role ID**, or **role @mention** in this channel.",
+			context: "Valid inputs for setup roles"
+		},
+		"SETUP_CHANNELS_INPUT": {
+			string: "You can send a **channel #mention**, **channel ID**, or **channel name**.",
+			context: "Valid inputs for setup channels"
+		},
+		"SETUP_ROLES_DONE_TITLE": {
+			string: "Done setting up roles?",
+			context: "Title for the field showing how to finish specifying roles in setup"
+		},
+		"SETUP_ROLES_DONE_DESC": {
+			string: "Type `done` to go to the next step\nIf you're not done, just specify another role!",
+			context: "Information about how to move on to the next setting"
+		},
+		"SETUP_BEGIN": {
+			string: "Starting setup... Send `cancel` at any time to exit setup.",
+			context: "Shown at the start of the setup prompt"
+		},
+		"SETUP_MODE_DESC": {
+			string: "This is the mode for managing suggestions, either `review` or `autoapprove`",
+			context: "Description for the mode setting in setup"
+		},
+		"SETUP_REVIEW_TEXT": {
+			string: "Review",
+			context: "Header for review information in setup"
+		},
+		"SETUP_REVIEW_DESC": {
+			string: "This mode holds all suggestions for staff review, needing to be manually approved before being posted to the suggestions channel.",
+			context: "Description of the review mode in setup"
+		},
+		"SETUP_AUTOAPPROVE_TEXT": {
+			string: "Autoapprove",
+			context: "Header for autoapprove information in setup"
+		},
+		"SETUP_AUTOAPPROVE_DESC": {
+			string: "This mode automatically sends all suggestions to the suggestions channel, with no manual review.",
+			context: "Description of the autoapprove mode in setup"
+		},
+		"SETUP_MODE_INPUTS": {
+			string: "A valid mode (either `review` or `autoapprove`)",
+			context: "Valid inputs for mode in the setup command"
+		},
+		"SETUP_SUGGESTIONS_CHANNEL_DESC": {
+			string: "This is the channel where all suggestions are sent once they are approved.",
+			context: "Description of the suggestions channel for setup"
+		},
+		"SETUP_REVIEW_CHANNEL_DESC": {
+			string: "This is the channel where all suggestions are sent once they are suggested and awaiting staff review.",
+			context: "Description of the review channel for setup"
+		},
+		"SETUP_DENIED_CHANNEL_DESC": {
+			string: "This is the channel where all denied or deleted suggestions are sent.",
+			context: "Description of the denied channel for setup"
+		},
+		"SETUP_LOG_CHANNEL_DESC": {
+			string: "This is the channel where all actions on suggestions are logged.",
+			context: "Description of the log channel for setup"
+		},
+		"SETUP_SKIP_CHANNEL": {
+			string: "This channel is optional, send `skip` to skip it.",
+			context: "Information in setup about skipping setting a channel"
+		},
+		"SETUP_PREFIX_DESC": {
+			string: "The prefix is what is used to trigger the commands. Prefixes are usually symbols, for example `$`, `?` or `.`\nA prefix of `.` would mean commands would be used like `.vote`",
+			context: "Information about the prefix in setup"
+		},
+		"SETUP_PREFIX_INPUT": {
+			string: "Any text with no spaces",
+			context: "Information about prefix inputs in setup"
+		},
+		"SETUP_PREFIX_INCLUDES_SUGGEST": {
+			string: "The prefix you specified includes `suggest`, which means commands will be run using `{{prefix}}suggest`. React with {{check}} if you would like to __keep__ this prefix, and react with {{x}} to specify a new prefix.",
+			context: "Warning if the prefix includes the term suggest in setup",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				},
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"SETUP_COMPLETE_HEADER": {
+			string: "Setup Complete!",
+			context: "Header for the setup complete embed"
+		},
+		"SETUP_COMPLETE_DESC": {
+			string: "Suggester should now work in your server, try it out with `{{prefix}}suggest`!",
+			context: "Content for the setup complete embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"SETUP_ADDITIONAL_CONFIG_HEADER": {
+			string: "Additional Configuration",
+			context: "Header for the Additional Configuration aspect of the setup complete embed"
+		},
+		"SETUP_ADDITIONAL_CONFIG_DESC": {
+			string: "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.js.org/#/admin/config for more information.",
+			context: "Description for the Additional Configuration aspect of the setup complete embed"
+		},
+		"EVERYONE_PERMISSION_WARNING": {
+			string: "Adding the everyone role to the configuration will give __all members of your server__ enhanced permissions on the bot. React with {{check}} if you would like to add the everyone role, and {{x}} if you would like to cancel.",
+			context: "Warning about giving the everyone role staff/admin permissions",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"PING_COUNT_CONTENT": {
+			string: "{{guilds}} servers across {{shards}} shards",
+			context: "Shows total number of guilds and shards in the ping command",
+			replaced: {
+				guilds: {
+					to_replace: "{{guilds}}",
+					description: "Total server count of the bot"
+				},
+				shards: {
+					to_replace: "{{shards}}",
+					description: "Total shard count of the bot"
+				}
+			}
+		},
+		"PING_SHARD_STATS_HEADER": {
+			string: "Shard Statistics",
+			context: "Header for the shard statistics section of the ping embed"
 		}
 	}
 };

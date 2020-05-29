@@ -11,7 +11,7 @@ module.exports = async (Discord, client, guild) => {
 	let qServerDB = await dbQuery("Server", { id: guild.id });
 	if (qServerDB && qServerDB.blocked) {
 		await guild.leave();
-		return guildLog(`⛔ I was added to blacklisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
+		return guildLog(`⛔ I was added to blacklisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, {}, client);
 	}
 
 	let enforceWhitelist = [
@@ -20,10 +20,10 @@ module.exports = async (Discord, client, guild) => {
 	];
 	if ((enforceWhitelist.includes(release)) && (!qServerDB || !qServerDB.whitelist)) {
 		await guild.leave();
-		return guildLog(`⛔ I was added to non-whitelisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, client);
+		return guildLog(`⛔ I was added to non-whitelisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, {}, client);
 	}
 
-	await guildLog(`📥 New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, client);
+	await guildLog(`📥 New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, {}, client);
 
 	await guild.members.fetch(client.user.id);
 	if (guild.me.joinedTimestamp+60000<Date.now()) return;

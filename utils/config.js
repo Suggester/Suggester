@@ -1,5 +1,21 @@
 const nodeEmoji = require("node-emoji");
 const { findBestMatch } = require("string-similarity");
+const { string } = require("./strings");
+const { dbModify } = require("./db");
+/**
+ * Find something in a collection with near matching strings
+ * @param collection - Call .cache on it first
+ * @param words - The string containing a potential string match
+ */
+function nearMatchCollection (collection, words) {
+	let array = collection.array();
+	let nameArray = array.map((r) => r.name.toLowerCase());
+
+	let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), nameArray);
+
+	if (rating < .3) return null;
+	return array[bestMatchIndex];
+}
 
 module.exports = {
 	/**
@@ -8,7 +24,7 @@ module.exports = {
 	 * @param roles - Represents a guild's roles cache
 	 * @returns {Promise<null|*>}
 	 */
-	async findRole(input, roles) {
+	findRole: async function (input, roles) {
 		if (!input) return null;
 		let foundId;
 		let matches = input.match(/^<@&(\d+)>$/);
@@ -29,7 +45,7 @@ module.exports = {
 	 * @param channels - Represents a guild's channels cache
 	 * @returns {Promise<null|*>}
 	 */
-	async findChannel(input, channels) {
+	findChannel: async function (input, channels) {
 		if (!input) return null;
 		let foundId;
 		let matches = input.match(/^<#(\d+)>$/);
@@ -50,7 +66,7 @@ module.exports = {
 	 * @param emotes - Represents a guild's emoji cache
 	 * @returns {Promise<null|*>}
 	 */
-	async findEmoji(input, emotes) {
+	findEmoji: async function (input, emotes) {
 		if (!input) return [null, null];
 		if (nodeEmoji.find(input)) return [input, input];
 		let matches = input.match(/<a?:[a-z0-9_~-]+:([0-9]+)>/i) || null;
@@ -59,18 +75,67 @@ module.exports = {
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
 		else return [null, null];
 	},
-	/**
-	 * Find something in a collection with near matching strings
-	 * @param collection - Call .cache on it first
-	 * @param words - The string containing a potential string match
-	 */
-	nearMatchCollection: function (collection, words) {
-		let array = collection.array();
-		let nameArray = array.map((r) => r.name.toLowerCase());
+	handleRoleInput: async function (action, input, roles, name, present_string, success_string, force) {
+		const { findRole } = require("./config");
+		if (!input) return string("CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
+		let role = await findRole(input, roles);
+		if (!role) return string("CFG_INVALID_ROLE_ERROR", {}, "error");
+		let db = await role.guild.db;
+		let current = db.config[name];
+		switch (action) {
+		case "add":
+			if (!force && ["admin_roles", "staff_roles"].includes(name) && role.id === role.guild.id) return "CONFIRM";
+			if (current.includes(role.id)) return string(present_string, {}, "error");
+			current.push(role.id);
+			await dbModify("Server", {id: role.guild.id}, db);
+			return string(success_string, { role: role.name }, "success");
+		case "remove":
+			if (!current.includes(role.id)) return string(present_string, {}, "error");
+			current.splice(current.findIndex(r => r === role.id), 1);
+			await dbModify("Server", {id: role.guild.id}, db);
+			return string(success_string, { role: role.name }, "success");
+		}
+	},
+	handleChannelInput: async function (input, server, current_name, check_perms, done_str, reset_str) {
+		const { findChannel } = require("./config");
+		const { channelPermissions } = require("./checks");
+		if (!input) return string("CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
+		let qServerDB = await server.db;
+		if (reset_str && (input === "none" || input === "reset")) {
+			qServerDB.config.channels[current_name] = "";
+			if (current_name === "log" && qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
+				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+				qServerDB.config.loghook = {};
+			}
+			await dbModify("Server", {id: server.id}, qServerDB);
 
-		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(words.toLowerCase(), nameArray);
+			return string(reset_str, {}, "success");
+		}
+		let channel = await findChannel(input, server.channels.cache);
+		if (!channel || channel.type !== "text") return string("CFG_INVALID_CHANNEL_ERROR", {}, "error");
+		let permissions = await channelPermissions(check_perms, channel, server.client);
+		if (permissions) return permissions;
+		qServerDB.config.channels[current_name] = channel.id;
+		if (current_name === "log") {
+			if (qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
+				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+				qServerDB.config.loghook = {};
+			}
+			try {
+				let webhook = await channel.createWebhook("Suggester Logs", {
+					avatar: server.client.user.displayAvatarURL({format: "png"}),
+					reason: string("CREATE_LOG_CHANNEL")
+				});
 
-		if (rating < .3) return null;
-		return array[bestMatchIndex];
+				qServerDB.config.loghook = {
+					id: webhook.id,
+					token: webhook.token
+				};
+			} catch (err) {
+				return string("CFG_WEBHOOK_CREATION_ERROR", {}, "error");
+			}
+		}
+		await dbModify("Server", {id: server.id}, qServerDB);
+		return string(done_str, { channel: `<#${channel.id}>` }, "success");
 	}
 };
