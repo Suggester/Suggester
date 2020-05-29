@@ -1409,6 +1409,10 @@ module.exports = {
 			string: "Anonymous Comment Added",
 			context: "Header for the Anonymous Comment Added embed"
 		},
+		"COMMENT_ADDED_TILE": {
+			string: "Comment Added",
+			context: "Header for the Comment Added embed"
+		},
 		"COMMENT_ADDED_DM_TITLE": {
 			string: "A comment was added to your suggestion in **{{server}}**!",
 			context: "Title for the DM notification of a comment being added to a suggestion",
@@ -1422,6 +1426,20 @@ module.exports = {
 		"ANONYMOUS_COMMENT_ADDED_LOG": {
 			string: "{{user}} added an anonymous comment to #{{id}}",
 			context: "Title for the log embed when an anonymous comment is added",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"COMMENT_ADDED_LOG": {
+			string: "{{user}} added a comment to #{{id}}",
+			context: "Title for the log embed when a comment is added",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
