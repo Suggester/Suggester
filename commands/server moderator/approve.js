@@ -1,9 +1,9 @@
 const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
-const { fetchUser, suggestionEmbed } = require("../../utils/misc");
+const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify, dbQueryNoNew } = require("../../utils/db");
-const { checkConfig, channelPermissions } = require("../../utils/checks");
+const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 module.exports = {
 	controls: {
 		name: "approve",
@@ -18,23 +18,16 @@ module.exports = {
 		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(string("UNCONFIGURED_ERROR", {}, "error"));
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return message.channel.send(returned);
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string("MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
-		let missingConfig = await checkConfig(qServerDB);
-		if (missingConfig) return message.channel.send(missingConfig);
+		let checkSuggest = checkSuggestions(message.guild, qServerDB);
+		if (checkSuggest) return message.channel.send(checkSuggest);
 
-		if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
-			let perms = channelPermissions( "suggestions", client.channels.cache.get(qServerDB.config.channels.suggestions), client);
-			if (perms) return message.channel.send(perms);
-		} else return message.channel.send(string("NO_SUGGESTION_CHANNEL_ERROR", {}, "error"));
-
-		if (client.channels.cache.get(qServerDB.config.channels.staff)) {
-			let perms = channelPermissions( "staff", client.channels.cache.get(qServerDB.config.channels.staff), client);
-			if (perms) return message.channel.send(perms);
-		} else return message.channel.send(string("NO_REVIEW_CHANNEL_ERROR", {}, "error"));
+		let checkStaff = checkReview(message.guild, qServerDB);
+		if (checkStaff) return message.channel.send(checkStaff);
 
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
 		if (!qSuggestionDB) return message.channel.send(string("INVALID_SUGGESTION_ID_ERROR", {}, "error"));
@@ -89,17 +82,7 @@ module.exports = {
 		client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
 			await dbModify("Suggestion", { suggestionId: id }, { messageId: posted.id });
 			let qUserDB = await dbQuery("User", { id: suggester.id });
-			if (qServerDB.config.notify && qUserDB.notify) {
-				let dmEmbed = new Discord.MessageEmbed()
-					.setTitle(string("APPROVED_DM_TITLE", { server: message.guild.name }))
-					.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
-					.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${posted.id})`)
-					.setTimestamp(qSuggestionDB.submitted)
-					.setColor(colors.green);
-				isComment ? replyEmbed.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment) : "";
-				qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-				suggester.send(dmEmbed).catch(() => {});
-			}
+			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
 
 			if (qServerDB.config.react) {
 				let reactEmojiUp = qServerDB.config.emojis.up;
@@ -130,33 +113,18 @@ module.exports = {
 		if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string("SUGGESTION_APPROVED_TITLE"));
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string("APPROVED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
-				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-				.setTimestamp()
-				.setColor(colors.green);
-			isComment ? replyEmbed.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment) : "";
-
+			let embedLog = logEmbed(qSuggestionDB, message.author, "APPROVED_LOG", "green")
+				.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"));
+			isComment ? embedLog.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment) : "";
 			if (qSuggestionDB.attachment) {
-				logEmbed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
+				embedLog.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
 					.setImage(qSuggestionDB.attachment);
 			}
 
-			serverLog(logEmbed, qServerDB, client);
+			serverLog(embedLog, qServerDB, client);
 		}
 
-		let updateEmbed = new Discord.MessageEmbed()
-			.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: id.toString() }))
-			.setAuthor(string("USER_INFO_HEADER", { user: message.author.tag, id: message.author.id }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion)
-			.setColor(colors.green)
-			.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), string("APPROVED_BY", { user: message.author.tag }));
-
-		if (qSuggestionDB.attachment) {
-			updateEmbed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
-				.setImage(qSuggestionDB.attachment);
-		}
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "green", string("APPROVED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed)).catch(() => {});
 	}

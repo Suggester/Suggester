@@ -1,5 +1,5 @@
 const { colors } = require("../../config.json");
-const { fetchUser } = require("../../utils/misc.js");
+const { fetchUser, reviewEmbed, dmEmbed, logEmbed } = require("../../utils/misc.js");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/checks");
@@ -51,37 +51,16 @@ module.exports = {
 			.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
 			.setColor(colors.red);
 		reason ? replyEmbed.addField(string("REASON_GIVEN"), reason) : "";
+		if (qSuggestionDB.attachment) {
+			replyEmbed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
+				.setImage(qSuggestionDB.attachment);
+		}
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) {
-			let dmEmbed = new Discord.MessageEmbed()
-				.setTitle(string("DELETED_DM_TITLE", {server: message.guild.name}))
-				.setFooter(string("SUGGESTION_FOOTER", {id: id.toString()}))
-				.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}`)
-				.setTimestamp(qSuggestionDB.submitted)
-				.setColor(colors.red);
-			reason ? dmEmbed.addField(string("REASON_GIVEN"), reason) : "";
-			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-			suggester.send(dmEmbed).catch(() => {
-			});
-		}
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string("REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
-		if (qServerDB.config.channels.staff && qSuggestionDB.reviewMessage) {
-			let updateEmbed = new Discord.MessageEmbed()
-				.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: id.toString() }))
-				.setAuthor(string("USER_INFO_HEADER", { user: message.author.tag, id: message.author.id }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion)
-				.setColor(colors.red)
-				.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), string("DELETED_BY", { user: message.author.tag }));
-
-			if (qSuggestionDB.attachment) {
-				updateEmbed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
-					.setImage(qSuggestionDB.attachment);
-			}
-
-			client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed)).catch(() => {});
-		}
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()
@@ -100,15 +79,15 @@ module.exports = {
 		}
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string("DELETED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
-				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-				.setTimestamp()
-				.setColor(colors.red);
-			reason ? logEmbed.addField(string("REASON_GIVEN"), reason) : "";
-			qSuggestionDB.attachment ? logEmbed.setImage(qSuggestionDB.attachment) : "";
-			serverLog(logEmbed, qServerDB, client);
+			let logs = logEmbed(qSuggestionDB, message.author, "DELETED_LOG", "red")
+				.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"));
+
+			reason ? logs.addField(string("REASON_GIVEN"), reason) : "";
+			if (qSuggestionDB.attachment) {
+				logs.setImage(qSuggestionDB.attachment);
+				logs.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+			}
+			serverLog(logs, qServerDB, client);
 		}
 
 	}

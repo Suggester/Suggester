@@ -4,7 +4,7 @@ const { serverLog } = require("../../utils/logs");
 const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
-const { fetchUser } = require("../../utils/misc");
+const { fetchUser, logEmbed } = require("../../utils/misc");
 module.exports = {
 	controls: {
 		name: "deletecomment",
@@ -55,6 +55,12 @@ module.exports = {
 			.setTimestamp();
 		message.channel.send(replyEmbed);
 
+		if (qServerDB.config.channels.log) {
+			let logs = logEmbed(qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")
+				.addField(author.id !== "0" ? string("COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string("COMMENT_TITLE_ANONYMOUS"), comment.comment);
+
+			serverLog(logs, qServerDB, client);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()

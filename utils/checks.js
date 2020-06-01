@@ -116,10 +116,16 @@ module.exports = {
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
-	checkApprovedSuggestion: async function (guild, id) {
+	checkSuggestion: async function (guild, id) {
 		const { dbQueryNoNew } = require("./db");
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: id, id: guild.id });
 		if (!qSuggestionDB) return [string("INVALID_SUGGESTION_ID_ERROR", {}, "error")];
+		return [null, qSuggestionDB];
+	},
+	checkApprovedSuggestion: async function (guild, id) {
+		const { checkSuggestion } = require("./checks");
+		let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(guild, id);
+		if (fetchSuggestion) return [fetchSuggestion];
 
 		if (qSuggestionDB.status !== "approved") return [string("SUGGESTION_NOT_APPROVED_ERROR", {}, "error")];
 		if (qSuggestionDB.implemented) return [string("SUGGESTION_IMPLEMENTED_ERROR", {}, "error")];

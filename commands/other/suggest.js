@@ -1,5 +1,5 @@
 const { colors } = require("../../config.json");
-const { suggestionEmbed } = require("../../utils/misc");
+const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig } = require("../../utils/checks");
 const { serverLog } = require("../../utils/logs");
@@ -93,6 +93,9 @@ module.exports = {
 				submitted: new Date()
 			}).save();
 
+			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id, id: message.guild.id });
+			if (!qSuggestionDB) return message.channel.send(string("ERROR", {}, "error"));
+
 			let replyEmbed = new Discord.MessageEmbed()
 				.setAuthor(string("SUGGESTION_FROM_TITLE", { user: message.author.tag }), message.author.displayAvatarURL({dynamic: true, format: "png"}))
 				.setDescription(suggestion)
@@ -107,36 +110,21 @@ module.exports = {
 				}, 7500);
 			});
 
-			let reviewEmbed = new Discord.MessageEmbed()
-				.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: id.toString() }))
-				.setAuthor(string("USER_INFO_HEADER", { user: message.author.tag, id: message.author.id }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"))
-				.setColor(colors.yellow);
+			let embedReview = reviewEmbed(qSuggestionDB, message.author, "yellow");
+			embedReview.addField(string("APPROVE_DENY_HEADER"), string("REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
-			if (attachment) {
-				reviewEmbed.addField(string("WITH_ATTACHMENT_HEADER"), attachment)
-					.setImage(attachment);
-			}
-
-			reviewEmbed.addField(string("APPROVE_DENY_HEADER"), string("REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
-
-			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(reviewEmbed);
+			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(embedReview);
 			await dbModify("Suggestion", { suggestionId: id }, { reviewMessage: reviewMessage.id });
 
 			if (qServerDB.config.channels.log) {
-				let logEmbed = new Discord.MessageEmbed()
-					.setAuthor(string("LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-					.setDescription(suggestion)
-					.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-					.setTimestamp()
-					.setColor(colors.yellow);
-
+				let embedLog = logEmbed(qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
+					.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"));
 				if (attachment) {
-					logEmbed.setImage(attachment)
+					embedLog.setImage(attachment)
 						.addField(string("WITH_ATTACHMENT_HEADER"), attachment);
 				}
 
-				serverLog(logEmbed, qServerDB, client);
+				serverLog(embedLog, qServerDB, client);
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
@@ -203,17 +191,14 @@ module.exports = {
 			});
 
 			if (qServerDB.config.channels.log) {
-				let logEmbed = new Discord.MessageEmbed()
-					.setAuthor(string("LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-					.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"))
-					.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-					.setTimestamp()
-					.setColor(colors.green);
+				let embedLog = logEmbed(qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", "green")
+					.setDescription(suggestion || string("NO_SUGGESTION_CONTENT"));
 				if (attachment) {
-					logEmbed.setImage(attachment)
+					embedLog.setImage(attachment)
 						.addField(string("WITH_ATTACHMENT_HEADER"), attachment);
 				}
-				await serverLog(logEmbed, qServerDB, client);
+
+				serverLog(embedLog, qServerDB, client);
 			}
 		}
 	}

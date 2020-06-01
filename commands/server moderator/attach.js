@@ -4,6 +4,7 @@ const { editFeedMessage } = require("../../utils/actions");
 const { serverLog } = require("../../utils/logs");
 const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
+const { logEmbed } = require("../../utils/misc");
 module.exports = {
 	controls: {
 		name: "attach",
@@ -45,14 +46,10 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string("ATTACHED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+			let embedLog = logEmbed(qSuggestionDB, message.author, "ATTACHED_LOG", "blue")
 				.addField(string("ATTACHMENT_ADDED_HEADER"), attachment)
-				.setImage(attachment)
-				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-				.setTimestamp()
-				.setColor(colors.blue);
-			serverLog(logEmbed, qServerDB, client);
+				.setImage(attachment);
+			serverLog(embedLog, qServerDB, client);
 		}
 	}
 };

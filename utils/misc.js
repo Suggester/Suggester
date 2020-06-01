@@ -2,6 +2,7 @@ const { colors } = require("../config.json");
 const Discord = require("discord.js");
 const { promises } = require("fs");
 const { resolve } = require("path");
+const { string } = require("./strings");
 
 module.exports = {
 	permLevelToRole: (permLevel) => {
@@ -80,6 +81,41 @@ module.exports = {
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
 
+		return embed;
+	},
+	dmEmbed: function(qSuggestionDB, color, title, attachment, suggestions, reason) {
+		let embed = new Discord.MessageEmbed()
+			.setTitle(string(title.string, {server: title.guild}))
+			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" ? `\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setTimestamp(qSuggestionDB.submitted)
+			.setColor(colors[color]);
+		if (attachment) embed.setImage(qSuggestionDB.attachment);
+		if (reason) embed.addField(reason.header, reason.reason);
+		return embed;
+	},
+	reviewEmbed: function (qSuggestionDB, user, color, change) {
+		let embed = new Discord.MessageEmbed()
+			.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: qSuggestionDB.suggestionId.toString() }))
+			.setAuthor(string("USER_INFO_HEADER", { user: user.tag, id: user.id }), user.displayAvatarURL({format: "png", dynamic: true}))
+			.setDescription(qSuggestionDB.suggestion)
+			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+			.setTimestamp(qSuggestionDB.submitted)
+			.setColor(colors[color]);
+
+		if (change) embed.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), change);
+		if (qSuggestionDB.attachment) {
+			embed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+			embed.setImage(qSuggestionDB.attachment);
+		}
+		return embed;
+	},
+	logEmbed: function (qSuggestionDB, user, title, color) {
+		let embed = new Discord.MessageEmbed()
+			.setAuthor(string(title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
+			.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
+			.setTimestamp()
+			.setColor(colors[color]);
 		return embed;
 	},
 	/**

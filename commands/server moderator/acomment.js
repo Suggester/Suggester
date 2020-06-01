@@ -1,6 +1,6 @@
 const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
-const { fetchUser } = require("../../utils/misc");
+const { fetchUser, dmEmbed, logEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
@@ -54,26 +54,12 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) {
-			let dmEmbed = new Discord.MessageEmbed()
-				.setTitle(string("COMMENT_ADDED_DM_TITLE", { server: message.guild.name }))
-				.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-				.addField(string("COMMENT_TITLE_ANONYMOUS"), comment)
-				.setColor(colors.blue)
-				.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
-				.setTimestamp(qSuggestionDB.submitted);
-			suggester.send(dmEmbed).catch(() => {});
-		}
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string("COMMENT_TITLE_ANONYMOUS"), reason: comment }))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string("ANONYMOUS_COMMENT_ADDED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField(string("SUGGESTION"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
-				.addField(string("COMMENT_TITLE_ANONYMOUS"), comment)
-				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
-				.setTimestamp()
-				.setColor(colors.blue);
-			serverLog(logEmbed, qServerDB, client);
+			let embedLog = logEmbed(qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")
+				.addField(string("COMMENT_TITLE_ANONYMOUS"), comment);
+			serverLog(embedLog, qServerDB, client);
 		}
 	}
 };

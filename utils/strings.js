@@ -1481,6 +1481,10 @@ module.exports = {
 			string: "This suggestion has already been denied! Previously denied suggestions cannot be approved.",
 			context: "Error shown when a suggestion is already denied and a user attempts to approve it"
 		},
+		"SUGGESTION_ALREADY_DENIED_DENIED_ERROR": {
+			string: "This suggestion has already been denied!",
+			context: "Error shown when a suggestion is already denied and a user attempts to deny it"
+		},
 		"SUGGESTION_APPROVED_TITLE": {
 			string: "Suggestion Approved",
 			context: "Title for the suggestion approved embed"
@@ -1813,6 +1817,10 @@ module.exports = {
 			string: "Deletion reasons are limited to a length of 1024 characters.",
 			context: "Error when the deletion reason is too long"
 		},
+		"DENIAL_REASON_TOO_LONG_ERROR": {
+			string: "Denial reasons are limited to a length of 1024 characters.",
+			context: "Error when the denial reason is too long"
+		},
 		"SUGGESTION_DELETED_TITLE": {
 			string: "Suggestion Deleted",
 			context: "Title for the suggestion deleted embed"
@@ -1904,6 +1912,44 @@ module.exports = {
 		"COMMENT_DELETED_TITLE": {
 			string: "Comment Deleted",
 			context: "Title when a comment is deleted"
-		}
+		},
+		"SUGGESTION_DENIED_TITLE": {
+			string: "Suggestion Denied",
+			context: "Title for the suggestion denied embed"
+		},
+		"DENIED_BY": {
+			string: "Denied by {{user}}",
+			context: "Details who denied a suggestion",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"DENIED_DM_TITLE": {
+			string: "Your suggestion was denied in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being denied",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"DENIED_LOG": {
+			string: "{{user}} denied #{{id}}",
+			context: "Title for the log embed when a suggestion is denied",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
 	}
 };
