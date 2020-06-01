@@ -13,6 +13,16 @@ module.exports = {
 
 		if (!messageEdited) return string("SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error");
 	},
+	deleteFeedMessage: async function(qSuggestionDB, qServerDB, client) {
+		let messageDeleted;
+		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+			f.delete();
+			messageDeleted = f;
+		}).catch(() => messageDeleted = false);
+
+		if (!messageDeleted) return [string("SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error")];
+		else return [null, messageDeleted];
+	},
 	/**
 	 * Ask for confirmation before proceeding
 	 * @param {Message} message Discord.js message object
@@ -149,5 +159,14 @@ module.exports = {
 		collector.on("end", () => {
 			msg.reactions.removeAll();
 		});
+	},
+	checkVotes: function(qSuggestionDB, msg) {
+		let upCount = "Unknown";
+		let downCount = "Unknown";
+		let upReaction = msg.reactions.cache.get(qSuggestionDB.emojis.up);
+		let downReaction = msg.reactions.cache.get(qSuggestionDB.emojis.down);
+		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;
+		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
+		return [upCount, downCount, upCount-downCount];
 	}
 };

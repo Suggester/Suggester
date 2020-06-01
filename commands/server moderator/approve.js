@@ -94,7 +94,7 @@ module.exports = {
 					.setTitle(string("APPROVED_DM_TITLE", { server: message.guild.name }))
 					.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
 					.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${posted.id})`)
-					.setTimestamp()
+					.setTimestamp(qSuggestionDB.submitted)
 					.setColor(colors.green);
 				isComment ? replyEmbed.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment) : "";
 				qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";

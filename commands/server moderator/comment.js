@@ -35,7 +35,6 @@ module.exports = {
 			id: qSuggestionDB.comments.length+1,
 			created: new Date()
 		});
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string("ERROR", {}, "error"));
@@ -43,13 +42,15 @@ module.exports = {
 		let editFeed = await editFeedMessage(qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
+		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
+
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string("COMMENT_ADDED_TILE"))
 			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(string("COMMENT_TITLE", { user: message.author.tag, id: message.author.id }), comment)
 			.setColor(colors.blue)
 			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
-			.setTimestamp();
+			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
@@ -60,7 +61,7 @@ module.exports = {
 				.addField(string("COMMENT_TITLE", { user: message.author.tag, id: message.author.id }), comment)
 				.setColor(colors.blue)
 				.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
-				.setTimestamp();
+				.setTimestamp(qSuggestionDB.submitted);
 			suggester.send(dmEmbed).catch(() => {});
 		}
 

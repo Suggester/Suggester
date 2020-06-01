@@ -1,5 +1,10 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, checkConfig, serverLog, fetchUser, dbModify, dbQueryNoNew, checkChannel } = require("../../utils/misc.js");
+const { colors } = require("../../config.json");
+const { fetchUser } = require("../../utils/misc.js");
+const { serverLog } = require("../../utils/logs");
+const { dbQuery, dbModify } = require("../../utils/db");
+const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/checks");
+const { string } = require("../../utils/strings");
+const { deleteFeedMessage, checkVotes } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "delete",
@@ -13,46 +18,16 @@ module.exports = {
 		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!"
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
-
-		let missing = checkConfig(qServerDB);
-
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let missingPermsSuggestions = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPermsSuggestions) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPermsSuggestions !== true) return message.channel.send(missingPermsSuggestions);
-
-		if (qServerDB.config.channels.denied) {
-			let missingPermsDenied = checkChannel(qServerDB.config.channels.denied, message.guild.channels.cache, "denied", client);
-			if (!missingPermsDenied) return message.channel.send(`<:${emoji.x}> Could not find your denied suggestions channel even though there is one configured! If you want to remove your denied suggestions channel, use \`${Discord.escapeMarkdown(qServerDB.prefix)}config denied none\``);
-			if (missingPermsDenied !== true) return message.channel.send(missingPermsDenied);
-		}
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
-
-		let id = qSuggestionDB.suggestionId;
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(message, args);
+		if (returned) return message.channel.send(returned);
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let missingReviewPerms = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
-			if (!missingReviewPerms) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
-			if (missingReviewPerms !== true) return message.channel.send(missingReviewPerms);
+			let reviewCheck = checkReview(message.guild, qServerDB);
+			if (reviewCheck) return message.channel.send(reviewCheck);
 		}
 
-		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Only approved suggestions can be deleted!`);
-
-		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
-
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
+		if (!suggester) return message.channel.send(string("ERROR", {}, "error"));
 
 		qSuggestionDB.status = "denied";
 		qSuggestionDB.staff_member = message.author.id;
@@ -60,72 +35,78 @@ module.exports = {
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Deletion reasons cannot be longer than 1024 characters.`);
+			if (reason.length > 1024) return message.channel.send(string("DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
 			qSuggestionDB.denial_reason = reason;
 		}
 
+		let deleteMsg = await deleteFeedMessage(qSuggestionDB, qServerDB, client);
+		if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
+
 		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 
-		let messageDeleted;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			f.delete();
-			messageDeleted = true;
-		}).catch(() => messageDeleted = false);
-
-		if (!messageDeleted) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
-
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle("Suggestion Deleted")
-			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
-			.setFooter(`Deleted by ${message.author.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
+			.setTitle(string("SUGGESTION_DELETED_TITLE"))
+			.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+			.setFooter(string("DELETED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+			.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
 			.setColor(colors.red);
-		reason ? replyEmbed.addField("Reason Given", reason) : "";
+		reason ? replyEmbed.addField(string("REASON_GIVEN"), reason) : "";
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
 		if (qServerDB.config.notify && qUserDB.notify) {
 			let dmEmbed = new Discord.MessageEmbed()
-				.setTitle(`Your Suggestion in **${message.guild.name}** Was Deleted`)
-				.setFooter(`Suggestion ID: ${id.toString()}`)
-				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
+				.setTitle(string("DELETED_DM_TITLE", {server: message.guild.name}))
+				.setFooter(string("SUGGESTION_FOOTER", {id: id.toString()}))
+				.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}`)
+				.setTimestamp(qSuggestionDB.submitted)
 				.setColor(colors.red);
-			reason ? dmEmbed.addField("Reason Given", reason) : "";
+			reason ? dmEmbed.addField(string("REASON_GIVEN"), reason) : "";
 			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-			suggester.send(dmEmbed).catch(() => {});
+			suggester.send(dmEmbed).catch(() => {
+			});
 		}
 
 		if (qServerDB.config.channels.staff && qSuggestionDB.reviewMessage) {
 			let updateEmbed = new Discord.MessageEmbed()
-				.setTitle(`Suggestion Awaiting Review (#${id.toString()})`)
-				.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
+				.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: id.toString() }))
+				.setAuthor(string("USER_INFO_HEADER", { user: message.author.tag, id: message.author.id }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 				.setDescription(qSuggestionDB.suggestion)
 				.setColor(colors.red)
-				.addField("A change was processed on this suggestion", "This suggestion has been deleted");
-			client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed));
+				.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), string("DELETED_BY", { user: message.author.tag }));
+
+			if (qSuggestionDB.attachment) {
+				updateEmbed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
+					.setImage(qSuggestionDB.attachment);
+			}
+
+			client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed)).catch(() => {});
 		}
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()
-				.setTitle("Suggestion Deleted")
-				.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`)
+				.setTitle(string("SUGGESTION_DELETED_TITLE"))
+				.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.setFooter(`Suggestion ID: ${id.toString()}`)
+				.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
+				.setFooter(string("SUGGESTION_FOOTER", {id: id.toString()}))
+				.setTimestamp(qSuggestionDB.submitted)
 				.setColor(colors.red);
-			reason ? deniedEmbed.addField("Reason Given:", reason) : "";
+			reason ? deniedEmbed.addField(string("REASON_GIVEN"), reason) : "";
+			let votes = checkVotes(qSuggestionDB, deleteMsg[1]);
+			if (!(!votes[0] && !votes[1])) deniedEmbed.addField(string("VOTE_TOTAL_HEADER"), `${string("VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string("UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string("VOTE_COUNT_UP")} ${votes[0]}\n${string("VOTE_COUNT_DOWN")} ${votes[1]}`);
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(`${message.author.tag} deleted #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.setFooter(`Suggestion ID: ${id.toString()} | Deleter ID: ${message.author.id}`)
+				.setAuthor(string("DELETED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+				.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
+				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.red);
-			reason ? logEmbed.addField("Deletion Reason", reason) : "";
+			reason ? logEmbed.addField(string("REASON_GIVEN"), reason) : "";
 			qSuggestionDB.attachment ? logEmbed.setImage(qSuggestionDB.attachment) : "";
 			serverLog(logEmbed, qServerDB, client);
 		}

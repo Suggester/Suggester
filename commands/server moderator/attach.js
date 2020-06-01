@@ -29,17 +29,19 @@ module.exports = {
 		if (!(checkURL(attachment))) return message.channel.send(string("INVALID_AVATAR_ERROR", {}, "error"));
 
 		qSuggestionDB.attachment = attachment;
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let editFeed = await editFeedMessage(qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
+
+		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string("ATTACHMENT_ADDED_HEADER"))
 			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
 			.setColor(colors.blue)
-			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }));
+			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
+			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {

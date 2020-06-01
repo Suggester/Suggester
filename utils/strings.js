@@ -1379,6 +1379,10 @@ module.exports = {
 			string: "There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.",
 			context: "Error shown when the suggestion feed embed cannot be edited"
 		},
+		"SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR": {
+			string: "There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.",
+			context: "Error shown when the suggestion feed embed cannot be deleted"
+		},
 		"NO_SUGGESTION_CONTENT": {
 			string: "[No Suggestion Content]",
 			context: "Shown when there is a suggestion with no content"
@@ -1800,6 +1804,76 @@ module.exports = {
 					description: "The staff member's ID"
 				}
 			}
+		},
+		"NO_DENIED_CHANNEL_ERROR": {
+			string: "I could not find your configured denied suggestions channel! Please reconfigure or remove your set denied suggestions channel.",
+			context: "Error when the configured denied suggestions channel is not found"
+		},
+		"DELETION_REASON_TOO_LONG_ERROR": {
+			string: "Deletion reasons are limited to a length of 1024 characters.",
+			context: "Error when the deletion reason is too long"
+		},
+		"SUGGESTION_DELETED_TITLE": {
+			string: "Suggestion Deleted",
+			context: "Title for the suggestion deleted embed"
+		},
+		"DELETED_BY": {
+			string: "Deleted by {{user}}",
+			context: "Details who deleted a suggestion",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"REASON_GIVEN": {
+			string: "Reason Given",
+			context: "Denotes the reason in the denied/deleted embed"
+		},
+		"DELETED_DM_TITLE": {
+			string: "Your suggestion was deleted in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being deleted",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"DELETED_LOG": {
+			string: "{{user}} deleted #{{id}}",
+			context: "Title for the log embed when a suggestion is deleted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"VOTE_TOTAL_HEADER": {
+			string: "Vote Counts",
+			context: "Header used above vote counts"
+		},
+		"VOTE_COUNT_OPINION": {
+			string: "Opinion:",
+			context: "Denotes the vote opinion (upvotes-downvotes) for the suggestion"
+		},
+		"VOTE_COUNT_UP": {
+			string: "Upvotes:",
+			context: "Denotes the number of upvotes for the suggestion"
+		},
+		"VOTE_COUNT_DOWN": {
+			string: "Downvotes:",
+			context: "Denotes number of downvotes for the suggestion"
+		},
+		"UNKNOWN": {
+			string: "Unknown",
+			context: "Shown if something is unknown"
 		}
 	}
 };

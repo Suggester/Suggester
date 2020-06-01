@@ -88,25 +88,42 @@ module.exports = {
 		return null;
 	},
 	suggestionEditCommandCheck: async function (message, args) {
-		const { dbQuery, dbQueryNoNew } = require("./db");
-		const { checkConfig, channelPermissions } = require("./checks");
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return [string("UNCONFIGURED_ERROR", {}, "error")];
+		const { baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return returned;
 
-		let missingConfig = await checkConfig(qServerDB);
-		if (missingConfig) return [missingConfig];
+		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		if (suggestionsCheck) [suggestionsCheck];
 
-		if (message.guild.channels.cache.get(qServerDB.config.channels.suggestions)) {
-			let perms = channelPermissions( "suggestions", message.guild.channels.cache.get(qServerDB.config.channels.suggestions), message.client);
-			if (perms) return [perms];
-		} else return [string("NO_SUGGESTION_CHANNEL_ERROR", {}, "error")];
+		let suggestion = await checkApprovedSuggestion(message.guild, args[0]);
+		if (suggestion[0]) return [suggestion[0]];
 
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
+		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
+	},
+	suggestionDeleteCommandCheck: async function (message, args) {
+		const { checkDenied, baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return [returned];
+
+		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		if (suggestionsCheck) return [suggestionsCheck];
+
+		let deniedCheck = checkDenied(message.guild, qServerDB);
+		if (deniedCheck) return [deniedCheck];
+
+		let suggestion = await checkApprovedSuggestion(message.guild, args[0]);
+		if (suggestion[0]) return [suggestion[0]];
+
+		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
+	},
+	checkApprovedSuggestion: async function (guild, id) {
+		const { dbQueryNoNew } = require("./db");
+		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: id, id: guild.id });
 		if (!qSuggestionDB) return [string("INVALID_SUGGESTION_ID_ERROR", {}, "error")];
 
 		if (qSuggestionDB.status !== "approved") return [string("SUGGESTION_NOT_APPROVED_ERROR", {}, "error")];
 		if (qSuggestionDB.implemented) return [string("SUGGESTION_IMPLEMENTED_ERROR", {}, "error")];
-		return [null, qServerDB, qSuggestionDB, qSuggestionDB.suggestionId];
+		return [null, qSuggestionDB];
 	},
 	baseConfig: async function(guild) {
 		const { dbQuery } = require("./db");
@@ -117,6 +134,28 @@ module.exports = {
 		let missingConfig = await checkConfig(qServerDB);
 		if (missingConfig) return [missingConfig];
 		return [null, qServerDB];
+	},
+	checkSuggestions: function (guild, db) {
+		const { channelPermissions } = require("./checks");
+		if (guild.channels.cache.get(db.config.channels.suggestions)) {
+			let perms = channelPermissions( "suggestions", guild.channels.cache.get(db.config.channels.suggestions), guild.client);
+			if (perms) return perms;
+		} else return string("NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
+	},
+	checkReview: function (guild, db) {
+		const { channelPermissions } = require("./checks");
+		if (guild.channels.cache.get(db.config.channels.staff)) {
+			let perms = channelPermissions( "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
+			if (perms) return perms;
+		} else return string("NO_REVIEW_CHANNEL_ERROR", {}, "error");
+	},
+	checkDenied: function (guild, db) {
+		const { channelPermissions } = require("./checks");
+		if (!db.config.channels.denied) return null;
+		if (guild.channels.cache.get(db.config.channels.denied)) {
+			let perms = channelPermissions( "denied", guild.channels.cache.get(db.config.channels.denied), guild.client);
+			if (perms) return perms;
+		} else return string("NO_DENIED_CHANNEL_ERROR", {}, "error");
 	},
 	/**
 	 * Check a URL to see if it makes a valid attachment
