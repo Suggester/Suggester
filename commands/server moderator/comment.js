@@ -29,10 +29,12 @@ module.exports = {
 
 		if (comment.length > 1024) return message.channel.send(string("COMMENT_TOO_LONG_ERROR", {}, "error"));
 
+		let commentId = qSuggestionDB.comments.length+1;
+
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: message.author.id,
-			id: qSuggestionDB.comments.length+1,
+			id: commentId,
 			created: new Date()
 		});
 
@@ -47,7 +49,7 @@ module.exports = {
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string("COMMENT_ADDED_TILE"))
 			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-			.addField(string("COMMENT_TITLE", { user: message.author.tag, id: message.author.id }), comment)
+			.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment)
 			.setColor(colors.blue)
 			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
@@ -58,7 +60,7 @@ module.exports = {
 			let dmEmbed = new Discord.MessageEmbed()
 				.setTitle(string("COMMENT_ADDED_DM_TITLE", { server: message.guild.name }))
 				.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-				.addField(string("COMMENT_TITLE", { user: message.author.tag, id: message.author.id }), comment)
+				.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment)
 				.setColor(colors.blue)
 				.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp(qSuggestionDB.submitted);
@@ -69,7 +71,7 @@ module.exports = {
 			let logEmbed = new Discord.MessageEmbed()
 				.setAuthor(string("COMMENT_ADDED_LOG", { user: message.author.tag, id: id.toString() }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 				.addField(string("SUGGESTION"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
-				.addField(string("COMMENT_TITLE", { user: message.author.tag, id: message.author.id }), comment)
+				.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment)
 				.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id.toString(), user: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.blue);

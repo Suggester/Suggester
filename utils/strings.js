@@ -1874,6 +1874,36 @@ module.exports = {
 		"UNKNOWN": {
 			string: "Unknown",
 			context: "Shown if something is unknown"
+		},
+		"NO_COMMENT_ID_SPECIFIED_ERROR": {
+			string: "Please provide a valid comment ID.",
+			context: "Error shown when the user does not specify or specifies an invalid comment ID"
+		},
+		"COMMENT_ALREADY_DELETED_ERROR": {
+			string: "This comment has already been deleted!",
+			context: "Error shown when a user attempts to delete a previously deleted comment"
+		},
+		"DELETED_COMMENT_LOG": {
+			string: "{{user}} deleted comment {{comment}} from #{{id}}",
+			context: "Title for the log embed when a comment is deleted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				},
+				comment: {
+					to_replace: "{{comment}}",
+					description: "The comment ID"
+				}
+			}
+		},
+		"COMMENT_DELETED_TITLE": {
+			string: "Comment Deleted",
+			context: "Title when a comment is deleted"
 		}
 	}
 };
