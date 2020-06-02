@@ -42,7 +42,7 @@ module.exports = {
 		}
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_ERROR", {}, "error"));
+		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_APPROVE_ERROR", {}, "error"));
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send(string("PROCESSING"));
 

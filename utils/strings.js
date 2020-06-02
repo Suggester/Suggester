@@ -2053,9 +2053,13 @@ module.exports = {
 			string: "You must specify at least one suggestion.",
 			context: "Error shown when no suggestions are specified for a mass command"
 		},
-		"NAN_MASS_ERROR": {
+		"NAN_MASS_APPROVE_ERROR": {
 			string: "One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers. If you're trying to specify a comment, add `-r` between the suggestion IDs and the comment.",
-			context: "Error shown when a suggestion ID specified in a mass command is not a number"
+			context: "Error shown when a suggestion ID specified in a mass approve command is not a number"
+		},
+		"NAN_MASS_DENY_ERROR": {
+			string: "One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers. If you're trying to specify a reason, add `-r` between the suggestion IDs and the reason.",
+			context: "Error shown when a suggestion ID specified in a mass deny/delete command is not a number"
 		},
 		"MASS_APPROVE_SUCCESS_TITLE": {
 			string: "Approved {{some}}/{{total}} suggestions",
@@ -2131,7 +2135,45 @@ module.exports = {
 		},
 		"MASS_DELETE_ERROR_DETAILS": {
 			string: "One or more of these suggestions could not be deleted. Please make sure the suggestion IDs you have provided exist and have not already been deleted/denied.",
-			context: "Shows why suggestions generally are not approved in the massdelete command"
+			context: "Shows why suggestions generally are not deleted in the massdelete command"
+		},
+		"MASS_DENY_SUCCESS_TITLE": {
+			string: "Denied {{some}}/{{total}} suggestions",
+			context: "Title of the massdeny embed which shows the results of the command",
+			replaced: {
+				some: {
+					to_replace: "{{some}}",
+					description: "The number of suggestions that were denied"
+				},
+				total: {
+					to_replace: "{{total}}",
+					description: "The number of suggestions that were inputted"
+				}
+			}
+		},
+		"MASS_DENY_SUCCESS_RESULTS_DETAILED": {
+			string: "**Denied:** {{list}}",
+			context: "Details which suggestions could be denied in the massdeny command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_DENY_FAIL_RESULTS_DETAILED": {
+			string: "**Could Not Deny:** {{list}}",
+			context: "Details which suggestions could not be denied in the massdeny command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_DENY_ERROR_DETAILS": {
+			string: "One or more of these suggestions could not be denied. Please make sure the suggestion IDs you have provided exist and have not already been approved/denied.",
+			context: "Shows why suggestions generally are not denied in the massdeny command"
 		}
 	}
 };

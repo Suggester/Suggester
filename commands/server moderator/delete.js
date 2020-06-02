@@ -89,7 +89,5 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
-
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", {user: message.author.tag}))))).catch(() => {});
 	}
 };

@@ -37,11 +37,11 @@ module.exports = {
 		let suggestions = reasonSplit[0].split(" ");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string("COMMENT_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string("DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
 		}
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_ERROR", {}, "error"));
+		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_DENY_ERROR", {}, "error"));
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send(string("PROCESSING"));
 
@@ -117,7 +117,6 @@ module.exports = {
 					serverLog(logs, qServerDB, client);
 				}
 
-				if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", {user: message.author.tag}))))).catch(() => {});
 				await denied[s].save();
 			}
 		}
