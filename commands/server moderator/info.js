@@ -1,5 +1,8 @@
-const { colors, emoji, prefix } = require("../../config.json");
-const { dbQuery, fetchUser, dbQueryNoNew, checkConfig } = require("../../utils/misc.js");
+const { colors } = require("../../config.json");
+const { fetchUser } = require("../../utils/misc.js");
+const { baseConfig, checkSuggestion } = require("../../utils/checks");
+const { string } = require("../../utils/strings");
+const { checkVotes } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "info",
@@ -13,58 +16,41 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
-
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
+		let [err, qSuggestionDB] = await checkSuggestion(message.guild, args[0]);
+		if (err) return message.channel.send(err);
 
 		let id = qSuggestionDB.suggestionId;
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
+		if (!suggester) return message.channel.send(string("ERROR", {}, "error"));
 
 		let embed = new Discord.MessageEmbed()
-			.setTitle(`Suggestion Info: #${id.toString()}`)
+			.setTitle(`${string("SUGGESTION_HEADER")}: #${id.toString()}`)
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
-			.addField("Author", `${suggester.tag} (${suggester.id})`)
+			.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
+			.addField(string("INFO_AUTHOR_HEADER"), string("USER_INFO_HEADER", { user: suggester.tag, id: suggester.id }))
 			.setColor(colors.blue);
 
 		if (qSuggestionDB.attachment) {
-			embed.addField("Attachment", qSuggestionDB.attachment)
+			embed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
 				.setImage(qSuggestionDB.attachment);
 		}
 
-		if (qSuggestionDB.comments && qSuggestionDB.comments.length > 0) {
-			if (qSuggestionDB.comments.filter(c => c.deleted).length > 0) {
-				embed.addField("Comment Count", `${qSuggestionDB.comments.filter(c => !c.deleted).length} (+${qSuggestionDB.comments.filter(c => c.deleted).length} deleted)`);
-			} else {
-				embed.addField("Comment Count", `${qSuggestionDB.comments.filter(c => !c.deleted).length}`);
-			}
-		}
+		if (qSuggestionDB.comments && qSuggestionDB.comments.length > 0) embed.addField(string("INFO_COMMENT_COUNT_HEADER"), `${qSuggestionDB.comments.filter(c => !c.deleted).length} ${qSuggestionDB.comments.filter(c => c.deleted).length > 0 ? `(+${qSuggestionDB.comments.filter(c => c.deleted).length} deleted)` : ""}`);
+
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":
 			embed.setColor(colors.yellow)
-				.addField("Internal Status", `Awaiting Staff Review ([Queue Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
+				.addField(string("INFO_INTERNAL_STATUS_HEADER"), `${string("AWAITING_REVIEW_STATUS")} ([${string("QUEUE_POST_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
 		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
 			embed.setColor(colors.red)
-				.addField("Internal Status", `Denied by ${denier.tag} (${denier.id})`);
-			if (qSuggestionDB.denial_reason) {
-				embed.addField("Denial Reason", qSuggestionDB.denial_reason);
-			}
+				.addField(string("INFO_INTERNAL_STATUS_HEADER"), string("DENIED_BY", { user: denier.tag }));
+			if (qSuggestionDB.denial_reason) embed.addField(string("REASON_GIVEN"), qSuggestionDB.denial_reason);
 			break;
 		}
 		case "approved": {
@@ -72,53 +58,40 @@ module.exports = {
 				let statusArr = [];
 				switch (qSuggestionDB.displayStatus) {
 				case "implemented":
-					statusArr = [colors.green, "Implemented"];
+					statusArr = [colors.green, string("STATUS_IMPLEMENTED")];
 					break;
 				case "working":
-					statusArr = [colors.orange, "In Progress"];
+					statusArr = [colors.orange, string("STATUS_PROGRESS")];
 					break;
 				case "no":
-					statusArr = [colors.gray, "Not Happening"];
+					statusArr = [colors.gray, string("STATUS_NO")];
 					break;
 				}
 				if (statusArr[0]) {
-					embed.addField("Public Status", statusArr[1])
+					embed.addField(string("INFO_PUBLIC_STATUS_HEADER"), statusArr[1])
 						.setColor(statusArr[0]);
 				}
 			}
 
 			let approver = await fetchUser(qSuggestionDB.staff_member, client);
-			embed.addField("Internal Status", `Approved by ${approver.tag} (${approver.id})`);
+			embed.addField(string("INFO_INTERNAL_STATUS_HEADER"), string("APPROVED_BY", { user: approver.tag }));
 
 			if (!qSuggestionDB.implemented) {
-				let upCount = "Unknown";
-				let downCount = "Unknown";
 				let messageFetched;
 				await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-					if (qSuggestionDB.emojis.up !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.up)) {
-						f.reactions.cache.get(qSuggestionDB.emojis.up).me ? upCount = f.reactions.cache.get(qSuggestionDB.emojis.up).count - 1 : upCount = f.reactions.cache.get(qSuggestionDB.emojis.up);
-					}
-					if (qSuggestionDB.emojis.down !== "none" && f.reactions.cache.get(qSuggestionDB.emojis.down)) {
-						f.reactions.cache.get(qSuggestionDB.emojis.down).me ? downCount = f.reactions.cache.get(qSuggestionDB.emojis.down).count - 1 : downCount = f.reactions.cache.get(qSuggestionDB.emojis.down);
-					}
+					let [up, down, opinion] = checkVotes(qSuggestionDB, f);
 					messageFetched = true;
+					if (up || down) embed.addField(string("VOTE_TOTAL_HEADER"), `${string("VOTE_COUNT_OPINION")} ${isNaN(opinion) ? string("UNKNOWN") : (opinion > 0 ? `+${opinion}` : opinion)}\n${string("VOTE_COUNT_UP")} ${up}\n${string("VOTE_COUNT_DOWN")} ${down}`);
 				}).catch(() => messageFetched = false);
 
-				if (!messageFetched) return message.channel.send(`<:${emoji.x}> There was an error fetching the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+				if (!messageFetched) return message.channel.send(string("SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error"));
 
-				if (!isNaN(upCount) && !isNaN(downCount)) {
-					let opinion = upCount - downCount;
-					opinion > 0 ? embed.addField("Votes Opinion", `+${opinion.toString()}`) : embed.addField("Votes Opinion", opinion.toString());
-					embed.addField("Upvotes", upCount.toString(), true)
-						.addField("Downvotes", downCount.toString(), true);
-				}
-				embed.addField("Suggestions Feed Post", `[Jump to post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
-			} else embed.addField("Additional Information", "This suggestion was transferred to the implemented suggestion archive channel");
+				embed.addField(string("SUGGESTION_FEED_LINK"), `[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+			} else embed.addField(string("HELP_ADDITIONAL_INFO"), string("INFO_IMPLEMENTED"));
 			break;
 		}
 		}
 
 		message.channel.send(embed);
-
 	}
 };

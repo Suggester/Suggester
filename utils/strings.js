@@ -1951,5 +1951,45 @@ module.exports = {
 				}
 			}
 		},
+		"INFO_AUTHOR_HEADER": {
+			string: "Author",
+			context: "Denotes the suggestion author in the info command"
+		},
+		"INFO_COMMENT_COUNT_HEADER": {
+			string: "Comment Count",
+			context: "Denotes the comment count in the info command"
+		},
+		"INFO_INTERNAL_STATUS_HEADER": {
+			string: "Internal Status",
+			context: "Denotes the internal status in the info command"
+		},
+		"INFO_PUBLIC_STATUS_HEADER": {
+			string: "Public Status",
+			context: "Denotes the public status in the info command"
+		},
+		"AWAITING_REVIEW_STATUS": {
+			string: "Awaiting Staff Review",
+			context: "Denotes a suggestion await staff review"
+		},
+		"QUEUE_POST_LINK": {
+			string: "Queue Post",
+			context: "Hyperlink for the queue post of a suggestion awaiting review"
+		},
+		"STATUS_IMPLEMENTED": {
+			string: "Implemented",
+			context: "Denotes a suggestion having the implemented status"
+		},
+		"STATUS_PROGRESS": {
+			string: "In Progress",
+			context: "Denotes a suggestion having the in progress status"
+		},
+		"STATUS_NO": {
+			string: "Not Happening",
+			context: "Denotes a suggestion having the not happening status"
+		},
+		"INFO_IMPLEMENTED": {
+			string: "This suggestion was transferred to the implemented suggestion archive channel.",
+			context: "Note on the info command when a suggestion has been transferred to the implemented archive channel"
+		}
 	}
 };

@@ -6,7 +6,7 @@ const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
 	const pre = new Date();
-	if (message.channel.type !== "text") {
+	if (!["text", "news"].includes(message.channel.type)) {
 		let dmEmbed = new Discord.MessageEmbed()
 			.setDescription(message.content);
 		if (message.channel.type === "dm" && client.user.id !== message.author.id) return coreLog(`📧 **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, { embeds: [dmEmbed] }, client);
