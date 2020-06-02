@@ -2196,6 +2196,38 @@ module.exports = {
 					description: "The suggestion ID"
 				}
 			}
+		},
+		"USER_NOT_BLACKLISTED_ERROR": {
+			string: "This user is not blacklisted from using the bot on this server.",
+			context: "Error shown when a user attempts to unblacklist a user who is not blacklisted on a server"
+		},
+		"UNBLACKLIST_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been unblacklisted from using the bot on this server.",
+			context: "Success message when a user is unblacklisted in a guild",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"UNBLACKLIST_LOG_TITLE": {
+			string: "{{staff}} unblacklisted {{user}}",
+			context: "Title of the log embed when a user is unblacklisted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The unblacklisted user's tag"
+				},
+				staff: {
+					to_replace: "{{staff}}",
+					description: "The staff member's tag"
+				}
+			}
 		}
 	}
 };

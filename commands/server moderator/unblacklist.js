@@ -1,5 +1,9 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, dbModify, serverLog, checkConfig, fetchUser } = require("../../utils/misc.js");
+const { colors } = require("../../config.json");
+const { dbModify } = require("../../utils/db");
+const { baseConfig } = require("../../utils/checks");
+const { serverLog } = require("../../utils/logs");
+const { fetchUser } = require("../../utils/misc.js");
+const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
 		name: "unblacklist",
@@ -13,49 +17,35 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
-
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a user!`);
+		if (!args[0]) return message.channel.send(string("BLACKLIST_NO_ARGS_ERROR", {}, "error"));
 
 		let user = await fetchUser(args[0], client);
-		if (!user) return message.channel.send("You must specify a valid user!");
+		if (!user || user.id === "0") return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+
+		if (!qServerDB.config.blacklist.includes(user.id)) return message.channel.send(string("USER_NOT_BLACKLISTED_ERROR", {}, "error"));
 
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Blacklist reasons must be 1024 characters or less in length.`);
+			if (reason.length > 1024) return message.channel.send(string("BLACKLIST_REASON_TOO_LONG_ERROR", {}, "error"));
 		}
 
-		if (!qServerDB.config.blacklist.includes(user.id)) return message.channel.send(`<:${emoji.x}> This user is not blacklisted from using the bot on this server!`);
 		qServerDB.config.blacklist.splice(qServerDB.config.blacklist.findIndex(u => u === user.id), 1);
-		await dbModify("Server", {id: message.guild.id}, qServerDB);
-		let embed = new Discord.MessageEmbed();
-		if (reason) {
-			embed.setDescription(`**Reason:** ${reason}`)
-				.setColor(colors.default);
-		}
-		message.channel.send(`<:${emoji.check}> **${Discord.Util.escapeMarkdown(user.tag)}** (\`${user.id}\`) is no longer blacklisted from using the bot on this server.`, reason ? embed : "");
+		await dbModify("Server", { id: message.guild.id }, qServerDB);
+		message.channel.send(`${string("UNBLACKLIST_SUCCESS", { user: user.tag, id: user.id }, {}, "check")}${reason ? `\n${string("BLACKLIST_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(`${message.author.tag} unblacklisted ${user.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(`Tag: ${user.tag}\nID: ${user.id}\nMention: <@${user.id}>`)
-				.setFooter(`Staff Member ID: ${message.author.id}`)
+				.setAuthor(string("UNBLACKLIST_LOG_TITLE", { staff: message.author.tag, user: user.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+				.setDescription(string("BLACKLIST_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
+				.setFooter(string("STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.green);
 
-			reason ? logEmbed.addField("Reason", reason)  : "";
+			reason ? logEmbed.addField(string("BLACKLIST_REASON_HEADER"), reason) : null;
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}

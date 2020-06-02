@@ -51,21 +51,21 @@ module.exports = {
 
 		let qUserDB = await dbQuery("User", {id: user.id});
 
-		let reason;
-		if (args[1]) {
-			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string("BLACKLIST_REASON_TOO_LONG_ERROR", {}, "error"));
-		}
-
 		await message.guild.members.fetch(user.id).catch(() => {});
 
+		if (qServerDB.config.blacklist.includes(user.id)) return message.channel.send(string("ALREADY_BLACKLISTED_ERROR", {}, "error"));
 		if (qUserDB.flags.includes("STAFF")) return message.channel.send(string("BLACKLIST_GLOBAL_STAFF_ERROR", {}, "error"));
 		if (message.guild.members.cache.get(user.id)) {
 			let memberPermission = await checkPermissions(message.guild.members.cache.get(user.id), client);
 			if (memberPermission <= 2) return message.channel.send(string("BLACKLIST_STAFF_ERROR", {}, "error"));
 		}
 
-		if (qServerDB.config.blacklist.includes(user.id)) return message.channel.send(string("ALREADY_BLACKLISTED_ERROR", {}, "error"));
+		let reason;
+		if (args[1]) {
+			reason = args.splice(1).join(" ");
+			if (reason.length > 1024) return message.channel.send(string("BLACKLIST_REASON_TOO_LONG_ERROR", {}, "error"));
+		}
+
 		qServerDB.config.blacklist.push(user.id);
 		await dbModify("Server", {id: message.guild.id}, qServerDB);
 		message.channel.send(`${string("BLACKLIST_SUCCESS", { user: user.tag, id: user.id }, {}, "check")}${reason ? `\n${string("BLACKLIST_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
@@ -78,7 +78,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.red);
 
-			reason ? logEmbed.addField(string("BLACKLIST_REASON_HEADER"), reason)  : "";
+			reason ? logEmbed.addField(string("BLACKLIST_REASON_HEADER"), reason) : null;
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}
