@@ -65,7 +65,7 @@ const suggestion = new Schema({
 		}
 	],
 	attachment: String,
-	implemented: Boolean
+	implemented: { type: Boolean, default: false }
 });
 
 const user = new Schema({

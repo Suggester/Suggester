@@ -2094,6 +2094,44 @@ module.exports = {
 		"MASS_APPROVE_ERROR_DETAILS": {
 			string: "One or more of these suggestions could not be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved.",
 			context: "Shows why suggestions generally are not approved in the massapprove command"
+		},
+		"MASS_DELETE_SUCCESS_TITLE": {
+			string: "Deleted {{some}}/{{total}} suggestions",
+			context: "Title of the massdelete embed which shows the results of the command",
+			replaced: {
+				some: {
+					to_replace: "{{some}}",
+					description: "The number of suggestions that were deleted"
+				},
+				total: {
+					to_replace: "{{total}}",
+					description: "The number of suggestions that were inputted"
+				}
+			}
+		},
+		"MASS_DELETE_SUCCESS_RESULTS_DETAILED": {
+			string: "**Deleted:** {{list}}",
+			context: "Details which suggestions could be deleted in the massdelete command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_DELETE_FAIL_RESULTS_DETAILED": {
+			string: "**Could Not Delete:** {{list}}",
+			context: "Details which suggestions could not be deleted in the massdelete command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_DELETE_ERROR_DETAILS": {
+			string: "One or more of these suggestions could not be deleted. Please make sure the suggestion IDs you have provided exist and have not already been deleted/denied.",
+			context: "Shows why suggestions generally are not approved in the massdelete command"
 		}
 	}
 };

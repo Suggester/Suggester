@@ -50,6 +50,7 @@ module.exports = {
 		let alreadyApproved = preApprove.filter((s) => s.status !== "awaiting_review");
 
 		let notApprovedId = alreadyApproved.map((s) => s.suggestionId);
+		su.filter(num => !notApprovedId.includes(num));
 
 		let newSet = {
 			status: "approved",
@@ -80,7 +81,7 @@ module.exports = {
 				.setDescription(string("MASS_APPROVE_SUCCESS_TITLE", { some: nModified.toString(), total: postApprove.length }, nModified !== 0 ? "success" : "error"))
 				.addField(string("RESULT_FIELD_TITLE"), `${approvedId.length > 0 ? string("MASS_APPROVE_APPROVE_RESULTS_DETAILED", { list: approvedId.join(", ") }, "success") : ""}\n${notApprovedId.length > 0 ? string("MASS_APPROVE_FAIL_RESULTS_DETAILED", { list: notApprovedId.join(", ") }, "error") : ""}`)
 				.setColor(approvedId.length !== 0 ? colors.green : colors.red)
-				.setFooter(nModified !== su.length ? string("MASS_APPROVE_ERROR_DETAILS") : null)
+				.setFooter(nModified !== su.length ? string("MASS_APPROVE_ERROR_DETAILS") : "")
 		);
 
 		for (let s in approved) {
@@ -145,8 +146,7 @@ module.exports = {
 						serverLog(embedLog, qServerDB, client);
 					}
 
-					if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "green", string("APPROVED_BY", {user: message.author.tag}))))).catch(() => {
-					});
+					if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "green", string("APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
 					await approved[s].save();
 				});
 			}

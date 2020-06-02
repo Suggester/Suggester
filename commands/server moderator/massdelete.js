@@ -1,6 +1,11 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { checkChannel, checkConfig, fetchUser, dbQuery, serverLog } = require("../../utils/misc.js");
+const { colors } = require("../../config.json");
+const { string } = require("../../utils/strings");
+const { fetchUser, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
+const { serverLog } = require("../../utils/logs");
+const { dbQuery } = require("../../utils/db");
 const { Suggestion } = require("../../utils/schemas");
+const { checkDenied, baseConfig, checkSuggestions } = require("../../utils/checks");
+const { deleteFeedMessage, checkVotes } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "massdelete",
@@ -15,56 +20,45 @@ module.exports = {
 		cooldown: 20
 	},
 	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
+		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
+		let deniedCheck = checkDenied(message.guild, qServerDB);
+		if (deniedCheck) return message.channel.send(deniedCheck);
 
-		let missingPermsSuggestions = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPermsSuggestions) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPermsSuggestions !== true) return message.channel.send(missingPermsSuggestions);
-
-		if (qServerDB.config.channels.denied) {
-			let missingPermsDenied = checkChannel(qServerDB.config.channels.denied, message.guild.channels.cache, "denied", client);
-			if (!missingPermsDenied) return message.channel.send(`<:${emoji.x}> Could not find your denied suggestions channel even though there is one configured! If you want to remove your denied suggestions channel, use \`${Discord.escapeMarkdown(qServerDB.prefix)}config denied none\``);
-			if (missingPermsDenied !== true) return message.channel.send(missingPermsDenied);
-		}
-
-		if (!args[0]) return message.channel.send("You must specify at least one suggestion!");
+		if (!args[0]) return message.channel.send(string("NONE_SPECIFIED_MASS_ERROR", {}, "error"));
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
+		if (!reasonSplit[0]) return message.channel.send(string("NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		let suggestions = reasonSplit[0].split(" ");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Deletion reasons cannot be longer than 1024 characters.`);
+			if (reason.length > 1024) return message.channel.send(string("COMMENT_TOO_LONG_ERROR", {}, "error"));
 		}
-		let suggestions = reasonSplit[0].split(" ");
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(`<:${emoji.x}> One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers. If you're trying to specify a reason, add \`-r\` between the suggestion IDs and the reason.`);
+		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_ERROR", {}, "error"));
 		let su = suggestions.map(Number);
-		let msg = await message.channel.send("Processing... this may take a moment");
+		let msg = await message.channel.send(string("PROCESSING"));
 
 		let preDeny = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
-		let alreadyDenied = preDeny.filter((s) => s.status === "denied" || s.implemented);
+		let alreadyDenied = preDeny.filter((s) => s.status !== "approved" || s.implemented);
 
 		let notDeniedId = alreadyDenied.map((s) => s.suggestionId);
+		su.filter(num => !notDeniedId.includes(num));
 
-		let { n, nModified } = await Suggestion.update({
+		let { nModified } = await Suggestion.update({
 			suggestionId: { $in: su },
 			status: "approved"
 		}, {
 			$set: {
 				status: "denied",
-				staff_member: message.author.id
+				staff_member: message.author.id,
+				denial_reason: reason
 			},
 		}, {
 			multi: true
@@ -74,84 +68,56 @@ module.exports = {
 		let denied = postDeny.filter((s) => s.status === "denied" && !notDeniedId.includes(s.suggestionId));
 		let deniedId = denied.map((s) => s.suggestionId);
 
-		if (n !== 0) {
-			await msg.edit(
-				new Discord.MessageEmbed()
-					.setDescription(`<:${emoji.check}> ${nModified !== 0 ? "Successfully deleted" : "Deleted"} ${nModified}/${su.length} suggestions`)
-					.addField("Result", `**Deleted**: ${deniedId.length > 0 ? deniedId.join(", ") : "No suggestions were deleted."}\n${notDeniedId.length > 0 ? "**Could Not Delete**: " + notDeniedId.join(", ") : ""}`)
-					.setColor(colors.green)
-					.setFooter(nModified !== su.length
-						? "One or more of these suggestions could not be deleted. Please make sure the suggestion IDs you have provided exist and have not already been deleted."
-						: "All of these suggestions have been deleted."
-					)
-			);
-		} else {
-			return await msg.edit(
-				new Discord.MessageEmbed()
-					.setDescription(`<:${emoji.x}> None of the suggestions you provided could be deleted. Please make sure the suggestion IDs you have provided exist and have not already been denied.`)
-					.setColor(colors.red)
-			);
-		}
+		await msg.edit(
+			new Discord.MessageEmbed()
+				.setDescription(string("MASS_DELETE_SUCCESS_TITLE", { some: nModified.toString(), total: postDeny.length }, nModified !== 0 ? "success" : "error"))
+				.addField(string("RESULT_FIELD_TITLE"), `${deniedId.length > 0 ? string("MASS_DELETE_SUCCESS_RESULTS_DETAILED", { list: deniedId.join(", ") }, "success") : ""}\n${notDeniedId.length > 0 ? string("MASS_DELETE_FAIL_RESULTS_DETAILED", { list: notDeniedId.join(", ") }, "error") : ""}`)
+				.setColor(deniedId.length !== 0 ? colors.green : colors.red)
+				.setFooter(nModified !== su.length ? string("MASS_DELETE_ERROR_DETAILS") : "")
+		);
 
 		for (let s in denied) {
 			// eslint-disable-next-line no-prototype-builtins
 			if (denied.hasOwnProperty(s)) {
-				let suggester = await fetchUser(denied[s].suggester, client);
+				let qSuggestionDB = denied[s];
+				let suggester = await fetchUser(qSuggestionDB.suggester, client);
 
-				await client.channels.cache.get(qServerDB.config.channels.suggestions)
-					.messages.fetch(denied[s].messageId)
-					.then((m) => m.delete())
-					.catch();
+				let deleteMsg = await deleteFeedMessage(qSuggestionDB, qServerDB, client);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) {
-					let dmEmbed = new Discord.MessageEmbed()
-						.setTitle(`Your Suggestion In **${message.guild.name}** Was Deleted`)
-						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
-						.setDescription(denied[s].suggestion || "[No Suggestion Content]")
-						.setColor(colors.red);
-					reason ? dmEmbed.addField("Reason Given:", reason) : "";
-					denied[s].attachment ? dmEmbed.setImage(denied[s].attachment) : "";
-					await suggester.send(dmEmbed).catch(() => {});
-				}
-				if (qServerDB.config.channels.log) {
-					let logEmbed = new Discord.MessageEmbed()
-						.setAuthor(`${message.author.tag} deleted #${denied[s].suggestionId}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-						.addField("Suggestion", denied[s].suggestion || "[No Suggestion Content]")
-						.setFooter(`Suggestion ID: ${denied[s].suggestionId} | Denier ID: ${message.author.id}`)
-						.setTimestamp()
-						.setColor(colors.red);
-					reason ? logEmbed.addField("Reason Given:", reason) : "";
-					denied[s].attachment ? logEmbed.setImage(denied[s].attachment) : "";
+				if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string("REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
-					serverLog(logEmbed, qServerDB, client);
-				}
-				let updateEmbed = new Discord.MessageEmbed()
-					.setTitle(`Suggestion Awaiting Review (#${denied[s].suggestionId})`)
-					.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
-					.setDescription(denied[s].suggestion)
-					.setColor(colors.red)
-					.addField("A change was processed on this suggestion", "This suggestion has been deleted");
-				await client.channels.cache.get(qServerDB.config.channels.staff)
-					.messages.fetch(denied[s].reviewMessage)
-					.then((fetched) => fetched.edit(updateEmbed));
+				if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
 				if (qServerDB.config.channels.denied) {
 					let deniedEmbed = new Discord.MessageEmbed()
-						.setTitle("Suggestion Deleted")
-						.setAuthor(`Suggestion from ${suggester.tag} (${suggester.id})`)
+						.setTitle(string("SUGGESTION_DELETED_TITLE"))
+						.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 						.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-						.setDescription(denied[s].suggestion || "[No Suggestion Content]")
-						.setFooter(`Suggestion ID: ${denied[s].suggestionId}`)
+						.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
+						.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+						.setTimestamp(qSuggestionDB.submitted)
 						.setColor(colors.red);
-					reason ? deniedEmbed.addField("Reason Given:", reason) : "";
-					denied[s].attachment ? deniedEmbed.setImage(denied[s].attachment) : "";
-					await client.channels.cache.get(qServerDB.config.channels.denied)
-						.send(deniedEmbed);
+					reason ? deniedEmbed.addField(string("REASON_GIVEN"), reason) : "";
+					let votes = checkVotes(qSuggestionDB, deleteMsg[1]);
+					if (votes[0] || votes[1]) deniedEmbed.addField(string("VOTE_TOTAL_HEADER"), `${string("VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string("UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string("VOTE_COUNT_UP")} ${votes[0]}\n${string("VOTE_COUNT_DOWN")} ${votes[1]}`);
+					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
+					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}
-				let modified = denied[s];
-				if (reason) modified.denial_reason = reason;
-				denied[s] = modified;
+
+				if (qServerDB.config.channels.log) {
+					let logs = logEmbed(qSuggestionDB, message.author, "DELETED_LOG", "red")
+						.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"));
+
+					reason ? logs.addField(string("REASON_GIVEN"), reason) : "";
+					if (qSuggestionDB.attachment) {
+						logs.setImage(qSuggestionDB.attachment);
+						logs.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+					}
+					serverLog(logs, qServerDB, client);
+				}
+
+				if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", {user: message.author.tag}))))).catch(() => {});
 				await denied[s].save();
 			}
 		}
