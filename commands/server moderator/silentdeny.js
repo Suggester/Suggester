@@ -9,7 +9,7 @@ module.exports = {
 		name: "silentdeny",
 		permission: 3,
 		usage: "silentdeny <suggestion id> (reason)",
-		description: "Denies a suggestion without posting it to the denied suggestions feed",
+		description: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
 		docs: "staff/silentdeny",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
