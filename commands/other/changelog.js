@@ -34,7 +34,7 @@ module.exports = {
 
 			pages(message, embeds);
 		}).catch((e) => {
-			console.log(e)
+			console.log(e);
 			return message.channel.send(string("ERROR", {}, "error"));
 		});
 	}

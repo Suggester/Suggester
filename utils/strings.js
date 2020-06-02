@@ -1990,6 +1990,14 @@ module.exports = {
 		"INFO_IMPLEMENTED": {
 			string: "This suggestion was transferred to the implemented suggestion archive channel.",
 			context: "Note on the info command when a suggestion has been transferred to the implemented archive channel"
+		},
+		"NONE_AWAITING_REVIEW": {
+			string: "There are no suggestions awaiting review!",
+			context: "Shown when the queue is empty in the listqueue command"
+		},
+		"PENDING_REVIEW_HEADER": {
+			string: "Suggestions Pending Review",
+			context: "Header for the listqueue embed"
 		}
 	}
 };
