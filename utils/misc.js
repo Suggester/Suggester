@@ -125,7 +125,7 @@ module.exports = {
 	 * @returns {Collection}
 	 */
 	async fetchUser(id, client) {
-		if (!id) return null;
+		if (!id) return client.user.unknown;
 		let foundId;
 		let matches = id.match(/^<@!?(\d+)>$/);
 		if (!matches) foundId = id;

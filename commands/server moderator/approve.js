@@ -125,7 +125,5 @@ module.exports = {
 		}
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "green", string("APPROVED_BY", { user: message.author.tag }))))).catch(() => {});
-
-		client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed)).catch(() => {});
 	}
 };

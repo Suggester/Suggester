@@ -2049,5 +2049,51 @@ module.exports = {
 				}
 			}
 		},
+		"NONE_SPECIFIED_MASS_ERROR": {
+			string: "You must specify at least one suggestion.",
+			context: "Error shown when no suggestions are specified for a mass command"
+		},
+		"NAN_MASS_ERROR": {
+			string: "One or more of the suggestion IDs you've entered is not a number. Please ensure all of your IDs are numbers. If you're trying to specify a comment, add `-r` between the suggestion IDs and the comment.",
+			context: "Error shown when a suggestion ID specified in a mass command is not a number"
+		},
+		"MASS_APPROVE_SUCCESS_TITLE": {
+			string: "Approved {{some}}/{{total}} suggestions",
+			context: "Title of the massapprove embed which shows the results of the command",
+			replaced: {
+				some: {
+					to_replace: "{{some}}",
+					description: "The number of suggestions that were approved"
+				},
+				total: {
+					to_replace: "{{total}}",
+					description: "The number of suggestions that were inputted"
+				}
+			}
+		},
+		"MASS_APPROVE_APPROVE_RESULTS_DETAILED": {
+			string: "**Approved:** {{list}}",
+			context: "Details which suggestions could be approved in the massapprove command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_APPROVE_FAIL_RESULTS_DETAILED": {
+			string: "**Could Not Approve:** {{list}}",
+			context: "Details which suggestions could not be approved in the massapprove command",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of suggestions"
+				}
+			}
+		},
+		"MASS_APPROVE_ERROR_DETAILS": {
+			string: "One or more of these suggestions could not be approved. Please make sure the suggestion IDs you have provided exist and have not already been approved.",
+			context: "Shows why suggestions generally are not approved in the massapprove command"
+		}
 	}
 };
