@@ -93,7 +93,7 @@ module.exports = {
 		if (returned) return returned;
 
 		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
-		if (suggestionsCheck) [suggestionsCheck];
+		if (suggestionsCheck) return [suggestionsCheck];
 
 		let suggestion = await checkApprovedSuggestion(message.guild, args[0]);
 		if (suggestion[0]) return [suggestion[0]];
