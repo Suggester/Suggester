@@ -2174,6 +2174,28 @@ module.exports = {
 		"MASS_DENY_ERROR_DETAILS": {
 			string: "One or more of these suggestions could not be denied. Please make sure the suggestion IDs you have provided exist and have not already been approved/denied.",
 			context: "Shows why suggestions generally are not denied in the massdeny command"
+		},
+		"NO_ATTACHMENT_REMOVE_ERROR": {
+			string: "This suggestion does not have an attachment.",
+			context: "Error shown when a user attempts to remove an attachment from a suggestion that has no attachment"
+		},
+		"ATTACHMENT_REMOVED_TITLE": {
+			string: "Attachment Removed",
+			context: "Title for the Attachment Removed embed"
+		},
+		"ATTACH_REMOVE_LOG": {
+			string: "{{user}} removed the attachment from #{{id}}",
+			context: "Title for the log embed when an attachment is removed from a suggestion",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
 		}
 	}
 };
