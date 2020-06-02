@@ -161,10 +161,15 @@ module.exports = {
 		});
 	},
 	checkVotes: function(qSuggestionDB, msg) {
+		const nodeEmoji = require("node-emoji");
+		function getEmoji (input) {
+			if (nodeEmoji.find(input)) return input;
+			else return input.match(/[a-zA-Z0-9-_]+:([0-9]+)/)[1] || null;
+		}
 		let upCount = "Unknown";
 		let downCount = "Unknown";
-		let upReaction = msg.reactions.cache.get(qSuggestionDB.emojis.up);
-		let downReaction = msg.reactions.cache.get(qSuggestionDB.emojis.down);
+		let upReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.up));
+		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
 		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;
 		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
 		return [upCount, downCount, upCount-downCount];
