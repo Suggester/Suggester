@@ -87,9 +87,9 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(string(title.string, {server: title.guild}))
 			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
-			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" ? `\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
-			.setColor(colors[color]);
+			.setColor(colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
 		if (reason) embed.addField(reason.header, reason.reason);
 		return embed;
@@ -101,7 +101,7 @@ module.exports = {
 			.setDescription(qSuggestionDB.suggestion)
 			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)
-			.setColor(colors[color]);
+			.setColor(colors[color] || color);
 
 		if (change) embed.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), change);
 		if (qSuggestionDB.attachment) {
@@ -115,7 +115,7 @@ module.exports = {
 			.setAuthor(string(title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
 			.setTimestamp()
-			.setColor(colors[color]);
+			.setColor(colors[color] || color);
 		return embed;
 	},
 	/**

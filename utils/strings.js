@@ -73,7 +73,7 @@ module.exports = {
 		},
 		"NO_STATUS_ERROR": {
 			string: "You must specify a valid status!",
-			context: "Error that shows when the botconfig command is run without any status parameter"
+			context: "Error that shows when the botconfig or mark commands are run without any status parameter"
 		},
 		"STATUS_SET_SUCCESS": {
 			string: "Status set!",
@@ -1409,11 +1409,11 @@ module.exports = {
 				}
 			}
 		},
-		"ANONYMOUS_COMMENT_ADDED_TILE": {
+		"ANONYMOUS_COMMENT_ADDED_TITLE": {
 			string: "Anonymous Comment Added",
 			context: "Header for the Anonymous Comment Added embed"
 		},
-		"COMMENT_ADDED_TILE": {
+		"COMMENT_ADDED_TITLE": {
 			string: "Comment Added",
 			context: "Header for the Comment Added embed"
 		},
@@ -1813,6 +1813,10 @@ module.exports = {
 			string: "I could not find your configured denied suggestions channel! Please reconfigure or remove your set denied suggestions channel.",
 			context: "Error when the configured denied suggestions channel is not found"
 		},
+		"NO_ARCHIVE_CHANNEL_ERROR": {
+			string: "I could not find your implemented suggestions archive channel! Please reconfigure or remove your set implemented suggestions archive channel.",
+			context: "Error when the configured implemented suggestions channel is not found"
+		},
 		"DELETION_REASON_TOO_LONG_ERROR": {
 			string: "Deletion reasons are limited to a length of 1024 characters.",
 			context: "Error when the deletion reason is too long"
@@ -1987,6 +1991,10 @@ module.exports = {
 			string: "Not Happening",
 			context: "Denotes a suggestion having the not happening status"
 		},
+		"STATUS_DEFAULT": {
+			string: "Default",
+			context: "Denotes a suggestion having the default status"
+		},
 		"INFO_IMPLEMENTED": {
 			string: "This suggestion was transferred to the implemented suggestion archive channel.",
 			context: "Note on the info command when a suggestion has been transferred to the implemented archive channel"
@@ -1998,6 +2006,48 @@ module.exports = {
 		"PENDING_REVIEW_HEADER": {
 			string: "Suggestions Pending Review",
 			context: "Header for the listqueue embed"
-		}
+		},
+		"STATUS_ALREADY_SET_ERROR": {
+			string: "This suggestion already has a status of **{{status}}**",
+			context: "Error shown when the suggestion already has the status a user is trying to mark",
+			replaced: {
+				status: {
+					to_replace: "{{status}}",
+					description: "A status string"
+				}
+			}
+		},
+		"STATUS_EDITED_TITLE": {
+			string: "Status Edited",
+			context: "Header for the Status Edited embed"
+		},
+		"IMPLEMENTED_LINK": {
+			string: "Implemented Archive Post",
+			context: "Hyperlink to the implemented archive channel post when a suggestion is archived"
+		},
+		"STATUS_MARK_DM_TITLE": {
+			string: "The status of your suggestion in **{{server}}** was edited!",
+			context: "Title for the DM notification of a status being marked on a suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"STATUS_MARK_LOG": {
+			string: "{{user}} set a status for #{{id}}",
+			context: "Title for the log embed when a status is marked",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
 	}
 };

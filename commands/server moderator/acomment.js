@@ -45,7 +45,7 @@ module.exports = {
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle(string("ANONYMOUS_COMMENT_ADDED_TILE"))
+			.setTitle(string("ANONYMOUS_COMMENT_ADDED_TITLE"))
 			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(string("COMMENT_TITLE_ANONYMOUS"), comment)
 			.setColor(colors.blue)
