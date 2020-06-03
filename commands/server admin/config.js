@@ -191,6 +191,31 @@ module.exports = {
 			}
 			}
 		}
+		case "blocked":
+		case "blockedroles":
+		case "blacklist":
+		case "blacklistroles":
+		case "blockedrole": {
+			switch (args[1]) {
+			case "add":
+			case "+": {
+				return message.channel.send((await handleRoleInput("add", args.splice(2).join(" "), server.roles.cache, "blocked_roles", "CFG_ALREADY_BLOCKED_ROLE_ERROR", "CFG_BLOCKED_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+			}
+			case "remove":
+			case "-":
+			case "rm":
+			case "delete": {
+				return message.channel.send((await handleRoleInput("remove", args.splice(2).join(" "), server.roles.cache, "blocked_roles", "CFG_NOT_BLOCKED_ROLE_ERROR", "CFG_BLOCK_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+			}
+			case "list": {
+				return message.channel.send((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
+			}
+			default: {
+				if (args[1]) return message.channel.send(string("CFG_INVALID_ROLE_PARAM_ERROR"));
+				else return message.channel.send((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
+			}
+			}
+		}
 		case "approvedrole":
 		case "approverole": {
 			if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.approved_role, server, "CFG_APPROVED_ROLE_TITLE", false)));
@@ -409,6 +434,8 @@ module.exports = {
 			cfgRolesArr.push(staffRoles[0]);
 			// Allowed roles
 			cfgRolesArr.push((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", false, string("CFG_ALLOWED_ROLES_APPEND")))[0]);
+			// Blocked roles
+			cfgRolesArr.push((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
 			// Approved suggestion role
 			cfgRolesArr.push((await listRoles(qServerDB.config.approved_role, server, "CFG_APPROVED_ROLE_TITLE", false)));
 			// Suggestions channel

@@ -107,12 +107,11 @@ module.exports = {
 		return embed;
 	},
 	logEmbed: function (qSuggestionDB, user, title, color) {
-		let embed = new Discord.MessageEmbed()
+		return (new Discord.MessageEmbed()
 			.setAuthor(string(title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
 			.setTimestamp()
-			.setColor(colors[color] || color);
-		return embed;
+			.setColor(colors[color] || color));
 	},
 	/**
 	 * Fetch a user

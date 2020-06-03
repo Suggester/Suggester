@@ -361,6 +361,10 @@ module.exports = {
 			string: "**Admin Roles:**",
 			context: "Denotes the list of admin roles when configuration is listed"
 		},
+		"CFG_BLOCKED_ROLES_TITLE": {
+			string: "**Blocked Roles:**",
+			context: "Denotes the list of blocked roles when configuration is listed"
+		},
 		"CFG_STAFF_ROLES_TITLE": {
 			string: "**Staff Roles:**",
 			context: "Denotes the list of staff roles when configuration is listed"
@@ -2492,6 +2496,34 @@ module.exports = {
 		"ALL_USERS_PERMISSION": {
 			string: "All Users",
 			context: "Permission shown in the help command if all users can use the command"
+		},
+		"CFG_ALREADY_BLOCKED_ROLE_ERROR": {
+			string: "This role has already been blocked from using the bot on this server.",
+			context: "Error when a role has already been added as a blocked role"
+		},
+		"CFG_BLOCKED_ROLE_ADD_SUCCESS": {
+			string: "Members with the **{{role}}** role can no longer use the bot on this server.",
+			context: "Success message when a role is added to the server blocked role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_BLOCKED_ROLE_ERROR": {
+			string: "This role is not currently a blocked role.",
+			context: "Error when a role has not already been added as a blocked role"
+		},
+		"CFG_BLOCK_ROLE_REMOVE_SUCCESS": {
+			string: "Members with the **{{role}}** role are no longer blocked from using the bot on this server.",
+			context: "Success message when a role is removed from the server blocked role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
 		}
 	}
 };

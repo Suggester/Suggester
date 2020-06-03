@@ -27,7 +27,7 @@ module.exports = {
 		if (qUserDB && qUserDB.blocked) return 12;
 		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
 		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
-		if (qServerDB.config.blacklist.includes(member.id)) return 11;
+		if (qServerDB.config.blacklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
 		return 10;
 	},
 	channelPermissions: (permissionCheckFor, channel, client) => {
@@ -78,11 +78,10 @@ module.exports = {
 		if (config.mode === "review" && !config.channels.staff) missing.push(string("CFG_REVIEW_CHANNEL_TITLE"));
 
 		if (missing.length > 0) {
-			let embed = new Discord.MessageEmbed()
+			return (new Discord.MessageEmbed()
 				.setDescription(string("MISSING_CONFIG_HEADER", { prefix: db.config.prefix }))
 				.addField(string("MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return embed;
+				.setColor(colors.red));
 		}
 		return null;
 	},

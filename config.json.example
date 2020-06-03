@@ -1,10 +1,10 @@
 {
-  "developer": [ //Array of developer IDs, has access to all commands on all servers
-      "0123",
-      "0123"
+  "developer": [
+    "327887845270487041",
+    "255834596766253057"
   ],
-  "prefix": "./", //Default prefix
-  "support_invite": "G5pEdUp", //Invite to support server
+  "prefix": ".",
+  "support_invite": "G5pEdUp",
   "colors": {
     "default": "#7289da",
     "red": "#e74c3c",
@@ -12,36 +12,31 @@
     "blue": "#3498db",
     "gray": "#979c9f",
     "orange": "#e67e22",
-    "yellow": "#f1c40f",
-    "gold": "#FFD700"
+    "yellow": "#f1c40f"
   },
   "release": "special",
-  "logs": { //Log channels in the main guild
-    "commands": "614433607078903818", //Command Logs
-    "core": "614433641266937884", //Startup Logs
-    "guild": "614433722707738634" //Bot Added/Removed Logs
+  "emoji": {
+    "x": "x_alt:704665482828972113",
+    "mid": "mid_alt:704666116294705212",
+    "check": "check_alt:704665656573952040"
   },
-  "emoji": { //Default success and failure emotes
-    "x": "suggester_x:614554969198166027",
-    "mid": "suggester_mid:666626829968343051",
-    "check": "suggester_check:614554968812421160"
-  },
-  "log_hooks": { //Webhooks in the logging channels
+  "log_hooks": {
     "commands": {
-      "id": "000",
-      "token": "abcd123"
+      "id": "",
+      "token": ""
     },
     "core": {
-      "id": "000",
-      "token": "abcd123"
+      "id": "",
+      "token": ""
     },
     "guild": {
-      "id": "000",
-      "token": "abcd123"
+      "id": "",
+      "token": ""
     },
     "debug": {
-      "id": "000",
-      "token": "abcd123"
+      "id": "",
+      "token": ""
     }
-  }
+  },
+  "lists": {}
 }

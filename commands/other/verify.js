@@ -36,8 +36,8 @@ module.exports = {
 			let member = message.guild.members.cache.get(user.id);
 			if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) posArr.push(`🛠️ ${string("VERIFY_ACK_SERVER_ADMIN")}`);
 			if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) posArr.push(`🛠️ ${string("VERIFY_ACK_SERVER_STAFF")}`);
-		}
-		if (qServerDB.config.blacklist.includes(user.id)) posArr.push(`🚫 ${string("VERIFY_ACK_SERVER_BLACKLIST")}`);
+			if (qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r)) || qServerDB.config.blacklist.includes(user.id)) posArr.push(`🚫 ${string("VERIFY_ACK_SERVER_BLACKLIST")}`);
+		} else if (qServerDB.config.blacklist.includes(user.id)) posArr.push(`🚫 ${string("VERIFY_ACK_SERVER_BLACKLIST")}`);
 
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(user.id), client);
 		let embed = new Discord.MessageEmbed()

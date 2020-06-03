@@ -12,6 +12,7 @@ const settings = new Schema({
 		admin_roles: [String],
 		staff_roles: [String],
 		allowed_roles: [String],
+		blocked_roles: [String],
 		approved_role: { type: String },
 		channels: {
 			suggestions: { type: String },
