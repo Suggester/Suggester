@@ -49,6 +49,22 @@ module.exports = {
 		if (!checkFor) return message.channel.send(string("NO_STATUS_ERROR", {}, "error"));
 		if (checkFor.includes(qSuggestionDB.displayStatus)) return message.channel.send(string("STATUS_ALREADY_SET_ERROR", { status: str }, "error"));
 
+		let isComment = args[2];
+
+		let comment;
+		if (isComment) {
+			comment = args.splice(2).join(" ");
+			if (comment.length > 1024) return message.channel.send(string("COMMENT_TOO_LONG_ERROR", {}, "error"));
+			let commentId = qSuggestionDB.comments.length+1;
+			isComment = commentId;
+			qSuggestionDB.comments.push({
+				comment: comment,
+				author: message.author.id,
+				id: commentId,
+				created: new Date()
+			});
+		}
+
 		qSuggestionDB.displayStatus = checkFor[0];
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
@@ -77,16 +93,22 @@ module.exports = {
 					.setFooter(string("SUGGESTION_FOOTER", {id: id.toString()}))
 					.setTimestamp(qSuggestionDB.submitted)
 					.addField(string("INFO_PUBLIC_STATUS_HEADER"), str);
+
+				if (isComment) replyEmbed.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 				message.channel.send(replyEmbed);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string("INFO_PUBLIC_STATUS_HEADER"), reason: str })).addField(string("IMPLEMENTED_LINK"), `[${string("IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)).catch(() => {});
+				let notify = dmEmbed(qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string("INFO_PUBLIC_STATUS_HEADER"), reason: str });
+				if (isComment) notify.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+				notify.addField(string("IMPLEMENTED_LINK"), `[${string("IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
+				if (qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 
 				if (qServerDB.config.channels.log) {
 					let logs = logEmbed(qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
 						.addField(string("INFO_PUBLIC_STATUS_HEADER"), str)
 						.addField(string("IMPLEMENTED_LINK"), `[${string("IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 
+					if (isComment) logs.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					serverLog(logs, qServerDB, client);
 				}
 			});
@@ -106,15 +128,20 @@ module.exports = {
 			.setFooter(string("SUGGESTION_FOOTER", {id: id.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)
 			.addField(string("INFO_PUBLIC_STATUS_HEADER"), str);
+
+		if (isComment) replyEmbed.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (![null, "default"].includes(qSuggestionDB.displayStatus) && qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string("INFO_PUBLIC_STATUS_HEADER"), reason: str }))).catch(() => {});
+		let notify = dmEmbed(qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string("INFO_PUBLIC_STATUS_HEADER"), reason: str });
+		if (isComment) notify.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+		if (![null, "default"].includes(qSuggestionDB.displayStatus) && qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
 				.addField(string("INFO_PUBLIC_STATUS_HEADER"), str);
 
+			if (isComment) logs.addField(string("COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
 		}
 	}
