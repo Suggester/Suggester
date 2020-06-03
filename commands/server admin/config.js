@@ -491,7 +491,7 @@ module.exports = {
 				const permissions = require("../../utils/permissions");
 				let hasPermissionList = [];
 				Object.keys(permissions).forEach(perm => {
-					server.me.permissions.has(perm) ? hasPermissionList.push(permissions[perm]) : "";
+					server.me.permissions.has(perm) ? hasPermissionList.push(string(`PERMISSION:${perm}`)) : "";
 				});
 
 				cfgEmbed.addField(string("CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None");

@@ -8,19 +8,19 @@ module.exports = {
 	permLevelToRole: (permLevel) => {
 		switch (permLevel) {
 		case -1:
-			return "No Users";
+			return string("NO_USERS_PERMISSION");
 		case 0:
-			return "Bot Administrator";
+			return string("BOT_ADMIN_PERMISSION");
 		case 1:
-			return "Global Permissions+";
+			return string("GLOBAL_STAFF_PERMISSION");
 		case 2:
-			return "Server Administrator (Manage Server or Admin Role)+";
+			return string("SERVER_ADMIN_PERMISSION");
 		case 3:
-			return "Server Staff (Staff Role)+";
+			return string("SERVER_STAFF_PERMISSION");
 		case 10:
-			return "All Users";
+			return string("ALL_USERS_PERMISSION");
 		default:
-			return "Undefined";
+			return string("UNKNOWN");
 		}
 	},
 	/**
@@ -35,31 +35,27 @@ module.exports = {
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
 		// User information
-		if (suggester) {
-			embed.setAuthor(`Suggestion from ${suggester.tag}`, suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}));
-		} else {
-			embed.setTitle("Suggestion from Unknown User");
-		}
+		embed.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}));
 		// Suggestion
 		embed.setDescription(suggestion.suggestion)
 			// Footer
 			.setTimestamp(suggestion.submitted)
-			.setFooter(`Suggestion ID: ${suggestion.suggestionId} | Submitted at`);
+			.setFooter(string("SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
 		// Side Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
 			embed.setColor(colors.green)
-				.addField("Status", "Implemented");
+				.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_IMPLEMENTED"));
 			break;
 		}
 		case "working": {
-			embed.addField("Status", "In Progress")
+			embed.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_PROGRESS"))
 				.setColor(colors.orange);
 			break;
 		}
 		case "no": {
-			embed.addField("Status", "Not Happening")
+			embed.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_NO"))
 				.setColor(colors.gray);
 			break;
 		}
@@ -73,7 +69,7 @@ module.exports = {
 				if (!comment.deleted || comment.deleted !== true) {
 					let user = await fetchUser(comment.author, client);
 					let title;
-					!user ? title = `Staff Comment (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `Comment from ${user.tag} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}`;
+					!user || user.id === "0" ? title = `${string("COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `${string("COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created ? " • " + comment.created.toUTCString() : ""}`;
 					embed.addField(title, comment.comment);
 				}
 			}

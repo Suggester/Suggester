@@ -2228,6 +2228,270 @@ module.exports = {
 					description: "The staff member's tag"
 				}
 			}
+		},
+		"COOLDOWN_SPAM_FLAG": {
+			string: "{{mention}} ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join {{support}} and contact our Support Team.",
+			context: "Message shown when a user triggers the command cooldown spam filter",
+			replaced: {
+				mention: {
+					to_replace: "{{mention}}",
+					description: "The user mention"
+				},
+				support: {
+					to_replace: "{{support}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"COMMAND_COOLDOWN": {
+			string: "🕑 This command is on cooldown for {{time}} more second(s).",
+			context: "Shown when a command is on cooldown and a user attempts to use it",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The number of seconds left for the cooldown"
+				}
+			}
+		},
+		"TUTORIAL_HEADER": {
+			string: "Thanks for adding Suggester!",
+			context: "Header for the tutorial embed"
+		},
+		"TUTORIAL_DESC": {
+			string: "Suggester will help you easily and efficiently manage your server's suggestions, letting you get feedback from your community while also keeping out spam/unwanted suggestions! Staff members can also perform a number of actions on suggestions including (but not limited to) adding comments and marking statuses! The bot's prefix is `{{prefix}}` by default, but can be changed at any time using the `config` command.",
+			context: "Description for the tutorial embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The bot prefix"
+				}
+			}
+		},
+		"TUTORIAL_GET_STARTED_HEADER": {
+			string: "Let's Get Started!",
+			context: "Header for the Let's Get Started section of the tutorial embed"
+		},
+		"TUTORIAL_GET_STARTED_DESCRIPTION": {
+			string: "Before users can submit suggestions, someone with the **Manage Server** permission needs to do a bit of configuration. An easy way to do this is to run `{{prefix}}setup`, which will start a walkthrough for setting up the most essential elements of the bot.",
+			context: "Description for the Let's Get Started section of the tutorial embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The bot prefix"
+				}
+			}
+		},
+		"TUTORIAL_NEXT_HEADER": {
+			string: "What's Next?",
+			context: "Header for the What's Next? section of the tutorial embed"
+		},
+		"TUTORIAL_NEXT_DESCRIPTION": {
+			string: "After you run `{{prefix}}setup`, users can submit suggestions and the bot will work. If you are looking for more advanced configuration options like custom suggestion feed reactions and auto-cleaning of suggestion commands, take a look at https://suggester.js.org/#/admin/config.\n\nIf you're having an issue, or just want to find out more about the bot, head over to the __Suggester support server__: {{invite}}\nThis embed can be shown at any time using the `{{prefix}}tutorial` command.",
+			context: "Description for the What's Next? section of the tutorial embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The bot prefix"
+				},
+				invite: {
+					to_replace: "{{invite}}",
+					description: "The invite to the Suggester support server"
+				}
+			}
+		},
+		"PERMISSIONS_MISSING_HEADER": {
+			string: "This command cannot be run because some permissions are missing. {{name}} needs the following permissions in the {{channel}} channel:",
+			context: "Header for the embed shown when the bot is missing permissions necessary for a command",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The username of the bot"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The channel where permissions are missing"
+				}
+			}
+		},
+		"MISSING_ELEMENTS_HEADER": {
+			string: "Missing Elements",
+			context: "Denotes what elements are missing when some permissions/config elements are"
+		},
+		"HOW_TO_FIX_HEADER": {
+			string: "How to Fix",
+			context: "Shows how to fix missing configuration elements/permissions"
+		},
+		"FIX_MISSING_PERMISSIONS_INFO": {
+			string: "In the channel settings for {{channel}}, make sure that **{{name}}** has the above permissions allowed.",
+			context: "Shows how to fix permission issues",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The username of the bot"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The channel where permissions are missing"
+				}
+			}
+		},
+		"MISSING_CONFIG_HEADER": {
+			string: "This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the `{{prefix}}config` command.",
+			context: "Shown when configuration elements are missing",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The bot prefix"
+				}
+			}
+		},
+		"PERMISSION:CREATE_INSTANT_INVITE": {
+			string: "Create Instant Invite",
+			context: "String representing the Create Instant Invite permission"
+		},
+		"PERMISSION:KICK_MEMBERS": {
+			string: "Kick Members",
+			context: "String representing the Kick Members permission"
+		},
+		"PERMISSION:BAN_MEMBERS": {
+			string: "Ban Members",
+			context: "String representing the Ban Members permission"
+		},
+		"PERMISSION:ADMINISTRATOR": {
+			string: "Administrator",
+			context: "String representing the Administrator permission"
+		},
+		"PERMISSION:MANAGE_CHANNELS": {
+			string: "Manage Channels",
+			context: "String representing the Manage Channels permission"
+		},
+		"PERMISSION:MANAGE_GUILD": {
+			string: "Manage Server",
+			context: "String representing the Manage Server permission"
+		},
+		"PERMISSION:ADD_REACTIONS": {
+			string: "Add Reactions",
+			context: "String representing the Add Reactions permission"
+		},
+		"PERMISSION:VIEW_AUDIT_LOG": {
+			string: "View Audit Log",
+			context: "String representing the View Audit Log permission"
+		},
+		"PERMISSION:VIEW_CHANNEL": {
+			string: "View Channel",
+			context: "String representing the View Channel permission"
+		},
+		"PERMISSION:SEND_MESSAGES": {
+			string: "Send Messages",
+			context: "String representing the Send Messages permission"
+		},
+		"PERMISSION:SEND_TTS_MESSAGES": {
+			string: "Send TTS Messages",
+			context: "String representing the Send TTS Messages permission"
+		},
+		"PERMISSION:MANAGE_MESSAGES": {
+			string: "Manage Messages",
+			context: "String representing the Manage Messages permission"
+		},
+		"PERMISSION:EMBED_LINKS": {
+			string: "Embed Links",
+			context: "String representing the Embed Links permission"
+		},
+		"PERMISSION:ATTACH_FILES": {
+			string: "Attach Files",
+			context: "String representing the Attach Files permission"
+		},
+		"PERMISSION:READ_MESSAGE_HISTORY": {
+			string: "Read Message History",
+			context: "String representing the Read Message History permission"
+		},
+		"PERMISSION:MENTION_EVERYONE": {
+			string: "Mention Everyone",
+			context: "String representing the Mention Everyone permission"
+		},
+		"PERMISSION:USE_EXTERNAL_EMOJIS": {
+			string: "Use External Emojis",
+			context: "String representing the Use External Emojis permission"
+		},
+		"PERMISSION:CONNECT": {
+			string: "Connect",
+			context: "String representing the Connect permission"
+		},
+		"PERMISSION:SPEAK": {
+			string: "Speak",
+			context: "String representing the Speak permission"
+		},
+		"PERMISSION:MUTE_MEMBERS": {
+			string: "Mute Members",
+			context: "String representing the Mute Members permission"
+		},
+		"PERMISSION:DEAFEN_MEMBERS": {
+			string: "Deafen Members",
+			context: "String representing the Deafen Members permission"
+		},
+		"PERMISSION:MOVE_MEMBERS": {
+			string: "Move Members",
+			context: "String representing the Move Members permission"
+		},
+		"PERMISSION:USE_VAD": {
+			string: "Use Voice Activity",
+			context: "String representing the Use Voice Activity permission"
+		},
+		"PERMISSION:PRIORITY_SPEAKER": {
+			string: "Priority Speaker",
+			context: "String representing the Priority Speaker permission"
+		},
+		"PERMISSION:CHANGE_NICKNAME": {
+			string: "Change Nickname",
+			context: "String representing the Change Nickname permission"
+		},
+		"PERMISSION:MANAGE_NICKNAMES": {
+			string: "Manage Nicknames",
+			context: "String representing the Manage Nicknames permission"
+		},
+		"PERMISSION:MANAGE_ROLES": {
+			string: "Manage Roles",
+			context: "String representing the Manage Roles permission"
+		},
+		"PERMISSION:MANAGE_WEBHOOKS": {
+			string: "Manage Webhooks",
+			context: "String representing the Manage Webhooks permission"
+		},
+		"PERMISSION:MANAGE_EMOJIS": {
+			string: "Manage Emojis",
+			context: "String representing the Manage Emojis permission"
+		},
+		"PERMISSION:STREAM": {
+			string: "Stream",
+			context: "String representing the Stream permission"
+		},
+		"PERMISSION:VIEW_GUILD_INSIGHTS": {
+			string: "View Guild Insights",
+			context: "String representing the View Guild Insights permission"
+		},
+		"NO_USERS_PERMISSION": {
+			string: "No Users",
+			context: "Permission shown in the help command if no users can use the command"
+		},
+		"BOT_ADMIN_PERMISSION": {
+			string: "Bot Administrator",
+			context: "Permission shown in the help command if only bot admins can use the command"
+		},
+		"GLOBAL_STAFF_PERMISSION": {
+			string: "Global Staff+",
+			context: "Permission shown in the help command if global staff+ can use the command"
+		},
+		"SERVER_ADMIN_PERMISSION": {
+			string: "Server Administrator (Manage Server or Admin Role)+",
+			context: "Permission shown in the help command if server admins+ can use the command"
+		},
+		"SERVER_STAFF_PERMISSION": {
+			string: "Server Staff (Staff Role)+",
+			context: "Permission shown in the help command if server staff+ can use the command"
+		},
+		"ALL_USERS_PERMISSION": {
+			string: "All Users",
+			context: "Permission shown in the help command if all users can use the command"
 		}
 	}
 };

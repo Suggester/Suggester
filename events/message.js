@@ -1,7 +1,8 @@
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { dbQuery, dbModify } = require("../utils/db");
 const { coreLog, commandLog, errorLog, commandExecuted } = require("../utils/logs");
-const { emoji, prefix, log_hooks, support_invite } = require("../config.json");
+const { prefix, log_hooks, support_invite } = require("../config.json");
+const { string } = require("../utils/strings");
 const { Collection } = require("discord.js");
 
 module.exports = async (Discord, client, message) => {
@@ -17,6 +18,8 @@ module.exports = async (Discord, client, message) => {
 	let permission = await checkPermissions(message.member, client);
 
 	let qServerDB = await dbQuery("Server", { id: message.guild.id });
+	if (qServerDB.blocked) return message.guild.leave();
+
 	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 	let regexEscape = "^$.|?*+()[{".split("");
@@ -59,7 +62,7 @@ module.exports = async (Discord, client, message) => {
 	if (command.controls.enabled === false) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return message.channel.send("This command is currently disabled globally.");
+		return message.channel.send(string("COMMAND_DISABLED", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -110,16 +113,15 @@ module.exports = async (Discord, client, message) => {
 
 				counts.set(message.author.id, 0);
 
-				message.channel.send(`<@${message.author.id}> ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join https://discord.gg/${support_invite} and contact our Support Team.`);
+				message.channel.send(string("COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` }));
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
-				hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
-				return;
+				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
 			}
 
 			if (expires > now) {
 				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-				return message.channel.send(`🕑 This command is on cooldown for ${((expires - now) / 1000).toFixed(0)} more second${((expires - now) / 1000).toFixed(0) !== "1" ? "s" : ""}. ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
+				return message.channel.send(`${string("COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
 			}
 		}
 
@@ -141,7 +143,7 @@ module.exports = async (Discord, client, message) => {
 				let errorText;
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
-				message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later. ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+				message.channel.send(`${string("ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 				errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
@@ -152,11 +154,10 @@ module.exports = async (Discord, client, message) => {
 		let errorText;
 		if (err.stack) errorText = err.stack;
 		else if (err.error) errorText = err.error;
-		message.channel.send(`<:${emoji.x}> Something went wrong with that command, please try again later. ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+		message.channel.send(`${string("ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);
-
 		commandExecuted(command, message, { pre, post: new Date(), success: false });
 	}
 };

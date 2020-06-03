@@ -1,10 +1,10 @@
 const { colors } = require("../../config.json");
-const { fetchUser, reviewEmbed, dmEmbed, logEmbed } = require("../../utils/misc.js");
+const { fetchUser, reviewEmbed, logEmbed } = require("../../utils/misc.js");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbModify } = require("../../utils/db");
 const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
-const { deleteFeedMessage, checkVotes } = require("../../utils/actions");
+const { deleteFeedMessage } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "silentdelete",

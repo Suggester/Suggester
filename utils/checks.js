@@ -31,7 +31,6 @@ module.exports = {
 		return 10;
 	},
 	channelPermissions: (permissionCheckFor, channel, client) => {
-		const permissionNames = require("./permissions.json");
 		let permissionCheckArr = [];
 		switch (permissionCheckFor) {
 		case "suggestions":
@@ -53,17 +52,17 @@ module.exports = {
 			permissionCheckArr = permissionCheckFor;
 		}
 		let channelPermissions = channel.permissionsFor(client.user.id);
-		let missing = permissionCheckArr.filter(p => !channelPermissions.has(p)).map(p => permissionNames[p]);
+		let missing = permissionCheckArr.filter(p => !channelPermissions.has(p)).map(p => string(`PERMISSION:${p}`));
 		if (missing.length < 1) return null;
 
 		let returned;
 		if (channelPermissions.has("EMBED_LINKS")) {
 			returned = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
+				.setDescription(string("PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
+				.addField(string("MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.addField(string("HOW_TO_FIX_HEADER"), string("FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` }))
 				.setColor(colors.red);
-		} else returned = `This command cannot be run because some permissions are missing. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:\n- ${missing.join("\n- ")}\n\nIn the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has the above permissions.`;
+		} else returned = `${string("PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` })}\n- ${missing.join("\n- ")}\n\n${string("FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` })}`;
 
 		return returned;
 	},
@@ -73,15 +72,15 @@ module.exports = {
 		let config = db.config;
 		let missing = [];
 
-		if (!config.admin_roles || config.admin_roles.length < 1) missing.push("Server Admin Roles");
-		if (!config.staff_roles || config.staff_roles.length < 1) missing.push("Server Staff Roles");
-		if (!config.channels.suggestions) missing.push("Approved Suggestions Channel");
-		if (config.mode === "review" && !config.channels.staff) missing.push("Suggestion Review Channel");
+		if (!config.admin_roles || config.admin_roles.length < 1) missing.push(string("CFG_ADMIN_ROLES_TITLE"));
+		if (!config.staff_roles || config.staff_roles.length < 1) missing.push(string("CFG_STAFF_ROLES_TITLE"));
+		if (!config.channels.suggestions) missing.push(string("CFG_SUGGESTION_CHANNEL_TITLE"));
+		if (config.mode === "review" && !config.channels.staff) missing.push(string("CFG_REVIEW_CHANNEL_TITLE"));
 
 		if (missing.length > 0) {
 			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${db.config.prefix}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.setDescription(string("MISSING_CONFIG_HEADER", { prefix: db.config.prefix }))
+				.addField(string("MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
 				.setColor(colors.red);
 			return embed;
 		}
