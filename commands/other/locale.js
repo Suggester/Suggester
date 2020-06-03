@@ -17,14 +17,17 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
+		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setTitle(string(locale, "LOCALE_LIST_TITLE"))
 				.setDescription(client.locales.map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `_${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+				.setFooter(string(locale, "LOCALE_FOOTER"))
 				.setColor(colors.default);
 			return message.channel.send(embed);
 		}
-		if ((await checkPermissions(message.member, client)) <= 1 && args[0].toLowerCase() === "pull") {
+		let permission = await checkPermissions(message.member, client);
+		if (permission <= 1 && args[0].toLowerCase() === "pull") {
 			const fs = require("fs");
 
 			return fs.access("i18n", async function(error) {
@@ -44,6 +47,6 @@ module.exports = {
 		if (!found) return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error"));
 		qUserDB.locale = found.settings.code;
 		await dbModify("User", { id: message.author.id }, qUserDB);
-		message.channel.send(string(locale, "USER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success"));
+		message.channel.send(`${string(locale, "USER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success")}${permission <= 2 ? `\n\n${string(locale, "LOCALE_SERVER_SETTING_PROMPT", { prefix: qServerDB.config.prefix, code: found.settings.code })}` : ""}`);
 	}
 };

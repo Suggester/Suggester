@@ -89,7 +89,7 @@ connection.on("error", (err) => {
 	fs.access("i18n", async function(error) {
 		if (error) console.log("Locales folder missing, please run `locales pull`");
 		else {
-			fs.readdir("./i18n/", (err, files) => {
+			fs.readdir("i18n", (err, files) => {
 				files.forEach(file => {
 					if (!file.endsWith(".json")) return;
 					const localeCode = file.split(".")[0]; //Command to check against

@@ -2610,11 +2610,25 @@ module.exports = {
 		},
 		"LOCALE_SERVER_SETTING_PROMPT": {
 			string: "If you would like to set this locale as the server default, use `{{prefix}}config locale {{code}}`.",
-			context: "If a server admin uses the command, prompts them to configure the locale for the entire server"
+			context: "If a server admin uses the command, prompts them to configure the locale for the entire server",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				code: {
+					to_replace: "{{code}}",
+					description: "The locale code"
+				}
+			}
 		},
 		"CFG_LOCALE_TITLE": {
 			string: "**Locale:**",
 			context: "Title for the locale in the config embed"
+		},
+		"LOCALE_FOOTER": {
+			string: "Don't see your language listed here? Apply to translate it in the support server!",
+			context: "Shown in the locale list embed informing users of how they can help translate"
 		}
 	}
 };
