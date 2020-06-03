@@ -9,6 +9,7 @@ const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
 const { basename } = require("path");
 const { presence } = require("./persistent.json");
+const fs = require("fs");
 if (process.env.SENTRY_DSN) {
 	const {init} = require("@sentry/node");
 	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
@@ -84,6 +85,15 @@ connection.on("error", (err) => {
 		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
 	}
 	console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${client.commands.size} commands}}`);
+
+	fs.readdir("./i18n/", (err, files) => {
+		files.forEach(file => {
+			if (!file.endsWith(".json")) return;
+			const localeCode = file.split(".")[0]; //Command to check against
+			const locale = require("./i18n/" + localeCode); //Command file
+			client.locales.set(localeCode, locale);
+		});
+	});
 })();
 
 client.login(process.env.TOKEN)

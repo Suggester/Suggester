@@ -75,56 +75,56 @@ module.exports = {
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
 		else return [null, null];
 	},
-	handleRoleInput: async function (action, input, roles, name, present_string, success_string, force) {
+	handleRoleInput: async function (locale, action, input, roles, name, present_string, success_string, force) {
 		const { findRole } = require("./config");
-		if (!input) return string("CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
+		if (!input) return string(locale, "CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
 		let role = await findRole(input, roles);
-		if (!role) return string("CFG_INVALID_ROLE_ERROR", {}, "error");
+		if (!role) return string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error");
 		let db = await role.guild.db;
 		let current = db.config[name];
 		switch (action) {
 		case "add":
 			if (!force && ["admin_roles", "staff_roles"].includes(name) && role.id === role.guild.id) return "CONFIRM";
-			if (current.includes(role.id)) return string(present_string, {}, "error");
+			if (current.includes(role.id)) return string(locale, present_string, {}, "error");
 			current.push(role.id);
 			await dbModify("Server", {id: role.guild.id}, db);
-			return string(success_string, { role: role.name }, "success");
+			return string(locale, success_string, { role: role.name }, "success");
 		case "remove":
-			if (!current.includes(role.id)) return string(present_string, {}, "error");
+			if (!current.includes(role.id)) return string(locale, present_string, {}, "error");
 			current.splice(current.findIndex(r => r === role.id), 1);
 			await dbModify("Server", {id: role.guild.id}, db);
-			return string(success_string, { role: role.name }, "success");
+			return string(locale, success_string, { role: role.name }, "success");
 		}
 	},
-	handleChannelInput: async function (input, server, current_name, check_perms, done_str, reset_str) {
+	handleChannelInput: async function (locale, input, server, current_name, check_perms, done_str, reset_str) {
 		const { findChannel } = require("./config");
 		const { channelPermissions } = require("./checks");
-		if (!input) return string("CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
+		if (!input) return string(locale, "CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
 		let qServerDB = await server.db;
 		if (reset_str && (input === "none" || input === "reset")) {
 			qServerDB.config.channels[current_name] = "";
 			if (current_name === "log" && qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
-				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string(locale, "REMOVE_LOG_CHANNEL"))).catch(() => {});
 				qServerDB.config.loghook = {};
 			}
 			await dbModify("Server", {id: server.id}, qServerDB);
 
-			return string(reset_str, {}, "success");
+			return string(locale, reset_str, {}, "success");
 		}
 		let channel = await findChannel(input, server.channels.cache);
-		if (!channel || channel.type !== "text") return string("CFG_INVALID_CHANNEL_ERROR", {}, "error");
-		let permissions = await channelPermissions(check_perms, channel, server.client);
+		if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+		let permissions = await channelPermissions(locale, check_perms, channel, server.client);
 		if (permissions) return permissions;
 		qServerDB.config.channels[current_name] = channel.id;
 		if (current_name === "log") {
 			if (qServerDB.config.loghook && qServerDB.config.loghook.id && qServerDB.config.loghook.token) {
-				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string("REMOVE_LOG_CHANNEL"))).catch(() => {});
+				server.client.fetchWebhook(qServerDB.config.loghook.id, qServerDB.config.loghook.token).then(hook => hook.delete(string(locale, "REMOVE_LOG_CHANNEL"))).catch(() => {});
 				qServerDB.config.loghook = {};
 			}
 			try {
 				let webhook = await channel.createWebhook("Suggester Logs", {
 					avatar: server.client.user.displayAvatarURL({format: "png"}),
-					reason: string("CREATE_LOG_CHANNEL")
+					reason: string(locale, "CREATE_LOG_CHANNEL")
 				});
 
 				qServerDB.config.loghook = {
@@ -132,10 +132,10 @@ module.exports = {
 					token: webhook.token
 				};
 			} catch (err) {
-				return string("CFG_WEBHOOK_CREATION_ERROR", {}, "error");
+				return string(locale, "CFG_WEBHOOK_CREATION_ERROR", {}, "error");
 			}
 		}
 		await dbModify("Server", {id: server.id}, qServerDB);
-		return string(done_str, { channel: `<#${channel.id}>` }, "success");
+		return string(locale, done_str, { channel: `<#${channel.id}>` }, "success");
 	}
 };

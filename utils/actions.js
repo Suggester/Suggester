@@ -3,24 +3,24 @@ const { string } = require("./strings");
 const { emoji } = require("../config.json");
 const Discord = require("discord.js");
 module.exports = {
-	editFeedMessage: async function(qSuggestionDB, qServerDB, client) {
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
+	editFeedMessage: async function(locale, qSuggestionDB, qServerDB, client) {
+		let suggestionEditEmbed = await suggestionEmbed(locale, qSuggestionDB, qServerDB, client);
 		let messageEdited;
 		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
 			messageEdited = true;
 		}).catch(() => messageEdited = false);
 
-		if (!messageEdited) return string("SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error");
+		if (!messageEdited) return string(locale, "SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error");
 	},
-	deleteFeedMessage: async function(qSuggestionDB, qServerDB, client) {
+	deleteFeedMessage: async function(locale, qSuggestionDB, qServerDB, client) {
 		let messageDeleted;
 		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.delete();
 			messageDeleted = f;
 		}).catch(() => messageDeleted = false);
 
-		if (!messageDeleted) return [string("SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error")];
+		if (!messageDeleted) return [string(locale, "SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error")];
 		else return [null, messageDeleted];
 	},
 	/**
@@ -99,9 +99,9 @@ module.exports = {
 	 *   startPage: 2
 	 * }
 	 *
-	 * pages(message, content, options)
+	 * pages(locale, message, content, options)
 	 */
-	pages: async function (message, content, options = {
+	pages: async function (locale, message, content, options = {
 		time: 300000,
 		startPage: 0,
 		hideControlsSinglePage: true,
@@ -146,7 +146,7 @@ module.exports = {
 				if (removeReaction) users.remove(user.id);
 			}
 			else if (emojis.end && (id === emojis.end || name === emojis.end)) {
-				msg.edit(string("CANCELLED", {}, "error"), {embed: null});
+				msg.edit(string(locale, "CANCELLED", {}, "error"), {embed: null});
 				collector.stop();
 				return;
 			}

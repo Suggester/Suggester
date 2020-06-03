@@ -16,36 +16,36 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},
-	do: async (message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(message.guild.id);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
 
-		if (!args[0]) return message.channel.send(string("BLACKLIST_NO_ARGS_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "BLACKLIST_NO_ARGS_ERROR", {}, "error"));
 
 		let user = await fetchUser(args[0], client);
-		if (!user || user.id === "0") return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+		if (!user || user.id === "0") return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 
-		if (!qServerDB.config.blacklist.includes(user.id)) return message.channel.send(string("USER_NOT_BLACKLISTED_ERROR", {}, "error"));
+		if (!qServerDB.config.blacklist.includes(user.id)) return message.channel.send(string(locale, "USER_NOT_BLACKLISTED_ERROR", {}, "error"));
 
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string("BLACKLIST_REASON_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string(locale, "BLACKLIST_REASON_TOO_LONG_ERROR", {}, "error"));
 		}
 
 		qServerDB.config.blacklist.splice(qServerDB.config.blacklist.findIndex(u => u === user.id), 1);
 		await dbModify("Server", { id: message.guild.id }, qServerDB);
-		message.channel.send(`${string("UNBLACKLIST_SUCCESS", { user: user.tag, id: user.id }, {}, "check")}${reason ? `\n${string("BLACKLIST_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
+		message.channel.send(`${string(locale, "UNBLACKLIST_SUCCESS", { user: user.tag, id: user.id }, {}, "check")}${reason ? `\n${string(locale, "BLACKLIST_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string("UNBLACKLIST_LOG_TITLE", { staff: message.author.tag, user: user.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(string("BLACKLIST_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
-				.setFooter(string("STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
+				.setAuthor(string(locale, "UNBLACKLIST_LOG_TITLE", { staff: message.author.tag, user: user.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+				.setDescription(string(locale, "BLACKLIST_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
+				.setFooter(string(locale, "STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.green);
 
-			reason ? logEmbed.addField(string("BLACKLIST_REASON_HEADER"), reason) : null;
+			reason ? logEmbed.addField(string(locale, "BLACKLIST_REASON_HEADER"), reason) : null;
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}

@@ -59,10 +59,13 @@ module.exports = async (Discord, client, message) => {
 	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 	if (!command) return;
 
+	let qUserDB = await dbQuery("User", { id: message.author.id });
+	let locale = qUserDB.locale || qServerDB.config.locale || "en";
+
 	if (command.controls.enabled === false) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return message.channel.send(string("COMMAND_DISABLED", {}, "error"));
+		return message.channel.send(string(locale, "COMMAND_DISABLED", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -72,14 +75,13 @@ module.exports = async (Discord, client, message) => {
 	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, message);
 
 	if (command.controls.permissions) {
-		let checkPerms = channelPermissions(command.controls.permissions, message.channel, client);
+		let checkPerms = channelPermissions(locale, command.controls.permissions, message.channel, client);
 		if (checkPerms) {
 			await commandExecuted(command, message, { pre, post: new Date(), success: false });
 			return message.channel.send(checkPerms).catch(() => {});
 		}
 	}
 
-	let qUserDB = await dbQuery("User", { id: message.author.id });
 	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && (!qUserDB.flags || (!qUserDB.flags.includes("NO_COOLDOWN") && !qUserDB.flags.includes("PROTECTED"))) && (!qServerDB.flags || !qServerDB.flags.includes("NO_COOLDOWN"))) {
 		/*
 			Cooldown collection:
@@ -113,7 +115,7 @@ module.exports = async (Discord, client, message) => {
 
 				counts.set(message.author.id, 0);
 
-				message.channel.send(string("COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` }));
+				message.channel.send(string(locale, "COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` }));
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
 				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
@@ -121,7 +123,7 @@ module.exports = async (Discord, client, message) => {
 
 			if (expires > now) {
 				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-				return message.channel.send(`${string("COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
+				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
 			}
 		}
 
@@ -135,7 +137,7 @@ module.exports = async (Discord, client, message) => {
 	}
 
 	try {
-		command.do(message, client, args, Discord)
+		command.do(locale, message, client, args, Discord)
 			.then(() => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
 			})
@@ -143,7 +145,7 @@ module.exports = async (Discord, client, message) => {
 				let errorText;
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
-				message.channel.send(`${string("ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 				errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
@@ -154,7 +156,7 @@ module.exports = async (Discord, client, message) => {
 		let errorText;
 		if (err.stack) errorText = err.stack;
 		else if (err.error) errorText = err.error;
-		message.channel.send(`${string("ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);

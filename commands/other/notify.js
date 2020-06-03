@@ -12,36 +12,36 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},
-	do: async (message, client, args) => {
+	do: async (locale, message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
-		if (!args[0]) return message.channel.send(string(qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED"));
+		if (!args[0]) return message.channel.send(string(locale, qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED"));
 		switch (args[0].toLowerCase()) {
 		case "enable":
 		case "on":
 		case "true":
 		case "yes": {
-			if (qUserDB.notify) return message.channel.send(string("NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
+			if (qUserDB.notify) return message.channel.send(string(locale, "NOTIFICATIONS_ALREADY_ENABLED", {}, "error"));
 			qUserDB.notify = true;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(string("NOTIFICATIONS_ENABLED", {}, "success"));
+			return message.channel.send(string(locale, "NOTIFICATIONS_ENABLED", {}, "success"));
 		}
 		case "disable":
 		case "off":
 		case "false":
 		case "no": {
-			if (!qUserDB.notify) return message.channel.send(string("NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
+			if (!qUserDB.notify) return message.channel.send(string(locale, "NOTIFICATIONS_ALREADY_DISABLED", {}, "error"));
 			qUserDB.notify = false;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(string("NOTIFICATIONS_DISABLED", {}, "success"));
+			return message.channel.send(string(locale, "NOTIFICATIONS_DISABLED", {}, "success"));
 		}
 		case "toggle":
 		case "switch": {
 			qUserDB.notify = !qUserDB.notify;
 			await dbModify("User", {id: qUserDB.id}, qUserDB);
-			return message.channel.send(string(qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED", {}, "success"));
+			return message.channel.send(string(locale, qUserDB.notify ? "NOTIFICATIONS_ENABLED" : "NOTIFICATIONS_DISABLED", {}, "success"));
 		}
 		default:
-			return message.channel.send(string("ON_OFF_TOGGLE_ERROR", {}, "error"));
+			return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 		}
 	}
 };

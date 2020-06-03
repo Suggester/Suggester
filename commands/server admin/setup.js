@@ -17,7 +17,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 45
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (locale, message, client, args, Discord) => {
 		async function awaitMessage(msg) {
 			return msg.channel.awaitMessages(response => response.author.id === msg.author.id, {
 				max: 1,
@@ -25,12 +25,12 @@ module.exports = {
 				errors: ["time"],
 			}).then(async (collected) => {
 				if (collected.first().content && collected.first().content.toLowerCase() === "cancel") {
-					msg.channel.send(string("SETUP_CANCELLED", {}, "error"));
+					msg.channel.send(string(locale, "SETUP_CANCELLED", {}, "error"));
 					return false;
 				}
 				return collected.first();
 			}).catch(async () => {
-				await msg.channel.send(string("SETUP_TIMED_OUT_ERROR", {}, "error"));
+				await msg.channel.send(string(locale, "SETUP_TIMED_OUT_ERROR", {}, "error"));
 				return false;
 			});
 		}
@@ -40,8 +40,8 @@ module.exports = {
 				.setTitle(title)
 				.setColor(colors.default)
 				.setDescription(desc)
-				.addField(string("INPUTS"), inputs)
-				.setFooter(`${string("TIME_SETUP_WARNING")} • ${step}/8`));
+				.addField(string(locale, "INPUTS"), inputs)
+				.setFooter(`${string(locale, "TIME_SETUP_WARNING")} • ${step}/8`));
 		}
 
 		async function setup(through) {
@@ -49,25 +49,25 @@ module.exports = {
 			switch (through) {
 			case 0: {
 				//Server Admin role
-				let adminRolesEmbed = setupEmbed(string("CFG_ADMIN_ROLES_TITLE"), string("SETUP_ADMIN_ROLES_DESC"), string("SETUP_ROLES_INPUT"), 1);
-				if (db.config.admin_roles.length >= 1) adminRolesEmbed.addField(string("SETUP_ROLES_DONE_TITLE"), string("SETUP_ROLES_DONE_DESC"));
+				let adminRolesEmbed = setupEmbed(string(locale, "CFG_ADMIN_ROLES_TITLE"), string(locale, "SETUP_ADMIN_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 1);
+				if (db.config.admin_roles.length >= 1) adminRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
 				await message.channel.send(adminRolesEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
 					if (returnCollect.content.toLowerCase() === "done" && db.config.admin_roles.length >= 1) return setup(1);
-					//await message.channel.send((await handleRoleInput("add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
-					let output = await handleRoleInput("add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS");
+					//await message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+					let output = await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS");
 					if (output === "CONFIRM") {
 						if ((
 							await confirmation(
 								message,
-								string("EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								string(locale, "EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
 								{
 									deleteAfterReaction: true
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput("add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
 							return setup(0);
 						}
 						else return setup(0);
@@ -76,24 +76,24 @@ module.exports = {
 				} else return;
 			}
 			case 1: {
-				let staffRolesEmbed = setupEmbed(string("CFG_STAFF_ROLES_TITLE"), string("SETUP_STAFF_ROLES_DESC"), string("SETUP_ROLES_INPUT"), 2);
-				if (db.config.staff_roles.length >= 1) staffRolesEmbed.addField(string("SETUP_ROLES_DONE_TITLE"), string("SETUP_ROLES_DONE_DESC"));
+				let staffRolesEmbed = setupEmbed(string(locale, "CFG_STAFF_ROLES_TITLE"), string(locale, "SETUP_STAFF_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 2);
+				if (db.config.staff_roles.length >= 1) staffRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
 				await message.channel.send(staffRolesEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
 					if (returnCollect.content.toLowerCase() === "done" && db.config.admin_roles.length >= 1) return setup(2);
-					let output = await handleRoleInput("add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS");
+					let output = await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS");
 					if (output === "CONFIRM") {
 						if ((
 							await confirmation(
 								message,
-								string("EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								string(locale, "EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
 								{
 									deleteAfterReaction: true
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput("add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
 							return setup(1);
 						}
 						else return setup(1);
@@ -103,9 +103,9 @@ module.exports = {
 			}
 			case 2: {
 				//Mode
-				let modeEmbed = setupEmbed(string("CFG_MODE_TITLE"), string("SETUP_MODE_DESC"), string("SETUP_MODE_INPUTS"), 3);
-				modeEmbed.addField(string("SETUP_REVIEW_TEXT"), string("SETUP_REVIEW_DESC"))
-					.addField(string("SETUP_AUTOAPPROVE_TEXT"), string("SETUP_AUTOAPPROVE_DESC"));
+				let modeEmbed = setupEmbed(string(locale, "CFG_MODE_TITLE"), string(locale, "SETUP_MODE_DESC"), string(locale, "SETUP_MODE_INPUTS"), 3);
+				modeEmbed.addField(string(locale, "SETUP_REVIEW_TEXT"), string(locale, "SETUP_REVIEW_DESC"))
+					.addField(string(locale, "SETUP_AUTOAPPROVE_TEXT"), string(locale, "SETUP_AUTOAPPROVE_DESC"));
 				await message.channel.send(modeEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
@@ -113,7 +113,7 @@ module.exports = {
 					case "review":
 						db.config.mode = "review";
 						await dbModify("Server", {id: message.guild.id}, db);
-						message.channel.send(string("CFG_MODE_REVIEW_SET_SUCCESS", {}, "success"));
+						message.channel.send(string(locale, "CFG_MODE_REVIEW_SET_SUCCESS", {}, "success"));
 						return setup(3);
 					case "autoapprove":
 					case "auto-approve":
@@ -124,17 +124,17 @@ module.exports = {
 							id: message.guild.id
 						});
 						if (suggestionsAwaitingReview) {
-							message.channel.send(string("CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
+							message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
 							return setup(2);
 						}
 						db.config.mode = "autoapprove";
 						await dbModify("Server", {id: message.guild.id}, db);
 
-						message.channel.send(string("CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, "success"));
+						message.channel.send(string(locale, "CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, "success"));
 						return setup(3);
 					}
 					default:
-						message.channel.send(string("CFG_MODE_INVALID_ERROR", {}, "error"));
+						message.channel.send(string(locale, "CFG_MODE_INVALID_ERROR", {}, "error"));
 						return setup(2);
 					}
 				}
@@ -142,11 +142,11 @@ module.exports = {
 			}
 			case 3: {
 				//Suggestion channel
-				let suggestionChannelEmbed = setupEmbed(string("CFG_SUGGESTION_CHANNEL_TITLE"), string("SETUP_SUGGESTIONS_CHANNEL_DESC"), string("SETUP_CHANNELS_INPUT"), 4);
+				let suggestionChannelEmbed = setupEmbed(string(locale, "CFG_SUGGESTION_CHANNEL_TITLE"), string(locale, "SETUP_SUGGESTIONS_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 4);
 				await message.channel.send(suggestionChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
-					let { content } = await message.channel.send((await handleChannelInput(returnCollect.content, message.guild, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
 					if (!content.startsWith(`<:${emoji.check}>`)) return setup(3);
 					return setup(4);
 				} else return;
@@ -154,54 +154,54 @@ module.exports = {
 			case 4:
 				//Review channel (if mode is review)
 				if (db.config.mode === "review") {
-					let reviewChannelEmbed = setupEmbed(string("CFG_REVIEW_CHANNEL_TITLE"), string("SETUP_REVIEW_CHANNEL_DESC"), string("SETUP_CHANNELS_INPUT"), 5);
+					let reviewChannelEmbed = setupEmbed(string(locale, "CFG_REVIEW_CHANNEL_TITLE"), string(locale, "SETUP_REVIEW_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 5);
 					await message.channel.send(reviewChannelEmbed);
 					let returnCollect = await awaitMessage(message);
 					if (returnCollect.content) {
-						let { content } = await message.channel.send((await handleChannelInput(returnCollect.content, message.guild, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
+						let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
 						if (!content.startsWith(`<:${emoji.check}>`)) return setup(4);
 						return setup(5);
 					} else return;
 				} else return setup(5);
 			case 5: {
 				//Denied channel
-				let deniedChannelEmbed = setupEmbed(string("CFG_DENIED_CHANNEL_TITLE"), string("SETUP_DENIED_CHANNEL_DESC"), `${string("SETUP_CHANNELS_INPUT")}\n${string("SETUP_SKIP_CHANNEL")}`, 6);
+				let deniedChannelEmbed = setupEmbed(string(locale, "CFG_DENIED_CHANNEL_TITLE"), string(locale, "SETUP_DENIED_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 6);
 				await message.channel.send(deniedChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
 					if (returnCollect.content.toLowerCase() === "skip") return setup(6);
-					let { content } = await message.channel.send((await handleChannelInput(returnCollect.content, message.guild, "denied", "denied", "CFG_DENIED_SET_SUCCESS")));
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "denied", "denied", "CFG_DENIED_SET_SUCCESS")));
 					if (!content.startsWith(`<:${emoji.check}>`)) return setup(5);
 					return setup(6);
 				} else return;
 			}
 			case 6: {
 				//Logs
-				let logChannelEmbed = setupEmbed(string("CFG_LOG_CHANNEL_TITLE"), string("SETUP_LOG_CHANNEL_DESC"), `${string("SETUP_CHANNELS_INPUT")}\n${string("SETUP_SKIP_CHANNEL")}`, 7);
+				let logChannelEmbed = setupEmbed(string(locale, "CFG_LOG_CHANNEL_TITLE"), string(locale, "SETUP_LOG_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 7);
 				await message.channel.send(logChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
 					if (returnCollect.content.toLowerCase() === "skip") return setup(7);
-					let { content } = await message.channel.send((await handleChannelInput(returnCollect.content, message.guild, "log", "log", "CFG_LOG_SET_SUCCESS")));
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "log", "log", "CFG_LOG_SET_SUCCESS")));
 					if (!content.startsWith(`<:${emoji.check}>`)) return setup(6);
 					return setup(7);
 				} else return;
 			}
 			case 7: {
 				//Prefix
-				let prefixEmbed = setupEmbed(string("CFG_PREFIX_TITLE"), string("SETUP_PREFIX_DESC"), string("SETUP_PREFIX_INPUT"), 8);
+				let prefixEmbed = setupEmbed(string(locale, "CFG_PREFIX_TITLE"), string(locale, "SETUP_PREFIX_DESC"), string(locale, "SETUP_PREFIX_INPUT"), 8);
 				await message.channel.send(prefixEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
 					let prefix = returnCollect.content.toLowerCase().split(" ")[0];
 
 					if (prefix.length > 20) {
-						message.channel.send(string("CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
+						message.channel.send(string(locale, "CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
 						return setup(7);
 					}
 					let disallowed = ["suggester:", `${client.user.id}:`];
 					if (disallowed.includes(prefix)) {
-						message.channel.send(string("CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
+						message.channel.send(string(locale, "CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
 						return setup(7);
 					}
 					
@@ -209,12 +209,12 @@ module.exports = {
 					async function savePrefix(p) {
 						db.config.prefix = p;
 						await dbModify("Server", {id: message.guild.id}, db);
-						return message.channel.send(string("CFG_PREFIX_SET_SUCCESS", { prefix: Discord.escapeMarkdown(p) }, "success"));
+						return message.channel.send(string(locale, "CFG_PREFIX_SET_SUCCESS", { prefix: Discord.escapeMarkdown(p) }, "success"));
 					}
 					if (prefix.includes("suggest")) {
 						if ((await confirmation(
 							message,
-							string("SETUP_PREFIX_INCLUDES_SUGGEST", { prefix: prefix, check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+							string(locale, "SETUP_PREFIX_INCLUDES_SUGGEST", { prefix: prefix, check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
 							{
 								deleteAfterReaction: true
 							}
@@ -231,10 +231,10 @@ module.exports = {
 			}
 			case 8: {
 				let doneEmbed = new Discord.MessageEmbed()
-					.setTitle(string("SETUP_COMPLETE_HEADER"))
+					.setTitle(string(locale, "SETUP_COMPLETE_HEADER"))
 					.setColor(colors.default)
-					.setDescription(string("SETUP_COMPLETE_DESC", { prefix: Discord.escapeMarkdown(db.config.prefix) }))
-					.addField(string("SETUP_ADDITIONAL_CONFIG_HEADER"), string("SETUP_ADDITIONAL_CONFIG_DESC"));
+					.setDescription(string(locale, "SETUP_COMPLETE_DESC", { prefix: Discord.escapeMarkdown(db.config.prefix) }))
+					.addField(string(locale, "SETUP_ADDITIONAL_CONFIG_HEADER"), string(locale, "SETUP_ADDITIONAL_CONFIG_DESC"));
 				return message.channel.send(doneEmbed);
 			}
 			default:
@@ -243,7 +243,7 @@ module.exports = {
 		}
 
 		let qServerDB = await dbQuery("Server", {id: message.guild.id});
-		let check = await checkConfig(qServerDB);
+		let check = await checkConfig(locale, qServerDB);
 
 		async function start (startAt=0) {
 			let oldWhitelist = qServerDB.whitelist;
@@ -262,10 +262,10 @@ module.exports = {
 			if ((
 				await confirmation(
 					message,
-					string("SETUP_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+					string(locale, "SETUP_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
 					{
-						denyMessage: string("SETUP_CANCELLED", {}, "error"),
-						confirmMessage: string("SETUP_BEGIN"),
+						denyMessage: string(locale, "SETUP_CANCELLED", {}, "error"),
+						confirmMessage: string(locale, "SETUP_BEGIN"),
 						keepReactions: false
 					}
 				)

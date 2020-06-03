@@ -9,7 +9,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 20
 	},
-	do: async (message, client) => {
-		message.channel.send(string("SHARD_INFO", { shard: client.shard.ids[0].toString() }))
+	do: async (locale, message, client) => {
+		message.channel.send(string(locale, "SHARD_INFO", { shard: client.shard.ids[0].toString() }));
 	}
 };

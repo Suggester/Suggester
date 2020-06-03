@@ -5,22 +5,22 @@ const { resolve } = require("path");
 const { string } = require("./strings");
 
 module.exports = {
-	permLevelToRole: (permLevel) => {
+	permLevelToRole: (locale, permLevel) => {
 		switch (permLevel) {
 		case -1:
-			return string("NO_USERS_PERMISSION");
+			return string(locale, "NO_USERS_PERMISSION");
 		case 0:
-			return string("BOT_ADMIN_PERMISSION");
+			return string(locale, "BOT_ADMIN_PERMISSION");
 		case 1:
-			return string("GLOBAL_STAFF_PERMISSION");
+			return string(locale, "GLOBAL_STAFF_PERMISSION");
 		case 2:
-			return string("SERVER_ADMIN_PERMISSION");
+			return string(locale, "SERVER_ADMIN_PERMISSION");
 		case 3:
-			return string("SERVER_STAFF_PERMISSION");
+			return string(locale, "SERVER_STAFF_PERMISSION");
 		case 10:
-			return string("ALL_USERS_PERMISSION");
+			return string(locale, "ALL_USERS_PERMISSION");
 		default:
-			return string("UNKNOWN");
+			return string(locale, "UNKNOWN");
 		}
 	},
 	/**
@@ -30,32 +30,32 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - Discord.js client
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
-	suggestionEmbed: async (suggestion, server, client) => {
+	suggestionEmbed: async (locale, suggestion, server, client) => {
 		let { fetchUser } = require("./misc.js");
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
 		// User information
-		embed.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+		embed.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}));
 		// Suggestion
 		embed.setDescription(suggestion.suggestion)
 			// Footer
 			.setTimestamp(suggestion.submitted)
-			.setFooter(string("SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
+			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
 		// Side Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
 			embed.setColor(colors.green)
-				.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_IMPLEMENTED"));
+				.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_IMPLEMENTED"));
 			break;
 		}
 		case "working": {
-			embed.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_PROGRESS"))
+			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_PROGRESS"))
 				.setColor(colors.orange);
 			break;
 		}
 		case "no": {
-			embed.addField(string("INFO_PUBLIC_STATUS_HEADER"), string("STATUS_NO"))
+			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_NO"))
 				.setColor(colors.gray);
 			break;
 		}
@@ -69,7 +69,7 @@ module.exports = {
 				if (!comment.deleted || comment.deleted !== true) {
 					let user = await fetchUser(comment.author, client);
 					let title;
-					!user || user.id === "0" ? title = `${string("COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `${string("COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created ? " • " + comment.created.toUTCString() : ""}`;
+					!user || user.id === "0" ? title = `${string(locale, "COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `${string(locale, "COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created ? " • " + comment.created.toUTCstring(locale, ) : ""}`;
 					embed.addField(title, comment.comment);
 				}
 			}
@@ -79,37 +79,37 @@ module.exports = {
 
 		return embed;
 	},
-	dmEmbed: function(qSuggestionDB, color, title, attachment, suggestions, reason) {
+	dmEmbed: function(locale, qSuggestionDB, color, title, attachment, suggestions, reason) {
 		let embed = new Discord.MessageEmbed()
-			.setTitle(string(title.string, {server: title.guild}))
-			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
-			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setTitle(string(locale, title.string, {server: title.guild}))
+			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
 		if (reason) embed.addField(reason.header, reason.reason);
 		return embed;
 	},
-	reviewEmbed: function (qSuggestionDB, user, color, change) {
+	reviewEmbed: function (locale, qSuggestionDB, user, color, change) {
 		let embed = new Discord.MessageEmbed()
-			.setTitle(string("SUGGESTION_REVIEW_EMBED_TITLE", { id: qSuggestionDB.suggestionId.toString() }))
-			.setAuthor(string("USER_INFO_HEADER", { user: user.tag, id: user.id }), user.displayAvatarURL({format: "png", dynamic: true}))
+			.setTitle(string(locale, "SUGGESTION_REVIEW_EMBED_TITLE", { id: qSuggestionDB.suggestionId.toString() }))
+			.setAuthor(string(locale, "USER_INFO_HEADER", { user: user.tag, id: user.id }), user.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion)
-			.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(colors[color] || color);
 
-		if (change) embed.addField(string("SUGGESTION_CHANGE_REVIEW_EMBED"), change);
+		if (change) embed.addField(string(locale, "SUGGESTION_CHANGE_REVIEW_EMBED"), change);
 		if (qSuggestionDB.attachment) {
-			embed.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+			embed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			embed.setImage(qSuggestionDB.attachment);
 		}
 		return embed;
 	},
-	logEmbed: function (qSuggestionDB, user, title, color) {
+	logEmbed: function (locale, qSuggestionDB, user, title, color) {
 		return (new Discord.MessageEmbed()
-			.setAuthor(string(title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
-			.setFooter(string("LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
+			.setAuthor(string(locale, title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
+			.setFooter(string(locale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
 			.setTimestamp()
 			.setColor(colors[color] || color));
 	},

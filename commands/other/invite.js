@@ -11,15 +11,15 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},
-	do: async (message, client) => {
+	do: async (locale, message, client) => {
 		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=805694544>";
 		if (release === "special") {
 			if (client.admins.has(message.author.id)) {
-				return message.channel.send(string("INVITE_BOT", { name: client.user.username, link: url.replace("[ID]", client.user.id) }));
+				return message.channel.send(string(locale, "INVITE_BOT", { name: client.user.username, link: url.replace("[ID]", client.user.id) }));
 			}
 			const stableId = "564426594144354315";
-			return message.channel.send(string("INVITE_RESTRICTED", { link: url.replace("[ID]", stableId) }, "error"));
+			return message.channel.send(string(locale, "INVITE_RESTRICTED", { link: url.replace("[ID]", stableId) }, "error"));
 		}
-		return message.channel.send(string("INVITE_BOT", { name: client.user.username, link: url.replace("[ID]", client.user.id) }));
+		return message.channel.send(string(locale, "INVITE_BOT", { name: client.user.username, link: url.replace("[ID]", client.user.id) }));
 	}
 };

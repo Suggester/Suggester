@@ -17,17 +17,17 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},
-	do: async (message, client, args, Discord) => {
-		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(message, args);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
 
-		if (!args[1]) return message.channel.send(string("NO_COMMENT_ERROR", {}, "error"));
+		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error"));
 
-		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(string("TOO_MANY_COMMENTS_ERROR", {}, "error"));
+		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR", {}, "error"));
 
 		let comment = args.splice(1).join(" ");
 
-		if (comment.length > 1024) return message.channel.send(string("COMMENT_TOO_LONG_ERROR", {}, "error"));
+		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
 
 		qSuggestionDB.comments.push({
 			comment: comment,
@@ -37,28 +37,28 @@ module.exports = {
 		});
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string("ERROR", {}, "error"));
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
-		let editFeed = await editFeedMessage(qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle(string("ANONYMOUS_COMMENT_ADDED_TITLE"))
-			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-			.addField(string("COMMENT_TITLE_ANONYMOUS"), comment)
+			.setTitle(string(locale, "ANONYMOUS_COMMENT_ADDED_TITLE"))
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.addField(string(locale, "COMMENT_TITLE_ANONYMOUS"), comment)
 			.setColor(colors.blue)
-			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
+			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string("COMMENT_TITLE_ANONYMOUS"), reason: comment }))).catch(() => {});
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE_ANONYMOUS"), reason: comment }))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let embedLog = logEmbed(qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")
-				.addField(string("COMMENT_TITLE_ANONYMOUS"), comment);
+			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")
+				.addField(string(locale, "COMMENT_TITLE_ANONYMOUS"), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
 	}

@@ -9,6 +9,7 @@ const settings = new Schema({
 	flags: [ String ],
 	config: {
 		prefix: { type: String, default: prefix },
+		locale: { type: String, default: "en" },
 		admin_roles: [String],
 		staff_roles: [String],
 		allowed_roles: [String],
@@ -75,6 +76,7 @@ const user = new Schema({
 	ack: String,
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
+	locale: { type: String },
 	flags: [ String ]
 });
 

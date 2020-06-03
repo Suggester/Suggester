@@ -30,7 +30,7 @@ module.exports = {
 		if (qServerDB.config.blacklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
 		return 10;
 	},
-	channelPermissions: (permissionCheckFor, channel, client) => {
+	channelPermissions: (locale, permissionCheckFor, channel, client) => {
 		let permissionCheckArr = [];
 		switch (permissionCheckFor) {
 		case "suggestions":
@@ -52,114 +52,114 @@ module.exports = {
 			permissionCheckArr = permissionCheckFor;
 		}
 		let channelPermissions = channel.permissionsFor(client.user.id);
-		let missing = permissionCheckArr.filter(p => !channelPermissions.has(p)).map(p => string(`PERMISSION:${p}`));
+		let missing = permissionCheckArr.filter(p => !channelPermissions.has(p)).map(p => string(locale, `PERMISSION:${p}`));
 		if (missing.length < 1) return null;
 
 		let returned;
 		if (channelPermissions.has("EMBED_LINKS")) {
 			returned = new Discord.MessageEmbed()
-				.setDescription(string("PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
-				.addField(string("MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.addField(string("HOW_TO_FIX_HEADER"), string("FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` }))
+				.setDescription(string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
+				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.addField(string(locale, "HOW_TO_FIX_HEADER"), string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` }))
 				.setColor(colors.red);
-		} else returned = `${string("PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` })}\n- ${missing.join("\n- ")}\n\n${string("FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` })}`;
+		} else returned = `${string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` })}\n- ${missing.join("\n- ")}\n\n${string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` })}`;
 
 		return returned;
 	},
-	async checkConfig(db) {
+	async checkConfig(locale, db) {
 		if (!db) return null;
 
 		let config = db.config;
 		let missing = [];
 
-		if (!config.admin_roles || config.admin_roles.length < 1) missing.push(string("CFG_ADMIN_ROLES_TITLE"));
-		if (!config.staff_roles || config.staff_roles.length < 1) missing.push(string("CFG_STAFF_ROLES_TITLE"));
-		if (!config.channels.suggestions) missing.push(string("CFG_SUGGESTION_CHANNEL_TITLE"));
-		if (config.mode === "review" && !config.channels.staff) missing.push(string("CFG_REVIEW_CHANNEL_TITLE"));
+		if (!config.admin_roles || config.admin_roles.length < 1) missing.push(string(locale, "CFG_ADMIN_ROLES_TITLE"));
+		if (!config.staff_roles || config.staff_roles.length < 1) missing.push(string(locale, "CFG_STAFF_ROLES_TITLE"));
+		if (!config.channels.suggestions) missing.push(string(locale, "CFG_SUGGESTION_CHANNEL_TITLE"));
+		if (config.mode === "review" && !config.channels.staff) missing.push(string(locale, "CFG_REVIEW_CHANNEL_TITLE"));
 
 		if (missing.length > 0) {
 			return (new Discord.MessageEmbed()
-				.setDescription(string("MISSING_CONFIG_HEADER", { prefix: db.config.prefix }))
-				.addField(string("MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.setDescription(string(locale, "MISSING_CONFIG_HEADER", { prefix: db.config.prefix }))
+				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
 				.setColor(colors.red));
 		}
 		return null;
 	},
-	suggestionEditCommandCheck: async function (message, args) {
+	suggestionEditCommandCheck: async function (locale, message, args) {
 		const { baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
-		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return returned;
 
-		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return [suggestionsCheck];
 
-		let suggestion = await checkApprovedSuggestion(message.guild, args[0]);
+		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
 		if (suggestion[0]) return [suggestion[0]];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
-	suggestionDeleteCommandCheck: async function (message, args) {
+	suggestionDeleteCommandCheck: async function (locale, message, args) {
 		const { checkDenied, baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
-		let [returned, qServerDB] = await baseConfig(message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return [returned];
 
-		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return [suggestionsCheck];
 
-		let deniedCheck = checkDenied(message.guild, qServerDB);
+		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return [deniedCheck];
 
-		let suggestion = await checkApprovedSuggestion(message.guild, args[0]);
+		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
 		if (suggestion[0]) return [suggestion[0]];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
-	checkSuggestion: async function (guild, id) {
+	checkSuggestion: async function (locale, guild, id) {
 		const { dbQueryNoNew } = require("./db");
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: id, id: guild.id });
-		if (!qSuggestionDB) return [string("INVALID_SUGGESTION_ID_ERROR", {}, "error")];
+		if (!qSuggestionDB) return [string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error")];
 		return [null, qSuggestionDB];
 	},
-	checkApprovedSuggestion: async function (guild, id) {
+	checkApprovedSuggestion: async function (locale, guild, id) {
 		const { checkSuggestion } = require("./checks");
-		let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(guild, id);
+		let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(locale, guild, id);
 		if (fetchSuggestion) return [fetchSuggestion];
 
-		if (qSuggestionDB.status !== "approved") return [string("SUGGESTION_NOT_APPROVED_ERROR", {}, "error")];
-		if (qSuggestionDB.implemented) return [string("SUGGESTION_IMPLEMENTED_ERROR", {}, "error")];
+		if (qSuggestionDB.status !== "approved") return [string(locale, "SUGGESTION_NOT_APPROVED_ERROR", {}, "error")];
+		if (qSuggestionDB.implemented) return [string(locale, "SUGGESTION_IMPLEMENTED_ERROR", {}, "error")];
 		return [null, qSuggestionDB];
 	},
-	baseConfig: async function(guild) {
+	baseConfig: async function(locale, guild) {
 		const { dbQuery } = require("./db");
 		const { checkConfig } = require("./checks");
 		let qServerDB = await dbQuery("Server", { id: guild });
-		if (!qServerDB) return [string("UNCONFIGURED_ERROR", {}, "error")];
+		if (!qServerDB) return [string(locale, "UNCONFIGURED_ERROR", {}, "error")];
 
-		let missingConfig = await checkConfig(qServerDB);
+		let missingConfig = await checkConfig(locale, qServerDB);
 		if (missingConfig) return [missingConfig];
 		return [null, qServerDB];
 	},
-	checkSuggestions: function (guild, db) {
+	checkSuggestions: function (locale, guild, db) {
 		const { channelPermissions } = require("./checks");
 		if (guild.channels.cache.get(db.config.channels.suggestions)) {
-			let perms = channelPermissions( "suggestions", guild.channels.cache.get(db.config.channels.suggestions), guild.client);
+			let perms = channelPermissions(locale,  "suggestions", guild.channels.cache.get(db.config.channels.suggestions), guild.client);
 			if (perms) return perms;
-		} else return string("NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
+		} else return string(locale, "NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
 	},
-	checkReview: function (guild, db) {
+	checkReview: function (locale, guild, db) {
 		const { channelPermissions } = require("./checks");
 		if (guild.channels.cache.get(db.config.channels.staff)) {
-			let perms = channelPermissions( "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
+			let perms = channelPermissions(locale,  "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
 			if (perms) return perms;
-		} else return string("NO_REVIEW_CHANNEL_ERROR", {}, "error");
+		} else return string(locale, "NO_REVIEW_CHANNEL_ERROR", {}, "error");
 	},
-	checkDenied: function (guild, db) {
+	checkDenied: function (locale, guild, db) {
 		const { channelPermissions } = require("./checks");
 		if (!db.config.channels.denied) return null;
 		if (guild.channels.cache.get(db.config.channels.denied)) {
-			let perms = channelPermissions( "denied", guild.channels.cache.get(db.config.channels.denied), guild.client);
+			let perms = channelPermissions(locale,  "denied", guild.channels.cache.get(db.config.channels.denied), guild.client);
 			if (perms) return perms;
-		} else return string("NO_DENIED_CHANNEL_ERROR", {}, "error");
+		} else return string(locale, "NO_DENIED_CHANNEL_ERROR", {}, "error");
 	},
 	/**
 	 * Check a URL to see if it makes a valid attachment

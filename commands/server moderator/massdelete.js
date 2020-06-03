@@ -19,31 +19,31 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 20
 	},
-	do: async (message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(message.guild.id);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
 
-		let suggestionsCheck = checkSuggestions(message.guild, qServerDB);
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
-		let deniedCheck = checkDenied(message.guild, qServerDB);
+		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return message.channel.send(deniedCheck);
 
-		if (!args[0]) return message.channel.send(string("NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
-		if (!reasonSplit[0]) return message.channel.send(string("NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!reasonSplit[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
 		let suggestions = reasonSplit[0].split(" ");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string("DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
 		}
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(string("NAN_MASS_DENY_ERROR", {}, "error"));
+		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_DENY_ERROR", {}, "error"));
 		let su = suggestions.map(Number);
-		let msg = await message.channel.send(string("PROCESSING"));
+		let msg = await message.channel.send(string(locale, "PROCESSING"));
 
 		let preDeny = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
 		let alreadyDenied = preDeny.filter((s) => s.status !== "approved" || s.implemented);
@@ -70,10 +70,10 @@ module.exports = {
 
 		await msg.edit(
 			new Discord.MessageEmbed()
-				.setDescription(string("MASS_DELETE_SUCCESS_TITLE", { some: nModified.toString(), total: postDeny.length }, nModified !== 0 ? "success" : "error"))
-				.addField(string("RESULT_FIELD_TITLE"), `${deniedId.length > 0 ? string("MASS_DELETE_SUCCESS_RESULTS_DETAILED", { list: deniedId.join(", ") }, "success") : ""}\n${notDeniedId.length > 0 ? string("MASS_DELETE_FAIL_RESULTS_DETAILED", { list: notDeniedId.join(", ") }, "error") : ""}`)
+				.setDescription(string(locale, "MASS_DELETE_SUCCESS_TITLE", { some: nModified.toString(), total: postDeny.length }, nModified !== 0 ? "success" : "error"))
+				.addField(string(locale, "RESULT_FIELD_TITLE"), `${deniedId.length > 0 ? string(locale, "MASS_DELETE_SUCCESS_RESULTS_DETAILED", { list: deniedId.join(", ") }, "success") : ""}\n${notDeniedId.length > 0 ? string(locale, "MASS_DELETE_FAIL_RESULTS_DETAILED", { list: notDeniedId.join(", ") }, "error") : ""}`)
 				.setColor(deniedId.length !== 0 ? colors.green : colors.red)
-				.setFooter(nModified !== su.length ? string("MASS_DELETE_ERROR_DETAILS") : "")
+				.setFooter(nModified !== su.length ? string(locale, "MASS_DELETE_ERROR_DETAILS") : "")
 		);
 
 		for (let s in denied) {
@@ -82,37 +82,37 @@ module.exports = {
 				let qSuggestionDB = denied[s];
 				let suggester = await fetchUser(qSuggestionDB.suggester, client);
 
-				let deleteMsg = await deleteFeedMessage(qSuggestionDB, qServerDB, client);
+				let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string("REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+				if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
-				if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(qSuggestionDB, suggester, "red", string("DELETED_BY", { user: message.author.tag }))))).catch(() => {});
+				if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
 				if (qServerDB.config.channels.denied) {
 					let deniedEmbed = new Discord.MessageEmbed()
-						.setTitle(string("SUGGESTION_DELETED_TITLE"))
-						.setAuthor(string("SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+						.setTitle(string(locale, "SUGGESTION_DELETED_TITLE"))
+						.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 						.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-						.setDescription(qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"))
-						.setFooter(string("SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
+						.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
+						.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 						.setTimestamp(qSuggestionDB.submitted)
 						.setColor(colors.red);
-					reason ? deniedEmbed.addField(string("REASON_GIVEN"), reason) : "";
+					reason ? deniedEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
 					let votes = checkVotes(qSuggestionDB, deleteMsg[1]);
-					if (votes[0] || votes[1]) deniedEmbed.addField(string("VOTE_TOTAL_HEADER"), `${string("VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string("UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string("VOTE_COUNT_UP")} ${votes[0]}\n${string("VOTE_COUNT_DOWN")} ${votes[1]}`);
+					if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
 					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}
 
 				if (qServerDB.config.channels.log) {
-					let logs = logEmbed(qSuggestionDB, message.author, "DELETED_LOG", "red")
-						.addField(string("SUGGESTION_HEADER"), qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT"));
+					let logs = logEmbed(locale, qSuggestionDB, message.author, "DELETED_LOG", "red")
+						.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
 
-					reason ? logs.addField(string("REASON_GIVEN"), reason) : "";
+					reason ? logs.addField(string(locale, "REASON_GIVEN"), reason) : "";
 					if (qSuggestionDB.attachment) {
 						logs.setImage(qSuggestionDB.attachment);
-						logs.addField(string("WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+						logs.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 					}
 					serverLog(logs, qServerDB, client);
 				}

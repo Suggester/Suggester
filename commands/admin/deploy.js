@@ -12,8 +12,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: async (message, client, args, Discord) => {
-		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(string("DEPLOY_NOT_PRODUCTION", {}, "error")); // Don't deploy if the bot isn't running in the production environment
+	do: async (locale, message, client, args, Discord) => {
+		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(string(locale, "DEPLOY_NOT_PRODUCTION", {}, "error")); // Don't deploy if the bot isn't running in the production environment
 		/**
 		 * Use an embed for deploy command logs
 		 * @param {string} msg - The message to be logged
@@ -37,7 +37,7 @@ module.exports = {
 				}
 			)
 		)) {
-			let m = await message.channel.send(string("PROCESSING"));
+			let m = await message.channel.send(string(locale, "PROCESSING"));
 			await coreLog("📥 Deploy initiated", client);
 			await generateEmbed("Deploy command received", m);
 			await generateEmbed("Updating code", m);

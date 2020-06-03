@@ -28,13 +28,15 @@ module.exports = async (Discord, client, guild) => {
 
 	await guild.members.fetch(client.user.id);
 	if (guild.me.joinedTimestamp+60000<Date.now()) return;
-	
+
+	let locale = "en";
+
 	let embed = new Discord.MessageEmbed()
-		.setAuthor(string("TUTORIAL_HEADER"), client.user.displayAvatarURL({format: "png"}))
+		.setAuthor(string(locale, "TUTORIAL_HEADER"), client.user.displayAvatarURL({format: "png"}))
 		.setColor(colors.default)
-		.setDescription(string("TUTORIAL_DESC", { prefix: prefix }))
-		.addField(string("TUTORIAL_GET_STARTED_HEADER"), string("TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: prefix }))
-		.addField(string("TUTORIAL_NEXT_HEADER"), string("TUTORIAL_NEXT_DESCRIPTION", { prefix: prefix, invite: `https://discord.gg/${support_invite}` }));
+		.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
+		.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: prefix }))
+		.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION", { prefix: prefix, invite: `https://discord.gg/${support_invite}` }));
 	let names = ["staff", "admin", "mod", "bot", "general"];
 	let channelsFetch = guild.channels.cache.filter(c => names.filter(a => c.name.includes(a)).length > 0 && c.type === "text" && c.permissionsFor(client.user.id).has(["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]) && !c.name.includes("log"));
 	if (channelsFetch.size > 0) return channelsFetch.first().send(embed);

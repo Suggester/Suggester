@@ -11,7 +11,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 5
 	},
-	do: message => {
-		return message.channel.send(string("SUPPORT_INVITE", { link: `https://discord.gg/${support_invite}` }));
+	do: (locale, message) => {
+		return message.channel.send(string(locale, "SUPPORT_INVITE", { link: `https://discord.gg/${support_invite}` }));
 	}
 };

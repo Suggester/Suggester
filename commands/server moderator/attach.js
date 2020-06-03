@@ -17,37 +17,37 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"],
 		cooldown: 5
 	},
-	do: async (message, client, args, Discord) => {
-		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(message, args);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
 
-		if (qSuggestionDB.attachment) return message.channel.send(string("ALREADY_ATTACHMENT_ERROR", {}, "error"));
+		if (qSuggestionDB.attachment) return message.channel.send(string(locale, "ALREADY_ATTACHMENT_ERROR", {}, "error"));
 
-		if (!args[1] && !message.attachments.first()) return message.channel.send(string("NO_ATTACHMENT_ERROR", {}, "error"));
+		if (!args[1] && !message.attachments.first()) return message.channel.send(string(locale, "NO_ATTACHMENT_ERROR", {}, "error"));
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : args.splice(1).join(" ");
 
-		if (!(checkURL(attachment))) return message.channel.send(string("INVALID_AVATAR_ERROR", {}, "error"));
+		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error"));
 
 		qSuggestionDB.attachment = attachment;
 
-		let editFeed = await editFeedMessage(qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle(string("ATTACHMENT_ADDED_HEADER"))
-			.setDescription(`${qSuggestionDB.suggestion || string("NO_SUGGESTION_CONTENT")}\n[${string("SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setTitle(string(locale, "ATTACHMENT_ADDED_HEADER"))
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
 			.setColor(colors.blue)
-			.setFooter(string("SUGGESTION_FOOTER", { id: id.toString() }))
+			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {
-			let embedLog = logEmbed(qSuggestionDB, message.author, "ATTACHED_LOG", "blue")
-				.addField(string("ATTACHMENT_ADDED_HEADER"), attachment)
+			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ATTACHED_LOG", "blue")
+				.addField(string(locale, "ATTACHMENT_ADDED_HEADER"), attachment)
 				.setImage(attachment);
 			serverLog(embedLog, qServerDB, client);
 		}

@@ -1,10 +1,11 @@
 const { emoji } = require("../config.json");
 module.exports = {
-	string: function (string_name, replaced, prefix_with) {
-		const list = module.exports.list;
-		const string = list[string_name];
+	string: function (locale, string_name, replaced, prefix_with) {
+		const { list } = require(`../i18n/${locale}`);
+		const defaultList = module.exports.list;
+		const string = defaultList[string_name];
 		if (!string) return `String ${string_name} Not Found`;
-		let newString = string.string;
+		let newString = list[string_name] || string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
 				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
@@ -2567,5 +2568,53 @@ module.exports = {
 				}
 			}
 		},
+		"LOCALE_LIST_TITLE": {
+			string: "Available Locales",
+			context: "Title for the list of locales"
+		},
+		"SELECTED": {
+			string: "Selected",
+			context: "Indicates a selected locale"
+		},
+		"NO_LOCALE_ERROR": {
+			string: "No locale was found based on that input! Run this command with no parameters to see a list of available locales.",
+			context: "Error shown when a user specifies an invalid locale"
+		},
+		"USER_LOCALE_SET_SUCCESS": {
+			string: "Your locale has been successfully set to **{{name}}**. You can report issues with this locale and help translate it by joining the Suggester support server: {{invite}}",
+			context: "Success message shown when the locale is set for a user",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The locale name"
+				},
+				invite: {
+					to_replace: "{{invite}}",
+					description: "The invite to the support server"
+				}
+			}
+		},
+		"SERVER_LOCALE_SET_SUCCESS": {
+			string: "Your locale has been successfully set to **{{name}}**. You can report issues with this locale and help translate it by joining the Suggester support server: {{invite}}",
+			context: "Success message shown when the locale is set for a user",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The locale name"
+				},
+				invite: {
+					to_replace: "{{invite}}",
+					description: "The invite to the support server"
+				}
+			}
+		},
+		"LOCALE_SERVER_SETTING_PROMPT": {
+			string: "If you would like to set this locale as the server default, use `{{prefix}}config locale {{code}}`.",
+			context: "If a server admin uses the command, prompts them to configure the locale for the entire server"
+		},
+		"CFG_LOCALE_TITLE": {
+			string: "**Locale:**",
+			context: "Title for the locale in the config embed"
+		}
 	}
 };

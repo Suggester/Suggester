@@ -10,7 +10,7 @@ module.exports = {
 		docs: "all/vote",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
-	do: async (message) => {
+	do: async (locale, message) => {
 		let lists = {
 			"topgg": "https://top.gg/bot/564426594144354315/vote",
 			"botlistspace": "https://botlist.space/bot/564426594144354315/upvote",
@@ -21,6 +21,6 @@ module.exports = {
 			"bod": "https://bots.ondiscord.xyz/bots/564426594144354315/review"
 		};
 
-		return message.channel.send(string("VOTE_INFO", { link: `<https://discord.gg/${support_invite}>`, links: `<${Object.values(lists).join(">\n<")}>` }));
+		return message.channel.send(string(locale, "VOTE_INFO", { link: `<https://discord.gg/${support_invite}>`, links: `<${Object.values(lists).join(">\n<")}>` }));
 	}
 };

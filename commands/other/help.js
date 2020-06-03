@@ -18,18 +18,18 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (locale, message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		let missingConfig = await checkConfig(qServerDB);
+		let missingConfig = await checkConfig(locale, qServerDB);
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
-				.setDescription(string("HELP_BASE_DESCRIPTION"))
-				.setFooter(string("HELP_PREFIX_INFO", { prefix: serverPrefix }))
+				.setDescription(string(locale, "HELP_BASE_DESCRIPTION"))
+				.setFooter(string(locale, "HELP_PREFIX_INFO", { prefix: serverPrefix }))
 				.setColor(colors.default);
 
-			if (missingConfig) embed.addField(string("MISSING_CONFIG_TITLE"), string("MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
+			if (missingConfig) embed.addField(string(locale, "MISSING_CONFIG_TITLE"), string(locale, "MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
 			return message.channel.send(embed);
 		}
 
@@ -44,13 +44,13 @@ module.exports = {
 		let returnEmbed = new Discord.MessageEmbed()
 			.setColor(colors.default)
 			.setDescription(commandInfo.description)
-			.addField(string("HELP_PERMISSION_LEVEL"), permLevelToRole(commandInfo.permission), true)
-			.addField(string("HELP_USAGE"), `\`${serverPrefix}${commandInfo.usage}\``, true)
+			.addField(string(locale, "HELP_PERMISSION_LEVEL"), permLevelToRole(locale, commandInfo.permission), true)
+			.addField(string(locale, "HELP_USAGE"), `\`${serverPrefix}${commandInfo.usage}\``, true)
 			.setAuthor(commandName, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
-		commandInfo.aliases ? returnEmbed.addField(string(commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField(string("HELP_DOCUMENTATION"), `https://suggester.js.org/#/${commandInfo.docs}`);
-		if (!commandInfo.enabled) returnEmbed.addField(string("HELP_ADDITIONAL_INFO"), `⚠️ ${string("COMMAND_DISABLED")}`);
+		commandInfo.aliases ? returnEmbed.addField(string(locale, commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
+		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField(string(locale, "HELP_DOCUMENTATION"), `https://suggester.js.org/#/${commandInfo.docs}`);
+		if (!commandInfo.enabled) returnEmbed.addField(string(locale, "HELP_ADDITIONAL_INFO"), `⚠️ ${string(locale, "COMMAND_DISABLED")}`);
 
 		if (commandInfo.image) returnEmbed.attachFiles([new MessageAttachment(commandInfo.image, `image.${commandInfo.image.split(".")[1]}`)]).setImage(`attachment://image.${commandInfo.image.split(".")[1]}`);
 

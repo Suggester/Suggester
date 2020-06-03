@@ -11,8 +11,8 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 20
 	},
-	do: async (message) => {
+	do: async (locale, message) => {
 		let chart_link = "https://suggester.js.org/#/botstats";
-		return message.channel.send(string("STATS_RESPONSE", { link: chart_link }));
+		return message.channel.send(string(locale, "STATS_RESPONSE", { link: chart_link }));
 	}
 };

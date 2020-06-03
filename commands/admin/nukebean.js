@@ -10,12 +10,12 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (locale, message, client, args, Discord) => {
 		let user = await fetchUser(args[0], client);
-		if (!user) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+		if (!user) return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 		let foundMember = true;
 		let member = await message.guild.members.fetch(user.id).catch(() => foundMember = false);
-		if (!member || !foundMember) return message.channel.send(string("INVALID_USER_ERROR", {}, "error"));
+		if (!member || !foundMember) return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 
 		let beanSendEmbed = new Discord.MessageEmbed()
 			.setColor("#AAD136")

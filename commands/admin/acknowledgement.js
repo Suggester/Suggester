@@ -11,21 +11,21 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
-	do: async (message, client, args) => {
+	do: async (locale, message, client, args) => {
 		let user = await fetchUser(args[0], client);
 		if (!user || user.id === "0" || !args[1]) {
 			if (!user) user = message.author;
 			let dbUser = await dbQuery("User", { id: user.id });
-			let ack = dbUser && dbUser.ack ? dbUser.ack : string("NO_ACK_SET");
-			return message.channel.send(string("ACK_FILLER_TEXT", { user: user.tag, acknowledgement: ack }));
+			let ack = dbUser && dbUser.ack ? dbUser.ack : string(locale, "NO_ACK_SET");
+			return message.channel.send(string(locale, "ACK_FILLER_TEXT", { user: user.tag, acknowledgement: ack }));
 		}
 
 		let ack = args.slice(1).join(" ");
 		if (ack.toLowerCase() === "reset") {
 			await dbModifyId("User", user.id, { ack: undefined });
-			return message.channel.send(string("ACK_RESET_SUCCESS", { user: user.tag }, "success"));
+			return message.channel.send(string(locale, "ACK_RESET_SUCCESS", { user: user.tag }, "success"));
 		}
 		await dbModifyId("User", user.id, { ack: ack });
-		return message.channel.send(string("ACK_SET_SUCCESS", { user: user.tag, acknowledgement: ack }, "success"));
+		return message.channel.send(string(locale, "ACK_SET_SUCCESS", { user: user.tag, acknowledgement: ack }, "success"));
 	}
 };

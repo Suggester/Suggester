@@ -10,7 +10,7 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
-	do: async (message, client) => {
+	do: async (locale, message, client) => {
 		if ((
 			await confirmation(
 				message,

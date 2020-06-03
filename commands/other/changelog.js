@@ -14,7 +14,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
 		cooldown: 25
 	},
-	do: async (message, client, args, Discord) => {
+	do: async (locale, message, client, args, Discord) => {
 		get("https://api.github.com/repos/Suggester-Bot/Suggester/releases/latest").then(({ data }) => {
 			let split_body = Discord.Util.splitMessage(data.body, {
 				char: " "
@@ -23,19 +23,19 @@ module.exports = {
 			let embeds = [];
 			for (const chunk of split_body) {
 				embeds.push(new Discord.MessageEmbed()
-					.setTitle(string("CHANGELOG_EMBED_HEADER", { version: data.name }))
+					.setTitle(string(locale, "CHANGELOG_EMBED_HEADER", { version: data.name }))
 					.setDescription(chunk)
 					.setURL(data.html_url)
 					.setColor(colors.default)
 					.setTimestamp(data.created_at)
-					.setFooter(`${string("CHANGELOG_RELEASED_FOOTER")}\n${string("PAGINATION_NAVIGATION_INSTRUCTIONS")}`)
+					.setFooter(`${string(locale, "CHANGELOG_RELEASED_FOOTER")}\n${string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS")}`)
 				);
 			}
 
-			pages(message, embeds);
+			pages(locale, message, embeds);
 		}).catch((e) => {
 			console.log(e);
-			return message.channel.send(string("ERROR", {}, "error"));
+			return message.channel.send(string(locale, "ERROR", {}, "error"));
 		});
 	}
 };
