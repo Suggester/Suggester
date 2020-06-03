@@ -113,7 +113,7 @@ module.exports = {
 			let embedReview = reviewEmbed(qSuggestionDB, message.author, "yellow");
 			embedReview.addField(string("APPROVE_DENY_HEADER"), string("REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
-			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(embedReview);
+			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "",embedReview);
 			await dbModify("Suggestion", { suggestionId: id }, { reviewMessage: reviewMessage.id });
 
 			if (qServerDB.config.channels.log) {

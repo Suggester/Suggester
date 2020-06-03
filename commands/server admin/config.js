@@ -234,6 +234,23 @@ module.exports = {
 			await dbModify("Server", {id: server.id}, qServerDB);
 			return message.channel.send(string("CFG_APPROVED_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
 		}
+		case "pingrole":
+		case "ping": {
+			if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CFG_PING_ROLE_TITLE", false)));
+			let input = args.splice(1).join(" ");
+			if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+				qServerDB.config.ping_role = "";
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string("CFG_RESET_PING_ROLE_SUCCESS", {}, "success"));
+			}
+			if (!server.me.permissions.has("MENTION_EVERYONE")) return message.channel.send(string("CFG_NO_MENTION_EVERYONE_ERROR", { bot: `<@${client.user.id}>` }, "error"));
+			let role = await findRole(input, server.roles.cache);
+			if (!role) return message.channel.send(string("CFG_INVALID_ROLE_ERROR", {}, "error"));
+			if (qServerDB.config.ping_role === role.id) return message.channel.send(string("CFG_ALREADY_PING_ROLE_ERROR", {}, "error"));
+			qServerDB.config.ping_role = role.id;
+			await dbModify("Server", {id: server.id}, qServerDB);
+			return message.channel.send(string("CFG_PING_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
+		}
 		case "review":
 		case "reviewchannel": {
 			if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, server, "CFG_REVIEW_CHANNEL_TITLE", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string("CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
@@ -438,6 +455,8 @@ module.exports = {
 			cfgRolesArr.push((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
 			// Approved suggestion role
 			cfgRolesArr.push((await listRoles(qServerDB.config.approved_role, server, "CFG_APPROVED_ROLE_TITLE", false)));
+			// Submitted suggestion mention role
+			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CFG_PING_ROLE_TITLE", false)));
 			// Suggestions channel
 			let suggestionChannel = await showChannel(qServerDB.config.channels.suggestions, server, "CFG_SUGGESTION_CHANNEL_TITLE", true);
 			if (suggestionChannel[1]) {

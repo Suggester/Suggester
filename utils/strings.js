@@ -2524,6 +2524,48 @@ module.exports = {
 					description: "A role name"
 				}
 			}
-		}
+		},
+		"SHARD_INFO": {
+			string: "This server is on shard {{shard}}.",
+			context: "Shows information about the current shard for the shard command",
+			replaced: {
+				shard: {
+					to_replace: "{{shard}}",
+					context: "The current shard"
+				}
+			}
+		},
+		"CFG_PING_ROLE_TITLE": {
+			string: "**Suggestion Submitted Mention Role:**",
+			context: "Title for the suggestion submitted mention role in config"
+		},
+		"CFG_RESET_PING_ROLE_SUCCESS": {
+			string: "Successfully reset the suggestion submitted mention role.",
+			context: "Success message when the mention on submitted suggestion role is reset"
+		},
+		"CFG_NO_MENTION_EVERYONE_ERROR": {
+			string: "Please give {{bot}} the **Mention Everyone** permission in order for the bot to be able to mention this role when a suggestion is submitted.",
+			context: "Error when an suggestion ping role is configured but the bot does not have the Mention Everyone permission",
+			replaced: {
+				bot: {
+					to_replace: "{{bot}}",
+					description: "The bot mention"
+				}
+			}
+		},
+		"CFG_ALREADY_PING_ROLE_ERROR": {
+			string: "This role is already set to be mentioned when a suggestion is submitted!",
+			context: "Error when the specified suggestion ping role is already set"
+		},
+		"CFG_PING_ROLE_SUCCESS": {
+			string: "The **{{role}}** role will now be mentioned when suggestions are submitted for review.",
+			context: "Success message when the suggestion ping role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
 	}
 };
