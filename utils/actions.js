@@ -160,14 +160,15 @@ module.exports = {
 			msg.reactions.removeAll();
 		});
 	},
-	checkVotes: function(qSuggestionDB, msg) {
+	checkVotes: function(locale, qSuggestionDB, msg) {
 		const nodeEmoji = require("node-emoji");
 		function getEmoji (input) {
 			if (nodeEmoji.find(input)) return input;
 			else return input.match(/[a-zA-Z0-9-_]+:([0-9]+)/)[1] || null;
 		}
-		let upCount = "Unknown";
-		let downCount = "Unknown";
+		let upCount = string(locale, "UNKNOWN");
+		let downCount = string(locale, "UNKNOWN");
+		if (!msg || !msg.reactions || !msg.reactions.cache) return [null, null, null];
 		let upReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.up));
 		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
 		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;

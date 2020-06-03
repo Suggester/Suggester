@@ -80,7 +80,7 @@ module.exports = {
 			let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 			if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
 
-			let votes = checkVotes(qSuggestionDB, deleteMsg[1]);
+			let votes = checkVotes(locale, qSuggestionDB, deleteMsg[1]);
 			if (votes[0] || votes[1]) suggestionNewEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
 
 			qSuggestionDB.implemented = true;

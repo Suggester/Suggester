@@ -79,7 +79,7 @@ module.exports = {
 			if (!qSuggestionDB.implemented) {
 				let messageFetched;
 				await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-					let [up, down, opinion] = checkVotes(qSuggestionDB, f);
+					let [up, down, opinion] = checkVotes(locale, qSuggestionDB, f);
 					messageFetched = true;
 					if (up || down) embed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(opinion) ? string(locale, "UNKNOWN") : (opinion > 0 ? `+${opinion}` : opinion)}\n${string(locale, "VOTE_COUNT_UP")} ${up}\n${string(locale, "VOTE_COUNT_DOWN")} ${down}`);
 				}).catch(() => messageFetched = false);

@@ -72,7 +72,7 @@ module.exports = {
 				.setTimestamp(qSuggestionDB.submitted)
 				.setColor(colors.red);
 			reason ? deniedEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
-			let votes = checkVotes(qSuggestionDB, deleteMsg[1]);
+			let votes = checkVotes(locale, qSuggestionDB, deleteMsg[1]);
 			if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
