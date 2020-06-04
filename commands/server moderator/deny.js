@@ -20,6 +20,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
+		const guildLocale = qServerDB.config.locale;
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
@@ -42,9 +43,9 @@ module.exports = {
 		if (qSuggestionDB.status !== "awaiting_review") {
 			switch (qSuggestionDB.status) {
 			case "approved":
-				return message.channel.send(string(locale, "SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR", { prefix: qServerDB.config.prefix, id: id.toString() }, "error"));
+				return message.channel.send(string(guildLocale, "SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR", { prefix: qServerDB.config.prefix, id: id.toString() }, "error"));
 			case "denied":
-				return message.channel.send(string(locale, "SUGGESTION_ALREADY_DENIED_DENIED_ERROR", {}, "error"));
+				return message.channel.send(string(guildLocale, "SUGGESTION_ALREADY_DENIED_DENIED_ERROR", {}, "error"));
 			}
 		}
 
@@ -80,26 +81,26 @@ module.exports = {
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()
-				.setTitle(string(locale, "SUGGESTION_DENIED_TITLE"))
-				.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+				.setTitle(string(guildLocale, "SUGGESTION_DENIED_TITLE"))
+				.setAuthor(string(guildLocale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-				.setFooter(string(locale, "SUGGESTION_FOOTER", {id: id.toString()}))
+				.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"))
+				.setFooter(string(guildLocale, "SUGGESTION_FOOTER", {id: id.toString()}))
 				.setTimestamp(qSuggestionDB.submitted)
 				.setColor(colors.red);
-			reason ? deniedEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
+			reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
-			let logs = logEmbed(locale, qSuggestionDB, message.author, "DENIED_LOG", "red")
-				.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
+			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DENIED_LOG", "red")
+				.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
-			reason ? logs.addField(string(locale, "REASON_GIVEN"), reason) : "";
+			reason ? logs.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			if (qSuggestionDB.attachment) {
 				logs.setImage(qSuggestionDB.attachment);
-				logs.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+				logs.addField(string(guildLocale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			}
 			serverLog(logs, qServerDB, client);
 		}

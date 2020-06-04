@@ -31,7 +31,8 @@ if (!process.env.MONGO) return console.log(chalk`{yellowBright [{bold MISSING}] 
 
 connect(process.env.MONGO, {
 	useNewUrlParser: true,
-	useUnifiedTopology: true
+	useUnifiedTopology: true,
+	useFindAndModify: false
 })
 	.catch((err) => {
 		console.log(chalk`{red [{bold DATABASE}] Connection error: ${err.stack}}`);

@@ -18,7 +18,10 @@ module.exports = {
 		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
 	},
 	do: async (locale, message, client, args, Discord) => {
+
 		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		locale = qServerDB.config.locale;
+
 		if (returned) return message.channel.send(returned);
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));

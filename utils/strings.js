@@ -1,6 +1,15 @@
 const { emoji } = require("../config.json");
 module.exports = {
-	string: function (locale, string_name, replaced, prefix_with) {
+	/**
+	 * Translate something
+	 * @param {string} locale The locale to use
+	 * @param {string} string_name The string to use
+	 * @param {object} replaced Stuff to replace
+	 * @oaram {string} prefix_with Prefix the string with something
+	 * @param {string} suffix_with Suffix the string with something
+	 * @returns {string}
+	 */
+	string: function (locale, string_name, replaced, prefix_with, suffix_with) {
 		const { list } = require(`../i18n/${locale}`);
 		const defaultList = module.exports.list;
 		const string = defaultList[string_name];
@@ -11,13 +20,24 @@ module.exports = {
 				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
 			});
 		}
-		switch (prefix_with) {
-		case "success":
-			newString = `<:${emoji.check}> ${newString}`;
-			break;
-		case "error":
-			newString = `<:${emoji.x}> ${newString}`;
-			break;
+		if (prefix_with) {
+			switch (prefix_with) {
+			case "success":
+				newString = `<:${emoji.check}> ${newString}`;
+				break;
+			case "error":
+				newString = `<:${emoji.x}> ${newString}`;
+				break;
+			default:
+				newString = `${prefix_with} ${newString}`;
+				break;
+			}
+		}
+		if (suffix_with) {
+			switch (suffix_with) {
+			default:
+				newString = `${newString} ${suffix_with}`;
+			}
 		}
 		return newString;
 	},
@@ -2629,6 +2649,10 @@ module.exports = {
 		"LOCALE_FOOTER": {
 			string: "Don't see your language listed here? Apply to translate it in the support server!",
 			context: "Shown in the locale list embed informing users of how they can help translate"
+		},
+		"LOCALE_EASTER_EGG_ACTIVATED": {
+			string: "OwO mode activated!",
+			context: "If you mispell a language name, there is a small chance OwO mode will be activated."
 		}
 	}
 };

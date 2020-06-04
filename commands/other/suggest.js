@@ -23,6 +23,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		if (!qServerDB) return message.channel.send(string(locale, "UNCONFIGURED_ERROR", {}, "error"));
+		const guildLocale = qServerDB.config.locale;
 
 		let missingConfig = await checkConfig(locale, qServerDB);
 		if (missingConfig) return message.channel.send(missingConfig);
@@ -110,14 +111,14 @@ module.exports = {
 				}, 7500);
 			});
 
-			let embedReview = reviewEmbed(locale, qSuggestionDB, message.author, "yellow");
+			let embedReview = reviewEmbed(guildLocale, qSuggestionDB, message.author, "yellow");
 			embedReview.addField(string(locale, "APPROVE_DENY_HEADER"), string(locale, "REVIEW_COMMAND_INFO", { prefix: qServerDB.config.prefix, id: id.toString(), channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
-			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "",embedReview);
+			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview);
 			await dbModify("Suggestion", { suggestionId: id }, { reviewMessage: reviewMessage.id });
 
 			if (qServerDB.config.channels.log) {
-				let embedLog = logEmbed(locale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
+				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
 					.setDescription(suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
 				if (attachment) {
 					embedLog.setImage(attachment)
@@ -144,7 +145,8 @@ module.exports = {
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
-			let embedSuggest = await suggestionEmbed(locale, qSuggestionDB, qServerDB, client);
+			console.log('guild locale is', guildLocale)
+			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
 				.send(embedSuggest)
 				.then(async (posted) => {

@@ -31,7 +31,8 @@ module.exports = {
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
 	suggestionEmbed: async (locale, suggestion, server, client) => {
-		let { fetchUser } = require("./misc.js");
+		console.log(locale)
+		const { fetchUser } = module.exports;
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
 		// User information
