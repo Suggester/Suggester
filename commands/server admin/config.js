@@ -442,7 +442,7 @@ module.exports = {
 			if (!args[1]) {
 				let embed = new Discord.MessageEmbed()
 					.setTitle(string(locale, "LOCALE_LIST_TITLE"))
-					.setDescription(client.locales.map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `_${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+					.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qServerDB.config.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
 					.setFooter(string(locale, "LOCALE_FOOTER"))
 					.setColor(colors.default);
 				return message.channel.send(embed);

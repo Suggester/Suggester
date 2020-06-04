@@ -104,7 +104,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(colors.default)
 				.setImage(attachment);
-			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_REVIEW_SUCCESS"), replyEmbed).then(sent => {
+			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS"), replyEmbed).then(sent => {
 				if (qServerDB.config.clean_suggestion_command && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
 					message.delete();
 					sent.delete();

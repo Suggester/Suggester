@@ -43,7 +43,7 @@ module.exports = {
 
 		let returnEmbed = new Discord.MessageEmbed()
 			.setColor(colors.default)
-			.setDescription(commandInfo.description)
+			.setDescription(string(locale, `COMMAND:${commandInfo.name.toUpperCase()}`))
 			.addField(string(locale, "HELP_PERMISSION_LEVEL"), permLevelToRole(locale, commandInfo.permission), true)
 			.addField(string(locale, "HELP_USAGE"), `\`${serverPrefix}${commandInfo.usage}\``, true)
 			.setAuthor(commandName, client.user.displayAvatarURL({dynamic: true, format: "png"}));

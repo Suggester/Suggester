@@ -11,7 +11,7 @@ module.exports = async (Discord, client) => {
 		client.admins.add(admin.id);
 		console.log(chalk`{blue [{bold INFO}] Found {bold ${admin.tag}}}`);
 	}
-
+	
 	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers! (Shard: ${client.shard.ids[0]})`, client);
 	console.log(chalk`{green [{bold INFO}] Logged in as {bold ${client.user.tag}}! (Release: {bold ${release}, Shard: ${client.shard.ids[0]})}}`);
 
@@ -23,12 +23,10 @@ module.exports = async (Discord, client) => {
 		blapi.manualPost(totalGuildCount, client.user.id, lists, null, guildCounts.length, guildCounts);
 	}
 
-	if (client.user.id === "564426594144354315" && client.shard.ids[0] === 0 && process.NODE_ENV === "production" && lists) {
-		setTimeout(async function() {
+	if (client.user.id === "564426594144354315" && client.shard.ids[0] === client.shard.count-1 && process.NODE_ENV === "production" && lists) {
+		await post();
+		setInterval(async function() {
 			await post();
-			setInterval(async function() {
-				await post();
-			}, 1800000);
-		}, 10000);
+		}, 1800000);
 	}
 };

@@ -1,6 +1,6 @@
 const { access } = require("fs");
 const { dbQuery, dbModify } = require("../../utils/db");
-const { colors, support_invite } = require("../../config.json");
+const { colors, support_invite, emoji } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
@@ -22,7 +22,7 @@ module.exports = {
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setTitle(string(locale, "LOCALE_LIST_TITLE"))
-				.setDescription(client.locales.filter(l => l.settings.code !== "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+				.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qUserDB.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
 				.setFooter(string(locale, "LOCALE_FOOTER"))
 				.setColor(colors.default);
 			return message.channel.send(embed);
@@ -53,8 +53,6 @@ module.exports = {
 			}
 			else return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error"));
 		}
-		// if (!found) return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error"));
-		// if (!found) found = client.locales.find((l) => l.settings.code === "owo");
 		qUserDB.locale = found.settings.code;
 		await dbModify("User", { id: message.author.id }, qUserDB);
 		message.channel.send(`${string(found.settings.code, "USER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success")}${permission <= 2 ? `\n\n${string(found.settings.code, "LOCALE_SERVER_SETTING_PROMPT", { prefix: qServerDB.config.prefix, code: found.settings.code })}` : ""}`);

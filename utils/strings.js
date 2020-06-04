@@ -740,9 +740,9 @@ module.exports = {
 				}
 			}
 		},
-		"SUGGESTION_SUBMITTED_REVIEW_SUCCESS": {
-			string: "Your suggestion has been submitted for review!",
-			context: "Success message when a suggestion is sent for review"
+		"SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS": {
+			string: "Your suggestion has been submitted to the server staff for review!",
+			context: "Success message when a suggestion is sent for staff review"
 		},
 		"SUGGESTION_REVIEW_EMBED_TITLE": {
 			string: "Suggestion Awaiting Review (#{{id}})",
@@ -2652,7 +2652,191 @@ module.exports = {
 		},
 		"LOCALE_EASTER_EGG_ACTIVATED": {
 			string: "OwO mode activated!",
-			context: "If you mispell a language name, there is a small chance OwO mode will be activated."
+			context: "If you misspell a language name, there is a small chance OwO mode will be activated."
+		},
+		"COMMAND:ACKNOWLEDGEMENT": {
+			string: "Sets a verify acknowledgement for a user",
+			context: "Description for the acknowledgement command"
+		},
+		"COMMAND:BOTCONFIG": {
+			string: "Configures elements of the bot user",
+			context: "Description for the botconfig command"
+		},
+		"COMMAND:DB": {
+			string: "Gets a database entry",
+			context: "Description for the db command"
+		},
+		"COMMAND:DEPLOY": {
+			string: "Updates the bot",
+			context: "Description for the deploy command"
+		},
+		"COMMAND:EVAL": {
+			string: "run JavaScript code",
+			context: "Description for the eval command"
+		},
+		"COMMAND:FLAGS": {
+			string: "Sets internal flags for a user",
+			context: "Description for the flags command"
+		},
+		"COMMAND:GLOBALBAN": {
+			string: "Excludes a user or server from using the bot globally",
+			context: "Description for the globalban command"
+		},
+		"COMMAND:MEGABEAN": {
+			string: "Megabeans a member from the server",
+			context: "Description for the megabean command"
+		},
+		"COMMAND:NUKEBEAN": {
+			string: "Nukebeans a member from the server",
+			context: "Description for the nukebean command"
+		},
+		"COMMAND:REBOOT": {
+			string: "Reboots the bot by exiting the process",
+			context: "Description for the reboot command"
+		},
+		"COMMAND:WHITELIST": {
+			string: "Whitelists a server",
+			context: "Description for the whitelist command"
+		},
+		"COMMAND:CHANGELOG": {
+			string: "Shows the latest Suggester release",
+			context: "Description for the changelog command"
+		},
+		"COMMAND:HELP": {
+			string: "Shows command information",
+			context: "Description for the help command"
+		},
+		"COMMAND:INVITE": {
+			string: "Shows the link to invite the bot",
+			context: "Description for the invite command"
+		},
+		"COMMAND:LOCALE": {
+			string: "Sets your personal locale",
+			context: "Description for the locale command"
+		},
+		"COMMAND:NOTIFY": {
+			string: "Changes your notification settings",
+			context: "Description for the notify command"
+		},
+		"COMMAND:PING": {
+			string: "Checks bot response time and shows information",
+			context: "Description for the ping command"
+		},
+		"COMMAND:SHARD": {
+			string: "Shows the shard of this server",
+			context: "Description for the shard command"
+		},
+		"COMMAND:STATS": {
+			string: "Shows the link to bot statistics",
+			context: "Description for the stats command"
+		},
+		"COMMAND:SUGGEST": {
+			string: "Submits a suggestion",
+			context: "Description for the suggest command"
+		},
+		"COMMAND:SUPPORT": {
+			string: "Shows the link to the support server",
+			context: "Description for the support command"
+		},
+		"COMMAND:TUTORIAL": {
+			string: "Shows information about setting up the bot and using it",
+			context: "Description for the tutorial command"
+		},
+		"COMMAND:VERIFY": {
+			string: "Shows permissions of a user as they relate to the bot",
+			context: "Description for the verify command"
+		},
+		"COMMAND:VOTE": {
+			string: "Shows the link to info about voting",
+			context: "Description for the vote command"
+		},
+		"COMMAND:AUTOSETUP": {
+			string: "Automatically sets up channels and configures the bot",
+			context: "Description for the autosetup command"
+		},
+		"COMMAND:BEAN": {
+			string: "Beans a member from the server",
+			context: "Description for the bean command"
+		},
+		"COMMAND:CONFIG": {
+			string: "Shows/edits server configuration",
+			context: "Description for the config command"
+		},
+		"COMMAND:SETUP": {
+			string: "Initiates a walkthrough for server configuration",
+			context: "Description for the setup command"
+		},
+		"COMMAND:ACOMMENT": {
+			string: "Adds a comment to an approved suggestion anonymously",
+			context: "Description for the acomment command"
+		},
+		"COMMAND:APPROVE": {
+			string: "Approves a suggestion",
+			context: "Description for the approve command"
+		},
+		"COMMAND:ATTACH": {
+			string: "Attaches a file to an approved suggestion",
+			context: "Description for the attach command"
+		},
+		"COMMAND:BLACKLIST": {
+			string: "Blacklists a user from using the bot in the server",
+			context: "Description for the blacklist command"
+		},
+		"COMMAND:COMMENT": {
+			string: "Adds a comment to an approved suggestion",
+			context: "Description for the comment command"
+		},
+		"COMMAND:DELETE": {
+			string: "Deletes a suggestion",
+			context: "Description for the delete command"
+		},
+		"COMMAND:DELETECOMMENT": {
+			string: "Deletes a comment on a suggestion",
+			context: "Description for the deletecomment command"
+		},
+		"COMMAND:DENY": {
+			string: "Denies a suggestion",
+			context: "Description for the deny command"
+		},
+		"COMMAND:INFO": {
+			string: "Shows information about a suggestion",
+			context: "Description for the info command"
+		},
+		"COMMAND:LISTQUEUE": {
+			string: "Shows the queue of suggestions awaiting review",
+			context: "Description for the listqueue command"
+		},
+		"COMMAND:MARK": {
+			string: "Marks a status for a suggestion",
+			context: "Description for the mark command"
+		},
+		"COMMAND:MASSAPPROVE": {
+			string: "Approves all specified suggestions",
+			context: "Description for the massapprove command"
+		},
+		"COMMAND:MASSDELETE": {
+			string: "Deletes all specified suggestions",
+			context: "Description for the massdelete command"
+		},
+		"COMMAND:MASSDENY": {
+			string: "Denies all specified suggestions",
+			context: "Description for the massdeny command"
+		},
+		"COMMAND:REMOVEATTACHMENT": {
+			string: "Removes a file from a suggestion",
+			context: "Description for the removeattachment command"
+		},
+		"COMMAND:SILENTDELETE": {
+			string: "Deletes a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
+			context: "Description for the silentdelete command"
+		},
+		"COMMAND:SILENTDENY": {
+			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
+			context: "Description for the silentdeny command"
+		},
+		"COMMAND:UNBLACKLIST": {
+			string: "Unblacklists a server member from using the bot",
+			context: "Description for the unblacklist command"
 		}
 	}
 };

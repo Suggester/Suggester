@@ -17,7 +17,7 @@ module.exports = {
 		name: "eval",
 		permission: 0,
 		usage: "eval <javascript code>",
-		description: "run JavaScript code",
+		description: "Runs JavaScript code",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
