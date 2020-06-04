@@ -3,7 +3,7 @@ require("dotenv").config();
 const chalk = require("chalk");
 const { ShardingManager } = require("discord.js");
 
-const manager = new ShardingManager("./bot.js", { token: process.env.TOKEN, totalShards: 2 });
+const manager = new ShardingManager("./bot.js", { token: process.env.TOKEN });
 
 manager.spawn();
 

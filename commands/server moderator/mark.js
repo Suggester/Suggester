@@ -29,24 +29,24 @@ module.exports = {
 			switch (input.toLowerCase()) {
 			case "implemented":
 			case "done":
-				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), colors.green];
+				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), string(guildLocale, "STATUS_IMPLEMENTED"), colors.green];
 			case "working":
 			case "progress":
 			case "in":
-				return [["working"], string(locale, "STATUS_PROGRESS"), colors.orange];
+				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), colors.orange];
 			case "no":
 			case "not":
-				return [["no"], string(locale, "STATUS_NO"), colors.gray];
+				return [["no"], string(locale, "STATUS_NO"), string(guildLocale, "STATUS_NO"), colors.gray];
 			case "default":
 			case "none":
 			case "reset":
-				return [[null, "default"], string(locale, "STATUS_DEFAULT"), colors.default];
+				return [[null, "default"], string(locale, "STATUS_DEFAULT"), string(guildLocale, "STATUS_DEFAULT"), colors.default];
 			default:
 				return [null];
 			}
 		}
 
-		let [checkFor, str, color] = status(args[1]);
+		let [checkFor, str, guildstr, color] = status(args[1]);
 		if (!checkFor) return message.channel.send(string(locale, "NO_STATUS_ERROR", {}, "error"));
 		if (checkFor.includes(qSuggestionDB.displayStatus)) return message.channel.send(string(locale, "STATUS_ALREADY_SET_ERROR", { status: str }, "error"));
 
@@ -106,7 +106,7 @@ module.exports = {
 
 				if (qServerDB.config.channels.log) {
 					let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
-						.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), str)
+						.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), guildstr)
 						.addField(string(guildLocale, "IMPLEMENTED_LINK"), `[${string(guildLocale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 
 					if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
@@ -140,7 +140,7 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
-				.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), str);
+				.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), guildstr);
 
 			if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
