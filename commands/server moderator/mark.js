@@ -21,6 +21,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (!args[1]) return message.channel.send(string(locale, "NO_STATUS_ERROR", {}, "error"));
 
@@ -76,19 +77,19 @@ module.exports = {
 				if (perms) return message.channel.send(perms);
 			} else return message.channel.send(string(locale, "NO_ARCHIVE_CHANNEL_ERROR", {}, "error"));
 
-			let suggestionNewEmbed = await suggestionEmbed(locale, qSuggestionDB, qServerDB, client);
+			let suggestionNewEmbed = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 			if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
 
-			let votes = checkVotes(locale, qSuggestionDB, deleteMsg[1]);
-			if (votes[0] || votes[1]) suggestionNewEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
+			let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
+			if (votes[0] || votes[1]) suggestionNewEmbed.addField(string(guildLocale, "VOTE_TOTAL_HEADER"), `${string(guildLocale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(guildLocale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(guildLocale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(guildLocale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
 
 			qSuggestionDB.implemented = true;
 
 			client.channels.cache.get(qServerDB.config.channels.archive).send(suggestionNewEmbed).then(async sent => {
 				let replyEmbed = new Discord.MessageEmbed()
 					.setTitle(string(locale, "STATUS_EDITED_TITLE"))
-					.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
+					.setDescription(`${qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
 					.setColor(color)
 					.setFooter(string(locale, "SUGGESTION_FOOTER", {id: id.toString()}))
 					.setTimestamp(qSuggestionDB.submitted)
@@ -98,17 +99,17 @@ module.exports = {
 				message.channel.send(replyEmbed);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				let notify = dmEmbed(qUserDB.locale || locale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string(locale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
-				if (isComment) notify.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
-				notify.addField(string(locale, "IMPLEMENTED_LINK"), `[${string(locale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
+				let notify = dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
+				if (isComment) notify.addField(string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+				notify.addField(string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK"), `[${string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 				if (qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 
 				if (qServerDB.config.channels.log) {
-					let logs = logEmbed(locale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
-						.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str)
-						.addField(string(locale, "IMPLEMENTED_LINK"), `[${string(locale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
+					let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
+						.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), str)
+						.addField(string(guildLocale, "IMPLEMENTED_LINK"), `[${string(guildLocale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 
-					if (isComment) logs.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+					if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					serverLog(logs, qServerDB, client);
 				}
 			});
@@ -118,7 +119,7 @@ module.exports = {
 
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
-		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage(guildLocale, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		let replyEmbed = new Discord.MessageEmbed()
@@ -133,15 +134,15 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		let notify = dmEmbed(qUserDB.locale || locale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
-		if (isComment) notify.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+		let notify = dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
+		if (isComment) notify.addField(string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 		if (![null, "default"].includes(qSuggestionDB.displayStatus) && qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let logs = logEmbed(locale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
-				.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str);
+			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
+				.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), str);
 
-			if (isComment) logs.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+			if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
 		}
 	}
