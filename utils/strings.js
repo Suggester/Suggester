@@ -2614,9 +2614,9 @@ module.exports = {
 				}
 			}
 		},
-		"SERVER_LOCALE_SET_SUCCESS": {
-			string: "Your locale has been successfully set to **{{name}}**. You can report issues with this locale and help translate it by joining the Suggester support server: {{invite}}",
-			context: "Success message shown when the locale is set for a user",
+		"GUILD_LOCALE_SET_SUCCESS": {
+			string: "This server's locale has been successfully set to **{{name}}**. You can report issues with this locale and help translate it by joining the Suggester support server: {{invite}}",
+			context: "Success message shown when the locale is set for a server",
 			replaced: {
 				name: {
 					to_replace: "{{name}}",

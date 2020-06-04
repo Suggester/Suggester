@@ -452,7 +452,7 @@ module.exports = {
 			if (!found) return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error"));
 			qServerDB.config.locale = found.settings.code;
 			await dbModify("Server", { id: message.guild.id }, qServerDB);
-			return message.channel.send(string(found.settings.code, "SERVER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success"));
+			return message.channel.send(string(found.settings.code, "GUILD_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success"));
 		}
 		case "list": {
 			let cfgRolesArr = [];
