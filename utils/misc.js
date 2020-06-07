@@ -25,13 +25,13 @@ module.exports = {
 	},
 	/**
 	 * Send a suggestion to the suggestion channel
+	 * @param {String} locale - The server locale
 	 * @param {Object} suggestion - The database record for the suggestion
 	 * @param {Object} server - The server's database record
 	 * @param {module:"discord.js".Client} client - Discord.js client
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
 	suggestionEmbed: async (locale, suggestion, server, client) => {
-		console.log(locale)
 		const { fetchUser } = module.exports;
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();

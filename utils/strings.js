@@ -2,11 +2,11 @@ const { emoji } = require("../config.json");
 module.exports = {
 	/**
 	 * Translate something
-	 * @param {string} locale The locale to use
+	 * @param {string}locale The locale to use
 	 * @param {string} string_name The string to use
-	 * @param {object} replaced Stuff to replace
-	 * @oaram {string} prefix_with Prefix the string with something
-	 * @param {string} suffix_with Suffix the string with something
+	 * @param {object} [replaced] Stuff to replace
+	 * @param {string} [prefix_with] Prefix the string with something
+	 * @param {string} [suffix_with] Suffix the string with something
 	 * @returns {string}
 	 */
 	string: function (locale, string_name, replaced, prefix_with, suffix_with) {
@@ -2682,14 +2682,6 @@ module.exports = {
 			string: "Excludes a user or server from using the bot globally",
 			context: "Description for the globalban command"
 		},
-		"COMMAND:MEGABEAN": {
-			string: "Megabeans a member from the server",
-			context: "Description for the megabean command"
-		},
-		"COMMAND:NUKEBEAN": {
-			string: "Nukebeans a member from the server",
-			context: "Description for the nukebean command"
-		},
 		"COMMAND:REBOOT": {
 			string: "Reboots the bot by exiting the process",
 			context: "Description for the reboot command"
@@ -2753,10 +2745,6 @@ module.exports = {
 		"COMMAND:AUTOSETUP": {
 			string: "Automatically sets up channels and configures the bot",
 			context: "Description for the autosetup command"
-		},
-		"COMMAND:BEAN": {
-			string: "Beans a member from the server",
-			context: "Description for the bean command"
 		},
 		"COMMAND:CONFIG": {
 			string: "Shows/edits server configuration",

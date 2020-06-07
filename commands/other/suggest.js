@@ -145,7 +145,6 @@ module.exports = {
 			}).save();
 
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
-			console.log('guild locale is', guildLocale)
 			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
 				.send(embedSuggest)

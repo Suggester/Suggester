@@ -13,13 +13,14 @@ module.exports = {
 	},
 	do: async (locale, message, client, args) => {
 		let user = await fetchUser(args[0], client);
-		if (!user || user.id === "0" || !args[1]) {
-			if (!user) user = message.author;
+		if (!args[1]) {
+			if (!user || user.id === "0") user = message.author;
 			let dbUser = await dbQuery("User", { id: user.id });
 			let ack = dbUser && dbUser.ack ? dbUser.ack : string(locale, "NO_ACK_SET");
 			return message.channel.send(string(locale, "ACK_FILLER_TEXT", { user: user.tag, acknowledgement: ack }));
 		}
 
+		if (!user || user.id === "0") return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 		let ack = args.slice(1).join(" ");
 		if (ack.toLowerCase() === "reset") {
 			await dbModifyId("User", user.id, { ack: undefined });

@@ -1,6 +1,6 @@
 const { access } = require("fs");
 const { dbQuery, dbModify } = require("../../utils/db");
-const { colors, support_invite, emoji } = require("../../config.json");
+const { colors, support_invite } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
