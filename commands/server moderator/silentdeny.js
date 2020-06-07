@@ -1,70 +1,50 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, serverLog, fetchUser, dbModify, dbQueryNoNew, checkConfig, checkChannel } = require("../../coreFunctions.js");
+const { colors } = require("../../config.json");
+const { dbModify } = require("../../utils/db");
+const { serverLog } = require("../../utils/logs");
+const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
+const { string } = require("../../utils/strings");
+const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 module.exports = {
 	controls: {
 		name: "silentdeny",
 		permission: 3,
 		usage: "silentdeny <suggestion id> (reason)",
-		description: "Denies a suggestion without posting it to the denied suggestions feed",
+		description: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
 		docs: "staff/silentdeny",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 5
 	},
-	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		if (returned) return message.channel.send(returned);
 
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(`<:${emoji.x}> This command is disabled when the suggestion mode is set to \`autoapprove\`.`);
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
-		let missing = checkConfig(qServerDB);
+		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
+		if (deniedCheck) return [deniedCheck];
 
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let missingPermsReview = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
-		if (!missingPermsReview) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
-		if (missingPermsReview !== true) return message.channel.send(missingPermsReview);
-
-		if (qServerDB.config.channels.denied) {
-			let missingPermsDenied = checkChannel(qServerDB.config.channels.denied, message.guild.channels.cache, "denied", client);
-			if (!missingPermsDenied) return message.channel.send(`<:${emoji.x}> Could not find your denied suggestions channel even though there is one configured! If you want to remove your denied suggestions channel, use \`${Discord.escapeMarkdown(qServerDB.prefix)}config denied none\``);
-			if (missingPermsDenied !== true) return message.channel.send(missingPermsDenied);
-		}
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
+		let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(locale, message.guild, args[0]);
+		if (fetchSuggestion) return message.channel.send(fetchSuggestion);
 
 		let id = qSuggestionDB.suggestionId;
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let missingReviewPerms = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
-			if (!missingReviewPerms) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
-			if (missingReviewPerms !== true) return message.channel.send(missingReviewPerms);
+			let reviewCheck = checkReview(locale, message.guild, qServerDB);
+			if (reviewCheck) return message.channel.send(reviewCheck);
 		}
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let missingReviewPerms = checkChannel(qServerDB.config.channels.staff, message.guild.channels.cache, "staff", client);
-			if (!missingReviewPerms) return message.channel.send(`<:${emoji.x}> Could not find your staff review channel! Please make sure you have configured a staff review channel.`);
-			if (missingReviewPerms !== true) return message.channel.send(missingReviewPerms);
-		}
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
 		if (qSuggestionDB.status !== "awaiting_review") {
 			switch (qSuggestionDB.status) {
 			case "approved":
-				return message.channel.send(`<:${emoji.x}> This suggestion has already been approved! Use \`${Discord.escapeMarkdown(qServerDB.config.prefix)}delete ${id.toString()}\` to remove it.`);
+				return message.channel.send(string(locale, "SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR", { prefix: qServerDB.config.prefix, id: id.toString() }, "error"));
 			case "denied":
-				return message.channel.send(`<:${emoji.x}> This suggestion has already been denied!`);
+				return message.channel.send(string(locale, "SUGGESTION_ALREADY_DENIED_DENIED_ERROR", {}, "error"));
 			}
 		}
-
-		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
 
 		qSuggestionDB.status = "denied";
 		qSuggestionDB.staff_member = message.author.id;
@@ -72,69 +52,37 @@ module.exports = {
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(`<:${emoji.x}> Denial reasons cannot be longer than 1024 characters.`);
+			if (reason.length > 1024) return message.channel.send(string(locale, "DENIAL_REASON_TOO_LONG_ERROR", {}, "error"));
 			qSuggestionDB.denial_reason = reason;
 		}
 
 		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle("Suggestion Denied")
-			.setAuthor(`Suggestion from ${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
-			.setFooter(`Denied by ${message.author.tag}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-			.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
+			.setTitle(string(locale, "SUGGESTION_DENIED_TITLE"))
+			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+			.setFooter(string(locale, "DENIED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
 			.setColor(colors.red);
-		reason ? replyEmbed.addField("Reason Given", reason) : "";
+		reason ? replyEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
 		if (qSuggestionDB.attachment) {
-			replyEmbed.addField("With Attachment", qSuggestionDB.attachment)
+			replyEmbed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
 				.setImage(qSuggestionDB.attachment);
 		}
 		await message.channel.send(replyEmbed);
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
-		let selfNotify;
-		if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-		else selfNotify = true;
-		if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
-			let dmEmbed = new Discord.MessageEmbed()
-				.setTitle(`Your Suggestion in **${message.guild.name}** Was Denied`)
-				.setFooter(`Suggestion ID: ${id.toString()}`)
-				.setDescription(qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.setColor(colors.red);
-			reason ? dmEmbed.addField("Reason Given", reason) : "";
-			qSuggestionDB.attachment ? dmEmbed.setImage(qSuggestionDB.attachment) : "";
-			suggester.send(dmEmbed).catch(() => {});
-		}
-
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let updateEmbed = new Discord.MessageEmbed()
-				.setTitle(`Suggestion Awaiting Review (#${id.toString()})`)
-				.setAuthor(`${suggester.tag} (ID: ${suggester.id})`, suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion)
-				.setColor(colors.red)
-				.addField("A change was processed on this suggestion", "This suggestion has been denied");
-
-			if (qSuggestionDB.attachment) {
-				updateEmbed.addField("With Attachment", qSuggestionDB.attachment)
-					.setImage(qSuggestionDB.attachment);
-			}
-
-			client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(updateEmbed));
-		}
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(`${message.author.tag} denied #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.setFooter(`Suggestion ID: ${id.toString()} | Denier ID: ${message.author.id}`)
-				.setTimestamp()
-				.setColor(colors.red);
-			reason ? logEmbed.addField("Denial Reason", reason) : "";
+			let logs = logEmbed(locale, qSuggestionDB, message.author, "DENIED_LOG", "red")
+				.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
+
+			reason ? logs.addField(string(locale, "REASON_GIVEN"), reason) : "";
 			if (qSuggestionDB.attachment) {
-				logEmbed.addField("With Attachment", qSuggestionDB.attachment)
-					.setImage(qSuggestionDB.attachment);
+				logs.setImage(qSuggestionDB.attachment);
+				logs.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			}
-			serverLog(logEmbed, qServerDB, client);
+			serverLog(logs, qServerDB, client);
 		}
 	}
 };

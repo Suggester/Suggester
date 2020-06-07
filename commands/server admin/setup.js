@@ -1,481 +1,275 @@
 const { emoji, colors } = require("../../config.json");
-const { dbQuery, dbModify, dbQueryNoNew, channelPermissions, findRole, findChannel, dbDeleteOne } = require("../../coreFunctions.js");
-const {Server} = require("../../utils/schemas");
+const { dbQueryNoNew, dbQuery, dbModify, dbDeleteOne } = require("../../utils/db");
+const { handleRoleInput, handleChannelInput } = require("../../utils/config");
+const { checkConfig } = require("../../utils/checks");
+const { string } = require("../../utils/strings");
+const { confirmation } = require("../../utils/actions");
+const { Server } = require("../../utils/schemas");
 module.exports = {
 	controls: {
 		name: "setup",
 		permission: 2,
 		usage: "setup",
 		description: "Initiates a walkthrough for server configuration",
+		image: "images/Setup.gif",
 		enabled: true,
 		docs: "admin/setup",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 45
 	},
-	do: async (message, client, args, Discord) => {
-		async function setup (through)  {
-			let qServerDB = await dbQuery("Server", {id: message.guild.id});
+	do: async (locale, message, client, args, Discord) => {
+		async function awaitMessage(msg) {
+			return msg.channel.awaitMessages(response => response.author.id === msg.author.id, {
+				max: 1,
+				time: 120000,
+				errors: ["time"],
+			}).then(async (collected) => {
+				if (collected.first().content && collected.first().content.toLowerCase() === "cancel") {
+					msg.channel.send(string(locale, "SETUP_CANCELLED", {}, "error"));
+					return false;
+				}
+				return collected.first();
+			}).catch(async () => {
+				await msg.channel.send(string(locale, "SETUP_TIMED_OUT_ERROR", {}, "error"));
+				return false;
+			});
+		}
+
+		function setupEmbed (title, desc, inputs, step) {
+			return (new Discord.MessageEmbed()
+				.setTitle(title)
+				.setColor(colors.default)
+				.setDescription(desc)
+				.addField(string(locale, "INPUTS"), inputs)
+				.setFooter(`${string(locale, "TIME_SETUP_WARNING")} • ${step}/8`));
+		}
+
+		async function setup(through) {
+			let db = await dbQuery("Server", {id: message.guild.id});
 			switch (through) {
 			case 0: {
 				//Server Admin role
-				let adminRolesEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("Any member with a server admin role can use all staff commands, as well as edit bot configuration. Anyone who has the `Manage Server` permission is automatically counted as an admin regardless of server configuration.")
-					.addField("Inputs", "You can send a role name, role ID, or role @mention in this channel")
-					.setFooter("You have 2 minutes to enter a role");
-				if (qServerDB.config.admin_roles.length >= 1) adminRolesEmbed.addField("Done setting up admin roles?", "Type `done` to go to the next step\nIf you're not done, just specify another admin role!");
-				message.channel.send("**SETUP: Admin Roles**", adminRolesEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							if (!collected.first().content.split(" ")[0]) {
-								message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
-								return setup(0);
-							}
-							if (collected.first().content.toLowerCase() === "done" && qServerDB.config.admin_roles.length >= 1) return setup(1);
-
-							let role = await findRole(collected.first().content, message.guild.roles.cache);
-
-							if (!role) {
-								message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Please make sure that you are specifying a **role mention**, **role name**, or **role ID**.`);
-								return setup(0);
-							}
-
-							if (qServerDB.config.admin_roles.includes(role.id)) {
-								message.channel.send(`<:${emoji.x}> This role has already been added as an admin role.`);
-								return setup(0);
-							}
-
-							await qServerDB.config.admin_roles.push(role.id);
-							await dbModify("Server", { id: message.guild.id }, qServerDB);
-
-							await message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server admin roles.`, {disableMentions: "everyone"});
+				let adminRolesEmbed = setupEmbed(string(locale, "CFG_ADMIN_ROLES_TITLE"), string(locale, "SETUP_ADMIN_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 1);
+				if (db.config.admin_roles.length >= 1) adminRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
+				await message.channel.send(adminRolesEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					if (returnCollect.content.toLowerCase() === "done" && db.config.admin_roles.length >= 1) return setup(1);
+					//await message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+					let output = await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS");
+					if (output === "CONFIRM") {
+						if ((
+							await confirmation(
+								message,
+								string(locale, "EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								{
+									deleteAfterReaction: true
+								}
+							)
+						)) {
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
 							return setup(0);
-						})
-						.catch(e => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-						});
-				});
-				break;
+						}
+						else return setup(0);
+					} else message.channel.send(output, { disableMentions: "everyone" });
+					return setup(0);
+				} else return;
 			}
 			case 1: {
-				let staffRolesEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("Any member with a server staff role can use all [staff commands](https://suggester.js.org/) to manage suggestions.")
-					.addField("Inputs", "You can send a role name, role ID, or role @mention in this channel")
-					.setFooter("You have 2 minutes to enter a role");
-				if (qServerDB.config.staff_roles.length >= 1) staffRolesEmbed.addField("Done setting up staff roles?", "Type `done` to go to the next step\nIf you're not done, just specify another staff role!");
-				message.channel.send("**SETUP: Staff Roles**", staffRolesEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							if (!collected.first().content.split(" ")[0]) {
-								message.channel.send(`<:${emoji.x}> You must specify a role name, @mention, or ID!`);
-								return setup(1);
-							}
-
-							if (collected.first().content.toLowerCase() === "done" && qServerDB.config.staff_roles.length >= 1) return setup(2);
-
-							let role = await findRole(collected.first().content, message.guild.roles.cache);
-
-							if (!role) {
-								message.channel.send(`<:${emoji.x}> I could not find a role based on your input! Please make sure that you are specifying a **role mention**, **role name**, or **role ID**.`);
-								return setup(1);
-							}
-
-							if (qServerDB.config.staff_roles.includes(role.id)) {
-								message.channel.send(`<:${emoji.x}> This role has already been added as a staff role.`);
-								return setup(1);
-							}
-
-							await qServerDB.config.staff_roles.push(role.id);
-							await dbModify("Server", { id: message.guild.id }, qServerDB);
-
-							message.channel.send(`<:${emoji.check}> Added **${role.name}** to the list of server staff roles.`, {disableMentions: "everyone"});
+				let staffRolesEmbed = setupEmbed(string(locale, "CFG_STAFF_ROLES_TITLE"), string(locale, "SETUP_STAFF_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 2);
+				if (db.config.staff_roles.length >= 1) staffRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
+				await message.channel.send(staffRolesEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					if (returnCollect.content.toLowerCase() === "done" && db.config.admin_roles.length >= 1) return setup(2);
+					let output = await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS");
+					if (output === "CONFIRM") {
+						if ((
+							await confirmation(
+								message,
+								string(locale, "EVERYONE_PERMISSION_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								{
+									deleteAfterReaction: true
+								}
+							)
+						)) {
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
 							return setup(1);
-						})
-						.catch(e => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-						});
-				});
-				break;
+						}
+						else return setup(1);
+					} else message.channel.send(output, { disableMentions: "everyone" });
+					return setup(1);
+				} else return;
 			}
 			case 2: {
 				//Mode
-				let modeEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("This is the mode for managing suggestions, either `review` or `autoapprove`")
-					.addField("Review", "This mode holds all suggestions for staff review, needing to be manually approved before being posted to the suggestions channel", true)
-					.addField("Autoapprove", "This mode automatically sends all suggestions to the suggestions channel, with no manual review.", true)
-					.addField("Inputs", "You can send `review` for the review mode, and `autoapprove` for the autoapprove mode", false)
-					.setFooter("You have 2 minutes to specify a mode");
-				message.channel.send("**SETUP: Mode**", modeEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							switch (collected.first().content.split(" ")[0].toLowerCase()) {
-							case "review":
-								qServerDB.mode = "review";
-								await dbModify("Server", {id: message.guild.id}, qServerDB);
-
-								message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **review**.`);
-								return setup(3);
-							case "autoapprove":
-							case "auto-approve":
-							case "auto_approve":
-							case "auto": {
-								let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: message.guild.id});
-								if (suggestionsAwaitingReview) {
-									message.channel.send(`<:${emoji.x}> All suggestions awaiting review must be cleared before the autoapprove mode is set.`);
-									return setup(2);
-								}
-								qServerDB.config.mode = "autoapprove";
-								await dbModify("Server", {id: message.guild.id}, qServerDB);
-
-								message.channel.send(`<:${emoji.check}> Successfully set the mode for this server to **autoapprove**.`);
-								return setup(3);
-							}
-							default:
-								message.channel.send(`<:${emoji.x}> Please specify a valid mode (\`review\` or \`autoapprove\`).`);
-								return setup(2);
-							}
-						}).catch(e => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
+				let modeEmbed = setupEmbed(string(locale, "CFG_MODE_TITLE"), string(locale, "SETUP_MODE_DESC"), string(locale, "SETUP_MODE_INPUTS"), 3);
+				modeEmbed.addField(string(locale, "SETUP_REVIEW_TEXT"), string(locale, "SETUP_REVIEW_DESC"))
+					.addField(string(locale, "SETUP_AUTOAPPROVE_TEXT"), string(locale, "SETUP_AUTOAPPROVE_DESC"));
+				await message.channel.send(modeEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					switch (returnCollect.content.toLowerCase()) {
+					case "review":
+						db.config.mode = "review";
+						await dbModify("Server", {id: message.guild.id}, db);
+						message.channel.send(string(locale, "CFG_MODE_REVIEW_SET_SUCCESS", {}, "success"));
+						return setup(3);
+					case "autoapprove":
+					case "auto-approve":
+					case "auto_approve":
+					case "auto": {
+						let suggestionsAwaitingReview = await dbQueryNoNew("Suggestion", {
+							status: "awaiting_review",
+							id: message.guild.id
 						});
-				});
+						if (suggestionsAwaitingReview) {
+							message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
+							return setup(2);
+						}
+						db.config.mode = "autoapprove";
+						await dbModify("Server", {id: message.guild.id}, db);
 
+						message.channel.send(string(locale, "CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, "success"));
+						return setup(3);
+					}
+					default:
+						message.channel.send(string(locale, "CFG_MODE_INVALID_ERROR", {}, "error"));
+						return setup(2);
+					}
+				}
 				break;
 			}
 			case 3: {
 				//Suggestion channel
-				let suggestionChannelEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("This is the channel where all suggestions are sent once they are approved")
-					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name", false)
-					.setFooter("You have 2 minutes to specify a suggestion channel");
-				message.channel.send("**SETUP: Suggestion Channel**", suggestionChannelEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							let input = collected.first().content.split(" ")[0].toLowerCase();
-							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel || channel.type !== "text") {
-								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-								return setup(3);
-							}
-							let perms = channelPermissions(channel.permissionsFor(client.user.id), "suggestions", client);
-							if (perms.length > 0) {
-								let suggestionChannelPermissionsMissingEmbed = new Discord.MessageEmbed()
-									.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
-									.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-									.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-									.setColor(colors.red);
-								message.channel.send(suggestionChannelPermissionsMissingEmbed);
-								return setup(3);
-							}
-							qServerDB.config.channels.suggestions = channel.id;
-							await dbModify("Server", {id: message.guild.id}, qServerDB);
-							message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the approved suggestions channel.`);
-							return setup(4);
-						}).catch(e => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-						});
-				});
-				break;
+				let suggestionChannelEmbed = setupEmbed(string(locale, "CFG_SUGGESTION_CHANNEL_TITLE"), string(locale, "SETUP_SUGGESTIONS_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 4);
+				await message.channel.send(suggestionChannelEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
+					if (!content.startsWith(`<:${emoji.check}>`)) return setup(3);
+					return setup(4);
+				} else return;
 			}
 			case 4:
 				//Review channel (if mode is review)
-				if (qServerDB.config.mode === "review") {
-					let reviewChannelEmbed = new Discord.MessageEmbed()
-						.setColor(colors.default)
-						.setDescription("This is the channel where all suggestions are sent once they are suggested and awaiting review")
-						.addField("Inputs", "You can send a channel #mention, channel ID, or channel name", false)
-						.setFooter("You have 2 minutes to specify a review channel");
-					message.channel.send("**SETUP: Suggestion Review Channel**", reviewChannelEmbed).then(msg => {
-						msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-							max: 1,
-							time: 120000,
-							errors: ["time"],
-						})
-							.then(async (collected) => {
-								let input = collected.first().content.split(" ")[0].toLowerCase();
-								let channel = await findChannel(input, message.guild.channels.cache);
-								if (!channel || channel.type !== "text") {
-									message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-									return setup(4);
-								}
-								let perms = channelPermissions(channel.permissionsFor(client.user.id), "staff", client);
-								if (perms.length > 0) {
-									let reviewChannelPermissionsMissingEmbed = new Discord.MessageEmbed()
-										.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
-										.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-										.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-										.setColor(colors.red);
-									message.channel.send(reviewChannelPermissionsMissingEmbed);
-									return setup(4);
-								}
-								qServerDB.config.channels.staff = channel.id;
-								await dbModify("Server", {id: message.guild.id}, qServerDB);
-								message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the suggestion review channel.`);
-								return setup(5);
-							}).catch(e => {
-								console.log(e);
-								return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-							});
-					});
+				if (db.config.mode === "review") {
+					let reviewChannelEmbed = setupEmbed(string(locale, "CFG_REVIEW_CHANNEL_TITLE"), string(locale, "SETUP_REVIEW_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 5);
+					await message.channel.send(reviewChannelEmbed);
+					let returnCollect = await awaitMessage(message);
+					if (returnCollect.content) {
+						let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
+						if (!content.startsWith(`<:${emoji.check}>`)) return setup(4);
+						return setup(5);
+					} else return;
 				} else return setup(5);
-				break;
 			case 5: {
 				//Denied channel
-				let deniedChannelEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("This is the channel where all denied or deleted suggestions are sent")
-					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name\nOr send `skip` to not set a denied suggestions channel (it is optional)", false)
-					.setFooter("You have 2 minutes to specify a denied suggestions channel");
-				message.channel.send("**SETUP: Denied Suggestions Channel**", deniedChannelEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							let input = collected.first().content.split(" ")[0].toLowerCase();
-							if (input === "none" || input === "skip") {
-								message.channel.send(`<:${emoji.check}> Skipped setting a denied suggestions channel`);
-								return setup(6);
-							}
-							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel || channel.type !== "text") {
-								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-								return setup(5);
-							}
-							let perms = channelPermissions(channel.permissionsFor(client.user.id), "denied", client);
-							if (perms.length > 0) {
-								let deniedChannelPermissionsMissingEmbed = new Discord.MessageEmbed()
-									.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
-									.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-									.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-									.setColor(colors.red);
-								message.channel.send(deniedChannelPermissionsMissingEmbed);
-								return setup(5);
-							}
-							qServerDB.config.channels.denied = channel.id;
-							await dbModify("Server", {id: message.guild.id}, qServerDB);
-							message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the denied suggestions channel.`);
-							return setup(6);
-						}).catch(e => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-						});
-				});
-				break;
+				let deniedChannelEmbed = setupEmbed(string(locale, "CFG_DENIED_CHANNEL_TITLE"), string(locale, "SETUP_DENIED_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 6);
+				await message.channel.send(deniedChannelEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					if (returnCollect.content.toLowerCase() === "skip") return setup(6);
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "denied", "denied", "CFG_DENIED_SET_SUCCESS")));
+					if (!content.startsWith(`<:${emoji.check}>`)) return setup(5);
+					return setup(6);
+				} else return;
 			}
 			case 6: {
 				//Logs
-				let logChannelEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("This is the channel where all actions on suggestions are logged")
-					.addField("Inputs", "You can send a channel #mention, channel ID, or channel name\nOr send `skip` to not set a log channel (it is optional)", false)
-					.setFooter("You have 2 minutes to specify a log channel");
-				message.channel.send("**SETUP: Log Channel**", logChannelEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							let input = collected.first().content.split(" ")[0].toLowerCase();
-							if (input === "none" || input === "skip") {
-								message.channel.send(`<:${emoji.check}> Skipped setting a log channel`);
-								return setup(7);
-							}
-							let channel = await findChannel(input, message.guild.channels.cache);
-							if (!channel || channel.type !== "text") {
-								message.channel.send(`<:${emoji.x}> I could not find a text channel based on your input! Please make sure to specify a **channel #mention**, **channel ID**, or **channel name**.`);
-								return setup(6);
-							}
-							let perms = channelPermissions(channel.permissionsFor(client.user.id), "log", client);
-							if (perms.length > 0) {
-								let logChannelPermissionsMissingEmbed = new Discord.MessageEmbed()
-									.setDescription(`This channel cannot be configured because ${client.user.username} is missing some permissions. ${client.user.username} needs the following permissions in the <#${channel.id}> channel:`)
-									.addField("Missing Elements", `<:${emoji.x}> ${perms.join(`\n<:${emoji.x}> `)}`)
-									.addField("How to Fix", `In the channel settings for <#${channel.id}>, make sure that **${client.user.username}** has a <:${emoji.check}> for the above permissions.`)
-									.setColor(colors.red);
-								message.channel.send(logChannelPermissionsMissingEmbed);
-								return setup(6);
-							}
-							await channel.createWebhook("Suggester Logs", {avatar: client.user.displayAvatarURL({format: "png"}), reason: "Create log channel from setup"}).then(async (webhook) => {
-								qServerDB.config.loghook = {};
-								qServerDB.config.loghook.id = webhook.id;
-								qServerDB.config.loghook.token = webhook.token;
-								qServerDB.config.channels.log = channel.id;
-
-								await dbModify("Server", {id: message.guild.id}, qServerDB);
-
-								message.channel.send(`<:${emoji.check}> Successfully set <#${channel.id}> as the log channel.`);
-								return setup(7);
-							}).catch(() => {
-								message.channel.send(`<:${emoji.x}> I was unable to create a webhook in the provided channel. Please make sure that you have less than 10 webhooks in the channel and try again.`);
-								return setup(6);
-							});
-						}).catch((e) => {
-							console.log(e);
-							return message.channel.send(`<:${emoji.x}> **Setup Timed Out**\nPlease restart setup`);
-						});
-				});
-				break;
+				let logChannelEmbed = setupEmbed(string(locale, "CFG_LOG_CHANNEL_TITLE"), string(locale, "SETUP_LOG_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 7);
+				await message.channel.send(logChannelEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					if (returnCollect.content.toLowerCase() === "skip") return setup(7);
+					let { content } = await message.channel.send((await handleChannelInput(locale, returnCollect.content, message.guild, "log", "log", "CFG_LOG_SET_SUCCESS")));
+					if (!content.startsWith(`<:${emoji.check}>`)) return setup(6);
+					return setup(7);
+				} else return;
 			}
 			case 7: {
 				//Prefix
-				let prefixEmbed = new Discord.MessageEmbed()
-					.setColor(colors.default)
-					.setDescription("This is the text you put before the command to trigger the bot.")
-					.addField("Inputs", "Any string with no spaces", false)
-					.setFooter("You have 2 minutes to specify a prefix");
-				message.channel.send("**SETUP: Prefix**", prefixEmbed).then(msg => {
-					msg.channel.awaitMessages(response => response.author.id === message.author.id, {
-						max: 1,
-						time: 120000,
-						errors: ["time"],
-					})
-						.then(async (collected) => {
-							let prefix = collected.first().content.split(" ")[0];
-							if (prefix.length > 20) {
-								message.channel.send(`<:${emoji.x}> Your prefix must be 20 characters or less.`);
-								return setup(7);
-							}
-							let disallowed = ["suggester:", `${client.user.id}:`];
-							if (disallowed.includes(prefix.toLowerCase())) {
-								message.channel.send(`<:${emoji.x}> This prefix is disallowed, please choose a different one.`);
-								return setup(7);
-							}
+				let prefixEmbed = setupEmbed(string(locale, "CFG_PREFIX_TITLE"), string(locale, "SETUP_PREFIX_DESC"), string(locale, "SETUP_PREFIX_INPUT"), 8);
+				await message.channel.send(prefixEmbed);
+				let returnCollect = await awaitMessage(message);
+				if (returnCollect.content) {
+					let prefix = returnCollect.content.toLowerCase().split(" ")[0];
 
-							qServerDB.config.prefix = prefix.toLowerCase();
-							await dbModify("Server", {id: message.guild.id}, qServerDB);
-							message.channel.send(`<:${emoji.check}> Successfully set this server's prefix to ${prefix.toLowerCase()}`);
+					if (prefix.length > 20) {
+						message.channel.send(string(locale, "CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
+						return setup(7);
+					}
+					let disallowed = ["suggester:", `${client.user.id}:`];
+					if (disallowed.includes(prefix)) {
+						message.channel.send(string(locale, "CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
+						return setup(7);
+					}
+					
+					// eslint-disable-next-line no-inner-declarations
+					async function savePrefix(p) {
+						db.config.prefix = p;
+						await dbModify("Server", {id: message.guild.id}, db);
+						return message.channel.send(string(locale, "CFG_PREFIX_SET_SUCCESS", { prefix: Discord.escapeMarkdown(p) }, "success"));
+					}
+					if (prefix.includes("suggest")) {
+						if ((await confirmation(
+							message,
+							string(locale, "SETUP_PREFIX_INCLUDES_SUGGEST", { prefix: prefix, check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+							{
+								deleteAfterReaction: true
+							}
+						)
+						)) {
+							await savePrefix(prefix);
 							return setup(8);
-						});
-				});
-				break;
+						} else return setup(7);
+					} else {
+						await savePrefix(prefix);
+						return setup(8);
+					}
+				} else return;
 			}
 			case 8: {
 				let doneEmbed = new Discord.MessageEmbed()
-					.setTitle("Setup Complete!")
+					.setTitle(string(locale, "SETUP_COMPLETE_HEADER"))
 					.setColor(colors.default)
-					.setDescription(`Suggester should now work in your server, try it out with **${Discord.escapeMarkdown(qServerDB.config.prefix)}suggest**!`)
-					.addField("Additional Configuration", "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.js.org/#/admin/config for more information.");
-				message.channel.send(doneEmbed);
-				break;
+					.setDescription(string(locale, "SETUP_COMPLETE_DESC", { prefix: Discord.escapeMarkdown(db.config.prefix) }))
+					.addField(string(locale, "SETUP_ADDITIONAL_CONFIG_HEADER"), string(locale, "SETUP_ADDITIONAL_CONFIG_DESC"));
+				return message.channel.send(doneEmbed);
 			}
+			default:
+				return message.channel.send("ERROR", {}, "error");
 			}
 		}
 
 		let qServerDB = await dbQuery("Server", {id: message.guild.id});
+		let check = await checkConfig(locale, qServerDB);
 
-		if (qServerDB) {
-			message.channel.send(`⚠️ Your server already has some configuration elements specified. ⚠️\n**This setup will overwrite your previous configuration, and this choice is final.**\n\nIf you would still like to continue with setup, click the <:${emoji.check}> reaction. If you would like to abort setup, click the <:${emoji.x}> reaction.`).then(async (checkMsg) => {
-				await checkMsg.react(emoji.check);
-				await checkMsg.react(emoji.x);
-				let checkMatches = emoji.check.match(/[a-z0-9~-]+:([0-9]+)/i)[1] || null;
-				let xMatches = emoji.x.match(/[a-z0-9~-]+:([0-9]+)/i)[1] || null;
-
-				const filter = (reaction, user) =>
-					(reaction.emoji.id === checkMatches || reaction.emoji.id === xMatches) &&
-					user.id === message.author.id;
-				await checkMsg
-					.awaitReactions(filter, {
-						time: 15000,
-						max: 1,
-						errors: ["time"]
-					})
-					.then(async (collected) => {
-						if (collected.first().emoji.id === xMatches) {
-							return checkMsg.edit(`<:${emoji.x}> **Setup Cancelled**`);
-						} else {
-							checkMsg.delete();
-							let oldWhitelist = qServerDB.whitelist;
-							await dbDeleteOne("Server", {id: message.guild.id});
-
-							await new Server({
-								id: message.guild.id,
-								blocked: false,
-								whitelist: oldWhitelist,
-								config: {
-									prefix: ".",
-									admin_roles: [],
-									staff_roles: [],
-									channels: {
-										suggestions: "",
-										staff: "",
-										log: "",
-										denied: ""
-									},
-									notify: true,
-									react: true,
-									mode: "review",
-									emojis: {
-										up: "👍",
-										mid: "🤷",
-										down: "👎"
-									},
-									loghook: {
-										id: "",
-										token: ""
-									}
-								}
-							}).save();
-
-							setup(0);
-						}
-					});
-			});
-		} else {
-			await new Server({
-				id: message.guild.id,
-				blocked: false,
-				whitelist: false,
-				config: {
-					prefix: ".",
-					admin_roles: [],
-					staff_roles: [],
-					channels: {
-						suggestions: "",
-						staff: "",
-						log: "",
-						denied: ""
-					},
-					notify: true,
-					react: true,
-					mode: "review",
-					emojis: {
-						up: "👍",
-						mid: "🤷",
-						down: "👎"
-					},
-					loghook: {
-						id: "",
-						token: ""
-					}
-				}
-			}).save();
-			setup(0);
+		async function start (startAt=0) {
+			let oldWhitelist = qServerDB.whitelist;
+			await dbDeleteOne("Server", {id: message.guild.id}); //Delete old config
+			await new Server({ id: message.guild.id }).save();
+			if (oldWhitelist) {
+				qServerDB.whitelist = oldWhitelist;
+				await dbModify("Server", {id: message.guild.id}, qServerDB); //Add whitelist if previous
+			}
+			return setup(startAt);
 		}
 
+		let startAt = client.admins.has(message.author.id) && args[0] && parseInt(args[0]) ? parseInt(args[0]) : 0;
+
+		if (!check) {
+			if ((
+				await confirmation(
+					message,
+					string(locale, "SETUP_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+					{
+						denyMessage: string(locale, "SETUP_CANCELLED", {}, "error"),
+						confirmMessage: string(locale, "SETUP_BEGIN"),
+						keepReactions: false
+					}
+				)
+			)) await start(startAt);
+		} else await start(startAt);
 	}
 };

@@ -1,5 +1,10 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, dbQueryNoNew, checkConfig, checkChannel, dbModify, suggestionEmbed, serverLog } = require("../../coreFunctions.js");
+const { colors } = require("../../config.json");
+const { suggestionEditCommandCheck } = require("../../utils/checks");
+const { editFeedMessage } = require("../../utils/actions");
+const { serverLog } = require("../../utils/logs");
+const { dbModify } = require("../../utils/db");
+const { string } = require("../../utils/strings");
+const { logEmbed } = require("../../utils/misc");
 module.exports = {
 	controls: {
 		name: "removeattachment",
@@ -12,64 +17,33 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},
-	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
-
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let missingPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPerms !== true) return message.channel.send(missingPerms);
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
-
-		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
-
-		let id = qSuggestionDB.suggestionId;
-
-		if (!qSuggestionDB.attachment) return message.channel.send(`<:${emoji.x}> This suggestion does not have an attachment!`);
+		if (!qSuggestionDB.attachment) return message.channel.send(string(locale, "NO_ATTACHMENT_REMOVE_ERROR", {}, "error"));
 		let oldAttachment = qSuggestionDB.attachment;
-		qSuggestionDB.attachment = "";
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
+		qSuggestionDB.attachment = null;
+		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		if (editFeed) return message.channel.send(editFeed);
 
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		let messageEdited;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			f.edit(suggestionEditEmbed);
-			messageEdited = true;
-		}).catch(() => messageEdited = false);
-
-		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle("Attachment Removed")
-			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setTitle(string(locale, "ATTACHMENT_REMOVED_TITLE"))
+			.setDescription(oldAttachment)
 			.setImage(oldAttachment)
 			.setColor(colors.orange)
-			.setFooter(`Suggestion ID: ${id.toString()}`);
+			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
+			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
-
-
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(`${message.author.tag} removed attachment from #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.setImage(oldAttachment)
-				.setFooter(`Suggestion ID: ${id.toString()} | Staff Member ID: ${message.author.id}`)
-				.setTimestamp()
-				.setColor(colors.orange);
-			serverLog(logEmbed, qServerDB, client);
+			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ATTACH_REMOVE_LOG", "orange")
+				.addField(string(locale, "ATTACHMENT_REMOVED_TITLE"), oldAttachment)
+				.setImage(oldAttachment);
+
+			serverLog(embedLog, qServerDB, client);
 		}
 	}
 };

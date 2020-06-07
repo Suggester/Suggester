@@ -1,5 +1,10 @@
-const { dbQuery, dbModify, checkConfig, checkChannel, fetchUser, serverLog, suggestionEmbed, dbQueryNoNew } = require("../../coreFunctions.js");
-const { emoji, colors, prefix } = require("../../config.json");
+const { colors } = require("../../config.json");
+const { editFeedMessage } = require("../../utils/actions");
+const { serverLog } = require("../../utils/logs");
+const { dbModify, dbQueryNoNew } = require("../../utils/db");
+const { string } = require("../../utils/strings");
+const { baseConfig, checkSuggestions } = require("../../utils/checks");
+const { fetchUser, logEmbed } = require("../../utils/misc");
 module.exports = {
 	controls: {
 		name: "deletecomment",
@@ -12,68 +17,58 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},
-	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
+		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let missingPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPerms !== true) return message.channel.send(missingPerms);
-
-		if (!args[0]) return message.channel.send(`<:${emoji.x}> You must specify a comment ID!`);
+		if (!args[0]) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
 		let idsections = args[0].split("_");
-		if (!idsections[0] || !idsections[1]) return message.channel.send(`<:${emoji.x}> You must specify a valid comment ID!`);
+		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
+		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
 
-		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
+		if (qSuggestionDB.implemented) return message.channel.send(string(locale, "SUGGESTION_IMPLEMENTED_ERROR", {}, "error"));
 
 		let id = qSuggestionDB.suggestionId;
 
 		let comment = qSuggestionDB.comments.find(comment => comment.id === idsections[1]) || null;
-		if (!comment) return message.channel.send(`<:${emoji.x}> You must specify a valid comment ID!`);
+		if (!comment) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
+		if (comment.deleted) return message.channel.send(string(locale, "COMMENT_ALREADY_DELETED_ERROR", {}, "error"));
 
-		if (comment.deleted) return message.channel.send(`<:${emoji.x}> This comment has already been deleted!`);
+		comment.deleted = true;
 
-		qSuggestionDB.comments.find(comment => comment.id === idsections[1]).deleted = true;
+		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		if (editFeed) return message.channel.send(editFeed);
+
+		let author = await fetchUser(comment.author, client);
+		if (!author) return message.channel.send(string(locale, "ERROR", {}, "error"));
+
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		let messageEdited;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			f.edit(suggestionEditEmbed);
-			messageEdited = true;
-		}).catch(() => messageEdited = false);
-
-		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
-
-		let commentAuthor = await fetchUser(comment.author, client);
-		let embed = new Discord.MessageEmbed()
-			.setTitle("Comment Deleted")
-			.setDescription(comment.comment)
+		let replyEmbed = new Discord.MessageEmbed()
+			.setTitle(string(locale, "COMMENT_DELETED_TITLE"))
+			.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
 			.setColor(colors.red)
-			.setFooter(`Comment ID: ${id}_${comment.id}`);
-		commentAuthor ? embed.setAuthor(`Comment from ${commentAuthor.tag}`, commentAuthor.displayAvatarURL({format: "png", dynamic: true})) : embed.setAuthor("Comment from Anonymous User");
-		message.channel.send(embed);
+			.setTimestamp();
+		message.channel.send(replyEmbed);
+
+		if (qServerDB.config.channels.log) {
+			let logs = logEmbed(locale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")
+				.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment);
+
+			serverLog(logs, qServerDB, client);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.addField("Comment", comment.comment)
-				.setFooter(`Suggestion ID: ${id.toString()} | Deleter ID: ${message.author.id}`)
+				.setAuthor(string(locale, "DELETED_COMMENT_LOG", { user: message.author.tag, id: id, comment: `${id}_${comment.id}` }), message.author.displayAvatarURL({ format: "png", dynamic: true }))
+				.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
+				.setFooter(string(locale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id, user: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.red);
-			commentAuthor ? logEmbed.setAuthor(`${message.author.tag} deleted ${commentAuthor.tag}'s comment #${comment.id} from suggestion #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true})) : logEmbed.setAuthor(`${message.author.tag} deleted comment #${comment.id} from suggestion #${id.toString()}`);
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}

@@ -115,3 +115,5 @@ commands/test.js
 utils/testSchemas.js
 /persistent.json
 watch.json
+i18n/
+/test.md

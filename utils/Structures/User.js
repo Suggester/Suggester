@@ -1,5 +1,5 @@
 const { Structures: { extend } } = require("discord.js");
-const { dbQueryNoNew } = require("../../coreFunctions");
+const { dbQueryNoNew } = require("../db");
 
 extend("User", (GM) => {
 	return class extends GM {
@@ -7,6 +7,20 @@ extend("User", (GM) => {
 			super(client, data);
 			this._client = client;
 			this.data = data;
+		}
+
+		get unknown () {
+			return ({
+				username: "Unknown User",
+				id: "0",
+				tag: "Unknown User#0000",
+				displayAvatarURL () {
+					return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
+				},
+				send () {
+					return null;
+				}
+			});
 		}
 
 		get db () {

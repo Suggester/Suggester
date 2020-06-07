@@ -1,16 +1,15 @@
 require("dotenv").config();
 
-// init the extended structures
-require("./utils/Structures/GuildMember");
-require("./utils/Structures/User");
-require("./utils/Structures/Guild");
-
 const Discord = require("discord.js");
-const { errorLog, fileLoader } = require("./coreFunctions.js");
+const Client = require("./utils/Client");
+const chalk = require("chalk");
+const { errorLog } = require("./utils/logs");
+const { fileLoader } = require("./utils/misc.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
 const { basename } = require("path");
 const { presence } = require("./persistent.json");
+const fs = require("fs");
 if (process.env.SENTRY_DSN) {
 	const {init} = require("@sentry/node");
 	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
@@ -18,32 +17,46 @@ if (process.env.SENTRY_DSN) {
 
 const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
 
-const client = new Discord.Client({
-	ws: { intents: intents},
+const client = new Client({
+	ws: { intents: intents },
 	disableMentions: "everyone",
-	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" }
+	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" },
+	messageCacheLifetime: 120,
+	messageSweepInterval: 300
 });
+
+if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);
+if (!process.env.MONGO) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.MONGO}}\n{red {bold Shutting Down}}`);
+
 
 connect(process.env.MONGO, {
 	useNewUrlParser: true,
-	useUnifiedTopology: true
+	useUnifiedTopology: true,
+	useFindAndModify: false
 })
 	.catch((err) => {
-		throw new Error(err);
+		console.log(chalk`{red [{bold DATABASE}] Connection error: ${err.stack}}`);
 	});
+
 autoIncrement(connection);
+
 connection.on("open", () => {
-	console.log("Connected to MongoDB!");
-});
-connection.on("error", (err) => {
-	console.error("Connection error: ", err);
+	console.log(chalk`{gray [{bold DATABASE}] {bold Connected} to {bold MongoDB}!}`);
 });
 
-client.commands = new Discord.Collection();
-client.cooldowns = new Discord.Collection();
+connection.on("error", (err) => {
+	console.log(chalk`{red [{bold DATABASE}] Error: ${err.stack}}`);
+});
+
 (async () => {
 	let eventFiles = await fileLoader("events");
+	let events = [];
 	for await (let file of eventFiles) {
+		const exclude = [];
+		if (exclude.includes(basename(file))) {
+			console.log("Skipping excluded file:", file);
+			continue;
+		}
 		if (!file.endsWith(".js")) continue;
 
 		let event = require(file);
@@ -57,8 +70,10 @@ client.cooldowns = new Discord.Collection();
 				errorLog(err, "Event Handler", `Event: ${eventName}`);
 			}
 		});
-		console.log("[Event] Loaded", eventName);
+		events.push(eventName);
+		//console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${eventName}}}`);
 	}
+	console.log(chalk`{yellow [{bold EVENT}] Loaded {bold ${events.length} events}}`);
 
 	let commandFiles = await fileLoader("commands");
 	for await (let file of commandFiles) {
@@ -68,12 +83,27 @@ client.cooldowns = new Discord.Collection();
 		let commandName = basename(file).split(".")[0];
 
 		client.commands.set(commandName, command);
-		console.log("[Command] Loaded", commandName);
+		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
 	}
+	console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${client.commands.size} commands}}`);
+
+	fs.access("i18n", async function(error) {
+		if (error) console.log("Locales folder missing, please run `locales pull`");
+		else {
+			fs.readdir("i18n", (err, files) => {
+				files.forEach(file => {
+					if (!file.endsWith(".json")) return;
+					const localeCode = file.split(".")[0]; //Command to check against
+					const locale = require("./i18n/" + localeCode); //Command file
+					client.locales.set(localeCode, locale);
+				});
+			});
+		}
+	});
 })();
 
 client.login(process.env.TOKEN)
-	.catch(console.error);
+	.catch((err) => console.log(chalk`{cyan [{bold DISCORD}] Error logging in: ${err.stack}}`));
 
 client.on("error", (err) => {
 	errorLog(err, "error", "something happened and idk what");

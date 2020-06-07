@@ -1,5 +1,10 @@
-const { emoji, colors, prefix } = require("../../config.json");
-const { dbQuery, serverLog, fetchUser, dbModify, suggestionEmbed, dbQueryNoNew, checkConfig, checkChannel } = require("../../coreFunctions.js");
+const { colors } = require("../../config.json");
+const { string } = require("../../utils/strings");
+const { fetchUser, dmEmbed, logEmbed } = require("../../utils/misc");
+const { serverLog } = require("../../utils/logs");
+const { dbQuery, dbModify } = require("../../utils/db");
+const { suggestionEditCommandCheck } = require("../../utils/checks");
+const { editFeedMessage } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "acomment",
@@ -12,40 +17,17 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},
-	do: async (message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		if (!qServerDB) return message.channel.send(`<:${emoji.x}> You must configure your server to use this command. Please use the \`${prefix}setup\` command.`);
+	do: async (locale, message, client, args, Discord) => {
+		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
+		if (returned) return message.channel.send(returned);
 
-		let missing = checkConfig(qServerDB);
+		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error"));
 
-		if (missing.length > 1) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(`This command cannot be run because some server configuration elements are missing. A server manager can fix this by using the \`${Discord.escapeMarkdown(qServerDB.config.prefix)}config\` command.`)
-				.addField("Missing Elements", `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red);
-			return message.channel.send(embed);
-		}
-
-		let missingPerms = checkChannel(qServerDB.config.channels.suggestions, message.guild.channels.cache, "suggestions", client);
-		if (!missingPerms) return message.channel.send(`<:${emoji.x}> Could not find your suggestions channel! Please make sure you have configured a suggestions channel.`);
-		if (missingPerms !== true) return message.channel.send(missingPerms);
-
-		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(`<:${emoji.x}> Please provide a valid suggestion ID!`);
-
-		let id = qSuggestionDB.suggestionId;
-
-		if (qSuggestionDB.status !== "approved") return message.channel.send(`<:${emoji.x}> Comments can only be added to approved suggestions!`);
-
-		if (qSuggestionDB.implemented) return message.channel.send(`<:${emoji.x}> This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.`);
-
-		if (!args[1]) return message.channel.send(`<:${emoji.x}> You must provide a comment!`);
-
-		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(`<:${emoji.x}> Suggestions can only have up to 23 comments.`);
+		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR", {}, "error"));
 
 		let comment = args.splice(1).join(" ");
 
-		if (comment.length > 1024) return message.channel.send(`<:${emoji.x}> Comments cannot be longer than 1024 characters.`);
+		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
 
 		qSuggestionDB.comments.push({
 			comment: comment,
@@ -53,51 +35,31 @@ module.exports = {
 			id: qSuggestionDB.comments.length+1,
 			created: new Date()
 		});
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(`<:${emoji.x}> The suggesting user could not be fetched! Please try again.`);
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
-		let suggestionEditEmbed = await suggestionEmbed(qSuggestionDB, qServerDB, client);
-		let messageEdited;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			f.edit(suggestionEditEmbed);
-			messageEdited = true;
-		}).catch(() => messageEdited = false);
+		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		if (editFeed) return message.channel.send(editFeed);
 
-		if (!messageEdited) return message.channel.send(`<:${emoji.x}> There was an error editing the suggestion feed message. Please check that the suggestion feed message exists and try again.`);
+		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
-			.setTitle("Anonymous Comment Added")
-			.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-			.addField("Official Comment", comment)
+			.setTitle(string(locale, "ANONYMOUS_COMMENT_ADDED_TITLE"))
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.addField(string(locale, "COMMENT_TITLE_ANONYMOUS"), comment)
 			.setColor(colors.blue)
-			.setFooter(`Suggestion ID: ${id.toString()}`);
+			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
+			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		let selfNotify;
-		if (suggester.id === message.author.id) qUserDB.selfnotify ? selfNotify = true : selfNotify = false;
-		else selfNotify = true;
-		if (qServerDB.config.notify && qUserDB.notify && selfNotify) {
-			let dmEmbed = new Discord.MessageEmbed()
-				.setTitle(`A comment was added to your suggestion in **${message.guild.name}**!`)
-				.setDescription(`${qSuggestionDB.suggestion || "[No Suggestion Content]"}\n[Suggestions Feed Post](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
-				.addField("Official Comment", comment)
-				.setColor(colors.blue)
-				.setFooter(`Suggestion ID: ${id.toString()}`);
-			suggester.send(dmEmbed).catch(() => {});
-		}
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE_ANONYMOUS"), reason: comment }))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(`${message.author.tag} added an anonymous comment to #${id.toString()}`, message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.addField("Suggestion", qSuggestionDB.suggestion || "[No Suggestion Content]")
-				.addField("Comment", comment)
-				.setFooter(`Suggestion ID: ${id.toString()} | Commenter ID: ${message.author.id}`)
-				.setTimestamp()
-				.setColor(colors.blue);
-			serverLog(logEmbed, qServerDB, client);
+			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")
+				.addField(string(locale, "COMMENT_TITLE_ANONYMOUS"), comment);
+			serverLog(embedLog, qServerDB, client);
 		}
 	}
 };
