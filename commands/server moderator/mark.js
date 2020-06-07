@@ -10,7 +10,7 @@ module.exports = {
 		name: "mark",
 		permission: 3,
 		aliases: ["status"],
-		usage: "mark <suggestion id> <status>",
+		usage: "mark <suggestion id> <status> (comment)",
 		description: "Marks a status for a suggestion",
 		image: "images/Mark.gif",
 		enabled: true,
