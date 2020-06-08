@@ -23,7 +23,7 @@ module.exports = async (Discord, client) => {
 		blapi.manualPost(totalGuildCount, client.user.id, lists, null, guildCounts.length, guildCounts);
 	}
 
-	if (client.user.id === "564426594144354315" && client.shard.ids[0] === client.shard.count-1 && process.NODE_ENV === "production" && lists) {
+	if (client.user.id === "564426594144354315" && client.shard.ids[0] === client.shard.count-1 && process.env.NODE_ENV === "production" && lists) {
 		await post();
 		setInterval(async function() {
 			await post();
