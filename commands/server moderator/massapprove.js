@@ -2,7 +2,7 @@ const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbQuery } = require("../../utils/db");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { Suggestion } = require("../../utils/schemas");
 module.exports = {
@@ -21,6 +21,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
@@ -75,7 +76,7 @@ module.exports = {
 		let postApprove = await Suggestion.find({ id: message.guild.id, suggestionId: { $in: su } });
 		let approved = postApprove.filter((s) => s.status === "approved" && !notApprovedId.includes(s.suggestionId));
 		let approvedId = approved.map((s) => s.suggestionId);
-		
+
 		await msg.edit(
 			new Discord.MessageEmbed()
 				.setDescription(string(locale, "MASS_APPROVE_SUCCESS_TITLE", { some: nModified.toString(), total: postApprove.length }, nModified !== 0 ? "success" : "error"))
@@ -89,20 +90,9 @@ module.exports = {
 			if (approved.hasOwnProperty(s)) {
 				let qSuggestionDB = approved[s];
 				let suggester = await fetchUser(qSuggestionDB.suggester, client);
-				let embedSuggest = await suggestionEmbed(locale, qSuggestionDB, qServerDB, client);
+				let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 				client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
 					qSuggestionDB.messageId = posted.id;
-					let qUserDB = await dbQuery("User", {id: suggester.id});
-					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "green", {
-						string: "APPROVED_DM_TITLE",
-						guild: message.guild.name
-					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, reason ? {
-						header: string(locale, "COMMENT_TITLE", {
-							user: message.author.tag,
-							id: `${qSuggestionDB.suggestionId.toString()}_1`
-						}), reason: reason
-					} : null))).catch(() => {
-					});
 
 					if (qServerDB.config.react) {
 						let reactEmojiUp = qServerDB.config.emojis.up;
@@ -120,33 +110,43 @@ module.exports = {
 							await posted.react("👎");
 							reactEmojiDown = "👎";
 						});
-						await dbModify("Suggestion", {suggestionId: qSuggestionDB.suggestionId}, {
-							emojis: {
-								up: reactEmojiUp,
-								mid: reactEmojiDown,
-								down: reactEmojiDown
-							}
-						});
+						qSuggestionDB.emojis = {
+							up: reactEmojiUp,
+							mid: reactEmojiMid,
+							down: reactEmojiDown
+						};
 					}
+
+					let qUserDB = await dbQuery("User", { id: suggester.id });
+					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "green", {
+						string: "APPROVED_DM_TITLE",
+						guild: message.guild.name
+					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, reason ? {
+						header: string(locale, "COMMENT_TITLE", {
+							user: message.author.tag,
+							id: `${qSuggestionDB.suggestionId.toString()}_1`
+						}), reason: reason
+					} : null))).catch(() => {
+					});
 
 					if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));
 
 					if (qServerDB.config.channels.log) {
-						let embedLog = logEmbed(locale, qSuggestionDB, message.author, "APPROVED_LOG", "green")
-							.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
-						reason ? embedLog.addField(string(locale, "COMMENT_TITLE", {
+						let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "APPROVED_LOG", "green")
+							.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
+						reason ? embedLog.addField(string(guildLocale, "COMMENT_TITLE", {
 							user: message.author.tag,
 							id: `${qSuggestionDB.suggestionId.toString()}_1`
 						}), reason) : "";
 						if (qSuggestionDB.attachment) {
-							embedLog.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
+							embedLog.addField(string(guildLocale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
 								.setImage(qSuggestionDB.attachment);
 						}
 
 						serverLog(embedLog, qServerDB, client);
 					}
 
-					if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "green", string(locale, "APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
+					if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
 					await approved[s].save();
 				});
 			}

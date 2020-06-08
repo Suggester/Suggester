@@ -20,11 +20,12 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (!qSuggestionDB.attachment) return message.channel.send(string(locale, "NO_ATTACHMENT_REMOVE_ERROR", {}, "error"));
 		let oldAttachment = qSuggestionDB.attachment;
 		qSuggestionDB.attachment = null;
-		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
@@ -39,8 +40,8 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {
-			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ATTACH_REMOVE_LOG", "orange")
-				.addField(string(locale, "ATTACHMENT_REMOVED_TITLE"), oldAttachment)
+			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "ATTACH_REMOVE_LOG", "orange")
+				.addField(string(guildLocale, "ATTACHMENT_REMOVED_TITLE"), oldAttachment)
 				.setImage(oldAttachment);
 
 			serverLog(embedLog, qServerDB, client);

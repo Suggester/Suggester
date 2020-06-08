@@ -82,9 +82,7 @@ module.exports = {
 
 		let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 		client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
-			await dbModify("Suggestion", { suggestionId: id }, { messageId: posted.id });
-			let qUserDB = await dbQuery("User", { id: suggester.id });
-			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
+			qSuggestionDB.messageId = posted.id;
 
 			if (qServerDB.config.react) {
 				let reactEmojiUp = qServerDB.config.emojis.up;
@@ -102,14 +100,15 @@ module.exports = {
 					await posted.react("👎");
 					reactEmojiDown = "👎";
 				});
-				await dbModify("Suggestion", { suggestionId: id }, {
-					emojis: {
-						up: reactEmojiUp,
-						mid: reactEmojiDown,
-						down: reactEmojiDown
-					}
-				});
+				qSuggestionDB.emojis = {
+					up: reactEmojiUp,
+					mid: reactEmojiMid,
+					down: reactEmojiDown
+				};
 			}
+			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+			let qUserDB = await dbQuery("User", { id: suggester.id });
+			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
 		});
 
 		if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));

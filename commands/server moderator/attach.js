@@ -20,6 +20,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (qSuggestionDB.attachment) return message.channel.send(string(locale, "ALREADY_ATTACHMENT_ERROR", {}, "error"));
 
@@ -31,7 +32,7 @@ module.exports = {
 
 		qSuggestionDB.attachment = attachment;
 
-		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
@@ -46,8 +47,8 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {
-			let embedLog = logEmbed(locale, qSuggestionDB, message.author, "ATTACHED_LOG", "blue")
-				.addField(string(locale, "ATTACHMENT_ADDED_HEADER"), attachment)
+			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "ATTACHED_LOG", "blue")
+				.addField(string(guildLocale, "ATTACHMENT_ADDED_HEADER"), attachment)
 				.setImage(attachment);
 			serverLog(embedLog, qServerDB, client);
 		}

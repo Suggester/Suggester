@@ -3,15 +3,15 @@ const { string } = require("./strings");
 const { emoji } = require("../config.json");
 const Discord = require("discord.js");
 module.exports = {
-	editFeedMessage: async function(locale, qSuggestionDB, qServerDB, client) {
-		let suggestionEditEmbed = await suggestionEmbed(locale, qSuggestionDB, qServerDB, client);
+	editFeedMessage: async function({ guild, user }, qSuggestionDB, qServerDB, client) {
+		let suggestionEditEmbed = await suggestionEmbed(guild, qSuggestionDB, qServerDB, client);
 		let messageEdited;
 		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
 			messageEdited = true;
 		}).catch(() => messageEdited = false);
 
-		if (!messageEdited) return string(locale, "SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error");
+		if (!messageEdited) return string(user, "SUGGESTION_FEED_MESSAGE_NOT_EDITED_ERROR", {}, "error");
 	},
 	deleteFeedMessage: async function(locale, qSuggestionDB, qServerDB, client) {
 		let messageDeleted;
@@ -161,14 +161,14 @@ module.exports = {
 		});
 	},
 	checkVotes: function(locale, qSuggestionDB, msg) {
+		if (!msg || !msg.reactions || !msg.reactions.cache) return [null, null, null];
 		const nodeEmoji = require("node-emoji");
 		function getEmoji (input) {
 			if (nodeEmoji.find(input)) return input;
 			else return input.match(/[a-zA-Z0-9-_]+:([0-9]+)/)[1] || null;
 		}
-		let upCount = string(locale, "UNKNOWN");
-		let downCount = string(locale, "UNKNOWN");
-		if (!msg || !msg.reactions || !msg.reactions.cache) return [null, null, null];
+		let upCount;
+		let downCount;
 		let upReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.up));
 		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
 		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;

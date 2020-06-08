@@ -19,6 +19,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (!args[0]) return message.channel.send(string(locale, "BLACKLIST_NO_ARGS_ERROR", {}, "error"));
 
@@ -39,13 +40,13 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string(locale, "UNBLACKLIST_LOG_TITLE", { staff: message.author.tag, user: user.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(string(locale, "BLACKLIST_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
-				.setFooter(string(locale, "STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
+				.setAuthor(string(guildLocale, "UNBLACKLIST_LOG_TITLE", { staff: message.author.tag, user: user.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
+				.setDescription(string(guildLocale, "BLACKLIST_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
+				.setFooter(string(guildLocale, "STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.green);
 
-			reason ? logEmbed.addField(string(locale, "BLACKLIST_REASON_HEADER"), reason) : null;
+			reason ? logEmbed.addField(string(guildLocale, "BLACKLIST_REASON_HEADER"), reason) : null;
 			serverLog(logEmbed, qServerDB, client);
 		}
 	}
