@@ -49,7 +49,10 @@ module.exports = {
 			.setAuthor(commandName, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
 		commandInfo.aliases ? returnEmbed.addField(string(locale, commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") returnEmbed.addField(string(locale, "HELP_DOCUMENTATION"), `https://suggester.js.org/#/${commandInfo.docs}`);
+		if (commandInfo.docs && commandInfo.docs !== "") {
+			let localeFull = client.locales.find(l => l.settings.code === locale);
+			returnEmbed.addField(string(locale, "HELP_DOCUMENTATION"), `${localeFull.settings.docs || "https://suggester.js.org/#/"}${commandInfo.docs}`);
+		}
 		if (!commandInfo.enabled) returnEmbed.addField(string(locale, "HELP_ADDITIONAL_INFO"), `⚠️ ${string(locale, "COMMAND_DISABLED")}`);
 
 		if (commandInfo.image) returnEmbed.attachFiles([new MessageAttachment(commandInfo.image, `image.${commandInfo.image.split(".")[1]}`)]).setImage(`attachment://image.${commandInfo.image.split(".")[1]}`);
