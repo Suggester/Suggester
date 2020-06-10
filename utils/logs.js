@@ -73,6 +73,7 @@ module.exports = {
 	},
 	joinLeaveLog: async function (guild, action) {
 		let document = {
+			date: Date.now(),
 			id: guild.id,
 			action
 		};
@@ -87,7 +88,6 @@ module.exports = {
 		else if (action === "leave" && maxJoins === 0) document.timesJoined = 1;
 		else document.timesJoined = maxJoins;
 
-		console.log(document);
 		return new models.ServerLog(document).save();
 	},
 	commandExecuted: function (command, message, { pre, post, success } = { pre: 0, post: 0, success: false }) {
@@ -100,6 +100,7 @@ module.exports = {
 			guild: message.guild.id,
 			channel: message.channel.id,
 			message: message.id,
+			date: Date.now(),
 
 			executionTime: Number(post) - Number(pre),
 			success: success
