@@ -20,6 +20,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
 			let reviewCheck = checkReview(locale, message.guild, qServerDB);
@@ -64,28 +65,28 @@ module.exports = {
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()
-				.setTitle(string(locale, "SUGGESTION_DELETED_TITLE"))
-				.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+				.setTitle(string(guildLocale, "SUGGESTION_DELETED_TITLE"))
+				.setAuthor(string(guildLocale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 				.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
-				.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-				.setFooter(string(locale, "SUGGESTION_FOOTER", {id: id.toString()}))
+				.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"))
+				.setFooter(string(guildLocale, "SUGGESTION_FOOTER", {id: id.toString()}))
 				.setTimestamp(qSuggestionDB.submitted)
 				.setColor(colors.red);
-			reason ? deniedEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
-			let votes = checkVotes(locale, qSuggestionDB, deleteMsg[1]);
-			if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
+			reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
+			let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
+			if (votes[0] || votes[1]) deniedEmbed.addField(string(guildLocale, "VOTE_TOTAL_HEADER"), `${string(guildLocale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(guildLocale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(guildLocale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(guildLocale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 
 		if (qServerDB.config.channels.log) {
-			let logs = logEmbed(locale, qSuggestionDB, message.author, "DELETED_LOG", "red")
-				.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
+			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")
+				.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
-			reason ? logs.addField(string(locale, "REASON_GIVEN"), reason) : "";
+			reason ? logs.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			if (qSuggestionDB.attachment) {
 				logs.setImage(qSuggestionDB.attachment);
-				logs.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+				logs.addField(string(guildLocale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			}
 			serverLog(logs, qServerDB, client);
 		}

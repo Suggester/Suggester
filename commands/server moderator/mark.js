@@ -119,7 +119,7 @@ module.exports = {
 
 		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
 
-		let editFeed = await editFeedMessage(guildLocale, qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		let replyEmbed = new Discord.MessageEmbed()

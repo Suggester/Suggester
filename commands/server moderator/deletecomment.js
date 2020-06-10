@@ -20,6 +20,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
@@ -40,7 +41,7 @@ module.exports = {
 
 		comment.deleted = true;
 
-		let editFeed = await editFeedMessage(locale, qSuggestionDB, qServerDB, client);
+		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
 		let author = await fetchUser(comment.author, client);
@@ -56,17 +57,17 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		if (qServerDB.config.channels.log) {
-			let logs = logEmbed(locale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")
-				.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment);
+			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")
+				.addField(author.id !== "0" ? string(guildLocale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(guildLocale, "COMMENT_TITLE_ANONYMOUS"), comment.comment);
 
 			serverLog(logs, qServerDB, client);
 		}
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string(locale, "DELETED_COMMENT_LOG", { user: message.author.tag, id: id, comment: `${id}_${comment.id}` }), message.author.displayAvatarURL({ format: "png", dynamic: true }))
-				.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
-				.setFooter(string(locale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id, user: message.author.id }))
+				.setAuthor(string(guildLocale, "DELETED_COMMENT_LOG", { user: message.author.tag, id: id, comment: `${id}_${comment.id}` }), message.author.displayAvatarURL({ format: "png", dynamic: true }))
+				.addField(author.id !== "0" ? string(guildLocale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(guildLocale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
+				.setFooter(string(guildLocale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id, user: message.author.id }))
 				.setTimestamp()
 				.setColor(colors.red);
 			serverLog(logEmbed, qServerDB, client);

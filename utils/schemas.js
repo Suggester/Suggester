@@ -90,7 +90,7 @@ const command = new Schema({
 	channel: { type: String, required: true },
 	message: { type: String, required: true },
 
-	date: { type: Date, required: true, default: new Date() },
+	date: { type: Date, required: true },
 	executionTime: { type: Number, required: true }
 }/*, { capped: { size: 10000000 }}*/); // can be made into a capped collection if needed
 
@@ -99,7 +99,7 @@ const serverLog = new Schema({
 	action: { type: String, required: true },
 	joinedAt: { type: Date, required: false }, // if the bot left a server, when did it join?
 	timesJoined: { type: Number, required: false },
-	date: { type: Date, required: true, default: new Date() }
+	date: { type: Date, required: true }
 }/*, { capped: true, size: 10000000 }*/); // can be made into a capped collection if needed.
 
 module.exports = {

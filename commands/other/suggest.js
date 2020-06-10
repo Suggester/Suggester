@@ -149,7 +149,7 @@ module.exports = {
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
 				.send(embedSuggest)
 				.then(async (posted) => {
-					await dbModify("Suggestion", { suggestionId: id }, { messageId: posted.id });
+					qSuggestionDB.messageId = posted.id;
 
 					if (qServerDB.config.react) {
 						let reactEmojiUp = qServerDB.config.emojis.up;
@@ -167,14 +167,13 @@ module.exports = {
 							await posted.react("👎");
 							reactEmojiDown = "👎";
 						});
-						await dbModify("Suggestion", { suggestionId: id }, {
-							emojis: {
-								up: reactEmojiUp,
-								mid: reactEmojiDown,
-								down: reactEmojiDown
-							}
-						});
+						qSuggestionDB.emojis = {
+							up: reactEmojiUp,
+							mid: reactEmojiMid,
+							down: reactEmojiDown
+						};
 					}
+					await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 				});
 
 			let replyEmbed = new Discord.MessageEmbed()
@@ -192,11 +191,11 @@ module.exports = {
 			});
 
 			if (qServerDB.config.channels.log) {
-				let embedLog = logEmbed(locale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", "green")
-					.setDescription(suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
+				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", "green")
+					.setDescription(suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 				if (attachment) {
 					embedLog.setImage(attachment)
-						.addField(string(locale, "WITH_ATTACHMENT_HEADER"), attachment);
+						.addField(string(guildLocale, "WITH_ATTACHMENT_HEADER"), attachment);
 				}
 
 				serverLog(embedLog, qServerDB, client);

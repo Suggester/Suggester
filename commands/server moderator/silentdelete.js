@@ -20,6 +20,7 @@ module.exports = {
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
 			let reviewCheck = checkReview(locale, message.guild, qServerDB);
@@ -60,13 +61,13 @@ module.exports = {
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
-			let logs = logEmbed(locale, qSuggestionDB, message.author, "DELETED_LOG", "red")
-				.addField(string(locale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"));
+			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")
+				.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
-			reason ? logs.addField(string(locale, "REASON_GIVEN"), reason) : "";
+			reason ? logs.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			if (qSuggestionDB.attachment) {
 				logs.setImage(qSuggestionDB.attachment);
-				logs.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
+				logs.addField(string(guildLocale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			}
 			serverLog(logs, qServerDB, client);
 		}
