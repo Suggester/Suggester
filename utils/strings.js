@@ -318,9 +318,9 @@ module.exports = {
 			string: "You must specify a valid user!",
 			context: "String used when no/an invalid user is specified in a command"
 		},
-		"INVALID_GLOBALBAN_PARAMS_ERROR": {
-			string: "Invalid blacklist setting. Use `true` to blacklist and `false` to unblacklist.",
-			context: "Error produced when globalban is run with an invalid blacklist setting"
+		"INVALID_GLOBALBAN_NEW_PARAMS_ERROR": {
+			string: "Invalid block setting. Use `true` to block and `false` to unblock.",
+			context: "Error produced when globalban is run with an invalid block setting"
 		},
 		"IS_GLOBALLY_BANNED": {
 			string: "{{banned}} is globally blocked.",
@@ -342,17 +342,17 @@ module.exports = {
 				}
 			}
 		},
-		"USER_PROTECTED_ERROR": {
-			string: "This user is protected and cannot be blacklisted.",
-			context: "Error shown when a user is protected and someone attempts to globally blacklist them"
+		"USER_PROTECTED_NEW_ERROR": {
+			string: "This user is protected and cannot be blocked.",
+			context: "Error shown when a user is protected and someone attempts to globally block them"
 		},
-		"GUILD_PROTECTED_ERROR": {
-			string: "This guild is protected and cannot be blacklisted.",
-			context: "Error shown when a guild is protected and someone attempts to globally blacklist it"
+		"GUILD_PROTECTED_NEW_ERROR": {
+			string: "This guild is protected and cannot be blocked.",
+			context: "Error shown when a guild is protected and someone attempts to globally block it"
 		},
-		"GUILD_WHITELIST_ADD_SUCCESS": {
-			string: "Whitelisted guild with ID `{{guild}}`",
-			context: "Success message when a guild is whitelisted",
+		"GUILD_ALLOWLIST_ADD_SUCCESS": {
+			string: "Added guild with ID `{{guild}}` to the allowed list",
+			context: "Success message when a guild is allowlisted",
 			replaced: {
 				guild: {
 					to_replace: "{{guild}}",
@@ -360,9 +360,9 @@ module.exports = {
 				}
 			}
 		},
-		"GUILD_WHITELIST_REMOVE_SUCCESS": {
-			string: "Unwhitelisted guild with ID `{{guild}}`",
-			context: "Success message when a guild is unwhitelisted",
+		"GUILD_ALLOWLIST_REMOVE_SUCCESS": {
+			string: "Removed guild with ID `{{guild}}` from the allowed list",
+			context: "Success message when a guild is unallowlisted",
 			replaced: {
 				guild: {
 					to_replace: "{{guild}}",
@@ -864,9 +864,9 @@ module.exports = {
 			string: "Suggester Staff Team",
 			context: "Verify acknowledgement for Suggester Staff Team"
 		},
-		"VERIFY_ACK_GLOBAL_BLACKLIST": {
-			string: "Blacklisted Globally",
-			context: "Verify acknowledgement for Blacklisted Globally"
+		"VERIFY_ACK_GLOBAL_BLOCK": {
+			string: "Blocked Globally",
+			context: "Verify acknowledgement for Blocked Globally"
 		},
 		"VERIFY_ACK_SERVER_ADMIN": {
 			string: "Server Admin",
@@ -876,9 +876,9 @@ module.exports = {
 			string: "Server Staff",
 			context: "Verify acknowledgement for Server Staff"
 		},
-		"VERIFY_ACK_SERVER_BLACKLIST": {
-			string: "Blacklisted on this server",
-			context: "Verify acknowledgement for Blacklisted on this server"
+		"VERIFY_ACK_SERVER_BLOCK": {
+			string: "Blocked on this server",
+			context: "Verify acknowledgement for Blocked on this server"
 		},
 		"VERIFY_TITLE_GLOBAL_ACKS": {
 			string: "Global Acknowledgements",
@@ -1742,45 +1742,45 @@ module.exports = {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
 		},
-		"BLACKLIST_NO_ARGS_ERROR": {
-			string: "You must specify a user or `list` to show a list of blacklisted users.",
-			context: "Error shown when no parameters are speciied for the blacklist command"
+		"BLOCK_NO_ARGS_ERROR": {
+			string: "You must specify a user or `list` to show a list of blocked users.",
+			context: "Error shown when no parameters are speciied for the block command"
 		},
-		"BLACKLIST_EMPTY": {
-			string: "There are no users blacklisted from using the bot on this server.",
-			context: "Shown when no users are blacklisted on a server"
+		"BLOCKLIST_EMPTY": {
+			string: "There are no users blocked from using the bot on this server.",
+			context: "Shown when no users are blocked on a server"
 		},
-		"BLACKLIST_SELF_ERROR": {
-			string: "You cannot blacklist yourself.",
-			context: "Error shown when a user attempts to blacklist themselves"
+		"BLOCK_SELF_ERROR": {
+			string: "You cannot block yourself.",
+			context: "Error shown when a user attempts to block themselves"
 		},
-		"BLACKLIST_USER_BOT_ERROR": {
-			string: "This user is a bot, and therefore cannot be blacklisted.",
-			context: "Error shown when a user attempts to blacklist a bot"
+		"BLOCK_USER_BOT_ERROR": {
+			string: "This user is a bot, and therefore cannot be blocked.",
+			context: "Error shown when a user attempts to block a bot"
 		},
-		"BLACKLIST_REASON_TOO_LONG_ERROR": {
-			string: "Blacklist reasons are limited to a length of 1024 characters.",
-			context: "Error shown when a blacklist reason is too long"
+		"BLOCK_REASON_TOO_LONG_ERROR": {
+			string: "Block reasons are limited to a length of 1024 characters.",
+			context: "Error shown when a block reason is too long"
 		},
-		"BLACKLIST_GLOBAL_STAFF_ERROR": {
-			string: "Global Suggester staff members cannot be blacklisted.",
-			context: "Error shown when a user attempts to blacklist a global staff member"
+		"BLOCK_GLOBAL_STAFF_ERROR": {
+			string: "Global Suggester staff members cannot be blocked.",
+			context: "Error shown when a user attempts to block a global staff member"
 		},
-		"BLACKLIST_STAFF_ERROR": {
-			string: "Staff members cannot be blacklisted.",
-			context: "Error shown when a user attempts to blacklist a server staff member"
+		"BLOCK_STAFF_ERROR": {
+			string: "Staff members cannot be blocked.",
+			context: "Error shown when a user attempts to block a server staff member"
 		},
-		"ALREADY_BLACKLISTED_ERROR": {
-			string: "This user is already blacklisted from using the bot on this server!",
-			context: "Error shown when a user attempts to blacklist a user who has already been blacklisted"
+		"ALREADY_BLOCKED_ERROR": {
+			string: "This user is already blocked from using the bot on this server!",
+			context: "Error shown when a user attempts to block a user who has already been blocked"
 		},
-		"BLACKLIST_REASON_HEADER": {
+		"BLOCK_REASON_HEADER": {
 			string: "Reason:",
-			context: "Shown if a reason is specified for the blacklist command"
+			context: "Shown if a reason is specified for the block command"
 		},
-		"BLACKLIST_SUCCESS": {
-			string: "**{{user}}** (`{{id}}`) has been blacklisted from using the bot on this server.",
-			context: "Success message when a user is blacklisted in a guild",
+		"BLOCK_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been blocked from using the bot on this server.",
+			context: "Success message when a user is blocked in a guild",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
@@ -1792,13 +1792,13 @@ module.exports = {
 				}
 			}
 		},
-		"BLACKLIST_LOG_TITLE": {
-			string: "{{staff}} blacklisted {{user}}",
-			context: "Title of the log embed when a user is blacklisted",
+		"BLOCK_LOG_TITLE": {
+			string: "{{staff}} blocked {{user}}",
+			context: "Title of the log embed when a user is blocked",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
-					description: "The blacklisted user's tag"
+					description: "The blocked user's tag"
 				},
 				staff: {
 					to_replace: "{{staff}}",
@@ -1806,27 +1806,27 @@ module.exports = {
 				}
 			}
 		},
-		"BLACKLIST_USER_DATA": {
+		"BLOCK_USER_DATA": {
 			string: "Tag: {{tag}}\nID: {{id}}\nMention: {{mention}}",
-			context: "Shows data about the user in the blacklist embed",
+			context: "Shows data about the user in the blocked embed",
 			replaced: {
 				tag: {
 					to_replace: "{{tag}}",
-					description: "The blacklisted user's tag"
+					description: "The blocked user's tag"
 				},
 				id: {
 					to_replace: "{{id}}",
-					description: "The blacklisted user's ID"
+					description: "The blocked user's ID"
 				},
 				mention: {
 					to_replace: "{{mention}}",
-					description: "The blacklisted user's mention"
+					description: "The blocked user's mention"
 				}
 			}
 		},
 		"STAFF_MEMBER_LOG_FOOTER": {
 			string: "Staff Member ID: {{id}}",
-			context: "Shows the staff member ID in the blacklist log embed",
+			context: "Shows the staff member ID in the block log embed",
 			replaced: {
 				id: {
 					to_replace: "{{id}}",
@@ -2222,13 +2222,13 @@ module.exports = {
 				}
 			}
 		},
-		"USER_NOT_BLACKLISTED_ERROR": {
-			string: "This user is not blacklisted from using the bot on this server.",
-			context: "Error shown when a user attempts to unblacklist a user who is not blacklisted on a server"
+		"USER_NOT_BLOCKED_ERROR": {
+			string: "This user is not blocked from using the bot on this server.",
+			context: "Error shown when a user attempts to unblock a user who is not blocked on a server"
 		},
-		"UNBLACKLIST_SUCCESS": {
-			string: "**{{user}}** (`{{id}}`) has been unblacklisted from using the bot on this server.",
-			context: "Success message when a user is unblacklisted in a guild",
+		"UNBLOCK_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been unblocked from using the bot on this server.",
+			context: "Success message when a user is unblocked in a guild",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
@@ -2240,13 +2240,13 @@ module.exports = {
 				}
 			}
 		},
-		"UNBLACKLIST_LOG_TITLE": {
-			string: "{{staff}} unblacklisted {{user}}",
-			context: "Title of the log embed when a user is unblacklisted",
+		"UNBLOCK_LOG_TITLE": {
+			string: "{{staff}} unblocked {{user}}",
+			context: "Title of the log embed when a user is unblocked",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
-					description: "The unblacklisted user's tag"
+					description: "The unblocked user's tag"
 				},
 				staff: {
 					to_replace: "{{staff}}",
@@ -2686,9 +2686,9 @@ module.exports = {
 			string: "Reboots the bot by exiting the process",
 			context: "Description for the reboot command"
 		},
-		"COMMAND:WHITELIST": {
-			string: "Whitelists a server",
-			context: "Description for the whitelist command"
+		"COMMAND:ALLOWLIST": {
+			string: "Allowlists a server",
+			context: "Description for the allowlist command"
 		},
 		"COMMAND:CHANGELOG": {
 			string: "Shows the latest Suggester release",
@@ -2766,9 +2766,9 @@ module.exports = {
 			string: "Attaches a file to an approved suggestion",
 			context: "Description for the attach command"
 		},
-		"COMMAND:BLACKLIST": {
-			string: "Blacklists a user from using the bot in the server",
-			context: "Description for the blacklist command"
+		"COMMAND:BLOCK": {
+			string: "Blocks a user from using the bot in the server",
+			context: "Description for the block command"
 		},
 		"COMMAND:COMMENT": {
 			string: "Adds a comment to an approved suggestion",
@@ -2822,9 +2822,17 @@ module.exports = {
 			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 			context: "Description for the silentdeny command"
 		},
-		"COMMAND:UNBLACKLIST": {
-			string: "Unblacklists a server member from using the bot",
-			context: "Description for the unblacklist command"
+		"COMMAND:UNBLOCK": {
+			string: "Unblocks a server member from using the bot",
+			context: "Description for the unblock command"
+		},
+		"COMMAND:BLACKLISTTEMP": {
+			string: "Shows information about the deprecated blacklist command",
+			context: "Description for the blacklisttemp command"
+		},
+		"BLACKLIST_DEPRECATED_INFO": {
+			string: "Over the past few weeks, protesters around the world have spoken out against all forms of racism and to proudly declare that Black Lives Matter. Here at Suggester, we support the Black Lives Matter movement and the protests, therefore we are working to eliminate even subtle forms of racism by moving away from terms like “blacklist” and “whitelist.” We have renamed the `blacklist` and `unblacklist` commands to `block` and `unblock`, respectively.\n\nThis [article](https://9to5google.com/2020/06/12/google-android-chrome-blacklist-blocklist-more-inclusive/) provides more context about why many tech companies are moving away from these terms.",
+			context: "Information about why the blacklist commands were deprecated"
 		}
 	}
 };

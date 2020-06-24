@@ -193,8 +193,6 @@ module.exports = {
 		}
 		case "blocked":
 		case "blockedroles":
-		case "blacklist":
-		case "blacklistroles":
 		case "blockedrole": {
 			switch (args[1]) {
 			case "add":

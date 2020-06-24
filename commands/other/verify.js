@@ -30,14 +30,14 @@ module.exports = {
 
 		if (qUserDB && qUserDB.flags.includes("STAFF")) globalPosArr.push(`<:suggesterglobal:689121762952216625> ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
 
-		if (qUserDB.blocked) globalPosArr.push(`🚫 ${string(locale, "VERIFY_ACK_GLOBAL_BLACKLIST")}`);
+		if (qUserDB.blocked) globalPosArr.push(`🚫 ${string(locale, "VERIFY_ACK_GLOBAL_BLOCK")}`);
 
 		if (message.guild.members.cache.get(user.id)) {
 			let member = message.guild.members.cache.get(user.id);
 			if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) posArr.push(`🛠️ ${string(locale, "VERIFY_ACK_SERVER_ADMIN")}`);
 			if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) posArr.push(`🛠️ ${string(locale, "VERIFY_ACK_SERVER_STAFF")}`);
-			if (qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r)) || qServerDB.config.blacklist.includes(user.id)) posArr.push(`🚫 ${string(locale, "VERIFY_ACK_SERVER_BLACKLIST")}`);
-		} else if (qServerDB.config.blacklist.includes(user.id)) posArr.push(`🚫 ${string(locale, "VERIFY_ACK_SERVER_BLACKLIST")}`);
+			if (qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r)) || qServerDB.config.blocklist.includes(user.id)) posArr.push(`🚫 ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
+		} else if (qServerDB.config.blocklist.includes(user.id)) posArr.push(`🚫 ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
 
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(user.id), client);
 		let embed = new Discord.MessageEmbed()
