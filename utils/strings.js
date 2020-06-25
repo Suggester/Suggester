@@ -2822,6 +2822,15 @@ module.exports = {
 			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 			context: "Description for the silentdeny command"
 		},
+		"LOCALE_REFRESH_SUCCESS": {
+			string: "Successfully loaded {{count}} locales.",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The amount of locales that were loaded"
+				}
+			}
+		},
 		"COMMAND:UNBLOCK": {
 			string: "Unblocks a server member from using the bot",
 			context: "Description for the unblock command"

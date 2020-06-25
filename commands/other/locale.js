@@ -4,6 +4,8 @@ const { colors, support_invite } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
+const { reloadLocales } = require("../../utils/misc");
+
 module.exports = {
 	controls: {
 		name: "locale",
@@ -41,7 +43,13 @@ module.exports = {
 					return message.channel.send(pull.stdout.substr(0, 1900), { code: "xl" });
 				}
 			});
+		} else if (permission <= 1 && args[0].toLowerCase() === "refresh") {
+			reloadLocales(client)
+				.then((count) => message.channel.send(string(locale, "LOCALE_REFRESH_SUCCESS", { count }, "success")))
+				.catch((err) => message.channel.send(err.toString().substr(0, 2000), { code: "js" }));
+			return;
 		}
+
 		let selection = args[0].toLowerCase();
 		let found = client.locales.find(l => l.settings.code === selection || l.settings.native.toLowerCase() === selection || l.settings.english.toLowerCase() === selection);
 		if (!found) {
