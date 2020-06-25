@@ -15,13 +15,13 @@ module.exports = async (Discord, client, guild) => {
 		return guildLog(`⛔ I was added to blacklisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, {}, client);
 	}
 
-	let enforceWhitelist = [
+	let enforceAllowlist = [
 		"special",
 		"premium"
 	];
-	if ((enforceWhitelist.includes(release)) && (!qServerDB || !qServerDB.whitelist)) {
+	if ((enforceAllowlist.includes(release)) && (!qServerDB || !qServerDB.allowlist)) {
 		await guild.leave();
-		return guildLog(`⛔ I was added to non-whitelisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, {}, client);
+		return guildLog(`⛔ I was added to non-allowlisted guild **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`) and left`, {}, client);
 	}
 
 	await guildLog(`📥 New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, {}, client);

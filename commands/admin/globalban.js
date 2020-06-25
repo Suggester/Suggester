@@ -18,15 +18,15 @@ module.exports = {
 			if (!args[0]) return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 			let foundUser = await fetchUser(args[0], client);
 			if (!foundUser || foundUser.id === "0") return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string(locale, "INVALID_GLOBALBAN_PARAMS_ERROR", {}, "error"));
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string(locale, "INVALID_GLOBALBAN_NEW_PARAMS_ERROR", {}, "error"));
 			let qUserDB = await dbQuery("User", { id: foundUser.id });
 			if (!args[1]) {
 				let { blocked } = qUserDB;
 				return message.channel.send(string(locale, blocked ? "IS_GLOBALLY_BANNED" : "IS_NOT_GLOBALLY_BANNED", { banned: foundUser.tag }));
 			}
-			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(string(locale, "USER_PROTECTED_ERROR", {}, "error"));
+			if (qUserDB.flags && qUserDB.flags.includes("PROTECTED")) return message.channel.send(string(locale, "USER_PROTECTED_NEW_ERROR", {}, "error"));
 			if (args[1] === "true") {
-				if (foundUser.bot) return message.channel.send(string(locale, "BLACKLIST_USER_BOT_ERROR", {}, "error"));
+				if (foundUser.bot) return message.channel.send(string(locale, "BLOCK_USER_BOT_ERROR", {}, "error"));
 				qUserDB.blocked = true;
 			}
 			else if (args[1] === "false") qUserDB.blocked = false;
@@ -37,13 +37,13 @@ module.exports = {
 		case "guild": {
 			if (!args[0]) return message.channel.send(string(locale, "INVALID_GUILD_ID_ERROR", {}, "error"));
 			let foundGuild = client.guilds.cache.get(args[0]);
-			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string(locale, "INVALID_GLOBALBAN_PARAMS_ERROR", {}, "error"));
+			if (args[1] && !(args[1] === "true" || args[1] === "false")) return message.channel.send(string(locale, "INVALID_GLOBALBAN_NEW_PARAMS_ERROR", {}, "error"));
 			let qServerDB = await dbQuery("Server", { id: args[0] });
 			if (!args[1]) {
 				let { blocked } = qServerDB;
 				return message.channel.send(blocked ? string(locale, "IS_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }) : string(locale, "IS_NOT_GLOBALLY_BANNED", { banned: foundGuild ? foundGuild.name : args[0] }));
 			}
-			if (qServerDB.flags && qServerDB.flags.includes("PROTECTED")) return message.channel.send(string(locale, "GUILD_PROTECTED_ERROR", {}, "error"));
+			if (qServerDB.flags && qServerDB.flags.includes("PROTECTED")) return message.channel.send(string(locale, "GUILD_PROTECTED_NEW_ERROR", {}, "error"));
 			if (args[1] === "true") qServerDB.blocked = true;
 			else if (args[1] === "false") qServerDB.blocked = false;
 			await dbModifyId("Server", args[0], qServerDB);

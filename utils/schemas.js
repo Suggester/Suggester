@@ -5,7 +5,7 @@ const { prefix } = require("../config.json");
 const settings = new Schema({
 	id: { type: String, required: true }, // server id
 	blocked: { type: Boolean, default: false },
-	whitelist: { type: Boolean, default: false },
+	allowlist: { type: Boolean, default: false },
 	flags: [ String ],
 	config: {
 		prefix: { type: String, default: prefix },
@@ -28,7 +28,7 @@ const settings = new Schema({
 		react: { type: Boolean, default: true },
 		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
-		blacklist: [String],
+		blocklist: [String],
 		emojis: {
 			up: { type: String, default: "👍" },
 			mid: { type: String, default: "🤷" },

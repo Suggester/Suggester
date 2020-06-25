@@ -204,7 +204,7 @@ module.exports = {
 						message.channel.send(string(locale, "CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
 						return setup(7);
 					}
-					
+
 					// eslint-disable-next-line no-inner-declarations
 					async function savePrefix(p) {
 						db.config.prefix = p;
@@ -246,12 +246,12 @@ module.exports = {
 		let check = await checkConfig(locale, qServerDB);
 
 		async function start (startAt=0) {
-			let oldWhitelist = qServerDB.whitelist;
+			let oldAllowlist = qServerDB.allowlist;
 			await dbDeleteOne("Server", {id: message.guild.id}); //Delete old config
 			await new Server({ id: message.guild.id }).save();
-			if (oldWhitelist) {
-				qServerDB.whitelist = oldWhitelist;
-				await dbModify("Server", {id: message.guild.id}, qServerDB); //Add whitelist if previous
+			if (oldAllowlist) {
+				qServerDB.allowlist = oldAllowlist;
+				await dbModify("Server", {id: message.guild.id}, qServerDB); //Add allowlist if previous
 			}
 			return setup(startAt);
 		}
