@@ -2825,6 +2825,15 @@ module.exports = {
 		"COMMAND:UNBLACKLIST": {
 			string: "Unblacklists a server member from using the bot",
 			context: "Description for the unblacklist command"
+		},
+		"LOCALE_REFRESH_SUCCESS": {
+			string: "Successfully loaded {{count}} locales.",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The amount of locales that were loaded"
+				}
+			}
 		}
 	}
 };
