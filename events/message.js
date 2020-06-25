@@ -107,7 +107,7 @@ module.exports = async (Discord, client, message) => {
 			let cooldownLimit = 15;
 			if (userCount > preLimit) {
 				if (userCount < cooldownLimit) return;
-				//If more than 15 cooldown breaches occur over the duration of the bot being up, auto-blacklist the user and notify the developers
+				//If more than 15 cooldown breaches occur over the duration of the bot being up, auto-block the user and notify the developers
 				qUserDB.blocked = true;
 				await dbModify("User", { id: message.author.id }, qUserDB);
 
@@ -118,7 +118,7 @@ module.exports = async (Discord, client, message) => {
 				message.channel.send(string(locale, "COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` }));
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
-				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blacklisted from using the bot globally\n(@everyone)`, {disableMentions: "none"});
+				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\n(@everyone)`, {disableMentions: "none"});
 			}
 
 			if (expires > now) {
@@ -131,7 +131,7 @@ module.exports = async (Discord, client, message) => {
 		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
-	if (qServerDB.config.blacklist && qServerDB.config.blacklist.includes(message.author.id)) {
+	if (qServerDB.config.blocklist && qServerDB.config.blocklist.includes(message.author.id)) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return;
 	}

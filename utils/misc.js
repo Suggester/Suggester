@@ -31,7 +31,7 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - Discord.js client
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
-	suggestionEmbed: async (locale, suggestion, server, client) => {
+	suggestionEmbed: async (locale, suggestion, _server, client) => {
 		const { fetchUser } = module.exports;
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
@@ -157,5 +157,36 @@ module.exports = {
 				yield res;
 			}
 		}
+	},
+
+	/**
+   * Reload locales from the locale folder
+   * @param {Client} client An instantiated client
+   * @param {string} [path] A path to the locale dir
+   * @returns {Promise<number>} The amount of locales loaded
+   */
+	async reloadLocales ({ locales }, path = "i18n") {
+		return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
+			try {
+				locales.sweep(() => true);
+
+				for (const [code] of locales) {
+					delete require.cache[require.resolve(`../${path}/${code}.json`)];
+				}
+
+				const files = (await promises.readdir(path))
+					.filter((f) => f.endsWith(".json"));
+
+				for (const file of files) {
+					const locale = require(`../${path}/${file}`);
+
+					locales.set(file.split(".")[0], locale);
+				}
+
+				resolve(locales.size);
+			}	catch(err) {
+				reject(err);
+			}
+		});
 	}
 };

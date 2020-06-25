@@ -6,7 +6,7 @@ module.exports = {
 	/**
 	 * Returns permission level of inputted ID
 	 *
-	 * 11 - Blacklisted
+	 * 11 - Blocked
 	 * 10 - Everyone
 	 * 3 - Server Staff
 	 * 2 - Server Admin
@@ -27,7 +27,7 @@ module.exports = {
 		if (qUserDB && qUserDB.blocked) return 12;
 		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
 		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
-		if (qServerDB.config.blacklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
+		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
 		return 10;
 	},
 	channelPermissions: (locale, permissionCheckFor, channel, client) => {
