@@ -31,17 +31,20 @@ module.exports = {
 		}
 		let permission = await checkPermissions(message.member, client);
 		if (permission <= 1 && args[0].toLowerCase() === "pull") {
-
 			return access("i18n", async function(error) {
+				let m;
 				if (error) {
 					//Dir does not exist
-					let clone = await exec("git clone https://github.com/Suggester-Bot/i18n.git ./i18n");
-					return message.channel.send(clone.stdout.substr(0, 1900), { code: "xl" });
+					let clone = await exec("git submodule update --init");
+					m = await message.channel.send(clone.stdout.substr(0, 1900), { code: "xl" });
 				} else {
 					//Dir exists
-					let pull = await exec("cd i18n && git pull");
-					return message.channel.send(pull.stdout.substr(0, 1900), { code: "xl" });
+					let pull = await exec("git submodule foreach git pull origin master");
+					m = await message.channel.send(pull.stdout.substr(0, 1900), { code: "xl" });
 				}
+				reloadLocales(client)
+					.then((count) => m.edit(`${m.content.match(/```..([\s\S]+)```/)[1]}\n${string(locale, "LOCALE_REFRESH_SUCCESS", { count })}`, { code: "xl" }))
+					.catch((err) => message.channel.send(err.toString().substr(0, 2000), { code: "js" }));
 			});
 		} else if (permission <= 1 && args[0].toLowerCase() === "refresh") {
 			reloadLocales(client)
