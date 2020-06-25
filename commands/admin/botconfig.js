@@ -15,31 +15,27 @@ module.exports = {
 		if (!args[0]) return message.channel.send(string(locale, "NO_PLAYING_STATUS_ERROR", {}, "error"));
 		switch (args[0]) {
 		case "game": {
-			let activity;
+			let activity = args.splice(2).join(" ").match(/`?([^`]+)`?/)[1];
 			let type;
 			let full;
 			switch (args[1].toLowerCase()) {
 			case "playing": {
 				type = "PLAYING";
-				activity = args.splice(2).join(" ");
 				full = `**Playing** ${activity}`;
 				break;
 			}
 			case "listening": {
 				type = "LISTENING";
-				activity = args.splice(2).join(" ");
 				full = `**Listening to** ${activity}`;
 				break;
 			}
 			case "watching": {
 				type = "WATCHING";
-				activity = args.splice(2).join(" ");
 				full = `**Watching** ${activity}`;
 				break;
 			}
 			default: {
 				type = "PLAYING";
-				activity = args.splice(1).join(" ");
 				full = `**Playing** ${activity}`;
 			}
 			}
