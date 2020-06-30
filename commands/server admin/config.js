@@ -5,6 +5,7 @@ const { checkPermissions } = require("../../utils/checks");
 const { confirmation } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
+const colorString = require("color-string");
 module.exports = {
 	controls: {
 		name: "config",
@@ -437,7 +438,7 @@ module.exports = {
 		case "uservote":
 		case "self":
 		case "selfvote": {
-			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
 			switch (args[1].toLowerCase()) {
 			case "enable":
 			case "on": {
@@ -461,6 +462,63 @@ module.exports = {
 				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED", {}, "success"));
 			default:
 				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "onevote":
+		case "one":
+		case "limitvote": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.reactionOptions.one) {
+					qServerDB.config.reactionOptions.one = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_ONE_VOTE_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_ONE_VOTE_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.reactionOptions.one) {
+					qServerDB.config.reactionOptions.one = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_ONE_VOTE_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_ONE_VOTE_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.reactionOptions.one = !qServerDB.config.reactionOptions.one;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "colorchange":
+		case "upvotechange": {
+			if (!args[1]) return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })));
+			switch (args[1].toLowerCase()) {
+			case "color":
+			case "embedcolor":
+			case "embedcolour":
+			case "colour": {
+				let color = colorString.get.rgb(args[2]);
+				if (!color) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_COLOR", {}, "error"));
+				qServerDB.config.reactionOptions.color = colorString.to.hex(color);
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color }, "success")));
+			}
+			case "upvotes":
+			case "number":
+			case "votes":
+			case "count": {
+				let number = parseInt(args[2]);
+				if (!number || number < 1) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
+				qServerDB.config.reactionOptions.color_threshold = number;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color }, "success"));
+			}
+			default:
+				return message.channel.send(string(locale, "CFG_COLOR_CHANGE_NO_PARAMS", {}, "error"));
 			}
 		}
 		case "lang":

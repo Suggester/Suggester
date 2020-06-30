@@ -44,7 +44,7 @@ module.exports = {
 			// Footer
 			.setTimestamp(suggestion.submitted)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
-		// Side Color
+		// Embed Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
 			embed.setColor(colors.green)
@@ -63,6 +63,11 @@ module.exports = {
 		}
 		default: {
 			embed.setColor(colors.default);
+			// Check for Color Change Threshold, Modify Color if Met
+			client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
+				let votes = checkVotes(locale, suggestion, m);
+				if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
+			}).catch(() => {});
 		}
 		}
 		// Comments
@@ -78,11 +83,6 @@ module.exports = {
 		}
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
-		// Check for Color Change Threshold
-		client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
-			let votes = checkVotes(locale, suggestion, m);
-			if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
-		}).catch(() => {});
 
 		return embed;
 	},

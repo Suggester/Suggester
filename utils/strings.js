@@ -1358,6 +1358,22 @@ module.exports = {
 			string: "Members are already disallowed from voting on their own suggestions.",
 			context: "Shown when self voting is disabled and a guild tries to disable it"
 		},
+		"CFG_ONE_VOTE_ENABLED": {
+			string: "Members can only choose one reaction option when voting on a suggestion.",
+			context: "Shown when a guild has enabled only choosing one vote option"
+		},
+		"CFG_ONE_VOTE_DISABLED": {
+			string: "Members can choose multiple reaction options when voting on a suggestion.",
+			context: "Shown when a guild has disabled only choosing one vote option"
+		},
+		"CFG_ONE_VOTE_ALREADY_ENABLED": {
+			string: "Members are already limited to choosing one reaction option when voting on a suggestion.",
+			context: "Shown when choosing one vote reaction is enabled and a guild tries to enable it"
+		},
+		"CFG_ONE_VOTE_ALREADY_DISABLED": {
+			string: "Members can already choose multiple reaction options when voting on a suggestion.",
+			context: "Shown when choosing one vote reaction is disabled and a guild tries to disable it"
+		},
 		"CFG_CLEAN_COMMANDS_ENABLED": {
 			string: "Auto-cleaning of suggestion commands is **enabled**.",
 			context: "Shown when a guild has enabled cleaning of the suggest command"
@@ -2862,6 +2878,32 @@ module.exports = {
 		"COMMAND:SHELL": {
 			string: "Runs shell code",
 			context: "Description for the shell command"
+		},
+		"CFG_COLOR_CHANGE_INFO": {
+			string: "At **{{number}}** net upvote(s), the embed color will change to {{color}}.",
+			context: "",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The configured number of net upvotes"
+				},
+				color: {
+					to_replace: "{{color}}",
+					description: "The configured color for the embed to change to"
+				}
+			}
+		},
+		"CFG_COLOR_CHANGE_INVALID_NUMBER": {
+			string: "You must specify a valid integer greater than 0.",
+			context: "Error shown when the number specified for the color change threshold is invalid or less than 1"
+		},
+		"CFG_COLOR_CHANGE_INVALID_COLOR": {
+			string: "You must specify a valid color (ex. Hex color, CSS color name)",
+			context: "Error shown when the color specified for the color change is invalid"
+		},
+		"CFG_COLOR_CHANGE_NO_PARAMS": {
+			string: "You must specify `color` or `count`",
+			context: "Error shown when an invalid parameter is specified in upvote color change configuration"
 		}
 	}
 };
