@@ -9,7 +9,7 @@ module.exports = {
 		name: "unblock",
 		permission: 3,
 		usage: "unblock <user>",
-		aliases: ["allow"],
+		aliases: ["allow", "unbl"],
 		description: "Unblocks a server member from using the bot",
 		enabled: true,
 		docs: "staff/unblock",

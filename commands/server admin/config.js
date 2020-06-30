@@ -2,7 +2,7 @@ const { colors, emoji, support_invite } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
 const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("../../utils/config");
 const { checkPermissions } = require("../../utils/checks");
-const { confirmation } = require("../../utils/actions");
+const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
 const colorString = require("color-string");
@@ -612,6 +612,12 @@ module.exports = {
 			let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string(locale, "CFG_DOWNVOTE_REACTION_DISABLED") : "👎");
 
 			cfgOtherArr.push(`${string(locale, "CFG_REACTION_EMOJIS_TITLE", {}, "success")} ${qServerDB.config.react ? string(locale, "ENABLED") : string(locale, "DISABLED")} (${upEmoji}, ${midEmoji}, ${downEmoji})`);
+			// Color Change
+			cfgOtherArr.push(`${string(locale, "CFG_COLOR_CHANGE_TITLE", {}, "success")} ${string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })}`);
+			// Own Voting
+			cfgOtherArr.push(`${string(locale, "CFG_SELF_VOTE_TITLE", {}, "success")} ${qServerDB.config.reactionOptions.suggester ? string(locale, "ENABLED") : string(locale, "DISABLED")}`);
+			// One Vote
+			cfgOtherArr.push(`${string(locale, "CFG_ONE_VOTE_TITLE", {}, "success")} ${qServerDB.config.reactionOptions.one ? string(locale, "CFG_ONE_VOTE_ENABLED") : string(locale, "CFG_ONE_VOTE_DISABLED")}`);
 			// Mode
 			let mode = string(locale, "ERROR", {}, "error");
 			switch (qServerDB.config.mode) {
@@ -632,13 +638,9 @@ module.exports = {
 			//Locale
 			cfgOtherArr.push(`${string(locale, "CFG_LOCALE_TITLE", {}, "success")} ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
 
-			let cfgEmbed = new Discord.MessageEmbed()
-				.setAuthor(string(locale, "SERVER_CONFIGURATION_TITLE", { server: server.name }), server.iconURL({ dynamic: true, format: "png" }))
-				.addField(string(locale, "ROLE_CONFIGURATION_TITLE"), cfgRolesArr.join("\n"))
-				.addField(string(locale, "CHANNEL_CONFIGURATION_TITLE"), cfgChannelsArr.join("\n"))
-				.addField(string(locale, "OTHER_CONFIGURATION_TITLE"), cfgOtherArr.join("\n"));
-			cfgEmbed.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
-				.addField(string(locale, "CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string(locale, "CFG_STATUS_BAD", {}, "error") : string(locale, "CFG_STATUS_GOOD", {}, "success"));
+			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n"))];
 
 			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
 				const permissions = require("../../utils/permissions");
@@ -647,10 +649,17 @@ module.exports = {
 					server.me.permissions.has(perm) ? hasPermissionList.push(string(locale, `PERMISSION:${perm}`)) : "";
 				});
 
-				cfgEmbed.addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None");
-				if (qServerDB.flags && qServerDB.flags.length > 0) cfgEmbed.addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.join(", "));
+				embeds.push(new Discord.MessageEmbed().setTitle(string(locale, "CFG_INTERNAL_TITLE")).addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None").addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.length > 0 ? qServerDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")));
 			}
-			return message.channel.send(cfgEmbed);
+
+			embeds.forEach(e => {
+				e.setAuthor(`${string(locale, "SERVER_CONFIGURATION_TITLE", { server: server.name })} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, server.iconURL({ dynamic: true, format: "png" }))
+					.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
+					.addField(string(locale, "CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string(locale, "CFG_STATUS_BAD", {}, "error") : string(locale, "CFG_STATUS_GOOD", {}, "success"))
+					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			});
+
+			return pages(locale, message, embeds);
 		}
 		default:
 			return message.channel.send(string(locale, "CFG_NO_PARAMS_ERROR", {}, "error"));

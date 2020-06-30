@@ -17,7 +17,7 @@ module.exports = {
 		let newString = list[string_name] || string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
-				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
+				if (replaced && replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
 			});
 		}
 		if (prefix_with) {
@@ -189,6 +189,10 @@ module.exports = {
 		"CANCELLED": {
 			string: "Cancelled",
 			context: "String used when an action is cancelled"
+		},
+		"CLOSED": {
+			string: "Closed",
+			context: "String used when an embed is closed"
 		},
 		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
@@ -1359,11 +1363,11 @@ module.exports = {
 			context: "Shown when self voting is disabled and a guild tries to disable it"
 		},
 		"CFG_ONE_VOTE_ENABLED": {
-			string: "Members can only choose one reaction option when voting on a suggestion.",
+			string: "Members can only choose one reaction option when voting on a suggestion",
 			context: "Shown when a guild has enabled only choosing one vote option"
 		},
 		"CFG_ONE_VOTE_DISABLED": {
-			string: "Members can choose multiple reaction options when voting on a suggestion.",
+			string: "Members can choose multiple reaction options when voting on a suggestion",
 			context: "Shown when a guild has disabled only choosing one vote option"
 		},
 		"CFG_ONE_VOTE_ALREADY_ENABLED": {
@@ -2904,6 +2908,22 @@ module.exports = {
 		"CFG_COLOR_CHANGE_NO_PARAMS": {
 			string: "You must specify `color` or `count`",
 			context: "Error shown when an invalid parameter is specified in upvote color change configuration"
+		},
+		"CFG_INTERNAL_TITLE": {
+			string: "Internal Configuration",
+			context: "Header for the internal configuration section of the config list embed"
+		},
+		"CFG_COLOR_CHANGE_TITLE": {
+			string: "**Color Change:**",
+			context: "Title for color change in the config embed"
+		},
+		"CFG_SELF_VOTE_TITLE": {
+			string: "**Voting on Own Suggestions:**",
+			context: "Title for self voting in the config embed"
+		},
+		"CFG_ONE_VOTE_TITLE": {
+			string: "**Multiple Reaction Voting:**",
+			context: "Title for choosing multiple vote reactions in the config embed"
 		}
 	}
 };

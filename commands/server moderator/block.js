@@ -10,7 +10,7 @@ module.exports = {
 		name: "block",
 		permission: 3,
 		usage: "block <user>",
-		aliases: ["disallow", "block"],
+		aliases: ["disallow", "bl"],
 		description: "Blocks a user from using the bot in the server",
 		enabled: true,
 		docs: "staff/block",
@@ -38,6 +38,7 @@ module.exports = {
 				embeds.push(new Discord.MessageEmbed()
 					.setDescription(list.join("\n"))
 					.setColor(colors.default)
+					.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : ""));
 			}
 			pages(locale, message, embeds);

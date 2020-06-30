@@ -28,6 +28,7 @@ module.exports = {
 					.setURL(data.html_url)
 					.setColor(colors.default)
 					.setTimestamp(data.created_at)
+					.setAuthor(split_body.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(`${split_body.length > 1 ? `${string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS")}\n` : ""}${string(locale, "CHANGELOG_RELEASED_FOOTER")}`)
 				);
 			}

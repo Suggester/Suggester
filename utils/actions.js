@@ -130,7 +130,7 @@ module.exports = {
 		const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 		let page = options.startPage;
-		content[page].setAuthor(`Page ${page+1}/${content.length}`);
+		content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
 		const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
 		for (const emoji in emojis) await msg.react(emojis[emoji]);
@@ -146,12 +146,12 @@ module.exports = {
 				if (removeReaction) users.remove(user.id);
 			}
 			else if (emojis.end && (id === emojis.end || name === emojis.end)) {
-				msg.edit(string(locale, "CANCELLED", {}, "error"), {embed: null});
+				msg.edit(string(locale, "CLOSED", {}, "error"), {embed: null});
 				collector.stop();
 				return;
 			}
 			if (msg) {
-				content[page].setAuthor(`Page ${page+1}/${content.length}`);
+				content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
 				if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 				else msg.edit(content[page]);
 			}

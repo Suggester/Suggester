@@ -41,7 +41,8 @@ module.exports = {
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);
 			});
-			if (chunks.length > 1) embed.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			if (chunks.length > 1) embed.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"))
+				.setAuthor(string(locale, "PAGINATION_PAGE_COUNT"));
 			embeds.push(embed);
 		}
 
