@@ -62,15 +62,5 @@ module.exports = {
 
 			serverLog(logs, qServerDB, client);
 		}
-
-		if (qServerDB.config.channels.log) {
-			let logEmbed = new Discord.MessageEmbed()
-				.setAuthor(string(guildLocale, "DELETED_COMMENT_LOG", { user: message.author.tag, id: id, comment: `${id}_${comment.id}` }), message.author.displayAvatarURL({ format: "png", dynamic: true }))
-				.addField(author.id !== "0" ? string(guildLocale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(guildLocale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
-				.setFooter(string(guildLocale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: id, user: message.author.id }))
-				.setTimestamp()
-				.setColor(colors.red);
-			serverLog(logEmbed, qServerDB, client);
-		}
 	}
 };

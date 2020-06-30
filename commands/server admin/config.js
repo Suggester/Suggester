@@ -433,6 +433,36 @@ module.exports = {
 				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
 		}
+		case "suggestervote":
+		case "uservote":
+		case "self":
+		case "selfvote": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.reactionOptions.suggester) {
+					qServerDB.config.reactionOptions.suggester = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_SELF_VOTE_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_SELF_VOTE_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.reactionOptions.suggester) {
+					qServerDB.config.reactionOptions.suggester = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_SELF_VOTE_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_SELF_VOTE_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.reactionOptions.suggester = !qServerDB.config.reactionOptions.suggester;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
 		case "lang":
 		case "locales":
 		case "locale":

@@ -31,8 +31,9 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - Discord.js client
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
-	suggestionEmbed: async (locale, suggestion, _server, client) => {
+	suggestionEmbed: async (locale, suggestion, server, client) => {
 		const { fetchUser } = module.exports;
+		const { checkVotes } = require("./actions");
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
 		// User information
@@ -77,6 +78,11 @@ module.exports = {
 		}
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
+		// Check for Color Change Threshold
+		client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
+			let votes = checkVotes(locale, suggestion, m);
+			if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
+		}).catch(() => {});
 
 		return embed;
 	},

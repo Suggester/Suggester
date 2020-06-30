@@ -22,7 +22,8 @@ const client = new Client({
 	disableMentions: "everyone",
 	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" },
 	messageCacheLifetime: 120,
-	messageSweepInterval: 300
+	messageSweepInterval: 300,
+	partials: ["MESSAGE", "REACTION", "USER"]
 });
 
 if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);

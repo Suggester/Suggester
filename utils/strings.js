@@ -1342,6 +1342,22 @@ module.exports = {
 			string: "Server notifications are already disabled.",
 			context: "Shown when notifications are disabled and a guild tries to disable them"
 		},
+		"CFG_SELF_VOTE_ENABLED": {
+			string: "Members can vote on their own suggestions.",
+			context: "Shown when a guild has enabled self voting"
+		},
+		"CFG_SELF_VOTE_DISABLED": {
+			string: "Members cannot vote on their own suggestions.",
+			context: "Shown when a guild has disabled self voting"
+		},
+		"CFG_SELF_VOTE_ALREADY_ENABLED": {
+			string: "Members can already vote on their own suggestions.",
+			context: "Shown when self voting is enabled and a guild tries to enable it"
+		},
+		"CFG_SELF_VOTE_ALREADY_DISABLED": {
+			string: "Members are already disallowed from voting on their own suggestions.",
+			context: "Shown when self voting is disabled and a guild tries to disable it"
+		},
 		"CFG_CLEAN_COMMANDS_ENABLED": {
 			string: "Auto-cleaning of suggestion commands is **enabled**.",
 			context: "Shown when a guild has enabled cleaning of the suggest command"
