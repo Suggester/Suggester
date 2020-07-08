@@ -84,33 +84,13 @@ module.exports = {
 				}
 			}
 		},
-		"NO_PLAYING_STATUS_ERROR": {
-			string: "You must specify a playing status!",
-			context: "Error that shows when the botconfig command is run without any playing status parameters"
-		},
-		"PLAYING_STATUS_SET_SUCCESS": {
-			string: "Playing status set!",
-			context: "Success message when the bot playing status is configured"
-		},
 		"NO_STATUS_ERROR": {
 			string: "You must specify a valid status!",
 			context: "Error that shows when the botconfig or mark commands are run without any status parameter"
 		},
-		"STATUS_SET_SUCCESS": {
-			string: "Status set!",
-			context: "Success message when the bot status is configured"
-		},
-		"NO_AVATAR_ERROR": {
-			string: "You must specify an avatar!",
-			context: "Error that shows when the botconfig command is run without any avatar parameter"
-		},
 		"INVALID_AVATAR_ERROR": {
 			string: "Please provide a valid image URL! Images can have extensions of `jpeg`, `jpg`, `png`, or `gif`",
 			context: "Error that shows when the avatar specified is invalid"
-		},
-		"AVATAR_SET_SUCCESS": {
-			string: "Avatar set!",
-			context: "Success message when the bot avatar is configured"
 		},
 		"NO_DB_PARAMS_SPECIFIED_ERROR": {
 			string: "You must specify whether to query or modify, a collection name, query field, and query value.",
