@@ -306,7 +306,7 @@ module.exports = {
 			case "auto-approve":
 			case "auto_approve":
 			case "auto": {
-				if ((await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id}))) return message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
+				if ((await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id}))) return message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR_Q", { prefix: qServerDB.config.prefix }, "error"));
 				qServerDB.config.mode = "autoapprove";
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string(locale, "CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, ""));

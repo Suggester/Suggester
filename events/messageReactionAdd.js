@@ -1,6 +1,7 @@
 const { dbQueryNoNew } = require("../utils/db");
 const { editFeedMessage } = require("../utils/actions");
 module.exports = async (Discord, client, messageReaction, user) => {
+	if (user.id === client.user.id) return;
 	const nodeEmoji = require("node-emoji");
 	if (messageReaction.message.partial) messageReaction.message = await messageReaction.message.fetch();
 	let db = await messageReaction.message.guild.db;

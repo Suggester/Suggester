@@ -1236,9 +1236,15 @@ module.exports = {
 			string: "Successfully set the mode for this server to **autoapprove**.",
 			context: "Success message when the mode is set to autoapprove"
 		},
-		"CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR": {
-			string: "All suggestions awaiting review must be cleared before the autoapprove mode is set.",
-			context: "Error when a user tries to set the autoapprove mode while suggestions are still awaiting review"
+		"CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR_Q": {
+			string: "All suggestions awaiting review must be cleared before the autoapprove mode is set. Use the `{{prefix}}queue` command to see all suggestions awaiting review.",
+			context: "Error when a user tries to set the autoapprove mode while suggestions are still awaiting review",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
 		},
 		"CFG_MODE_INVALID_ERROR": {
 			string: "Please specify a valid mode. (Either `review` or `autoapprove`)",
@@ -2860,6 +2866,7 @@ module.exports = {
 		},
 		"LOCALE_REFRESH_SUCCESS": {
 			string: "Successfully loaded {{count}} locales.",
+			context: "Message shown when locales are reloaded",
 			replaced: {
 				count: {
 					to_replace: "{{count}}",
@@ -2885,7 +2892,7 @@ module.exports = {
 		},
 		"CFG_COLOR_CHANGE_INFO": {
 			string: "At **{{number}}** net upvote(s), the embed color will change to {{color}}.",
-			context: "",
+			context: "Shows the configured color change settings",
 			replaced: {
 				number: {
 					to_replace: "{{number}}",
