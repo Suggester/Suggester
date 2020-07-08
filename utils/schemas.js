@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { prefix, colors: { gold } } = require("../config.json");
+const { prefix, emojis, colors: { gold } } = require("../config.json");
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
 
 const settings = new Schema({
@@ -62,6 +62,10 @@ const suggestion = new Schema({
 		up: { type: String, default: "👍" },
 		mid: { type: String, default: "🤷" },
 		down: { type: String, default: "👎" }
+	},
+	reviewEmojis: {
+		approve: String,
+		deny: String
 	},
 	messageId: String,
 	comments: [

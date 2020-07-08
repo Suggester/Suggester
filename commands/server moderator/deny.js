@@ -77,7 +77,10 @@ module.exports = {
 		let qUserDB = await dbQuery("User", { id: suggester.id });
 		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))))).catch(() => {});
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+			fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))))
+			fetched.reactions.removeAll();
+		}).catch(() => {});
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()

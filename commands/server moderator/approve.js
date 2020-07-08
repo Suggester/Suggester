@@ -126,6 +126,9 @@ module.exports = {
 			serverLog(embedLog, qServerDB, client);
 		}
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))))).catch(() => {});
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+			fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))))
+			fetched.reactions.removeAll();
+		}).catch(() => {});
 	}
 };
