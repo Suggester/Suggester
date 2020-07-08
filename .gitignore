@@ -113,6 +113,5 @@ config.json
 build/
 commands/test.js
 utils/testSchemas.js
-/persistent.json
 watch.json
 /test.md
