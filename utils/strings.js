@@ -756,7 +756,7 @@ module.exports = {
 			string: "Approve/Deny",
 			context: "Header for the approve/deny field of the review embed"
 		},
-		"REVIEW_COMMAND_INFO": {
+		"REVIEW_COMMAND_INFO": { //Keeping in case of a revert to old description during testing
 			string: "Use **{{prefix}}approve {{id}}** to send to {{channel}}\nUse **{{prefix}}deny {{id}}** to deny",
 			context: "Information in the review embed showing instructions on how to approve/deny",
 			replaced: {
@@ -767,6 +767,24 @@ module.exports = {
 				id: {
 					to_replace: "{{id}}",
 					description: "A suggestion ID"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The suggestions channel mention"
+				}
+			}
+		},
+		"REVIEW_COMMAND_INFO_NEW": {
+			string: "React with {{approve}} to send to {{channel}}\nReact with {{deny}} to deny",
+			context: "Information in the review embed showing instructions on how to approve/deny",
+			replaced: {
+				approve: {
+					to_replace: "{{approve}}",
+					description: "The approve reaction"
+				},
+				deny: {
+					to_replace: "{{deny}}",
+					description: "The deny reaction"
 				},
 				channel: {
 					to_replace: "{{channel}}",
