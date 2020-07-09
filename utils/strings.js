@@ -2920,14 +2920,6 @@ module.exports = {
 			string: "Unblocks a server member from using the bot",
 			context: "Description for the unblock command"
 		},
-		"COMMAND:BLACKLISTTEMP": {
-			string: "Shows information about the deprecated blacklist command",
-			context: "Description for the blacklisttemp command"
-		},
-		"BLACKLIST_DEPRECATED_INFO": {
-			string: "Over the past few weeks, protesters around the world have spoken out against all forms of racism and to proudly declare that Black Lives Matter. Here at Suggester, we support the Black Lives Matter movement and the protests, therefore we are working to eliminate even subtle forms of racism by moving away from terms like “blacklist” and “whitelist.” We have renamed the `blacklist` and `unblacklist` commands to `block` and `unblock`, respectively.\n\nThis [article](https://9to5google.com/2020/06/12/google-android-chrome-blacklist-blocklist-more-inclusive/) provides more context about why many tech companies are moving away from these terms.",
-			context: "Information about why the blacklist commands were deprecated"
-		},
 		"COMMAND:SHELL": {
 			string: "Runs shell code",
 			context: "Description for the shell command"
