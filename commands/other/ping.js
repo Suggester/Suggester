@@ -13,7 +13,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/ping",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let developerArray = [];

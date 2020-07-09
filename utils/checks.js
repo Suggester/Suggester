@@ -19,12 +19,13 @@ module.exports = {
 	 */
 	checkPermissions: async (member, client) => {
 		if (!member || !member.id || !client) return 10;
-		if (client.admins.has(member.id)) return 0;
 		let { dbQueryNoNew } = require("./db.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
-		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
+		if (client.admins.has(member.id)) return 0;
 		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;
+		if (!member.guild) return 10;
+		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
 		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
 		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;

@@ -12,7 +12,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/changelog",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
-		cooldown: 25
+		cooldown: 25,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
 		get("https://api.github.com/repos/Suggester-Bot/Suggester/releases/latest").then(({ data }) => {

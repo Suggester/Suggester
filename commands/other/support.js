@@ -9,7 +9,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/support",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: (locale, message) => {
 		return message.channel.send(string(locale, "SUPPORT_INVITE", { link: `https://discord.gg/${support_invite}` }));

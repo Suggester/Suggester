@@ -2965,6 +2965,10 @@ module.exports = {
 		"CFG_ONE_VOTE_TITLE": {
 			string: "**Multiple Reaction Voting:**",
 			context: "Title for choosing multiple vote reactions in the config embed"
+		},
+		"COMMAND_SERVER_ONLY": {
+			string: "This command is not available in DMs.",
+			context: "Error shown when a command is not available in DMs"
 		}
 	}
 };

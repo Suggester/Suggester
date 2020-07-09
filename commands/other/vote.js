@@ -8,7 +8,8 @@ module.exports = {
 		description: "Shows the link to info about voting",
 		enabled: true,
 		docs: "all/vote",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+		dmAvailable: true
 	},
 	do: async (locale, message) => {
 		let lists = {

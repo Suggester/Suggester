@@ -10,7 +10,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/notify",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });

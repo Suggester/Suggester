@@ -9,7 +9,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/invite",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: async (locale, message, client) => {
 		const url = "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=805694544>";

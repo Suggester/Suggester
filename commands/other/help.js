@@ -16,12 +16,17 @@ module.exports = {
 		enabled: true,
 		docs: "all/help",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		let missingConfig = await checkConfig(locale, qServerDB);
-		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
+		let serverPrefix = prefix;
+		let missingConfig;
+		if (message.guild) {
+			let qServerDB = await dbQuery("Server", { id: message.guild.id });
+			missingConfig = await checkConfig(locale, qServerDB);
+			serverPrefix = qServerDB.config.prefix;
+		}
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
