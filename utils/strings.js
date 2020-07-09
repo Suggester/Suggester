@@ -2969,6 +2969,24 @@ module.exports = {
 		"COMMAND_SERVER_ONLY": {
 			string: "This command is not available in DMs.",
 			context: "Error shown when a command is not available in DMs"
+		},
+		"HELP_USEFUL_LINKS": {
+			string: "Useful Links",
+			context: "Header for the useful links section of the help embed"
+		},
+		"HELP_USEFUL_LINKS_DESC": {
+			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://suggester.js.org/#/supporting/info)\n[Privacy Policy](https://suggester.js.org/#/legal)",
+			context: "Shows useful links on the help command",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				bot_invite: {
+					to_replace: "{{bot_invite}}",
+					description: "The link to invite the bot"
+				}
+			}
 		}
 	}
 };
