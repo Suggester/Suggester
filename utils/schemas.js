@@ -13,6 +13,7 @@ const settings = new Schema({
 		admin_roles: [String],
 		staff_roles: [String],
 		allowed_roles: [String],
+		voting_roles: [String],
 		blocked_roles: [String],
 		ping_role: String,
 		approved_role: { type: String },

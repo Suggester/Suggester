@@ -75,7 +75,7 @@ module.exports = {
 		if (emote) return [`${emote.animated ? "a:" : ""}${emote.name}:${emote.id}`, `<${emote.animated ? "a:" : ":"}${emote.name}:${emote.id}>`];
 		else return [null, null];
 	},
-	handleRoleInput: async function (locale, action, input, roles, name, present_string, success_string, force) {
+	handleRoleInput: async function (locale, action, input, roles, name, present_string, success_string, no_more_string, force) {
 		const { findRole } = require("./config");
 		if (!input) return string(locale, "CFG_NO_ROLE_SPECIFIED_ERROR", {}, "error");
 		let role = await findRole(input, roles);
@@ -93,7 +93,7 @@ module.exports = {
 			if (!current.includes(role.id)) return string(locale, present_string, {}, "error");
 			current.splice(current.findIndex(r => r === role.id), 1);
 			await dbModify("Server", {id: role.guild.id}, db);
-			return string(locale, success_string, { role: role.name }, "success");
+			return `${string(locale, success_string, { role: role.name }, "success")} ${no_more_string && current.length === 0 ? string(locale, no_more_string) : ""}`;
 		}
 	},
 	handleChannelInput: async function (locale, input, server, current_name, check_perms, done_str, reset_str) {

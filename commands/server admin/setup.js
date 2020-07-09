@@ -67,7 +67,7 @@ module.exports = {
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 							return setup(0);
 						}
 						else return setup(0);
@@ -93,7 +93,7 @@ module.exports = {
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 							return setup(1);
 						}
 						else return setup(1);

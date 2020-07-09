@@ -114,7 +114,7 @@ module.exports = {
 								deleteAfterReaction: true
 							}
 						)
-					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 					else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
 				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
@@ -150,7 +150,7 @@ module.exports = {
 								deleteAfterReaction: true
 							}
 						)
-					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 					else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
 				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
@@ -181,7 +181,7 @@ module.exports = {
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS", "CFG_ALLOWED_ROLES_APPEND_NOW")), { disableMentions: "everyone" });
 			}
 			case "list": {
 				return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
@@ -189,6 +189,31 @@ module.exports = {
 			default: {
 				if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
 				else return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
+			}
+			}
+		}
+		case "voting":
+		case "voterole":
+		case "voteroles":
+		case "votingrole":
+		case "votingroles": {
+			switch (args[1]) {
+			case "add":
+			case "+": {
+				return message.channel.send((await handleRoleInput(locale, "add", args.splice(2).join(" "), server.roles.cache, "voting_roles", "CFG_ALREADY_VOTING_ROLE_ERROR", "CFG_VOTING_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+			}
+			case "remove":
+			case "-":
+			case "rm":
+			case "delete": {
+				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "voting_roles", "CFG_NOT_VOTING_ROLE_ERROR", "CFG_VOTING_ROLE_REMOVE_SUCCESS", "CFG_VOTING_ROLES_APPEND_NOW")), { disableMentions: "everyone" });
+			}
+			case "list": {
+				return message.channel.send((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", true, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
+			}
+			default: {
+				if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+				else return message.channel.send((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", true, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
 			}
 			}
 		}
@@ -556,6 +581,8 @@ module.exports = {
 			cfgRolesArr.push(staffRoles[0]);
 			// Allowed roles
 			cfgRolesArr.push((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", false, string(locale, "CFG_ALLOWED_ROLES_APPEND")))[0]);
+			// Voting roles
+			cfgRolesArr.push((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", false, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
 			// Blocked roles
 			cfgRolesArr.push((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
 			// Approved suggestion role

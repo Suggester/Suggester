@@ -382,6 +382,22 @@ module.exports = {
 			string: "(all users can submit suggestions)",
 			context: "Appended to the end of the configuration value for allowed suggesting roles if none are configured"
 		},
+		"CFG_ALLOWED_ROLES_APPEND_NOW": {
+			string: "(All users can now submit suggestions)",
+			context: "Appended to the end of the role removed message when no more allowed roles exist"
+		},
+		"CFG_VOTING_ROLES_TITLE": {
+			string: "**Voting Roles:**",
+			context: "Denotes the list of voting roles when configuration is listed"
+		},
+		"CFG_VOTING_ROLES_APPEND": {
+			string: "(all users can vote on suggestions)",
+			context: "Appended to the end of the configuration value for voting roles if none are configured"
+		},
+		"CFG_VOTING_ROLES_APPEND_NOW": {
+			string: "(All users can now vote on suggestions)",
+			context: "Appended to the end of the role removed message when no more voting roles exist"
+		},
 		"CFG_APPROVED_ROLE_TITLE": {
 			string: "**Approved Suggestion Role:**",
 			context: "Denotes the approved suggestion role when configuration is listed"
@@ -1071,6 +1087,34 @@ module.exports = {
 		"CFG_ALLOWED_ROLE_REMOVE_SUCCESS": {
 			string: "Members with the **{{role}}** can no longer submit suggestions.",
 			context: "Success message when a role is removed from the allowed suggesting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_VOTING_ROLE_ERROR": {
+			string: "This role has already been given permission to vote on suggestions.",
+			context: "Error when a role has already been added as an voting role"
+		},
+		"CFG_VOTING_ROLE_ADD_SUCCESS": {
+			string: "Members with the **{{role}}** role can now vote on suggestions.",
+			context: "Success message when a role is added to the voting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_VOTING_ROLE_ERROR": {
+			string: "This role is not currently able to vote on suggestions.",
+			context: "Error when a role has not already been added as a voting role"
+		},
+		"CFG_VOTING_ROLE_REMOVE_SUCCESS": {
+			string: "Members with the **{{role}}** can no longer vote on suggestions.",
+			context: "Success message when a role is removed from the voting role list",
 			replaced: {
 				role: {
 					to_replace: "{{role}}",
