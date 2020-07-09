@@ -23,17 +23,17 @@ module.exports = async (Discord, client) => {
 	}
 
 	let presences = [
-		["LISTENING", `suggestions on ${(await getGuildCount())[1]} servers over ${client.shard.count} shards • @${client.user.username} help`],
-		["WATCHING", `${(await Suggestion.countDocuments())} suggestions • @${client.user.username} help`],
-		["PLAYING", `suggester.js.org • @${client.user.username} help`],
-		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info • @${client.user.username} help`],
-		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info • @${client.user.username} help`]
+		["LISTENING", `suggestions on ${(await getGuildCount())[1]} servers over ${client.shard.count} shards`],
+		["WATCHING", `${(await Suggestion.countDocuments())} suggestions`],
+		["PLAYING", "suggester.js.org"],
+		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info`],
+		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`]
 	];
 
 	let p = 0;
 	function setPresence() {
 		let presence = presences[p];
-		client.user.setActivity(presence[1], { type: presence[0] });
+		client.user.setActivity(`${presence[1]} • @${client.user.username} help`, { type: presence[0] });
 		p = p+1 === presences.length ? 0 : p+1;
 	}
 	setPresence();
