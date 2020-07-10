@@ -14,7 +14,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 	if (suggestion) {
 		let emotes = [suggestion.emojis.up.match(/a?:?.+:(\d+)/) ? suggestion.emojis.up.match(/a?:?.+:(\d+)/)[1] : suggestion.emojis.up, suggestion.emojis.mid.match(/a?:?.+:(\d+)/) ? suggestion.emojis.mid.match(/a?:?.+:(\d+)/)[1] : suggestion.emojis.mid, suggestion.emojis.down.match(/a?:?.+:(\d+)/) ? suggestion.emojis.down.match(/a?:?.+:(\d+)/)[1] : suggestion.emojis.down];
 		if (!emotes.includes(nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) return;
-		if (!db.config.voting_roles.some(r => messageReaction.message.guild.members.cache.get(user.id).roles.cache.has(r))) return messageReaction.users.remove(user.id);
+		if (db.config.voting_roles.length > 0 && !db.config.voting_roles.some(r => messageReaction.message.guild.members.cache.get(user.id).roles.cache.has(r))) return messageReaction.users.remove(user.id);
 		if (!db.config.reactionOptions.suggester && user.id === suggestion.suggester) return messageReaction.users.remove(user.id);
 		for await (let users of messageReaction.message.reactions.cache.map(r => r.users)) await users.fetch();
 		if (db.config.reactionOptions.one && emotes.filter(r => messageReaction.message.reactions.cache.get(r) && messageReaction.message.reactions.cache.get(r).users.cache.has(user.id)).length >= 2) return messageReaction.users.remove(user.id);
