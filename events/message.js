@@ -17,13 +17,12 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB;
 	let noCommand = false;
 	let command;
-	let args;
+	let args = message.content.split(" ");;
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
 		if (qServerDB.config.channels.suggestions === message.channel.id) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
-			args = message.content.split(" ");
 			noCommand = true;
 		}
 	}
@@ -32,7 +31,14 @@ module.exports = async (Discord, client, message) => {
 		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
 		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
 		if (!match) return;
-		args = message.content.split(" ").splice(match[1].endsWith(" ") ? 2 : 1);
+
+		if (match[1].endsWith(" ")) args = args.splice(1);
+		if (args[0].includes("\n")) {
+			args.splice(0, 1, ...args[0].split("\n"));
+		}
+
+		args.splice(0, 1);
+
 		command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2] || c.controls.aliases && c.controls.aliases.includes(match[2]));
 	}
 

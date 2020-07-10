@@ -53,7 +53,7 @@ module.exports = {
 		if (qServerDB.config.channels.commands && message.channel.id !== qServerDB.config.channels.commands && !noCommand) return message.channel.send(string(locale, "NOT_COMMAND_CHANNEL_ERROR", { channel: `<#${qServerDB.config.channels.commands}>` }, "error"));
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
-		if (!args[0] && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => {
+		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => {
 			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
 				message.delete();
 				sent.delete();
