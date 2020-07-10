@@ -22,5 +22,5 @@ module.exports = {
 		}
 		return message.channel.send(string(locale, "INVITE_BOT", { name: client.user.username, link: module.exports.url.replace("[ID]", client.user.id) }));
 	},
-	url: "<https://discordapp.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=805694544>"
+	url: "<https://discord.com/oauth2/authorize?client_id=[ID]&scope=bot&permissions=805694544>"
 };

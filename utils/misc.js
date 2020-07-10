@@ -90,7 +90,7 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(string(locale, title.string, {server: title.guild}))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
