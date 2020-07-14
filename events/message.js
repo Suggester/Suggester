@@ -39,7 +39,7 @@ module.exports = async (Discord, client, message) => {
 
 		args.splice(0, 1);
 
-		command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2] || c.controls.aliases && c.controls.aliases.includes(match[2]));
+		command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2].toLowerCase() || c.controls.aliases && c.controls.aliases.includes(match[2].toLowerCase()));
 	}
 
 	if (!command) return;

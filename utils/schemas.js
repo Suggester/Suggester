@@ -97,7 +97,7 @@ const command = new Schema({
 	success: { type: Boolean, required: false },
 
 	user: { type: String, required: true },
-	guild: { type: String, required: true },
+	guild: String,
 	channel: { type: String, required: true },
 	message: { type: String, required: true },
 
