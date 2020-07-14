@@ -1,4 +1,5 @@
-const { coreLog } = require("../utils/logs.js");
+const { coreLog } = require("../utils/logs");
+const { Suggestion } = require("../utils/schemas");
 const { release, lists } = require("../config.json");
 const blapi = require("blapi");
 const chalk = require("chalk");
@@ -11,14 +12,39 @@ module.exports = async (Discord, client) => {
 		client.admins.add(admin.id);
 		console.log(chalk`{blue [{bold INFO}] Found {bold ${admin.tag}}}`);
 	}
-	
+
 	coreLog(`🆗 Logged in with ${client.guilds.cache.size} servers! (Shard: ${client.shard.ids[0]})`, client);
 	console.log(chalk`{green [{bold INFO}] Logged in as {bold ${client.user.tag}}! (Release: {bold ${release}, Shard: ${client.shard.ids[0]})}}`);
 
-	//Post to bot lists
-	async function post() {
+	async function getGuildCount() {
 		const guildCounts = await client.shard.fetchClientValues("guilds.cache.size"); // ['1006', '966']
 		const totalGuildCount = guildCounts.reduce((total, current) => total + current, 0); // 1972
+		return [guildCounts, totalGuildCount];
+	}
+
+	let presences = [
+		["LISTENING", `suggestions on ${(await getGuildCount())[1]} servers over ${client.shard.count} shards`],
+		["WATCHING", `${(await Suggestion.countDocuments())} suggestions`],
+		["PLAYING", "suggester.js.org"],
+		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info`],
+		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`],
+		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`]
+	];
+
+	let p = 0;
+	function setPresence() {
+		let presence = presences[p];
+		client.user.setActivity(`${presence[1]} • @${client.user.username} help`, { type: presence[0] });
+		p = p+1 === presences.length ? 0 : p+1;
+	}
+	setPresence();
+	setInterval(function() {
+		setPresence();
+	}, 600000); //Change presence every 10 minutes
+
+	//Post to bot lists
+	async function post() {
+		let [guildCounts, totalGuildCount] = await getGuildCount();
 
 		blapi.manualPost(totalGuildCount, client.user.id, lists, null, guildCounts.length, guildCounts);
 	}

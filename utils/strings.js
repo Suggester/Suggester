@@ -17,7 +17,7 @@ module.exports = {
 		let newString = list[string_name] || string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
-				if (replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
+				if (replaced && replaced[r]) newString = newString.replace(new RegExp(string.replaced[r].to_replace, "g"), replaced[r]);
 			});
 		}
 		if (prefix_with) {
@@ -84,33 +84,13 @@ module.exports = {
 				}
 			}
 		},
-		"NO_PLAYING_STATUS_ERROR": {
-			string: "You must specify a playing status!",
-			context: "Error that shows when the botconfig command is run without any playing status parameters"
-		},
-		"PLAYING_STATUS_SET_SUCCESS": {
-			string: "Playing status set!",
-			context: "Success message when the bot playing status is configured"
-		},
 		"NO_STATUS_ERROR": {
 			string: "You must specify a valid status!",
 			context: "Error that shows when the botconfig or mark commands are run without any status parameter"
 		},
-		"STATUS_SET_SUCCESS": {
-			string: "Status set!",
-			context: "Success message when the bot status is configured"
-		},
-		"NO_AVATAR_ERROR": {
-			string: "You must specify an avatar!",
-			context: "Error that shows when the botconfig command is run without any avatar parameter"
-		},
 		"INVALID_AVATAR_ERROR": {
 			string: "Please provide a valid image URL! Images can have extensions of `jpeg`, `jpg`, `png`, or `gif`",
 			context: "Error that shows when the avatar specified is invalid"
-		},
-		"AVATAR_SET_SUCCESS": {
-			string: "Avatar set!",
-			context: "Success message when the bot avatar is configured"
 		},
 		"NO_DB_PARAMS_SPECIFIED_ERROR": {
 			string: "You must specify whether to query or modify, a collection name, query field, and query value.",
@@ -189,6 +169,10 @@ module.exports = {
 		"CANCELLED": {
 			string: "Cancelled",
 			context: "String used when an action is cancelled"
+		},
+		"CLOSED": {
+			string: "Closed",
+			context: "String used when an embed is closed"
 		},
 		"SPECIFY_USER_OR_GUILD_ERROR": {
 			string: "You must specify `user` or `guild`",
@@ -397,6 +381,22 @@ module.exports = {
 		"CFG_ALLOWED_ROLES_APPEND": {
 			string: "(all users can submit suggestions)",
 			context: "Appended to the end of the configuration value for allowed suggesting roles if none are configured"
+		},
+		"CFG_ALLOWED_ROLES_APPEND_NOW": {
+			string: "(All users can now submit suggestions)",
+			context: "Appended to the end of the role removed message when no more allowed roles exist"
+		},
+		"CFG_VOTING_ROLES_TITLE": {
+			string: "**Voting Roles:**",
+			context: "Denotes the list of voting roles when configuration is listed"
+		},
+		"CFG_VOTING_ROLES_APPEND": {
+			string: "(all users can vote on suggestions)",
+			context: "Appended to the end of the configuration value for voting roles if none are configured"
+		},
+		"CFG_VOTING_ROLES_APPEND_NOW": {
+			string: "(All users can now vote on suggestions)",
+			context: "Appended to the end of the role removed message when no more voting roles exist"
 		},
 		"CFG_APPROVED_ROLE_TITLE": {
 			string: "**Approved Suggestion Role:**",
@@ -772,7 +772,7 @@ module.exports = {
 			string: "Approve/Deny",
 			context: "Header for the approve/deny field of the review embed"
 		},
-		"REVIEW_COMMAND_INFO": {
+		"REVIEW_COMMAND_INFO": { //Keeping in case of a revert to old description during testing
 			string: "Use **{{prefix}}approve {{id}}** to send to {{channel}}\nUse **{{prefix}}deny {{id}}** to deny",
 			context: "Information in the review embed showing instructions on how to approve/deny",
 			replaced: {
@@ -783,6 +783,24 @@ module.exports = {
 				id: {
 					to_replace: "{{id}}",
 					description: "A suggestion ID"
+				},
+				channel: {
+					to_replace: "{{channel}}",
+					description: "The suggestions channel mention"
+				}
+			}
+		},
+		"REVIEW_COMMAND_INFO_NEW": {
+			string: "React with {{approve}} to send to {{channel}}\nReact with {{deny}} to deny",
+			context: "Information in the review embed showing instructions on how to approve/deny",
+			replaced: {
+				approve: {
+					to_replace: "{{approve}}",
+					description: "The approve reaction"
+				},
+				deny: {
+					to_replace: "{{deny}}",
+					description: "The deny reaction"
 				},
 				channel: {
 					to_replace: "{{channel}}",
@@ -1076,6 +1094,34 @@ module.exports = {
 				}
 			}
 		},
+		"CFG_ALREADY_VOTING_ROLE_ERROR": {
+			string: "This role has already been given permission to vote on suggestions.",
+			context: "Error when a role has already been added as an voting role"
+		},
+		"CFG_VOTING_ROLE_ADD_SUCCESS": {
+			string: "Members with the **{{role}}** role can now vote on suggestions.",
+			context: "Success message when a role is added to the voting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_NOT_VOTING_ROLE_ERROR": {
+			string: "This role is not currently able to vote on suggestions.",
+			context: "Error when a role has not already been added as a voting role"
+		},
+		"CFG_VOTING_ROLE_REMOVE_SUCCESS": {
+			string: "Members with the **{{role}}** can no longer vote on suggestions.",
+			context: "Success message when a role is removed from the voting role list",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
 		"CFG_INVALID_ROLE_PARAM_ERROR": {
 			string: "Please specify `add`, `remove`, or `list`.",
 			context: "Error when a user specifies an invalid action for role configuration"
@@ -1232,9 +1278,15 @@ module.exports = {
 			string: "Successfully set the mode for this server to **autoapprove**.",
 			context: "Success message when the mode is set to autoapprove"
 		},
-		"CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR": {
-			string: "All suggestions awaiting review must be cleared before the autoapprove mode is set.",
-			context: "Error when a user tries to set the autoapprove mode while suggestions are still awaiting review"
+		"CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR_Q": {
+			string: "All suggestions awaiting review must be cleared before the autoapprove mode is set. Use the `{{prefix}}queue` command to see all suggestions awaiting review.",
+			context: "Error when a user tries to set the autoapprove mode while suggestions are still awaiting review",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
 		},
 		"CFG_MODE_INVALID_ERROR": {
 			string: "Please specify a valid mode. (Either `review` or `autoapprove`)",
@@ -1341,6 +1393,38 @@ module.exports = {
 		"GUILD_NOTIFICATIONS_ALREADY_DISABLED": {
 			string: "Server notifications are already disabled.",
 			context: "Shown when notifications are disabled and a guild tries to disable them"
+		},
+		"CFG_SELF_VOTE_ENABLED": {
+			string: "Members can vote on their own suggestions.",
+			context: "Shown when a guild has enabled self voting"
+		},
+		"CFG_SELF_VOTE_DISABLED": {
+			string: "Members cannot vote on their own suggestions.",
+			context: "Shown when a guild has disabled self voting"
+		},
+		"CFG_SELF_VOTE_ALREADY_ENABLED": {
+			string: "Members can already vote on their own suggestions.",
+			context: "Shown when self voting is enabled and a guild tries to enable it"
+		},
+		"CFG_SELF_VOTE_ALREADY_DISABLED": {
+			string: "Members are already disallowed from voting on their own suggestions.",
+			context: "Shown when self voting is disabled and a guild tries to disable it"
+		},
+		"CFG_ONE_VOTE_ENABLED": {
+			string: "Members can only choose one reaction option when voting on a suggestion",
+			context: "Shown when a guild has enabled only choosing one vote option"
+		},
+		"CFG_ONE_VOTE_DISABLED": {
+			string: "Members can choose multiple reaction options when voting on a suggestion",
+			context: "Shown when a guild has disabled only choosing one vote option"
+		},
+		"CFG_ONE_VOTE_ALREADY_ENABLED": {
+			string: "Members are already limited to choosing one reaction option when voting on a suggestion.",
+			context: "Shown when choosing one vote reaction is enabled and a guild tries to enable it"
+		},
+		"CFG_ONE_VOTE_ALREADY_DISABLED": {
+			string: "Members can already choose multiple reaction options when voting on a suggestion.",
+			context: "Shown when choosing one vote reaction is disabled and a guild tries to disable it"
 		},
 		"CFG_CLEAN_COMMANDS_ENABLED": {
 			string: "Auto-cleaning of suggestion commands is **enabled**.",
@@ -2824,6 +2908,7 @@ module.exports = {
 		},
 		"LOCALE_REFRESH_SUCCESS": {
 			string: "Successfully loaded {{count}} locales.",
+			context: "Message shown when locales are reloaded",
 			replaced: {
 				count: {
 					to_replace: "{{count}}",
@@ -2835,17 +2920,73 @@ module.exports = {
 			string: "Unblocks a server member from using the bot",
 			context: "Description for the unblock command"
 		},
-		"COMMAND:BLACKLISTTEMP": {
-			string: "Shows information about the deprecated blacklist command",
-			context: "Description for the blacklisttemp command"
-		},
-		"BLACKLIST_DEPRECATED_INFO": {
-			string: "Over the past few weeks, protesters around the world have spoken out against all forms of racism and to proudly declare that Black Lives Matter. Here at Suggester, we support the Black Lives Matter movement and the protests, therefore we are working to eliminate even subtle forms of racism by moving away from terms like “blacklist” and “whitelist.” We have renamed the `blacklist` and `unblacklist` commands to `block` and `unblock`, respectively.\n\nThis [article](https://9to5google.com/2020/06/12/google-android-chrome-blacklist-blocklist-more-inclusive/) provides more context about why many tech companies are moving away from these terms.",
-			context: "Information about why the blacklist commands were deprecated"
-		},
 		"COMMAND:SHELL": {
 			string: "Runs shell code",
 			context: "Description for the shell command"
+		},
+		"CFG_COLOR_CHANGE_INFO": {
+			string: "At **{{number}}** net upvote(s), the embed color will change to {{color}}.",
+			context: "Shows the configured color change settings",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The configured number of net upvotes"
+				},
+				color: {
+					to_replace: "{{color}}",
+					description: "The configured color for the embed to change to"
+				}
+			}
+		},
+		"CFG_COLOR_CHANGE_INVALID_NUMBER": {
+			string: "You must specify a valid integer greater than 0.",
+			context: "Error shown when the number specified for the color change threshold is invalid or less than 1"
+		},
+		"CFG_COLOR_CHANGE_INVALID_COLOR": {
+			string: "You must specify a valid color (ex. Hex color, CSS color name)",
+			context: "Error shown when the color specified for the color change is invalid"
+		},
+		"CFG_COLOR_CHANGE_NO_PARAMS": {
+			string: "You must specify `color` or `count`",
+			context: "Error shown when an invalid parameter is specified in upvote color change configuration"
+		},
+		"CFG_INTERNAL_TITLE": {
+			string: "Internal Configuration",
+			context: "Header for the internal configuration section of the config list embed"
+		},
+		"CFG_COLOR_CHANGE_TITLE": {
+			string: "**Color Change:**",
+			context: "Title for color change in the config embed"
+		},
+		"CFG_SELF_VOTE_TITLE": {
+			string: "**Voting on Own Suggestions:**",
+			context: "Title for self voting in the config embed"
+		},
+		"CFG_ONE_VOTE_TITLE": {
+			string: "**Multiple Reaction Voting:**",
+			context: "Title for choosing multiple vote reactions in the config embed"
+		},
+		"COMMAND_SERVER_ONLY": {
+			string: "This command is not available in DMs.",
+			context: "Error shown when a command is not available in DMs"
+		},
+		"HELP_USEFUL_LINKS": {
+			string: "Useful Links",
+			context: "Header for the useful links section of the help embed"
+		},
+		"HELP_USEFUL_LINKS_DESC": {
+			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://suggester.js.org/#/supporting/info)\n[Privacy Policy](https://suggester.js.org/#/legal)",
+			context: "Shows useful links on the help command",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				bot_invite: {
+					to_replace: "{{bot_invite}}",
+					description: "The link to invite the bot"
+				}
+			}
 		}
 	}
 };

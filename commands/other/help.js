@@ -2,7 +2,8 @@ const { permLevelToRole } = require("../../utils/misc");
 const { dbQuery } = require("../../utils/db");
 const { checkConfig } = require("../../utils/checks");
 const { MessageAttachment } = require("discord.js");
-const { colors, prefix } = require("../../config.json");
+const { colors, prefix, support_invite } = require("../../config.json");
+const { url } = require("./invite");
 const { string } = require("../../utils/strings");
 
 module.exports = {
@@ -16,17 +17,23 @@ module.exports = {
 		enabled: true,
 		docs: "all/help",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
-		let missingConfig = await checkConfig(locale, qServerDB);
-		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
+		let serverPrefix = prefix;
+		let missingConfig;
+		if (message.guild) {
+			let qServerDB = await dbQuery("Server", { id: message.guild.id });
+			missingConfig = await checkConfig(locale, qServerDB);
+			serverPrefix = qServerDB.config.prefix;
+		}
 
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed()
 				.setDescription(string(locale, "HELP_BASE_DESCRIPTION"))
-				.setFooter(string(locale, "HELP_PREFIX_INFO", { prefix: serverPrefix }))
+				.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC", { support_invite, bot_invite: url.replace("[ID]", client.user.id) }))
+				.setFooter(message.guild ? string(locale, "HELP_PREFIX_INFO", { prefix: serverPrefix }) : "")
 				.setColor(colors.default);
 
 			if (missingConfig) embed.addField(string(locale, "MISSING_CONFIG_TITLE"), string(locale, "MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));

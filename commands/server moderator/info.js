@@ -44,7 +44,7 @@ module.exports = {
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":
 			embed.setColor(colors.yellow)
-				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), `${string(locale, "AWAITING_REVIEW_STATUS")} ([${string(locale, "QUEUE_POST_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
+				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), `${string(locale, "AWAITING_REVIEW_STATUS")} ([${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
 		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
@@ -86,7 +86,7 @@ module.exports = {
 
 				if (!messageFetched) return message.channel.send(string(locale, "SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error"));
 
-				embed.addField(string(locale, "SUGGESTION_FEED_LINK"), `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+				embed.addField(string(locale, "SUGGESTION_FEED_LINK"), `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
 			} else embed.addField(string(locale, "HELP_ADDITIONAL_INFO"), string(locale, "INFO_IMPLEMENTED"));
 			break;
 		}

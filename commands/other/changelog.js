@@ -12,7 +12,8 @@ module.exports = {
 		enabled: true,
 		docs: "all/changelog",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
-		cooldown: 25
+		cooldown: 25,
+		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
 		get("https://api.github.com/repos/Suggester-Bot/Suggester/releases/latest").then(({ data }) => {
@@ -28,6 +29,7 @@ module.exports = {
 					.setURL(data.html_url)
 					.setColor(colors.default)
 					.setTimestamp(data.created_at)
+					.setAuthor(split_body.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(`${split_body.length > 1 ? `${string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS")}\n` : ""}${string(locale, "CHANGELOG_RELEASED_FOOTER")}`)
 				);
 			}

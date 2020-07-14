@@ -31,8 +31,9 @@ module.exports = {
 	 * @param {module:"discord.js".Client} client - Discord.js client
 	 * @return {Promise<module:"discord.js".RichEmbed>}
 	 */
-	suggestionEmbed: async (locale, suggestion, _server, client) => {
+	suggestionEmbed: async (locale, suggestion, server, client) => {
 		const { fetchUser } = module.exports;
+		const { checkVotes } = require("./actions");
 		let suggester = await fetchUser(suggestion.suggester, client);
 		let embed = new Discord.MessageEmbed();
 		// User information
@@ -43,7 +44,7 @@ module.exports = {
 			// Footer
 			.setTimestamp(suggestion.submitted)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
-		// Side Color
+		// Embed Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
 			embed.setColor(colors.green)
@@ -62,6 +63,11 @@ module.exports = {
 		}
 		default: {
 			embed.setColor(colors.default);
+			// Check for Color Change Threshold, Modify Color if Met
+			client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
+				let votes = checkVotes(locale, suggestion, m);
+				if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
+			}).catch(() => {});
 		}
 		}
 		// Comments
@@ -84,7 +90,7 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(string(locale, title.string, {server: title.guild}))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);

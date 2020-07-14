@@ -1,80 +1,70 @@
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { dbQuery, dbModify } = require("../utils/db");
-const { coreLog, commandLog, errorLog, commandExecuted } = require("../utils/logs");
+const { commandLog, errorLog, commandExecuted } = require("../utils/logs");
 const { prefix, log_hooks, support_invite } = require("../config.json");
 const { string } = require("../utils/strings");
 const { Collection } = require("discord.js");
+function escapeRegExp(string) {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
 
 module.exports = async (Discord, client, message) => {
 	const pre = new Date();
-	if (!["text", "news"].includes(message.channel.type)) {
-		let dmEmbed = new Discord.MessageEmbed()
-			.setDescription(message.content);
-		if (message.channel.type === "dm" && client.user.id !== message.author.id) return coreLog(`📧 **${message.author.tag}** (\`${message.author.id}\`) sent a DM to the bot:`, { embeds: [dmEmbed] }, client);
-		return;
-	}
-	if (message.author.bot === true) return;
+	if (!["text", "news", "dm"].includes(message.channel.type) || message.author.bot) return;
 
-	let permission = await checkPermissions(message.member, client);
+	let permission = await checkPermissions(message.member || message.author, client);
 
-	let qServerDB = await dbQuery("Server", { id: message.guild.id });
-	if (qServerDB.blocked) return message.guild.leave();
-
-	let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
-
-	let regexEscape = "^$.|?*+()[{".split("");
-	regexEscape.push("\\");
-
-	const match = message.content.match(new RegExp(`^<@!?${client.user.id}> ?`));
-	let specialPrefix = false;
-	if (match) {
-		serverPrefix = match[0];
-		specialPrefix = true;
-	}
-	else if (permission <= 1 && message.content.toLowerCase().startsWith("suggester:")) {
-		serverPrefix = "suggester:";
-		specialPrefix = true;
-	}
-	else if (permission <= 1 && message.content.toLowerCase().startsWith(`${client.user.id}:`)) {
-		serverPrefix = `${client.user.id}:`;
-		specialPrefix = true;
-	}
-
-	if (!message.content.toLowerCase().startsWith(serverPrefix)) return;
-	let args = message.content.split(" ");
-	serverPrefix.endsWith(" ") ? args = args.splice(2) : args = args.splice(1);
-
-	if (!specialPrefix) {
-		let splitPrefix = serverPrefix.split("");
-		for (let i = 0; i < splitPrefix.length; i++) {
-			if (regexEscape.includes(splitPrefix[i])) splitPrefix[i] = "\\" + splitPrefix[i];
+	let qServerDB;
+	let noCommand = false;
+	let command;
+	let args = message.content.split(" ");;
+	if (message.guild) {
+		qServerDB = await dbQuery("Server", {id: message.guild.id});
+		if (qServerDB.blocked) return message.guild.leave();
+		if (qServerDB.config.channels.suggestions === message.channel.id) {
+			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
+			noCommand = true;
 		}
-		serverPrefix = splitPrefix.join("");
 	}
-	let commandName = message.content.toLowerCase().match(new RegExp(`^${serverPrefix}([a-z]+)`));
 
-	if (!commandName || !commandName[1]) return;
-	else commandName = commandName[1];
+	if (!command) {
+		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
+		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
+		if (!match) return;
 
-	const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
+		if (match[1].endsWith(" ")) args = args.splice(1);
+		if (args[0].includes("\n")) {
+			args.splice(0, 1, ...args[0].split("\n"));
+		}
+
+		args.splice(0, 1);
+
+		command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2].toLowerCase() || c.controls.aliases && c.controls.aliases.includes(match[2].toLowerCase()));
+	}
+
 	if (!command) return;
 
 	let qUserDB = await dbQuery("User", { id: message.author.id });
-	let locale = qUserDB.locale || qServerDB.config.locale || "en";
+	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "en";
 
+	if (message.channel.type === "dm" && !command.controls.dmAvailable) {
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in DMs but the command is only usable in a server.`, message);
+		await commandExecuted(command, message, { pre, post: new Date(), success: false });
+		return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
+	}
 	if (command.controls.enabled === false) {
-		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but the command is disabled.`, message);
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, "COMMAND_DISABLED", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`) but did not have permission to do so.`, message);
+		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but did not have permission to do so.`, message);
 	}
 
-	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${commandName}\` in the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`).`, message);
+	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
 
-	if (command.controls.permissions) {
+	if (command.controls.permissions && message.channel.type !== "dm") {
 		let checkPerms = channelPermissions(locale, command.controls.permissions, message.channel, client);
 		if (checkPerms) {
 			await commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -115,7 +105,14 @@ module.exports = async (Discord, client, message) => {
 
 				counts.set(message.author.id, 0);
 
-				message.channel.send(string(locale, "COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` }));
+				message.channel.send(string(locale, "COOLDOWN_SPAM_FLAG", { mention: `<@${message.author.id}>`, support: `https://discord.gg/${support_invite}` })).then(m => {
+					if (noCommand) {
+						setTimeout(function() {
+							message.delete();
+							m.delete();
+						}, 7500);
+					}
+				});
 
 				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
 				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\n(@everyone)`, {disableMentions: "none"});
@@ -123,7 +120,14 @@ module.exports = async (Discord, client, message) => {
 
 			if (expires > now) {
 				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`);
+				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`).then(m => {
+					if (noCommand) {
+						setTimeout(function() {
+							message.delete();
+							m.delete();
+						}, 7500);
+					}
+				});
 			}
 		}
 
@@ -131,13 +135,10 @@ module.exports = async (Discord, client, message) => {
 		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
-	if (qServerDB.config.blocklist && qServerDB.config.blocklist.includes(message.author.id)) {
-		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return;
-	}
+	if (message.guild && qServerDB.config.blocklist && qServerDB.config.blocklist.includes(message.author.id)) return commandExecuted(command, message, { pre, post: new Date(), success: false });
 
 	try {
-		command.do(locale, message, client, args, Discord)
+		command.do(locale, message, client, args, Discord, noCommand)
 			.then(() => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
 			})

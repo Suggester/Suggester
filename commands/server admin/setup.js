@@ -67,7 +67,7 @@ module.exports = {
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 							return setup(0);
 						}
 						else return setup(0);
@@ -93,7 +93,7 @@ module.exports = {
 								}
 							)
 						)) {
-							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+							message.channel.send((await handleRoleInput(locale, "add", returnCollect.content, message.guild.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 							return setup(1);
 						}
 						else return setup(1);
@@ -124,7 +124,7 @@ module.exports = {
 							id: message.guild.id
 						});
 						if (suggestionsAwaitingReview) {
-							message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
+							message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR_Q", { prefix: db.config.prefix }, "error"));
 							return setup(2);
 						}
 						db.config.mode = "autoapprove";
@@ -248,10 +248,10 @@ module.exports = {
 		async function start (startAt=0) {
 			let oldAllowlist = qServerDB.allowlist;
 			await dbDeleteOne("Server", {id: message.guild.id}); //Delete old config
-			await new Server({ id: message.guild.id }).save();
+			let newDB = await new Server({ id: message.guild.id }).save();
 			if (oldAllowlist) {
-				qServerDB.allowlist = oldAllowlist;
-				await dbModify("Server", {id: message.guild.id}, qServerDB); //Add allowlist if previous
+				newDB.allowlist = oldAllowlist;
+				await dbModify("Server", {id: message.guild.id}, newDB); //Add allowlist if previous
 			}
 			return setup(startAt);
 		}

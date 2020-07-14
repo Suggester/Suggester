@@ -27,7 +27,7 @@ module.exports = {
 		queuedSuggestions.forEach(suggestion => {
 			listarray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${suggestion.suggestionId.toString()}`,
-				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discordapp.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
+				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
 			});
 		});
 		if (!listarray[0]) return message.channel.send(string(locale, "NONE_AWAITING_REVIEW", {}, "success"));
@@ -41,7 +41,8 @@ module.exports = {
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);
 			});
-			if (chunks.length > 1) embed.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			if (chunks.length > 1) embed.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"))
+				.setAuthor(string(locale, "PAGINATION_PAGE_COUNT"));
 			embeds.push(embed);
 		}
 

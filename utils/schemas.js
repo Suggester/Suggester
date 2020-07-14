@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { prefix } = require("../config.json");
+const { prefix, emojis, colors: { gold } } = require("../config.json");
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
 
 const settings = new Schema({
@@ -13,6 +13,7 @@ const settings = new Schema({
 		admin_roles: [String],
 		staff_roles: [String],
 		allowed_roles: [String],
+		voting_roles: [String],
 		blocked_roles: [String],
 		ping_role: String,
 		approved_role: { type: String },
@@ -23,6 +24,12 @@ const settings = new Schema({
 			denied: { type: String },
 			archive: { type: String },
 			commands: { type: String }
+		},
+		reactionOptions: {
+			suggester: { type: Boolean, default: true },
+			one: { type: Boolean, default: true },
+			color_threshold: { type: Number, default: 15 },
+			color: { type: String, default: gold }
 		},
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
@@ -57,6 +64,10 @@ const suggestion = new Schema({
 		mid: { type: String, default: "🤷" },
 		down: { type: String, default: "👎" }
 	},
+	reviewEmojis: {
+		approve: String,
+		deny: String
+	},
 	messageId: String,
 	comments: [
 		{
@@ -86,7 +97,7 @@ const command = new Schema({
 	success: { type: Boolean, required: false },
 
 	user: { type: String, required: true },
-	guild: { type: String, required: true },
+	guild: String,
 	channel: { type: String, required: true },
 	message: { type: String, required: true },
 

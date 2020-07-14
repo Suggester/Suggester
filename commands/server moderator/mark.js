@@ -89,7 +89,7 @@ module.exports = {
 			client.channels.cache.get(qServerDB.config.channels.archive).send(suggestionNewEmbed).then(async sent => {
 				let replyEmbed = new Discord.MessageEmbed()
 					.setTitle(string(locale, "STATUS_EDITED_TITLE"))
-					.setDescription(`${qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
+					.setDescription(`${qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`)
 					.setColor(color)
 					.setFooter(string(locale, "SUGGESTION_FOOTER", {id: id.toString()}))
 					.setTimestamp(qSuggestionDB.submitted)
@@ -101,13 +101,13 @@ module.exports = {
 				let qUserDB = await dbQuery("User", { id: suggester.id });
 				let notify = dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
 				if (isComment) notify.addField(string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
-				notify.addField(string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK"), `[${string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
+				notify.addField(string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK"), `[${string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 				if (qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 
 				if (qServerDB.config.channels.log) {
 					let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
 						.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), guildstr)
-						.addField(string(guildLocale, "IMPLEMENTED_LINK"), `[${string(guildLocale, "IMPLEMENTED_LINK")}](https://discordapp.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
+						.addField(string(guildLocale, "IMPLEMENTED_LINK"), `[${string(guildLocale, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 
 					if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					serverLog(logs, qServerDB, client);
@@ -124,7 +124,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "STATUS_EDITED_TITLE"))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discordapp.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setColor(color)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: id.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)

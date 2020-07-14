@@ -15,7 +15,7 @@ extend("User", (GM) => {
 				id: "0",
 				tag: "Unknown User#0000",
 				displayAvatarURL () {
-					return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
+					return "https://discord.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
 				},
 				send () {
 					return null;

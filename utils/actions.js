@@ -60,7 +60,7 @@ module.exports = {
 		const e = (await msg.awaitReactions(filter, {max: 1, time: options && options.time || 300000})).first();
 
 		if (options && options.deleteAfterReaction) msg.delete();
-		else if (!options && options.keepReactions) msg.reactions.removeAll();
+		else if (!options && options.keepReactions && message.channel.type !== "dm") msg.reactions.removeAll();
 
 		if (e && e.emoji && e.emoji.id === yesId) {
 			if (options && options.confirmMessage && !options.deleteAfterReaction) await msg.edit(options && options.confirmMessage instanceof Discord.MessageEmbed ? {
@@ -112,7 +112,7 @@ module.exports = {
 		if (!content.length) throw new Error("Content array is empty");
 		let removeReaction = options.removeReaction;
 
-		if (!message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
+		if (message.channel.type === "dm" || !message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) removeReaction = false;
 
 		const emojis = {
 			left: "⬅️",
@@ -130,7 +130,7 @@ module.exports = {
 		const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 		let page = options.startPage;
-		content[page].setAuthor(`Page ${page+1}/${content.length}`);
+		content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
 		const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
 		for (const emoji in emojis) await msg.react(emojis[emoji]);
@@ -146,12 +146,12 @@ module.exports = {
 				if (removeReaction) users.remove(user.id);
 			}
 			else if (emojis.end && (id === emojis.end || name === emojis.end)) {
-				msg.edit(string(locale, "CANCELLED", {}, "error"), {embed: null});
+				msg.edit(string(locale, "CLOSED", {}, "error"), {embed: null});
 				collector.stop();
 				return;
 			}
 			if (msg) {
-				content[page].setAuthor(`Page ${page+1}/${content.length}`);
+				content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
 				if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
 				else msg.edit(content[page]);
 			}

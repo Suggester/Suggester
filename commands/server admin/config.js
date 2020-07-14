@@ -2,9 +2,10 @@ const { colors, emoji, support_invite } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
 const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("../../utils/config");
 const { checkPermissions } = require("../../utils/checks");
-const { confirmation } = require("../../utils/actions");
+const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
+const colorString = require("color-string");
 module.exports = {
 	controls: {
 		name: "config",
@@ -113,7 +114,7 @@ module.exports = {
 								deleteAfterReaction: true
 							}
 						)
-					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "admin_roles", "CFG_ALREADY_ADMIN_ROLE_ERROR", "CFG_ADMIN_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 					else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
 				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
@@ -149,7 +150,7 @@ module.exports = {
 								deleteAfterReaction: true
 							}
 						)
-					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", true)), { disableMentions: "everyone" });
+					)) return message.channel.send((await handleRoleInput(locale, "add", origRole, server.roles.cache, "staff_roles", "CFG_ALREADY_STAFF_ROLE_ERROR", "CFG_STAFF_ROLE_ADD_SUCCESS", null, true)), { disableMentions: "everyone" });
 					else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
 				} else return message.channel.send(output, { disableMentions: "everyone" });
 			}
@@ -180,7 +181,7 @@ module.exports = {
 			case "-":
 			case "rm":
 			case "delete": {
-				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS")), { disableMentions: "everyone" });
+				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "allowed_roles", "CFG_NOT_ALLOWED_ROLE_ERROR", "CFG_ALLOWED_ROLE_REMOVE_SUCCESS", "CFG_ALLOWED_ROLES_APPEND_NOW")), { disableMentions: "everyone" });
 			}
 			case "list": {
 				return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
@@ -188,6 +189,31 @@ module.exports = {
 			default: {
 				if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
 				else return message.channel.send((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", true))[0]);
+			}
+			}
+		}
+		case "voting":
+		case "voterole":
+		case "voteroles":
+		case "votingrole":
+		case "votingroles": {
+			switch (args[1]) {
+			case "add":
+			case "+": {
+				return message.channel.send((await handleRoleInput(locale, "add", args.splice(2).join(" "), server.roles.cache, "voting_roles", "CFG_ALREADY_VOTING_ROLE_ERROR", "CFG_VOTING_ROLE_ADD_SUCCESS")), { disableMentions: "everyone" });
+			}
+			case "remove":
+			case "-":
+			case "rm":
+			case "delete": {
+				return message.channel.send((await handleRoleInput(locale, "remove", args.splice(2).join(" "), server.roles.cache, "voting_roles", "CFG_NOT_VOTING_ROLE_ERROR", "CFG_VOTING_ROLE_REMOVE_SUCCESS", "CFG_VOTING_ROLES_APPEND_NOW")), { disableMentions: "everyone" });
+			}
+			case "list": {
+				return message.channel.send((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", true, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
+			}
+			default: {
+				if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+				else return message.channel.send((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", true, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
 			}
 			}
 		}
@@ -305,7 +331,7 @@ module.exports = {
 			case "auto-approve":
 			case "auto_approve":
 			case "auto": {
-				if ((await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id}))) return message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR", {}, "error"));
+				if ((await dbQueryNoNew("Suggestion", {status: "awaiting_review", id: server.id}))) return message.channel.send(string(locale, "CFG_SUGGESTIONS_AWAITING_REVIEW_ERROR_Q", { prefix: qServerDB.config.prefix }, "error"));
 				qServerDB.config.mode = "autoapprove";
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string(locale, "CFG_MODE_AUTOAPPROVE_SET_SUCCESS", {}, ""));
@@ -433,6 +459,93 @@ module.exports = {
 				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
 		}
+		case "suggestervote":
+		case "uservote":
+		case "self":
+		case "selfvote": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.reactionOptions.suggester) {
+					qServerDB.config.reactionOptions.suggester = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_SELF_VOTE_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_SELF_VOTE_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.reactionOptions.suggester) {
+					qServerDB.config.reactionOptions.suggester = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_SELF_VOTE_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_SELF_VOTE_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.reactionOptions.suggester = !qServerDB.config.reactionOptions.suggester;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "onevote":
+		case "one":
+		case "limitvote": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.reactionOptions.one) {
+					qServerDB.config.reactionOptions.one = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_ONE_VOTE_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_ONE_VOTE_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.reactionOptions.one) {
+					qServerDB.config.reactionOptions.one = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_ONE_VOTE_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_ONE_VOTE_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.reactionOptions.one = !qServerDB.config.reactionOptions.one;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "colorchange":
+		case "upvotechange": {
+			if (!args[1]) return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })));
+			switch (args[1].toLowerCase()) {
+			case "color":
+			case "embedcolor":
+			case "embedcolour":
+			case "colour": {
+				let color = colorString.get.rgb(args[2]);
+				if (!color) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_COLOR", {}, "error"));
+				qServerDB.config.reactionOptions.color = colorString.to.hex(color);
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color }, "success")));
+			}
+			case "upvotes":
+			case "number":
+			case "votes":
+			case "count": {
+				let number = parseInt(args[2]);
+				if (!number || number < 1) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
+				qServerDB.config.reactionOptions.color_threshold = number;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color }, "success"));
+			}
+			default:
+				return message.channel.send(string(locale, "CFG_COLOR_CHANGE_NO_PARAMS", {}, "error"));
+			}
+		}
 		case "lang":
 		case "locales":
 		case "locale":
@@ -468,6 +581,8 @@ module.exports = {
 			cfgRolesArr.push(staffRoles[0]);
 			// Allowed roles
 			cfgRolesArr.push((await listRoles(qServerDB.config.allowed_roles, server, "CFG_ALLOWED_ROLES_TITLE", false, string(locale, "CFG_ALLOWED_ROLES_APPEND")))[0]);
+			// Voting roles
+			cfgRolesArr.push((await listRoles(qServerDB.config.voting_roles, server, "CFG_VOTING_ROLES_TITLE", false, string(locale, "CFG_VOTING_ROLES_APPEND")))[0]);
 			// Blocked roles
 			cfgRolesArr.push((await listRoles(qServerDB.config.blocked_roles, server, "CFG_BLOCKED_ROLES_TITLE", false))[0]);
 			// Approved suggestion role
@@ -524,6 +639,12 @@ module.exports = {
 			let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string(locale, "CFG_DOWNVOTE_REACTION_DISABLED") : "👎");
 
 			cfgOtherArr.push(`${string(locale, "CFG_REACTION_EMOJIS_TITLE", {}, "success")} ${qServerDB.config.react ? string(locale, "ENABLED") : string(locale, "DISABLED")} (${upEmoji}, ${midEmoji}, ${downEmoji})`);
+			// Color Change
+			cfgOtherArr.push(`${string(locale, "CFG_COLOR_CHANGE_TITLE", {}, "success")} ${string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })}`);
+			// Own Voting
+			cfgOtherArr.push(`${string(locale, "CFG_SELF_VOTE_TITLE", {}, "success")} ${qServerDB.config.reactionOptions.suggester ? string(locale, "ENABLED") : string(locale, "DISABLED")}`);
+			// One Vote
+			cfgOtherArr.push(`${string(locale, "CFG_ONE_VOTE_TITLE", {}, "success")} ${qServerDB.config.reactionOptions.one ? string(locale, "CFG_ONE_VOTE_ENABLED") : string(locale, "CFG_ONE_VOTE_DISABLED")}`);
 			// Mode
 			let mode = string(locale, "ERROR", {}, "error");
 			switch (qServerDB.config.mode) {
@@ -544,13 +665,9 @@ module.exports = {
 			//Locale
 			cfgOtherArr.push(`${string(locale, "CFG_LOCALE_TITLE", {}, "success")} ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
 
-			let cfgEmbed = new Discord.MessageEmbed()
-				.setAuthor(string(locale, "SERVER_CONFIGURATION_TITLE", { server: server.name }), server.iconURL({ dynamic: true, format: "png" }))
-				.addField(string(locale, "ROLE_CONFIGURATION_TITLE"), cfgRolesArr.join("\n"))
-				.addField(string(locale, "CHANNEL_CONFIGURATION_TITLE"), cfgChannelsArr.join("\n"))
-				.addField(string(locale, "OTHER_CONFIGURATION_TITLE"), cfgOtherArr.join("\n"));
-			cfgEmbed.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
-				.addField(string(locale, "CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string(locale, "CFG_STATUS_BAD", {}, "error") : string(locale, "CFG_STATUS_GOOD", {}, "success"));
+			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n"))];
 
 			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
 				const permissions = require("../../utils/permissions");
@@ -559,10 +676,17 @@ module.exports = {
 					server.me.permissions.has(perm) ? hasPermissionList.push(string(locale, `PERMISSION:${perm}`)) : "";
 				});
 
-				cfgEmbed.addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None");
-				if (qServerDB.flags && qServerDB.flags.length > 0) cfgEmbed.addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.join(", "));
+				embeds.push(new Discord.MessageEmbed().setTitle(string(locale, "CFG_INTERNAL_TITLE")).addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None").addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.length > 0 ? qServerDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")));
 			}
-			return message.channel.send(cfgEmbed);
+
+			embeds.forEach(e => {
+				e.setAuthor(`${string(locale, "SERVER_CONFIGURATION_TITLE", { server: server.name })} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, server.iconURL({ dynamic: true, format: "png" }))
+					.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
+					.addField(string(locale, "CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string(locale, "CFG_STATUS_BAD", {}, "error") : string(locale, "CFG_STATUS_GOOD", {}, "success"))
+					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			});
+
+			return pages(locale, message, embeds);
 		}
 		default:
 			return message.channel.send(string(locale, "CFG_NO_PARAMS_ERROR", {}, "error"));

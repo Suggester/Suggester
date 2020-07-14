@@ -97,7 +97,7 @@ module.exports = {
 			fullCommand: message.content,
 
 			user: message.author.id,
-			guild: message.guild.id,
+			guild: message.guild ? message.guild.id : null,
 			channel: message.channel.id,
 			message: message.id,
 			date: Date.now(),

@@ -76,7 +76,7 @@ module.exports = {
 				end = Date.now();
 			}
 		}
-  
+
 		result
 			.then(async (res) => {
 				if (

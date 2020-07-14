@@ -8,7 +8,6 @@ const { fileLoader } = require("./utils/misc.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
 const { basename } = require("path");
-const { presence } = require("./persistent.json");
 const fs = require("fs");
 if (process.env.SENTRY_DSN) {
 	const {init} = require("@sentry/node");
@@ -20,9 +19,9 @@ const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES",
 const client = new Client({
 	ws: { intents: intents },
 	disableMentions: "everyone",
-	presence: { activity: { name: presence.activity || "", type: presence.type || "PLAYING" }, status: presence.status || "online" },
 	messageCacheLifetime: 120,
-	messageSweepInterval: 300
+	messageSweepInterval: 300,
+	partials: ["MESSAGE", "REACTION", "USER"]
 });
 
 if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);
