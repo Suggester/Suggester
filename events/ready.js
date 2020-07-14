@@ -23,12 +23,12 @@ module.exports = async (Discord, client) => {
 	}
 
 	let presences = [
+		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`],
 		["LISTENING", `suggestions on ${(await getGuildCount())[1]} servers over ${client.shard.count} shards`],
 		["WATCHING", `${(await Suggestion.countDocuments())} suggestions`],
 		["PLAYING", "suggester.js.org"],
 		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info`],
-		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`],
-		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`]
+		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`]
 	];
 
 	let p = 0;
