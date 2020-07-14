@@ -13,6 +13,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args, Discord) => {
+		if (!client.admins.has(message.author.id)) return;
 		if (process.env.NODE_ENV !== "production" && args[0] !== "-f") return message.channel.send(string(locale, "DEPLOY_NOT_PRODUCTION", {}, "error")); // Don't deploy if the bot isn't running in the production environment
 		/**
 		 * Use an embed for deploy command logs

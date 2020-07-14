@@ -12,6 +12,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args, Discord) => {
+		if (!client.admins.has(message.author.id)) return;
 		if (args.length < 4) return message.channel.send(string(locale, "NO_DB_PARAMS_SPECIFIED_ERROR", {}, "error"));
 		let collection = args[1];
 		let field = args[2];
