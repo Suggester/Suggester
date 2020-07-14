@@ -21,7 +21,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
-		if (qServerDB.config.channels.suggestions === message.channel.id) {
+		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\")) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
 		}
@@ -60,6 +60,7 @@ module.exports = async (Discord, client, message) => {
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but did not have permission to do so.`, message);
+		return;
 	}
 
 	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
