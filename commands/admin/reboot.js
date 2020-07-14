@@ -11,6 +11,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async (locale, message, client, args) => {
+		if (!client.admins.has(message.author.id)) return;
 		let toReboot = args[0] || "all";
 		if ((
 			await confirmation(

@@ -22,6 +22,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
 	},
 	do: async (locale, message, client, args) => {
+		if (!client.admins.has(message.author.id)) return;
 		if (!args[0]) return await message.channel.send(":x: You must provide code to execute!");
 
 		const script = parseCodeblock(args.join(" "));

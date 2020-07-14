@@ -13,6 +13,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args) => {
+		if (!client.admins.has(message.author.id)) return;
 		if (!args[0]) return message.channel.send(string(locale, "SPECIFY_USER_OR_GUILD_ERROR", {}, "error"));
 		switch (args[0].toLowerCase()) {
 		case "user":
