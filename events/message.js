@@ -21,7 +21,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
-		if (qServerDB.config.channels.suggestions === message.channel.id) {
+		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\")) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
 		}
