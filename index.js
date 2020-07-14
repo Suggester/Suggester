@@ -5,7 +5,7 @@ const { ShardingManager } = require("discord.js");
 
 const manager = new ShardingManager("./bot.js", { token: process.env.TOKEN });
 
-manager.spawn();
+(async () => await manager.spawn())();
 
 manager.on("shardCreate", (shard) => {
 	console.log(chalk`{blue [{bold SHARD}] Spawned shard {bold ${shard.id}}}`);
