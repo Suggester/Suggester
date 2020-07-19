@@ -29,9 +29,6 @@ module.exports = {
 		let checkSuggest = checkSuggestions(locale, message.guild, qServerDB);
 		if (checkSuggest) return message.channel.send(checkSuggest);
 
-		let checkStaff = checkReview(locale, message.guild, qServerDB);
-		if (checkStaff) return message.channel.send(checkStaff);
-
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
 		if (!qSuggestionDB) return message.channel.send(string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error"));
 
@@ -64,6 +61,17 @@ module.exports = {
 
 		qSuggestionDB.status = "approved";
 		qSuggestionDB.staff_member = message.author.id;
+
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
+			let returned = await client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+				let checkStaff = checkReview(locale, message.guild, qServerDB);
+				if (checkStaff) return message.channel.send(checkStaff);
+				fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))))
+				fetched.reactions.removeAll();
+			}).catch(() => {});
+			if (returned) return;
+		}
+
 		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
@@ -125,10 +133,5 @@ module.exports = {
 
 			serverLog(embedLog, qServerDB, client);
 		}
-
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
-			fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))))
-			fetched.reactions.removeAll();
-		}).catch(() => {});
 	}
 };

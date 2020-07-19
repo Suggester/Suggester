@@ -2112,6 +2112,10 @@ module.exports = {
 			string: "In Progress",
 			context: "Denotes a suggestion having the in progress status"
 		},
+		"STATUS_CONSIDERATION": {
+			string: "In Consideration",
+			context: "Denotes a suggestion having the in consideration status"
+		},
 		"STATUS_NO": {
 			string: "Not Happening",
 			context: "Denotes a suggestion having the not happening status"

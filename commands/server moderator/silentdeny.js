@@ -21,23 +21,16 @@ module.exports = {
 		const guildLocale = qServerDB.config.locale;
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
-
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
-		if (deniedCheck) return [deniedCheck];
+		if (deniedCheck) return message.channel.send(deniedCheck);
 
 		let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(locale, message.guild, args[0]);
 		if (fetchSuggestion) return message.channel.send(fetchSuggestion);
 
 		let id = qSuggestionDB.suggestionId;
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let reviewCheck = checkReview(locale, message.guild, qServerDB);
-			if (reviewCheck) return message.channel.send(reviewCheck);
-		}
-
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
-
 		if (qSuggestionDB.status !== "awaiting_review") {
 			switch (qSuggestionDB.status) {
 			case "approved":
@@ -57,6 +50,16 @@ module.exports = {
 			qSuggestionDB.denial_reason = reason;
 		}
 
+		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
+			let returned = await client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+				let checkStaff = checkReview(locale, message.guild, qServerDB);
+				if (checkStaff) return message.channel.send(checkStaff);
+				fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))));
+				fetched.reactions.removeAll();
+			}).catch(() => {});
+			if (returned) return;
+		}
+
 		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
@@ -71,8 +74,6 @@ module.exports = {
 				.setImage(qSuggestionDB.attachment);
 		}
 		await message.channel.send(replyEmbed);
-
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DENIED_LOG", "red")

@@ -34,6 +34,10 @@ module.exports = {
 			case "progress":
 			case "in":
 				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), colors.orange];
+			case "consideration":
+			case "consider":
+			case "considered":
+				return [["consideration"], string(locale, "STATUS_CONSIDERATION"), string(guildLocale, "STATUS_CONSIDERATION"), colors.teal];
 			case "no":
 			case "not":
 				return [["no"], string(locale, "STATUS_NO"), string(guildLocale, "STATUS_NO"), colors.gray];

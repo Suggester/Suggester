@@ -56,6 +56,11 @@ module.exports = {
 				.setColor(colors.orange);
 			break;
 		}
+		case "consideration": {
+			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_CONSIDERATION"))
+				.setColor(colors.teal);
+			break;
+		}
 		case "no": {
 			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_NO"))
 				.setColor(colors.gray);

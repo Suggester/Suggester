@@ -63,6 +63,9 @@ module.exports = {
 				case "working":
 					statusArr = [colors.orange, string(locale, "STATUS_PROGRESS")];
 					break;
+				case "consideration":
+					statusArr = [colors.teal, string(locale, "STATUS_CONSIDERATION")];
+					break;
 				case "no":
 					statusArr = [colors.gray, string(locale, "STATUS_NO")];
 					break;

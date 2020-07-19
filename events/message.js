@@ -17,7 +17,7 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB;
 	let noCommand = false;
 	let command;
-	let args = message.content.split(" ");;
+	let args = message.content.split(" ");
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
