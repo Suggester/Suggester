@@ -1426,6 +1426,22 @@ module.exports = {
 			string: "Members can already choose multiple reaction options when voting on a suggestion.",
 			context: "Shown when choosing one vote reaction is disabled and a guild tries to disable it"
 		},
+		"CFG_INCHANNEL_ENABLED": {
+			string: "Suggestions can be submitted via any message the suggestions feed channel",
+			context: "Shown when a guild has enabled in-channel suggestions"
+		},
+		"CFG_INCHANNEL_DISABLED": {
+			string: "Suggestions cannot be submitted via any message in the suggestions feed channel",
+			context: "Shown when a guild has disabled in-channel suggestions"
+		},
+		"CFG_INCHANNEL_ALREADY_ENABLED": {
+			string: "Suggestions can already be submitted via any message the suggestions feed channel",
+			context: "Shown when in-channel suggestions are enabled and a guild tries to enable them"
+		},
+		"CFG_INCHANNEL_ALREADY_DISABLED": {
+			string: "Suggestions already cannot be submitted via any message the suggestions feed channel",
+			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
+		},
 		"CFG_CLEAN_COMMANDS_ENABLED": {
 			string: "Auto-cleaning of suggestion commands is **enabled**.",
 			context: "Shown when a guild has enabled cleaning of the suggest command"

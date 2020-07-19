@@ -513,7 +513,37 @@ module.exports = {
 			case "toggle":
 				qServerDB.config.reactionOptions.one = !qServerDB.config.reactionOptions.one;
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "inchannelsuggestions":
+		case "suggestionsinchannel":
+		case "sendinchnl":
+		case "sendinchannel": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.in_channel_suggestions) {
+					qServerDB.config.in_channel_suggestions = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_INCHANNEL_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.in_channel_suggestions) {
+					qServerDB.config.in_channel_suggestions = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_INCHANNEL_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.in_channel_suggestions = !qServerDB.config.in_channel_suggestions;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED", {}, "success"));
 			default:
 				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
