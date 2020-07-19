@@ -29,7 +29,7 @@ module.exports = async (Discord, client, message) => {
 
 	if (!command) {
 		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
-		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
+		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|${permission <= 1 ? "suggester:|" : ""}<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
 		if (!match) return;
 
 		if (match[1].endsWith(" ")) args = args.splice(1);
