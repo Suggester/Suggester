@@ -100,7 +100,7 @@ module.exports = {
 				.setDescription(suggestion)
 				.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp()
-				.setColor(client.client.colors.default)
+				.setColor(client.colors.default)
 				.setImage(attachment);
 			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS"), replyEmbed).then(sent => {
 				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
@@ -182,7 +182,7 @@ module.exports = {
 				.setDescription(suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
 				.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp()
-				.setColor(client.client.colors.default)
+				.setColor(client.colors.default)
 				.setImage(attachment);
 			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS", { channel: `<#${qServerDB.config.channels.suggestions}>` }), replyEmbed).then(sent => {
 				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
