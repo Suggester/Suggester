@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { checkPermissions, baseConfig } = require("../../utils/checks");
 const { serverLog } = require("../../utils/logs");
@@ -18,7 +17,7 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
@@ -37,7 +36,7 @@ module.exports = {
 
 				embeds.push(new Discord.MessageEmbed()
 					.setDescription(list.join("\n"))
-					.setColor(colors.default)
+					.setColor(client.colors.default)
 					.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : ""));
 			}
@@ -78,7 +77,7 @@ module.exports = {
 				.setDescription(string(guildLocale, "BLOCK_USER_DATA", { tag: user.tag, id: user.id, mention: `<@${user.id}>` }))
 				.setFooter(string(guildLocale, "STAFF_MEMBER_LOG_FOOTER", { id: message.author.id }))
 				.setTimestamp()
-				.setColor(colors.red);
+				.setColor(client.colors.red);
 
 			reason ? logEmbed.addField(string(guildLocale, "BLOCK_REASON_HEADER"), reason) : null;
 			serverLog(logEmbed, qServerDB, client);

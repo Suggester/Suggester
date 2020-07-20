@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { dbModify } = require("../../utils/db");
 const { serverLog } = require("../../utils/logs");
 const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
@@ -16,7 +15,7 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 		const guildLocale = qServerDB.config.locale;
 
@@ -67,7 +66,7 @@ module.exports = {
 			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string(locale, "DENIED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-			.setColor(colors.red);
+			.setColor(client.colors.red);
 		reason ? replyEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
 		if (qSuggestionDB.attachment) {
 			replyEmbed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)

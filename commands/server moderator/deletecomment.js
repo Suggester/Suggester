@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { editFeedMessage } = require("../../utils/actions");
 const { serverLog } = require("../../utils/logs");
 const { dbModify, dbQueryNoNew } = require("../../utils/db");
@@ -18,7 +17,7 @@ module.exports = {
 		cooldown: 10
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
@@ -52,7 +51,7 @@ module.exports = {
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "COMMENT_DELETED_TITLE"))
 			.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
-			.setColor(colors.red)
+			.setColor(client.colors.red)
 			.setTimestamp();
 		message.channel.send(replyEmbed);
 

@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { prefix, colors: { gold } } = require("../config.json");
+const { prefix } = require("../config.json");
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
 
 const settings = new Schema({
@@ -29,7 +29,7 @@ const settings = new Schema({
 			suggester: { type: Boolean, default: true },
 			one: { type: Boolean, default: true },
 			color_threshold: { type: Number, default: 15 },
-			color: { type: String, default: gold }
+			color: { type: String, default: "#FFD700" }
 		},
 		notify: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },

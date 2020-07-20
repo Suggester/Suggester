@@ -1,4 +1,4 @@
-const { colors, emoji } = require("../config.json");
+const { emoji } = require("../config.json");
 const Discord = require("discord.js");
 const { string } = require("./strings");
 
@@ -62,12 +62,12 @@ module.exports = {
 				.setDescription(string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
 				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
 				.addField(string(locale, "HOW_TO_FIX_HEADER"), string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` }))
-				.setColor(colors.red);
+				.setColor(client.colors.red);
 		} else returned = `${string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` })}\n- ${missing.join("\n- ")}\n\n${string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` })}`;
 
 		return returned;
 	},
-	async checkConfig(locale, db) {
+	async checkConfig(locale, db, client) {
 		if (!db) return null;
 
 		let config = db.config;
@@ -82,13 +82,13 @@ module.exports = {
 			return (new Discord.MessageEmbed()
 				.setDescription(string(locale, "MISSING_CONFIG_HEADER", { prefix: db.config.prefix }))
 				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
-				.setColor(colors.red));
+				.setColor(client.colors.red));
 		}
 		return null;
 	},
 	suggestionEditCommandCheck: async function (locale, message, args) {
 		const { baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return returned;
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
@@ -101,7 +101,7 @@ module.exports = {
 	},
 	suggestionDeleteCommandCheck: async function (locale, message, args) {
 		const { checkDenied, baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return [returned];
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
@@ -133,10 +133,10 @@ module.exports = {
 	baseConfig: async function(locale, guild) {
 		const { dbQuery } = require("./db");
 		const { checkConfig } = require("./checks");
-		let qServerDB = await dbQuery("Server", { id: guild });
+		let qServerDB = await dbQuery("Server", { id: guild.id });
 		if (!qServerDB) return [string(locale, "UNCONFIGURED_ERROR", {}, "error")];
 
-		let missingConfig = await checkConfig(locale, qServerDB);
+		let missingConfig = await checkConfig(locale, qServerDB, guild.client);
 		if (missingConfig) return [missingConfig];
 		return [null, qServerDB];
 	},

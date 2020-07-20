@@ -3,7 +3,6 @@ const Discord = require("discord.js");
 const chalk = require("chalk");
 const { inspect } = require("util");
 const fetch = require("node-fetch");
-const { colors: { default: defaultColor } } = require("../../config.json");
 const { confirmation } = require("../../utils/actions");
 
 const options = {
@@ -33,7 +32,7 @@ module.exports = {
 				new Discord.MessageEmbed()
 					.setTitle(":warning: Are you sure you would like to execute the following code:")
 					.setDescription("```js\n" + script + "```")
-					.setColor(defaultColor),
+					.setColor(client.colors.default),
 				{
 					deleteAfterReaction: true
 				}

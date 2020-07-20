@@ -1,4 +1,4 @@
-const { emoji, colors } = require("../../config.json");
+const { emoji } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify, dbDeleteOne } = require("../../utils/db");
 const { handleRoleInput, handleChannelInput } = require("../../utils/config");
 const { checkConfig } = require("../../utils/checks");
@@ -38,7 +38,7 @@ module.exports = {
 		function setupEmbed (title, desc, inputs, step) {
 			return (new Discord.MessageEmbed()
 				.setTitle(title)
-				.setColor(colors.default)
+				.setColor(client.colors.default)
 				.setDescription(desc)
 				.addField(string(locale, "INPUTS"), inputs)
 				.setFooter(`${string(locale, "TIME_SETUP_WARNING")} • ${step}/8`));
@@ -232,7 +232,7 @@ module.exports = {
 			case 8: {
 				let doneEmbed = new Discord.MessageEmbed()
 					.setTitle(string(locale, "SETUP_COMPLETE_HEADER"))
-					.setColor(colors.default)
+					.setColor(client.colors.default)
 					.setDescription(string(locale, "SETUP_COMPLETE_DESC", { prefix: Discord.escapeMarkdown(db.config.prefix) }))
 					.addField(string(locale, "SETUP_ADDITIONAL_CONFIG_HEADER"), string(locale, "SETUP_ADDITIONAL_CONFIG_DESC"));
 				return message.channel.send(doneEmbed);
@@ -243,7 +243,7 @@ module.exports = {
 		}
 
 		let qServerDB = await dbQuery("Server", {id: message.guild.id});
-		let check = await checkConfig(locale, qServerDB);
+		let check = await checkConfig(locale, qServerDB, client);
 
 		async function start (startAt=0) {
 			let oldAllowlist = qServerDB.allowlist;

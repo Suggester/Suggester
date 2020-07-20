@@ -1,5 +1,5 @@
 const { dbQuery } = require("../../utils/db");
-const { colors, prefix, support_invite } = require("../../config.json");
+const { prefix, support_invite } = require("../../config.json");
 const { string } = require("../../utils/strings");
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
 
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(string(locale, "TUTORIAL_HEADER"), client.user.displayAvatarURL({format: "png"}))
-			.setColor(colors.default)
+			.setColor(client.colors.default)
 			.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
 			.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: serverPrefix }))
 			.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION", { prefix: serverPrefix, invite: `https://discord.gg/${support_invite}` }));

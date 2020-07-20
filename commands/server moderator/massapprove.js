@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
@@ -19,7 +18,7 @@ module.exports = {
 		cooldown: 20
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
@@ -81,7 +80,7 @@ module.exports = {
 			new Discord.MessageEmbed()
 				.setDescription(string(locale, "MASS_APPROVE_SUCCESS_TITLE", { some: nModified.toString(), total: postApprove.length }, nModified !== 0 ? "success" : "error"))
 				.addField(string(locale, "RESULT_FIELD_TITLE"), `${approvedId.length > 0 ? string(locale, "MASS_APPROVE_APPROVE_RESULTS_DETAILED", { list: approvedId.join(", ") }, "success") : ""}\n${notApprovedId.length > 0 ? string(locale, "MASS_APPROVE_FAIL_RESULTS_DETAILED", { list: notApprovedId.join(", ") }, "error") : ""}`)
-				.setColor(approvedId.length !== 0 ? colors.green : colors.red)
+				.setColor(approvedId.length !== 0 ? client.colors.green : client.colors.red)
 				.setFooter(nModified !== su.length ? string(locale, "MASS_APPROVE_ERROR_DETAILS") : "")
 		);
 
@@ -118,7 +117,7 @@ module.exports = {
 					}
 
 					let qUserDB = await dbQuery("User", { id: suggester.id });
-					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "green", {
+					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "green", {
 						string: "APPROVED_DM_TITLE",
 						guild: message.guild.name
 					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, reason ? {

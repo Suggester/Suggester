@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { dbQueryAll } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { pages } = require("../../utils/actions");
@@ -17,7 +16,7 @@ module.exports = {
 		cooldown: 25
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
@@ -36,7 +35,7 @@ module.exports = {
 		let embeds = [];
 		for await (let chunk of chunks) {
 			let embed = new Discord.MessageEmbed()
-				.setColor(colors.yellow)
+				.setColor(client.colors.yellow)
 				.setTitle(string(locale, "PENDING_REVIEW_HEADER"));
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);

@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
@@ -19,7 +18,7 @@ module.exports = {
 		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		let guildLocale = qServerDB.config.locale;
 
 		if (returned) return message.channel.send(returned);
@@ -66,7 +65,7 @@ module.exports = {
 			let returned = await client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
 				let checkStaff = checkReview(locale, message.guild, qServerDB);
 				if (checkStaff) return message.channel.send(checkStaff);
-				fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))))
+				fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", { user: message.author.tag }))));
 				fetched.reactions.removeAll();
 			}).catch(() => {});
 			if (returned) return;
@@ -79,7 +78,7 @@ module.exports = {
 			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string(locale, "APPROVED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-			.setColor(colors.green);
+			.setColor(client.colors.green);
 		isComment ? replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment) : "";
 
 		if (qSuggestionDB.attachment) {
@@ -117,7 +116,7 @@ module.exports = {
 			}
 			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
 			let qUserDB = await dbQuery("User", { id: suggester.id });
-			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
+			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || guildLocale, client, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
 		});
 
 		if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));

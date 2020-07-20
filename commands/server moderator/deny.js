@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { serverLog } = require("../../utils/logs");
 const { dmEmbed, reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
@@ -18,7 +17,7 @@ module.exports = {
 		cooldownMessage: "Need to deny multiple suggestions? Try the `mdeny` command!"
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 		const guildLocale = qServerDB.config.locale;
 
@@ -69,7 +68,7 @@ module.exports = {
 			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string(locale, "DENIED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-			.setColor(colors.red);
+			.setColor(client.colors.red);
 		reason ? replyEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
 		if (qSuggestionDB.attachment) {
 			replyEmbed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
@@ -78,7 +77,7 @@ module.exports = {
 		await message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()
@@ -88,7 +87,7 @@ module.exports = {
 				.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"))
 				.setFooter(string(guildLocale, "SUGGESTION_FOOTER", {id: id.toString()}))
 				.setTimestamp(qSuggestionDB.submitted)
-				.setColor(colors.red);
+				.setColor(client.colors.red);
 			reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);

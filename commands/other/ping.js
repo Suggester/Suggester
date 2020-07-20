@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { fetchUser } = require("../../utils/misc.js");
 const { string } = require("../../utils/strings");
 const humanizeDuration = require("humanize-duration");
@@ -42,9 +41,9 @@ module.exports = {
 			.addField(string(locale, "PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime)}\nAvg: ${humanizeDuration(uptime.reduce((t, c) => t + c)/uptime.length)}`)
 			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`)
 			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${Object.keys(shardValues).map(k => `**Shard ${k}:** ${shardValues[k].guildCount} servers, ${Math.round(shardValues[k].ping)} ms ping, up for ${humanizeDuration(shardValues[k].uptime)}`).join("\n")}`)
-			.setFooter(`Shard: ${client.shard.ids[0]} | ${client.user.tag} v4.1`, client.user.displayAvatarURL({format: "png"}))
+			.setFooter(`Shard: ${client.shard.ids[0]} | ${client.user.tag} v4.1.2`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
-			.setColor(colors.default);
+			.setColor(client.colors.default);
 
 		const before = Date.now();
 		message.channel.send(embed).then((sent) => {

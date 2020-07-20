@@ -1,4 +1,4 @@
-const { colors, emoji } = require("../../config.json");
+const { emoji } = require("../../config.json");
 const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig, checkReview } = require("../../utils/checks");
@@ -25,7 +25,7 @@ module.exports = {
 		if (!qServerDB) return message.channel.send(string(locale, "UNCONFIGURED_ERROR", {}, "error"));
 		const guildLocale = qServerDB.config.locale;
 
-		let missingConfig = await checkConfig(locale, qServerDB);
+		let missingConfig = await checkConfig(locale, qServerDB, client);
 		if (missingConfig) return message.channel.send(missingConfig);
 
 		let permission = await checkPermissions(message.member, client);
@@ -100,7 +100,7 @@ module.exports = {
 				.setDescription(suggestion)
 				.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp()
-				.setColor(colors.default)
+				.setColor(client.client.colors.default)
 				.setImage(attachment);
 			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS"), replyEmbed).then(sent => {
 				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
@@ -182,7 +182,7 @@ module.exports = {
 				.setDescription(suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
 				.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 				.setTimestamp()
-				.setColor(colors.default)
+				.setColor(client.client.colors.default)
 				.setImage(attachment);
 			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS", { channel: `<#${qServerDB.config.channels.suggestions}>` }), replyEmbed).then(sent => {
 				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {

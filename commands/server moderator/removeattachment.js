@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage } = require("../../utils/actions");
 const { serverLog } = require("../../utils/logs");
@@ -34,7 +33,7 @@ module.exports = {
 			.setTitle(string(locale, "ATTACHMENT_REMOVED_TITLE"))
 			.setDescription(oldAttachment)
 			.setImage(oldAttachment)
-			.setColor(colors.orange)
+			.setColor(client.colors.orange)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);

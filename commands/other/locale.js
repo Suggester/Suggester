@@ -1,6 +1,6 @@
 const { access } = require("fs");
 const { dbQuery, dbModify } = require("../../utils/db");
-const { colors, support_invite } = require("../../config.json");
+const { support_invite } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
@@ -26,7 +26,7 @@ module.exports = {
 				.setTitle(string(locale, "LOCALE_LIST_TITLE"))
 				.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qUserDB.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
 				.setFooter(string(locale, "LOCALE_FOOTER"))
-				.setColor(colors.default);
+				.setColor(client.colors.default);
 			return message.channel.send(embed);
 		}
 		let permission = await checkPermissions(message.member, client);

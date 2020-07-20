@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 const { fetchUser, logEmbed, dmEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
@@ -51,13 +50,13 @@ module.exports = {
 			.setTitle(string(locale, "COMMENT_ADDED_TITLE"))
 			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment)
-			.setColor(colors.blue)
+			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), reason: comment }))).catch(() => {});
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), reason: comment }))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "COMMENT_ADDED_LOG", "blue")

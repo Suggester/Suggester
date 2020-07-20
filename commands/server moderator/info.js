@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { fetchUser } = require("../../utils/misc.js");
 const { baseConfig, checkSuggestion } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
@@ -16,7 +15,7 @@ module.exports = {
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let [returned, qServerDB] = await baseConfig(locale, message.guild.id);
+		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 
 		let [err, qSuggestionDB] = await checkSuggestion(locale, message.guild, args[0]);
@@ -32,7 +31,7 @@ module.exports = {
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
 			.addField(string(locale, "INFO_AUTHOR_HEADER"), string(locale, "USER_INFO_HEADER", { user: suggester.tag, id: suggester.id }))
-			.setColor(colors.blue);
+			.setColor(client.colors.blue);
 
 		if (qSuggestionDB.attachment) {
 			embed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
@@ -43,12 +42,12 @@ module.exports = {
 
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":
-			embed.setColor(colors.yellow)
+			embed.setColor(client.colors.yellow)
 				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), `${string(locale, "AWAITING_REVIEW_STATUS")} ([${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
 		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
-			embed.setColor(colors.red)
+			embed.setColor(client.colors.red)
 				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), string(locale, "DENIED_BY", { user: denier.tag }));
 			if (qSuggestionDB.denial_reason) embed.addField(string(locale, "REASON_GIVEN"), qSuggestionDB.denial_reason);
 			break;
@@ -58,16 +57,16 @@ module.exports = {
 				let statusArr = [];
 				switch (qSuggestionDB.displayStatus) {
 				case "implemented":
-					statusArr = [colors.green, string(locale, "STATUS_IMPLEMENTED")];
+					statusArr = [client.colors.green, string(locale, "STATUS_IMPLEMENTED")];
 					break;
 				case "working":
-					statusArr = [colors.orange, string(locale, "STATUS_PROGRESS")];
+					statusArr = [client.colors.orange, string(locale, "STATUS_PROGRESS")];
 					break;
 				case "consideration":
-					statusArr = [colors.teal, string(locale, "STATUS_CONSIDERATION")];
+					statusArr = [client.colors.teal, string(locale, "STATUS_CONSIDERATION")];
 					break;
 				case "no":
-					statusArr = [colors.gray, string(locale, "STATUS_NO")];
+					statusArr = [client.colors.gray, string(locale, "STATUS_NO")];
 					break;
 				}
 				if (statusArr[0]) {

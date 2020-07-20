@@ -486,6 +486,10 @@ module.exports = {
 			string: "**Clean Suggestion Commands:**",
 			context: "Denotes the clean commands setting when configuration is listed"
 		},
+		"CFG_INCHANNEL_TITLE": {
+			string: "**In-Suggestions Channel Suggestion Submission:**",
+			context: "Denotes the in-channel suggestions setting when configuration is listed"
+		},
 		"SERVER_CONFIGURATION_TITLE": {
 			string: "Server Configuration for {{server}}",
 			context: "Title for the configuration list embed",

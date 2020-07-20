@@ -1,4 +1,3 @@
-const { colors } = require("../config.json");
 const Discord = require("discord.js");
 const { promises } = require("fs");
 const { resolve } = require("path");
@@ -47,27 +46,27 @@ module.exports = {
 		// Embed Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
-			embed.setColor(colors.green)
+			embed.setColor(client.colors.green)
 				.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_IMPLEMENTED"));
 			break;
 		}
 		case "working": {
 			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_PROGRESS"))
-				.setColor(colors.orange);
+				.setColor(client.colors.orange);
 			break;
 		}
 		case "consideration": {
 			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_CONSIDERATION"))
-				.setColor(colors.teal);
+				.setColor(client.colors.teal);
 			break;
 		}
 		case "no": {
 			embed.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), string(locale, "STATUS_NO"))
-				.setColor(colors.gray);
+				.setColor(client.colors.gray);
 			break;
 		}
 		default: {
-			embed.setColor(colors.default);
+			embed.setColor(client.colors.default);
 			// Check for Color Change Threshold, Modify Color if Met
 			client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
 				let votes = checkVotes(locale, suggestion, m);
@@ -91,13 +90,13 @@ module.exports = {
 
 		return embed;
 	},
-	dmEmbed: function(locale, qSuggestionDB, color, title, attachment, suggestions, reason) {
+	dmEmbed: function(locale, client, qSuggestionDB, color, title, attachment, suggestions, reason) {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(string(locale, title.string, {server: title.guild}))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
-			.setColor(colors[color] || color);
+			.setColor(client.colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
 		if (reason) embed.addField(reason.header, reason.reason);
 		return embed;
@@ -109,7 +108,7 @@ module.exports = {
 			.setDescription(qSuggestionDB.suggestion)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)
-			.setColor(colors[color] || color);
+			.setColor(user.client.colors[color] || color);
 
 		if (change) embed.addField(string(locale, "SUGGESTION_CHANGE_REVIEW_EMBED"), change);
 		if (qSuggestionDB.attachment) {
@@ -123,7 +122,7 @@ module.exports = {
 			.setAuthor(string(locale, title, { user: user.tag, id: qSuggestionDB.suggestionId.toString() }), user.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string(locale, "LOG_SUGGESTION_SUBMITTED_FOOTER", { id: qSuggestionDB.suggestionId.toString(), user: user.id }))
 			.setTimestamp()
-			.setColor(colors[color] || color));
+			.setColor(user.client.colors[color] || color));
 	},
 	/**
 	 * Fetch a user
