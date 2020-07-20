@@ -1,11 +1,11 @@
-const { colors, emoji, support_invite } = require("../../config.json");
+const { emoji, support_invite } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
 const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("../../utils/config");
 const { checkPermissions } = require("../../utils/checks");
 const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string } = require("../../utils/strings");
-const colorString = require("color-string");
+const colorstring = require("color-string");
 module.exports = {
 	controls: {
 		name: "config",
@@ -34,7 +34,7 @@ module.exports = {
 		if (!args[0]) {
 			let embed = new Discord.MessageEmbed();
 			embed.setDescription(string(locale, "CONFIG_HELP", { prefix: qServerDB.config.prefix }));
-			embed.setColor(colors.default);
+			embed.setColor(client.colors.default);
 			return message.channel.send(embed);
 		}
 
@@ -352,7 +352,7 @@ module.exports = {
 					.addField(string(locale, "CFG_EMOJI_UPVOTE_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string(locale, "DISABLED") : "👍"))
 					.addField(string(locale, "CFG_EMOJI_MID_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? string(locale, "DISABLED") : "🤷"))
 					.addField(string(locale, "CFG_EMOJI_DOWNVOTE_TITLE"), (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string(locale, "DISABLED") : "👎"))
-					.setColor(qServerDB.config.react ? colors.default : colors.orange);
+					.setColor(qServerDB.config.react ? client.colors.default : client.colors.orange);
 				return message.channel.send(reactEmbed);
 			}
 
@@ -513,7 +513,37 @@ module.exports = {
 			case "toggle":
 				qServerDB.config.reactionOptions.one = !qServerDB.config.reactionOptions.one;
 				await dbModify("Server", {id: server.id}, qServerDB);
-				return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+				return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED", {}, "success"));
+			default:
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+			}
+		}
+		case "inchannelsuggestions":
+		case "suggestionsinchannel":
+		case "sendinchnl":
+		case "sendinchannel": {
+			if (!args[1]) return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED"));
+			switch (args[1].toLowerCase()) {
+			case "enable":
+			case "on": {
+				if (!qServerDB.config.in_channel_suggestions) {
+					qServerDB.config.in_channel_suggestions = true;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_INCHANNEL_ENABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_ENABLED", {}, "error"));
+			}
+			case "disable":
+			case "off": {
+				if (qServerDB.config.in_channel_suggestions) {
+					qServerDB.config.in_channel_suggestions = false;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_INCHANNEL_DISABLED", {}, "success"));
+				} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED", {}, "error"));
+			}
+			case "toggle":
+				qServerDB.config.in_channel_suggestions = !qServerDB.config.in_channel_suggestions;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED", {}, "success"));
 			default:
 				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 			}
@@ -526,9 +556,9 @@ module.exports = {
 			case "embedcolor":
 			case "embedcolour":
 			case "colour": {
-				let color = colorString.get.rgb(args[2]);
+				let color = colorstring.get.rgb(args[2]);
 				if (!color) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_COLOR", {}, "error"));
-				qServerDB.config.reactionOptions.color = colorString.to.hex(color);
+				qServerDB.config.reactionOptions.color = colorstring.to.hex(color);
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color }, "success")));
 			}
@@ -555,7 +585,7 @@ module.exports = {
 					.setTitle(string(locale, "LOCALE_LIST_TITLE"))
 					.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qServerDB.config.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
 					.setFooter(string(locale, "LOCALE_FOOTER"))
-					.setColor(colors.default);
+					.setColor(client.colors.default);
 				return message.channel.send(embed);
 			}
 			let selection = args[1].toLowerCase();
@@ -662,6 +692,8 @@ module.exports = {
 			cfgOtherArr.push(`${string(locale, "CFG_NOTIFICATIONS_TITLE", {}, "success")} ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
 			//Clean Suggestion Command
 			cfgOtherArr.push(`${string(locale, "CFG_CLEAN_COMMANDS_TITLE", {}, "success")} ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
+			//In-Channel Suggestions
+			cfgOtherArr.push(`${string(locale, "CFG_INCHANNEL_TITLE", {}, "success")} ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
 			//Locale
 			cfgOtherArr.push(`${string(locale, "CFG_LOCALE_TITLE", {}, "success")} ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
 
@@ -681,7 +713,7 @@ module.exports = {
 
 			embeds.forEach(e => {
 				e.setAuthor(`${string(locale, "SERVER_CONFIGURATION_TITLE", { server: server.name })} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, server.iconURL({ dynamic: true, format: "png" }))
-					.setColor(issuesCountFatal > 0 ? colors.red : colors.green)
+					.setColor(issuesCountFatal > 0 ? client.colors.red : client.colors.green)
 					.addField(string(locale, "CFG_STATUS_TITLE"), issuesCountFatal > 0 ? string(locale, "CFG_STATUS_BAD", {}, "error") : string(locale, "CFG_STATUS_GOOD", {}, "success"))
 					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
 			});

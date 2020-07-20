@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { fetchUser, reviewEmbed, dmEmbed, logEmbed } = require("../../utils/misc.js");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
@@ -50,7 +49,7 @@ module.exports = {
 			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setFooter(string(locale, "DELETED_BY", { user: message.author.tag }), message.author.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-			.setColor(colors.red);
+			.setColor(client.colors.red);
 		reason ? replyEmbed.addField(string(locale, "REASON_GIVEN"), reason) : "";
 		if (qSuggestionDB.attachment) {
 			replyEmbed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
@@ -59,7 +58,7 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
 
 		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
@@ -71,7 +70,7 @@ module.exports = {
 				.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"))
 				.setFooter(string(guildLocale, "SUGGESTION_FOOTER", {id: id.toString()}))
 				.setTimestamp(qSuggestionDB.submitted)
-				.setColor(colors.red);
+				.setColor(client.colors.red);
 			reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
 			if (votes[0] || votes[1]) deniedEmbed.addField(string(guildLocale, "VOTE_TOTAL_HEADER"), `${string(guildLocale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(guildLocale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(guildLocale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(guildLocale, "VOTE_COUNT_DOWN")} ${votes[1]}`);

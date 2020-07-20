@@ -12,7 +12,6 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args) => {
-		if (!client.admins.has(message.author.id)) return;
 		let type = args.shift();
 		switch (type) {
 		case "user": {

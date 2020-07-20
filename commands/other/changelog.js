@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { get } = require("axios");
 const { string } = require("../../utils/strings");
 const { pages } = require("../../utils/actions");
@@ -27,7 +26,7 @@ module.exports = {
 					.setTitle(string(locale, "CHANGELOG_EMBED_HEADER", { version: data.name }))
 					.setDescription(chunk)
 					.setURL(data.html_url)
-					.setColor(colors.default)
+					.setColor(client.colors.default)
 					.setTimestamp(data.created_at)
 					.setAuthor(split_body.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(`${split_body.length > 1 ? `${string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS")}\n` : ""}${string(locale, "CHANGELOG_RELEASED_FOOTER")}`)

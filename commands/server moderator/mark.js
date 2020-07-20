@@ -2,7 +2,6 @@ const { suggestionEmbed, fetchUser, logEmbed, dmEmbed } = require("../../utils/m
 const { dbQuery, dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { serverLog } = require("../../utils/logs");
-const { colors } = require("../../config.json");
 const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/checks");
 const { deleteFeedMessage, checkVotes, editFeedMessage } = require("../../utils/actions");
 module.exports = {
@@ -29,18 +28,22 @@ module.exports = {
 			switch (input.toLowerCase()) {
 			case "implemented":
 			case "done":
-				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), string(guildLocale, "STATUS_IMPLEMENTED"), colors.green];
+				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), string(guildLocale, "STATUS_IMPLEMENTED"), client.colors.green];
 			case "working":
 			case "progress":
 			case "in":
-				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), colors.orange];
+				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), client.colors.orange];
+			case "consideration":
+			case "consider":
+			case "considered":
+				return [["consideration"], string(locale, "STATUS_CONSIDERATION"), string(guildLocale, "STATUS_CONSIDERATION"), client.colors.teal];
 			case "no":
 			case "not":
-				return [["no"], string(locale, "STATUS_NO"), string(guildLocale, "STATUS_NO"), colors.gray];
+				return [["no"], string(locale, "STATUS_NO"), string(guildLocale, "STATUS_NO"), client.colors.gray];
 			case "default":
 			case "none":
 			case "reset":
-				return [[null, "default"], string(locale, "STATUS_DEFAULT"), string(guildLocale, "STATUS_DEFAULT"), colors.default];
+				return [[null, "default"], string(locale, "STATUS_DEFAULT"), string(guildLocale, "STATUS_DEFAULT"), client.colors.default];
 			default:
 				return [null];
 			}
@@ -99,7 +102,7 @@ module.exports = {
 				message.channel.send(replyEmbed);
 
 				let qUserDB = await dbQuery("User", { id: suggester.id });
-				let notify = dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
+				let notify = dmEmbed(qUserDB.locale || guildLocale, client, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
 				if (isComment) notify.addField(string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 				notify.addField(string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK"), `[${string(qUserDB.locale || guildLocale, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 				if (qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
@@ -134,7 +137,7 @@ module.exports = {
 		message.channel.send(replyEmbed);
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		let notify = dmEmbed(qUserDB.locale || guildLocale, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
+		let notify = dmEmbed(qUserDB.locale || guildLocale, client, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(qUserDB.locale || guildLocale, "INFO_PUBLIC_STATUS_HEADER"), reason: str });
 		if (isComment) notify.addField(string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 		if (![null, "default"].includes(qSuggestionDB.displayStatus) && qServerDB.config.notify && qUserDB.notify) suggester.send(notify).catch(() => {});
 

@@ -1,5 +1,4 @@
 const { dbQueryNoNew, dbModify } = require("../../utils/db.js");
-const { colors } = require("../../config.json");
 const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
@@ -43,7 +42,7 @@ module.exports = {
 		}
 
 		embed.addField(string(locale, "RESULT_FIELD_TITLE"), result ? `\`\`\`${result.toString().substr(0, 1020)}\`\`\`` : string(locale, "DB_NO_RESULT_FOUND"))
-			.setColor(result ? colors.default : "#ff0000");
+			.setColor(result ? client.colors.default : "#ff0000");
 		return message.channel.send(embed);
 	}
 };

@@ -17,11 +17,11 @@ module.exports = async (Discord, client, message) => {
 	let qServerDB;
 	let noCommand = false;
 	let command;
-	let args = message.content.split(" ");;
+	let args = message.content.split(" ");
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
-		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\") && !message.content.startsWith(qServerDB.config.prefix) && !message.content.startsWith(`<@${client.user.id}>`) && !message.content.startsWith(`<@!${client.user.id}>`)) {
+		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\") && !message.content.startsWith(qServerDB.config.prefix) && !message.content.startsWith(`<@${client.user.id}>`) && !message.content.startsWith(`<@!${client.user.id}>`) && qServerDB.config.in_channel_suggestions) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
 		}
@@ -29,7 +29,7 @@ module.exports = async (Discord, client, message) => {
 
 	if (!command) {
 		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
-		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
+		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|${permission <= 1 ? "suggester:|" : ""}<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
 		if (!match) return;
 
 		if (match[1].endsWith(" ")) args = args.splice(1);
@@ -63,16 +63,16 @@ module.exports = async (Discord, client, message) => {
 		return;
 	}
 
-	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
-
 	if (command.controls.permissions && message.channel.type !== "dm") {
 		let checkPerms = channelPermissions(locale, command.controls.permissions, message.channel, client);
 		if (checkPerms) {
 			await commandExecuted(command, message, { pre, post: new Date(), success: false });
+			commandLog(`⚠️ ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but bot permissions were invalid`, message);
 			return message.channel.send(checkPerms).catch(() => {});
 		}
 	}
 
+	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
 	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && (!qUserDB.flags || (!qUserDB.flags.includes("NO_COOLDOWN") && !qUserDB.flags.includes("PROTECTED"))) && (!qServerDB.flags || !qServerDB.flags.includes("NO_COOLDOWN"))) {
 		/*
 			Cooldown collection:

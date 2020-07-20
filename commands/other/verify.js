@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { fetchUser } = require("../../utils/misc");
 const { checkPermissions } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
@@ -42,7 +41,7 @@ module.exports = {
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(user.id), client);
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(user.tag, user.displayAvatarURL({format: "png", dynamic: true}))
-			.setColor(colors.default)
+			.setColor(client.colors.default)
 			.setFooter(string(locale, "VERIFY_PERMISSION_LEVEL_FOOTER", { level: permissionLevel.toString() }));
 		if (globalPosArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_GLOBAL_ACKS"), `${globalPosArr.join("\n")}`);
 		if (posArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_SERVER_ACKS"), `${posArr.join("\n")}`);

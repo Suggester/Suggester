@@ -1,6 +1,6 @@
 const { guildLog, joinLeaveLog } = require("../utils/logs");
 const { dbQuery } = require("../utils/db");
-const { release, prefix, support_invite, colors } = require("../config.json");
+const { release, prefix, support_invite } = require("../config.json");
 const { string } = require("../utils/strings");
 module.exports = async (Discord, client, guild) => {
 	if (process.env.NODE_ENV === "production" || client.config.logServers) {
@@ -33,7 +33,7 @@ module.exports = async (Discord, client, guild) => {
 
 	let embed = new Discord.MessageEmbed()
 		.setAuthor(string(locale, "TUTORIAL_HEADER"), client.user.displayAvatarURL({format: "png"}))
-		.setColor(colors.default)
+		.setColor(client.colors.default)
 		.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
 		.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: prefix }))
 		.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION", { prefix: prefix, invite: `https://discord.gg/${support_invite}` }));

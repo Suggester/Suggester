@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const { colors: { default: defaultColor, red, green } } = require("../../config.json");
 const { confirmation } = require("../../utils/actions");
 const exec = (require("util").promisify((require("child_process").exec)));
 
@@ -32,7 +31,7 @@ module.exports = {
 				new Discord.MessageEmbed()
 					.setTitle(":warning: Are you sure you would like to execute the following code in the shell:")
 					.setDescription("```bash\n" + script + "```")
-					.setColor(defaultColor),
+					.setColor(client.colors.default),
 				{
 					deleteAfterReaction: true
 				}
@@ -41,7 +40,7 @@ module.exports = {
 
 		function genEmbed(res) {
 			let embed = new Discord.MessageEmbed()
-				.setColor(res.stderr ? red : green)
+				.setColor(res.stderr ? client.colors.red : client.colors.green)
 				.addField(":inbox_tray: Input", `\`\`\`bash\n${script}\`\`\``);
 			if (!res.stdout && !res.stderr) embed.addField(":outbox_tray: Result", "No Result");
 			if (res.stdout) embed.addField(":outbox_tray: Result", `\`\`\`bash\n${res.stdout.substr(0, 1000)}\`\`\``);

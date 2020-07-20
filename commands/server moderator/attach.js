@@ -1,4 +1,3 @@
-const { colors } = require("../../config.json");
 const { suggestionEditCommandCheck, checkURL } = require("../../utils/checks");
 const { editFeedMessage } = require("../../utils/actions");
 const { serverLog } = require("../../utils/logs");
@@ -41,7 +40,7 @@ module.exports = {
 			.setTitle(string(locale, "ATTACHMENT_ADDED_HEADER"))
 			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
-			.setColor(colors.blue)
+			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
