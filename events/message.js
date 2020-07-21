@@ -1,6 +1,7 @@
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { dbQuery, dbModify } = require("../utils/db");
 const { commandLog, errorLog, commandExecuted } = require("../utils/logs");
+const { protip } = require("../utils/tip");
 const { prefix, log_hooks, support_invite } = require("../config.json");
 const { string } = require("../utils/strings");
 const { Collection } = require("discord.js");
@@ -140,8 +141,9 @@ module.exports = async (Discord, client, message) => {
 
 	try {
 		command.do(locale, message, client, args, Discord, noCommand)
-			.then(() => {
+			.then(async r => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
+				await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2);
 			})
 			.catch((err) => {
 				let errorText;

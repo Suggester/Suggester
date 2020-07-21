@@ -148,5 +148,6 @@ module.exports = {
 			if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
 		}
+		return { protip: { command: "mark", not: [isComment ? "markcomment" : null] } };
 	}
 };

@@ -89,6 +89,8 @@ const user = new Schema({
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
 	locale: { type: String },
+	protips: { type: Boolean, default: true },
+	displayed_protips: [String],
 	flags: [ String ]
 });
 

@@ -18,7 +18,7 @@ module.exports = {
 		usage: "eval <javascript code>",
 		description: "Runs JavaScript code",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]
 	},
 	do: async (locale, message, client, args) => {
 		if (!client.admins.has(message.author.id)) return;

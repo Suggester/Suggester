@@ -660,6 +660,22 @@ module.exports = {
 			string: "DM Notifications are already disabled.",
 			context: "Shown when notifications are disabled and a user tries to disable them"
 		},
+		"PROTIPS_ENABLED": {
+			string: "Protips are **enabled**.",
+			context: "Shown when a user has enabled protips"
+		},
+		"PROTIPS_DISABLED": {
+			string: "Protips are **disabled**.",
+			context: "Shown when a user has disabled protips"
+		},
+		"PROTIPS_ALREADY_ENABLED": {
+			string: "Protips are already enabled.",
+			context: "Shown when protips are enabled and a user tries to enable them"
+		},
+		"PROTIPS_ALREADY_DISABLED": {
+			string: "Protips are already disabled.",
+			context: "Shown when protips are disabled and a user tries to disable them"
+		},
 		"ON_OFF_TOGGLE_ERROR": {
 			string: "You must specify `on`, `off`, or `toggle`.",
 			context: "Used when a configuration element requires on, off, or toggle parameters"
@@ -2774,6 +2790,10 @@ module.exports = {
 			string: "Gets a database entry",
 			context: "Description for the db command"
 		},
+		"COMMAND:PROTIPS": {
+			string: "Changes your protip settings",
+			context: "Description for the protips command"
+		},
 		"COMMAND:DEPLOY": {
 			string: "Updates the bot",
 			context: "Description for the deploy command"
@@ -3011,6 +3031,210 @@ module.exports = {
 					description: "The link to invite the bot"
 				}
 			}
+		},
+		"PROTIP_TITLE": {
+			string: "**Protip:**",
+			context: "Title when protips are shown"
+		},
+		"PROTIP_INVITE": {
+			string: "You can invite Suggester to your server [here]({{bot_invite}})",
+			context: "Protip for inviting the bot",
+			replaced: {
+				bot_invite: {
+					to_replace: "{{bot_invite}}",
+					description: "The link to invite the bot"
+				}
+			}
+		},
+		"PROTIP_SUPPORT": {
+			string: "If you need help with Suggester or want to suggest a new feature, join our [support server]({{support_invite}})",
+			context: "Protip for the support server",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_REASON_APPROVE": {
+			string: "You can specify a comment when approving a suggestion using `{{prefix}}approve <suggestion id> <comment>`",
+			context: "Protip for approving with a comment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MASS_APPROVE": {
+			string: "You can approve multiple suggestions at once using `{{prefix}}mapprove <suggestion id 1> <suggestion id 2> <suggestion id 3> -r <comment>`",
+			context: "Protip for mass approving",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_REASON_DENY": {
+			string: "You can specify a reason when denying a suggestion using `{{prefix}}deny <suggestion id> <reason>`",
+			context: "Protip for denying with a reason",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MASS_DENY": {
+			string: "You can deny multiple suggestions at once using `{{prefix}}mdeny <suggestion id 1> <suggestion id 2> <suggestion id 3> -r <comment>`",
+			context: "Protip for mass denying",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_INCHANNEL": {
+			string: "You can configure Suggester to allow suggestions to be submitted via any message in the suggestions feed channel using `{{prefix}}config sendinchannel on`",
+			context: "Protip for in-channel suggestions",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_EMOTES": {
+			string: "You can configure custom reaction emojis for the suggestion feed using these commands:\n`{{prefix}}config emojis up <emoji>`\n`{{prefix}}config emojis mid <emoji>`\n`{{prefix}}config emojis down <emoji>`\n\nYou can also disable any of the reaction emojis using `{{prefix}}config emojis <up, mid, or down> disable`",
+			context: "Protip for emote config",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_VOTING": {
+			string: "If you enjoy Suggester, consider helping to support us by voting on bot lists! If you have a minute, click [here]({{list}}) and vote. If you're in our [Support Server]({{support_invite}}) you can get cool rewards for voting!\n\nIf you want to help even more, you can use `{{prefix}}vote` to see the full list of sites where you can vote. Thanks for your support!",
+			context: "Protip for voting",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				list: {
+					to_replace: "{{list}}",
+					description: "Randomly selected bot list link"
+				}
+			}
+		},
+		"PROTIP_NOTIFY": {
+			string: "You can use `{{prefix}}notify` to enable or disable receiving DM notifications when an action is taken on one of your suggestions",
+			context: "Protip for notify",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_LOCALE": {
+			string: "You can use `{{prefix}}locale` to make the bot respond to you in a different language. If your language isn't listed and/or you'd like to help translate, join our [Support Server]({{support_invite}}) and ask to join the Translation Program!",
+			context: "Protip for locale",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_CHANGELOG": {
+			string: "You can use `{{prefix}}changelog` to see the latest bot updates",
+			context: "Protip for changelog",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_ACOMMENT": {
+			string: "You can add an anonymous comment to a suggestion using `{{prefix}}acomment <suggestion ID> <comment>`. These are the same as comments, but they don't show who created them",
+			context: "Protip for acomment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MARKCOMMENT": {
+			string: "You can add a comment to a suggestion when using the mark command using `{{prefix}}mark <suggestion ID> <status> <comment>`",
+			context: "Protip for mark with a comment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_BLOCK": {
+			string: "You can block a user from using the bot on your server using `{{prefix}}block <user>`",
+			context: "Protip for block",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_COLORCHANGE": {
+			string: "You can configure the bot to change the embed color when a suggestion reaches a certain number of upvotes by using `{{prefix}}config colorchange number <number of upvotes>` and `{{prefix}}config colorchange color <color>`",
+			context: "Protip for colorchange",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_QUEUE": {
+			string: "You can view all suggestions currently awaiting review using the `{{prefix}}queue` command",
+			context: "Protip for queue",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_CANARY": {
+			string: "You can join the Suggester Canary program to help test new bot features before they are released to the main bot. Join the [Support Server]({{support_invite}}) for info!",
+			context: "Protip for Canary",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIPS_TITLE": {
+			string: "**Protips:**",
+			context: "Denotes the protips section in the verify embed"
+		},
+		"PROTIPS_SHOWN_TITLE": {
+			string: "**Protips Shown:**",
+			context: "Denotes the protips shown section in the verify embed"
 		}
 	}
 };

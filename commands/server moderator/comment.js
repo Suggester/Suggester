@@ -63,5 +63,7 @@ module.exports = {
 				.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		return { protip: { command: "comment" } };
 	}
 };
