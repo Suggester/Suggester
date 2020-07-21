@@ -3257,11 +3257,7 @@ module.exports = {
 				"Never gonna let you down\n" +
 				"Never gonna run around and desert you\n" +
 				"Never gonna make you cry\n" +
-				"Never gonna say goodbye\n" +
-				"Never gonna tell a lie and hurt you\n" +
-				"Never gonna give, never gonna give\n" +
-				"(Give you up)\n" +
-				"(Ooh) Never gonna give, never...",
+				"Never gonna say goodbye",
 			context: "Protip for a rick-roll"
 		},
 		"PROTIPS_TITLE": {
