@@ -127,22 +127,22 @@ module.exports = {
 				use: {
 					support_invite: `https://discord.gg/${support_invite}`
 				}
+			},
+			rickroll: {
+				string: "PROTIP_RICKROLL",
+				command: ["rickroll"]
 			}
 		};
 		let qUserDB = await message.author.db;
 		const randomChance = Math.floor(Math.random() * 5);
-		console.log(randomChance)
 		if (!qUserDB.protips || randomChance !== 2) return;
-		let obj = {};
 		let filteredList = Object.keys(list).filter(k => !qUserDB.displayed_protips.includes(k) && (command ? (list[k].command && list[k].command.includes(command)) : !list[k].command) && !not.includes(k) && (!admin ? !list[k].admin : true));
 		let key = force || filteredList[Math.floor(Math.random()*filteredList.length)];
+		if (Math.floor(Math.random() * 100) === 5) key = "rickroll";
 		let str = list[key];
 		if (!str) return;
-		Object.keys(str.use).forEach(k => {
-			obj[k] = str.use[k];
-		});
 		if (message.guild && !message.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
-			let desc = string(locale, str.string, obj);
+			let desc = string(locale, str.string, str.use);
 			let matches = desc.match(/\[([A-Za-z0-9]+)\]\(([A-Za-z:./0-9?=_&-<>]+)\)/g);
 			if (matches) for (let m of matches) {
 				let ma = m.match(/\[([A-Za-z0-9]+)\]\(([A-Za-z:./0-9?=_&-<>]+)\)/);
@@ -152,7 +152,7 @@ module.exports = {
 		} else {
 			message.channel.send(new Discord.MessageEmbed()
 				.setColor(client.colors.protip)
-				.setDescription(`${string(locale, "PROTIP_TITLE")} ${string(locale, str.string, obj)}`));
+				.setDescription(`${string(locale, "PROTIP_TITLE")} ${string(locale, str.string, str.use)}`));
 		}
 		qUserDB.displayed_protips.push(key);
 		await dbModify("User", { id: message.author.id }, qUserDB);
