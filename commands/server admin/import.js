@@ -121,7 +121,7 @@ module.exports = {
 				let embed = m.embeds.length > 0 ? m.embeds[0] : null;
 				switch (m.author.id) {
 				case "393848142585397248": //Havoc
-					if (!embed) {
+					if (!embed || !embed.author || !embed.author.name) {
 						errorCount++;
 						continue;
 					}
