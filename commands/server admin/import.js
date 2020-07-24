@@ -497,7 +497,7 @@ module.exports = {
 					suggestionInfo.suggester = userAuthorMatch[1] ? userAuthorMatch[1] : (client.users.cache.find(u => u.tag === userAuthorMatch[2]) ? client.users.cache.find(u => u.tag === userAuthorMatch[2]).id : "0");
 					break;
 				case "668116464351576085": //Ticks
-					if (!embed) {
+					if (!embed || !embed.description) {
 						errorCount++;
 						continue;
 					}
