@@ -2826,6 +2826,10 @@ module.exports = {
 			string: "Shows the link to invite the bot",
 			context: "Description for the invite command"
 		},
+		"COMMAND:IMPORT": {
+			string: "Imports suggestions from a channel",
+			context: "Description for the import command"
+		},
 		"COMMAND:LOCALE": {
 			string: "Sets your personal locale",
 			context: "Description for the locale command"
