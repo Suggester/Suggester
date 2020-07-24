@@ -77,7 +77,7 @@ module.exports = {
 		if ((permission <= 1 || qServerDB.flags.includes("NO_IMPORT_LIMIT")) && args[0]) {
 			num = parseInt(args[0]);
 			if (!num || num < 1 || num > 100) return message.channel.send(string(locale, "IMPORT_TOO_MANY_ERROR", {}, "error"));
-			cEmbed.addField(string(locale, "IMPORT_STAFF_OVERRIDE_TITLE"), string(locale, "IMPORT_STAFF_OVERRIDE_DESC", { num }));
+			cEmbed.addField(string(locale, "IMPORT_OVERRIDE_TITLE"), string(locale, "IMPORT_OVERRIDE_DESC", { num }));
 		}
 		if (!(
 			await confirmation(
