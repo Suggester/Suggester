@@ -43,6 +43,9 @@ module.exports = {
 			// Footer
 			.setTimestamp(suggestion.submitted)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
+		let votes = await client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
+			return checkVotes(locale, suggestion, m);
+		}).catch(() => {});
 		// Embed Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
@@ -68,10 +71,7 @@ module.exports = {
 		default: {
 			embed.setColor(client.colors.default);
 			// Check for Color Change Threshold, Modify Color if Met
-			client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
-				let votes = checkVotes(locale, suggestion, m);
-				if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
-			}).catch(() => {});
+			if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
 		}
 		}
 		// Comments
@@ -85,6 +85,8 @@ module.exports = {
 				}
 			}
 		}
+		// Votes
+		if (votes[0] || votes[1]) embed.addField(string(locale, "VOTES_TITLE"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]} \`${((votes[0]/(votes[0]+votes[1]))*100).toFixed(2)}%\`\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]} \`${((votes[1]/(votes[0]+votes[1]))*100).toFixed(2)}%\``);
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
 

@@ -2012,10 +2012,6 @@ module.exports = {
 				}
 			}
 		},
-		"VOTE_TOTAL_HEADER": {
-			string: "Vote Counts",
-			context: "Header used above vote counts"
-		},
 		"VOTE_COUNT_OPINION": {
 			string: "Opinion:",
 			context: "Denotes the vote opinion (upvotes-downvotes) for the suggestion"
@@ -3349,6 +3345,10 @@ module.exports = {
 		"IMPORT_TOO_MANY_ERROR": {
 			string: "You must specify an integer between 1 and 100.",
 			context: "Error shown when the number of messages to import is invalid"
+		},
+		"VOTES_TITLE": {
+			string: "Votes",
+			context: "Header for the votes section of the suggestion embed"
 		}
 	}
 };

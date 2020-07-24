@@ -129,3 +129,17 @@ Object.defineProperty(Array.prototype, "chunk", {
 		return temporal;
 	}
 });
+
+/**
+ * Define the chunk method in the prototype of an array
+ * that returns an array with arrays of the given size.
+ *
+ * @param chunkSize {Integer} Size of every group
+ */
+Object.defineProperty(Number.prototype, "toFixed", {
+	value: function(size){
+		// eslint-disable-next-line no-useless-escape
+		let re = new RegExp("^-?\\d+(?:\.\\d{0," + (size || -1) + "})?");
+		return this.toString().match(re)[0];
+	}
+});

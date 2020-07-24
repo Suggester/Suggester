@@ -100,7 +100,7 @@ module.exports = {
 						.setColor(client.colors.red);
 					reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 					let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
-					if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(guildLocale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(guildLocale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(guildLocale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(guildLocale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
+					if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTES_TITLE"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]} \`${((votes[0]/(votes[0]+votes[1]))*100).toFixed(2)}%\`\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]} \`${((votes[1]/(votes[0]+votes[1]))*100).toFixed(2)}%\``);
 					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
 					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}

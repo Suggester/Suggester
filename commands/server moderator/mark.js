@@ -84,9 +84,6 @@ module.exports = {
 			let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 			if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
 
-			let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
-			if (votes[0] || votes[1]) suggestionNewEmbed.addField(string(guildLocale, "VOTE_TOTAL_HEADER"), `${string(guildLocale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(guildLocale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(guildLocale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(guildLocale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
-
 			qSuggestionDB.implemented = true;
 
 			client.channels.cache.get(qServerDB.config.channels.archive).send(suggestionNewEmbed).then(async sent => {

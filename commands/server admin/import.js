@@ -583,9 +583,6 @@ module.exports = {
 					let deleteMsg = await deleteFeedMessage(locale, suggestionInfo, qServerDB, client);
 					if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
 
-					let votes = checkVotes(qServerDB.config.prefix, suggestionInfo, deleteMsg[1]);
-					if (votes[0] || votes[1]) embedSuggest.addField(string(qServerDB.config.locale, "VOTE_TOTAL_HEADER"), `${string(qServerDB.config.locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(qServerDB.config.locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(qServerDB.config.locale, "VOTE_COUNT_UP")} ${votes[0]}\n${string(qServerDB.config.locale, "VOTE_COUNT_DOWN")} ${votes[1]}`);
-
 					suggestionInfo.implemented = true;
 
 					client.channels.cache.get(qServerDB.config.channels.archive).send(embedSuggest);

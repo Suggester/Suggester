@@ -81,9 +81,9 @@ module.exports = {
 			if (!qSuggestionDB.implemented) {
 				let messageFetched;
 				await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-					let [up, down, opinion] = checkVotes(locale, qSuggestionDB, f);
+					let votes = checkVotes(locale, qSuggestionDB, f);
 					messageFetched = true;
-					if (up || down) embed.addField(string(locale, "VOTE_TOTAL_HEADER"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(opinion) ? string(locale, "UNKNOWN") : (opinion > 0 ? `+${opinion}` : opinion)}\n${string(locale, "VOTE_COUNT_UP")} ${up}\n${string(locale, "VOTE_COUNT_DOWN")} ${down}`);
+					if (votes[0] || votes[1]) embed.addField(string(locale, "VOTES_TITLE"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]} \`${((votes[0]/(votes[0]+votes[1]))*100).toFixed(2)}%\`\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]} \`${((votes[1]/(votes[0]+votes[1]))*100).toFixed(2)}%\``);
 				}).catch(() => messageFetched = false);
 
 				if (!messageFetched) return message.channel.send(string(locale, "SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error"));
