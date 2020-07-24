@@ -16,7 +16,7 @@ module.exports = {
 		image: "images/Config.gif",
 		enabled: true,
 		docs: "admin/config",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {

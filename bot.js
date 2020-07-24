@@ -14,7 +14,7 @@ if (process.env.SENTRY_DSN) {
 	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
 }
 
-const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
+const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "GUILD_MEMBERS"]);
 
 const client = new Client({
 	ws: { intents: intents },

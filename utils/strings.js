@@ -3267,6 +3267,88 @@ module.exports = {
 		"PROTIPS_SHOWN_TITLE": {
 			string: "**Protips Shown:**",
 			context: "Denotes the protips shown section in the verify embed"
+		},
+		"IMPORTED_REASON": {
+			string: "This suggestion was denied before it was imported into Suggester.",
+			context: "Reason for suggestion denial for importing"
+		},
+		"IMPORTED_SUCCESS": {
+			string: "Successfully imported {{count}} suggestion(s)!",
+			context: "Success message for importing",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The number of imported suggestions"
+				}
+			}
+		},
+		"IMPORTED_SOME_ERROR": {
+			string: "Successfully imported {{count}} suggestion(s)! Some suggestions weren't imported, possibly because they were already imported or were above the 1024 character limit.",
+			context: "Success message for importing when some were not imported",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The number of imported suggestions"
+				}
+			}
+		},
+		"IMPORTED_NONE": {
+			string: "No suggestions were imported",
+			context: "Error shown when no suggestions are imported"
+		},
+		"IMPORT_START": {
+			string: "Beginning import... Under optimal conditions this should take {{time}}.",
+			context: "Shown when a user begins an import",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The estimated time that the import will take"
+				}
+			}
+		},
+		"IMPORT_TITLE": {
+			string: "Importing Suggestions",
+			context: "Title for the importing embed"
+		},
+		"IMPORT_DESC": {
+			string: "Suggester can import suggestions from your existing suggestions channel, allowing you to utilize all of Suggester's features on them!\nSuggester can import suggestions sent by users, as well as ones submitted through these bots:\n{{bots}}\n\nThe last **30** messages sent in __this channel__ will be imported. If you need to import more messages, stop this import and contact our [support team]({{support_invite}}).\nTo continue with this import, select {{check}}. To cancel, select {{x}}.",
+			context: "Description for the suggestion embed",
+			replaced: {
+				bots: {
+					to_replace: "{{bots}}",
+					description: "The list of supported bots for import"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"IMPORT_OVERRIDE_TITLE": {
+			string: "Message Override",
+			context: "Title for the override header of the import embed"
+		},
+		"IMPORT_OVERRIDE_DESC": {
+			string: "**{{num}}** messages will be imported",
+			context: "Shows how many messages will be imported if the limit is overriden",
+			replaced: {
+				num: {
+					to_replace: "{{num}}",
+					description: "The number of messages to import"
+				}
+			}
+		},
+		"IMPORT_TOO_MANY_ERROR": {
+			string: "You must specify an integer between 1 and 100.",
+			context: "Error shown when the number of messages to import is invalid"
 		}
 	}
 };

@@ -80,7 +80,8 @@ const suggestion = new Schema({
 		}
 	],
 	attachment: String,
-	implemented: { type: Boolean, default: false }
+	implemented: { type: Boolean, default: false },
+	imported: String
 });
 
 const user = new Schema({
