@@ -1,7 +1,7 @@
 const { string } = require("../../utils/strings");
 const { suggestionEmbed, fetchUser } = require("../../utils/misc");
 const { checkSuggestions, checkDenied, baseConfig, channelPermissions, checkPermissions } = require("../../utils/checks");
-const { checkVotes, deleteFeedMessage, confirmation } = require("../../utils/actions");
+const { deleteFeedMessage, confirmation } = require("../../utils/actions");
 const { dbQueryAll } = require("../../utils/db");
 const { Suggestion } = require("../../utils/schemas");
 const humanizeDuration = require("humanize-duration");
@@ -98,7 +98,7 @@ module.exports = {
 			let successCount = 0;
 			let errorCount = 0;
 			for await (let m of messages.array().reverse()) {
-				if (importedIds.includes(m.id) || message.content.length > 1024) {
+				if (importedIds.includes(m.id) || message.content.length > 1024 || m.system) {
 					errorCount++;
 					continue;
 				}
@@ -393,12 +393,20 @@ module.exports = {
 						continue;
 					}
 					if (embed.author.name.endsWith("Denied")) {
+						if (!embed.fields.find(f => f.name === "Description:") || !embed.fields.find(f => f.name === "User who suggested:")) {
+							errorCount++;
+							continue;
+						}
 						suggestionInfo.suggestion = embed.fields.find(f => f.name === "Description:").value;
 						suggestionInfo.suggester = embed.fields.find(f => f.name === "User who suggested:").value.match(/<@!?(\d+)>/)[1];
 						suggestionInfo.status = "denied";
 						suggestionInfo.denial_reason = embed.fields.find(f => f.name === "Reason:") ? embed.fields.find(f => f.name === "Reason:").value : null;
 						suggestionInfo.staff_member = embed.fields.find(f => f.name === "Denied by:") ? (message.guild.members.cache.find(m => m.user.username === embed.fields.find(f => f.name === "Denied by:").value) ? message.guild.members.cache.find(m => m.user.username === embed.fields.find(f => f.name === "Denied by:").value).id : null) : "0";
 					} else if (embed.author.name.endsWith("Accepted")) {
+						if (!embed.fields.find(f => f.name.includes("Description")) || !embed.fields.find(f => f.name.includes("User who suggested")) || !embed.fields.find(f => f.name.includes("Accepted by"))) {
+							errorCount++;
+							continue;
+						}
 						suggestionInfo.suggestion = embed.fields.find(f => f.name.includes("Description")).value;
 						suggestionInfo.suggester = embed.fields.find(f => f.name.includes("User who suggested")).value.match(/<@!?(\d+)>/)[1];
 						suggestionInfo.status = "approved";
@@ -412,13 +420,17 @@ module.exports = {
 							deleted: false
 						});
 					} else {
+						if (!embed.fields.find(f => f.name.includes("Suggestion")) || !embed.fields.find(f => f.name === "User:")) {
+							errorCount++;
+							continue;
+						}
 						suggestionInfo.suggestion = embed.fields.find(f => f.name.includes("Suggestion")).value;
 						suggestionInfo.suggester = embed.fields.find(f => f.name === "User:").value.match(/<@!?(\d+)>/)[1];
 						suggestionInfo.status = "approved";
 					}
 					break;
 				case "281041859692855296": //Suggestions#3153
-					if (!embed) {
+					if (!embed || !embed.fields.find(f => f.name === "Title")) {
 						errorCount++;
 						continue;
 					}
