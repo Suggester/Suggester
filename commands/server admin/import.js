@@ -178,7 +178,7 @@ module.exports = {
 						continue;
 					}
 					// eslint-disable-next-line no-case-declarations
-					let anchorMatch = (embed.author.iconURL ? embed.author.iconURL.match(/https:\/\/cdn\.discordapp\.com\/avatars\/([\d]+)\/[\S\s]+/) : null) || embed.author.name.match(/()([\S\s]+) \| Suggestion/);
+					let anchorMatch = embed.author ? ((embed.author.iconURL ? embed.author.iconURL.match(/https:\/\/cdn\.discordapp\.com\/avatars\/([\d]+)\/[\S\s]+/) : null) || embed.author.name.match(/()([\S\s]+) \| Suggestion/)): null;
 					if (!anchorMatch) {
 						errorCount++;
 						continue;
@@ -293,7 +293,12 @@ module.exports = {
 						continue;
 					}
 					suggestionInfo.suggester = fastMatch[1];
-					suggestionInfo.suggestion = embed.description.match(/\*\*Suggestion:\*\* \n > ([\s\S]+)/)[1];
+					let sugMatch = embed.description.match(/\*\*Suggestion:\*\* \n > ([\s\S]+)/);
+					if (!sugMatch) {
+						errorCount++;
+						continue;
+					}
+					suggestionInfo.suggestion = sugMatch[1];
 					suggestionInfo.status = "approved";
 					// eslint-disable-next-line no-case-declarations
 					let replyField = embed.fields.find(f => f.name === "Reply:");
@@ -449,7 +454,7 @@ module.exports = {
 					suggestionInfo.suggester = suggestingUser[1] ? suggestingUser[1] : (client.users.cache.find(u => u.tag === suggestingUser[2]) ? client.users.cache.find(u => u.tag === suggestingUser[2]).id : "0");
 					break;
 				case "474051954998509571": //Suggestions#2602
-					if (!embed) {
+					if (!embed || !embed.description || !embed.footer) {
 						errorCount++;
 						continue;
 					}
