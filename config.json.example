@@ -5,6 +5,7 @@
   ],
   "prefix": ".",
   "support_invite": "G5pEdUp",
+  "staff_alert_role": ""
   "colors": {
     "default": "#7289da",
     "red": "#e74c3c",
@@ -34,6 +35,10 @@
       "token": ""
     },
     "debug": {
+      "id": "",
+      "token": ""
+    },
+    "staff_alert": {
       "id": "",
       "token": ""
     }

@@ -173,7 +173,7 @@ module.exports = {
 					break;
 				case "448156485470388224": //Anchor
 					suggestionInfo.status = "approved";
-					if (!embed) {
+					if (!embed || (embed.author && embed.author.name && embed.author.name === "Suggestion Submitted")) {
 						errorCount++;
 						continue;
 					}

@@ -39,6 +39,7 @@ module.exports = {
 		} else if (qServerDB.config.blocklist.includes(user.id)) posArr.push(`🚫 ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
 
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(user.id), client);
+		let senderPermissionLevel = await checkPermissions(message.member, client);
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(user.tag, user.displayAvatarURL({format: "png", dynamic: true}))
 			.setColor(client.colors.default)
@@ -46,7 +47,7 @@ module.exports = {
 		if (globalPosArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_GLOBAL_ACKS"), `${globalPosArr.join("\n")}`);
 		if (posArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_SERVER_ACKS"), `${posArr.join("\n")}`);
 
-		if (args[0] && args[args.length-1].toLowerCase() === "--flags" && permissionLevel <= 1) {
+		if (args[0] && args[args.length-1].toLowerCase() === "--flags" && senderPermissionLevel <= 1) {
 			embed.addField(string(locale, "VERIFY_FLAGS_TITLE"), `${qUserDB.flags.length > 0 ? qUserDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")}`)
 				.addField(string(locale, "HELP_ADDITIONAL_INFO"), `${string(locale, "CFG_LOCALE_TITLE")} ${qUserDB.locale ? client.locales.find(l => l.settings.code === qUserDB.locale).settings.native : string(locale, "NONE_CONFIGURED")}\n${string(locale, "CFG_NOTIFICATIONS_TITLE")} ${qUserDB.notify ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_TITLE")} ${qUserDB.protips ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_SHOWN_TITLE")} ${qUserDB.displayed_protips.join(", ")}`);
 		}
