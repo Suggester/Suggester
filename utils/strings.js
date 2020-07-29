@@ -788,6 +788,20 @@ module.exports = {
 				}
 			}
 		},
+		"USER_INFO_HEADER_CB": {
+			string: "{{user}} (ID: `{{id}}`)",
+			context: "Used when a header using the user's tag and ID is present (codeblock version)",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A user ID"
+				}
+			}
+		},
 		"APPROVE_DENY_HEADER": {
 			string: "Approve/Deny",
 			context: "Header for the approve/deny field of the review embed"
@@ -3353,6 +3367,20 @@ module.exports = {
 		"VOTES_TITLE": {
 			string: "Votes",
 			context: "Header for the votes section of the suggestion embed"
+		},
+		"ALREADY_AWAITING_REVIEW_CONFIRM": {
+			string: "You already have a suggestion awaiting review. Are you sure you would like to submit another? Select {{check}} to submit and {{x}} to cancel.",
+			context: "Warning shown when a user tries to submit a suggestion and already has one awaiting review",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
 		}
 	}
 };

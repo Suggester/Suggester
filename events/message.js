@@ -144,7 +144,7 @@ module.exports = async (Discord, client, message) => {
 		command.do(locale, message, client, args, Discord, noCommand)
 			.then(async r => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
-				if (!noCommand) await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2);
+				if (!noCommand && (command.controls.name === "suggest" ? !qServerDB.config.clean_suggestion_command : true)) await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2);
 			})
 			.catch((err) => {
 				let errorText;

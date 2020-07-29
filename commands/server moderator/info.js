@@ -30,7 +30,7 @@ module.exports = {
 			.setTitle(`${string(locale, "SUGGESTION_HEADER")}: #${id.toString()}`)
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
-			.addField(string(locale, "INFO_AUTHOR_HEADER"), string(locale, "USER_INFO_HEADER", { user: suggester.tag, id: suggester.id }))
+			.addField(string(locale, "INFO_AUTHOR_HEADER"), string(locale, "USER_INFO_HEADER_CB", { user: suggester.tag, id: suggester.id }))
 			.setColor(client.colors.blue);
 
 		if (qSuggestionDB.attachment) {

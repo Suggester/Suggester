@@ -1,10 +1,11 @@
 const { emoji } = require("../../config.json");
 const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbQuery, dbModify, dbQueryAll } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig, checkReview } = require("../../utils/checks");
 const { serverLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
 const { checkURL } = require("../../utils/checks");
+const { confirmation } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 
 module.exports = {
@@ -81,6 +82,21 @@ module.exports = {
 		if (qServerDB.config.mode === "review") {
 			let checkStaff = checkReview(locale, message.guild, qServerDB);
 			if (checkStaff) return message.channel.send(checkStaff);
+
+
+			if ((await dbQueryAll("Suggestion", { suggester: message.author.id, id: message.guild.id, status: "awaiting_review" })).length > 0) {
+				if (!(
+					await confirmation(
+						message,
+						string(locale, "ALREADY_AWAITING_REVIEW_CONFIRM", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>` }),
+						{
+							deleteAfterReaction: true
+						}
+					))) {
+					if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) message.delete();
+					return;
+				}
+			}
 
 			let newSuggestion = await new Suggestion({
 				id: message.guild.id,
