@@ -7,6 +7,7 @@ const { Suggestion } = require("../../utils/schemas");
 const { checkURL } = require("../../utils/checks");
 const { confirmation } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
+const lngDetector = new (require("languagedetect"));
 
 module.exports = {
 	controls: {
@@ -216,6 +217,14 @@ module.exports = {
 				}
 
 				serverLog(embedLog, qServerDB, client);
+			}
+		}
+		if (suggestion) {
+			lngDetector.setLanguageType("iso2");
+			let detected = lngDetector.detect(suggestion)[0];
+			console.log(detected)
+			if (detected[1] > .3 && client.locales.find(l => l.settings.code === detected[0])) {
+				return { protip: { locale: detected[0], force: "locale" } };
 			}
 		}
 	}
