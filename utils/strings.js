@@ -850,6 +850,10 @@ module.exports = {
 			string: "Suggestion",
 			context: "Header used for the suggestion content"
 		},
+		"SUGGESTION_VOTES": {
+			string: "Votes:",
+			context: "Header used for votes in the context \"Votes: 3\""
+		},
 		"LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE": {
 			string: "{{user}} submitted a suggestion for review",
 			context: "Title in the log embed when a suggestion is submitted for review",
@@ -3381,6 +3385,18 @@ module.exports = {
 					description: "The X emoji"
 				}
 			}
+		},
+		"NO_TOP_FOUND": {
+			string: "No suggestions with votes were found",
+			context: "Error shown when no suggestions are found for the top command"
+		},
+		"TOP_TITLE": {
+			string: "Top 10 Highest Voted Suggestions",
+			context: "Header for the top suggestions embed"
+		},
+		"TOP_LOADING": {
+			string: "Collecting top suggestion data, this may take a moment...",
+			context: "Message shown when waiting for top 10 data to collect"
 		}
 	}
 };
