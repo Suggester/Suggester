@@ -34,8 +34,7 @@ module.exports = {
 				});
 			}).catch(() => {});
 		}
-		console.log(listArray);
-		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion)).sort((a, b) => b.opinion - a.opinion).splice(0, 10)) {
+		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, 10)) {
 			embedArray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
 				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`
@@ -47,7 +46,7 @@ module.exports = {
 			.setTitle(string(locale, "TOP_TITLE"))
 			.setColor(client.colors.green);
 		embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
-		message.channel.stopTyping();
-		m.edit(embed);
+		message.channel.stopTyping(true);
+		return m.edit(embed);
 	}
 };
