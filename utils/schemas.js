@@ -80,7 +80,8 @@ const suggestion = new Schema({
 		}
 	],
 	attachment: String,
-	implemented: { type: Boolean, default: false }
+	implemented: { type: Boolean, default: false },
+	imported: String
 });
 
 const user = new Schema({
@@ -89,6 +90,8 @@ const user = new Schema({
 	blocked: { type: Boolean, default: false },
 	notify: { type: Boolean, default: true },
 	locale: { type: String },
+	protips: { type: Boolean, default: true },
+	displayed_protips: [String],
 	flags: [ String ]
 });
 

@@ -104,5 +104,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		return { protip: { command: "deny", not: [reason ? "deny_reason" : null] } };
 	}
 };

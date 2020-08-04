@@ -18,6 +18,7 @@
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "humanize-duration": "^3.23.0",
+    "languagedetect": "^2.0.0",
     "mongoose": "^5.9.17",
     "mongoose-sequence": "^5.2.2",
     "ms": "^2.1.2",

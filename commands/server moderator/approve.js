@@ -132,5 +132,7 @@ module.exports = {
 
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		return { protip: { command: "approve", not: [comment ? "approve_reason" : null] } };
 	}
 };

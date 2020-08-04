@@ -1,7 +1,8 @@
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { dbQuery, dbModify } = require("../utils/db");
 const { commandLog, errorLog, commandExecuted } = require("../utils/logs");
-const { prefix, log_hooks, support_invite } = require("../config.json");
+const { protip } = require("../utils/tip");
+const { prefix, log_hooks, support_invite, staff_alert_role } = require("../config.json");
 const { string } = require("../utils/strings");
 const { Collection } = require("discord.js");
 function escapeRegExp(string) {
@@ -29,7 +30,7 @@ module.exports = async (Discord, client, message) => {
 
 	if (!command) {
 		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
-		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|${permission <= 1 ? "suggester:|" : ""}<@!?${client.user.id}> ?${!message.guild ? "|" : ""})([a-zA-Z0-9]+)`));
+		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|${permission <= 1 ? "suggester:|" : ""}<@!?${client.user.id}> ?${!message.guild ? "|" : ""})(\\S+)`));
 		if (!match) return;
 
 		if (match[1].endsWith(" ")) args = args.splice(1);
@@ -115,8 +116,9 @@ module.exports = async (Discord, client, message) => {
 					}
 				});
 
-				let hook = new Discord.WebhookClient(log_hooks.commands.id, log_hooks.commands.token);
-				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\n(@everyone)`, {disableMentions: "none"});
+				commandLog(`--- Cooldown Breach Lookup ${message.author.id} ---`);
+				let hook = new Discord.WebhookClient(log_hooks.staff_alert.id, log_hooks.staff_alert.token);
+				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\nCommand logs can be found by searching \`Cooldown Breach Lookup ${message.author.id}\`\n(${staff_alert_role ? `<@&${staff_alert_role}>` : "@everyone"})`, {disableMentions: "none"});
 			}
 
 			if (expires > now) {
@@ -140,8 +142,9 @@ module.exports = async (Discord, client, message) => {
 
 	try {
 		command.do(locale, message, client, args, Discord, noCommand)
-			.then(() => {
+			.then(async r => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
+				if (!noCommand && (command.controls.name === "suggest" ? !qServerDB.config.clean_suggestion_command : true)) await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2);
 			})
 			.catch((err) => {
 				let errorText;

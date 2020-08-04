@@ -14,7 +14,7 @@ if (process.env.SENTRY_DSN) {
 	if (process.env.NODE_ENV === "production") init({dsn: process.env.SENTRY_DSN});
 }
 
-const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"]);
+const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "GUILD_MEMBERS"]);
 
 const client = new Client({
 	ws: { intents: intents },
@@ -127,5 +127,19 @@ Object.defineProperty(Array.prototype, "chunk", {
 			temporal.push(this.slice(i,i+chunkSize));
 		}
 		return temporal;
+	}
+});
+
+/**
+ * Define the chunk method in the prototype of an array
+ * that returns an array with arrays of the given size.
+ *
+ * @param chunkSize {Integer} Size of every group
+ */
+Object.defineProperty(Number.prototype, "toFixed", {
+	value: function(size){
+		// eslint-disable-next-line no-useless-escape
+		let re = new RegExp("^-?\\d+(?:\.\\d{0," + (size || -1) + "})?");
+		return this.toString().match(re)[0];
 	}
 });

@@ -3,11 +3,12 @@ const { string } = require("./strings");
 const { emoji } = require("../config.json");
 const Discord = require("discord.js");
 module.exports = {
-	editFeedMessage: async function({ guild, user }, qSuggestionDB, qServerDB, client) {
+	editFeedMessage: async function({ guild, user }, qSuggestionDB, qServerDB, client, removereactions=false) {
 		let suggestionEditEmbed = await suggestionEmbed(guild, qSuggestionDB, qServerDB, client);
 		let messageEdited;
 		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
+			if (removereactions) f.reactions.removeAll();
 			messageEdited = true;
 		}).catch(() => messageEdited = false);
 

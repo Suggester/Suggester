@@ -660,6 +660,22 @@ module.exports = {
 			string: "DM Notifications are already disabled.",
 			context: "Shown when notifications are disabled and a user tries to disable them"
 		},
+		"PROTIPS_ENABLED": {
+			string: "Protips are **enabled**.",
+			context: "Shown when a user has enabled protips"
+		},
+		"PROTIPS_DISABLED": {
+			string: "Protips are **disabled**.",
+			context: "Shown when a user has disabled protips"
+		},
+		"PROTIPS_ALREADY_ENABLED": {
+			string: "Protips are already enabled.",
+			context: "Shown when protips are enabled and a user tries to enable them"
+		},
+		"PROTIPS_ALREADY_DISABLED": {
+			string: "Protips are already disabled.",
+			context: "Shown when protips are disabled and a user tries to disable them"
+		},
 		"ON_OFF_TOGGLE_ERROR": {
 			string: "You must specify `on`, `off`, or `toggle`.",
 			context: "Used when a configuration element requires on, off, or toggle parameters"
@@ -772,6 +788,20 @@ module.exports = {
 				}
 			}
 		},
+		"USER_INFO_HEADER_CB": {
+			string: "{{user}} (ID: `{{id}}`)",
+			context: "Used when a header using the user's tag and ID is present (codeblock version)",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "A user ID"
+				}
+			}
+		},
 		"APPROVE_DENY_HEADER": {
 			string: "Approve/Deny",
 			context: "Header for the approve/deny field of the review embed"
@@ -819,6 +849,10 @@ module.exports = {
 		"SUGGESTION_HEADER": {
 			string: "Suggestion",
 			context: "Header used for the suggestion content"
+		},
+		"SUGGESTION_VOTES": {
+			string: "Votes:",
+			context: "Header used for votes in the context \"Votes: 3\""
 		},
 		"LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE": {
 			string: "{{user}} submitted a suggestion for review",
@@ -1996,10 +2030,6 @@ module.exports = {
 				}
 			}
 		},
-		"VOTE_TOTAL_HEADER": {
-			string: "Vote Counts",
-			context: "Header used above vote counts"
-		},
 		"VOTE_COUNT_OPINION": {
 			string: "Opinion:",
 			context: "Denotes the vote opinion (upvotes-downvotes) for the suggestion"
@@ -2774,6 +2804,10 @@ module.exports = {
 			string: "Gets a database entry",
 			context: "Description for the db command"
 		},
+		"COMMAND:PROTIPS": {
+			string: "Changes your protip settings",
+			context: "Description for the protips command"
+		},
 		"COMMAND:DEPLOY": {
 			string: "Updates the bot",
 			context: "Description for the deploy command"
@@ -2809,6 +2843,10 @@ module.exports = {
 		"COMMAND:INVITE": {
 			string: "Shows the link to invite the bot",
 			context: "Description for the invite command"
+		},
+		"COMMAND:IMPORT": {
+			string: "Imports suggestions from a channel",
+			context: "Description for the import command"
 		},
 		"COMMAND:LOCALE": {
 			string: "Sets your personal locale",
@@ -3011,6 +3049,354 @@ module.exports = {
 					description: "The link to invite the bot"
 				}
 			}
+		},
+		"PROTIP_TITLE": {
+			string: "**Protip:**",
+			context: "Title when protips are shown"
+		},
+		"PROTIP_INVITE": {
+			string: "You can invite Suggester to your server [here]({{bot_invite}})",
+			context: "Protip for inviting the bot",
+			replaced: {
+				bot_invite: {
+					to_replace: "{{bot_invite}}",
+					description: "The link to invite the bot"
+				}
+			}
+		},
+		"PROTIP_SUPPORT": {
+			string: "If you need help with Suggester or want to suggest a new feature, join our [support server]({{support_invite}})",
+			context: "Protip for the support server",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_REASON_APPROVE": {
+			string: "You can specify a comment when approving a suggestion using `{{prefix}}approve <suggestion id> <comment>`",
+			context: "Protip for approving with a comment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MASS_APPROVE": {
+			string: "You can approve multiple suggestions at once using `{{prefix}}mapprove <suggestion id 1> <suggestion id 2> <suggestion id 3> -r <comment>`",
+			context: "Protip for mass approving",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_REASON_DENY": {
+			string: "You can specify a reason when denying a suggestion using `{{prefix}}deny <suggestion id> <reason>`",
+			context: "Protip for denying with a reason",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MASS_DENY": {
+			string: "You can deny multiple suggestions at once using `{{prefix}}mdeny <suggestion id 1> <suggestion id 2> <suggestion id 3> -r <comment>`",
+			context: "Protip for mass denying",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_INCHANNEL": {
+			string: "You can configure Suggester to allow suggestions to be submitted via any message in the suggestions feed channel using `{{prefix}}config sendinchannel on`",
+			context: "Protip for in-channel suggestions",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_EMOTES": {
+			string: "You can configure custom reaction emojis for the suggestion feed using these commands:\n`{{prefix}}config emojis up <emoji>`\n`{{prefix}}config emojis mid <emoji>`\n`{{prefix}}config emojis down <emoji>`\n\nYou can also disable any of the reaction emojis using `{{prefix}}config emojis <up, mid, or down> disable`",
+			context: "Protip for emote config",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_VOTING": {
+			string: "If you enjoy Suggester, consider helping to support us by voting on bot lists! If you have a minute, click [here]({{list}}) and vote. If you're in our [Support Server]({{support_invite}}) you can get cool rewards for voting!\n\nIf you want to help even more, you can use `{{prefix}}vote` to see the full list of sites where you can vote. Thanks for your support!",
+			context: "Protip for voting",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				list: {
+					to_replace: "{{list}}",
+					description: "Randomly selected bot list link"
+				}
+			}
+		},
+		"PROTIP_NOTIFY": {
+			string: "You can use `{{prefix}}notify` to enable or disable receiving DM notifications when an action is taken on one of your suggestions",
+			context: "Protip for notify",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_LOCALE": {
+			string: "You can use `{{prefix}}locale` to make the bot respond to you in a different language. If your language isn't listed and/or you'd like to help translate, join our [Support Server]({{support_invite}}) and ask to join the Translation Program!",
+			context: "Protip for locale",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_CHANGELOG": {
+			string: "You can use `{{prefix}}changelog` to see the latest bot updates",
+			context: "Protip for changelog",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_ACOMMENT": {
+			string: "You can add an anonymous comment to a suggestion using `{{prefix}}acomment <suggestion ID> <comment>`. These are the same as comments, but they don't show who created them",
+			context: "Protip for acomment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_MARKCOMMENT": {
+			string: "You can add a comment to a suggestion when using the mark command using `{{prefix}}mark <suggestion ID> <status> <comment>`",
+			context: "Protip for mark with a comment",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_BLOCK": {
+			string: "You can block a user from using the bot on your server using `{{prefix}}block <user>`",
+			context: "Protip for block",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_COLORCHANGE": {
+			string: "You can configure the bot to change the embed color when a suggestion reaches a certain number of upvotes by using `{{prefix}}config colorchange number <number of upvotes>` and `{{prefix}}config colorchange color <color>`",
+			context: "Protip for colorchange",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_QUEUE": {
+			string: "You can view all suggestions currently awaiting review using the `{{prefix}}queue` command",
+			context: "Protip for queue",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"PROTIP_CANARY": {
+			string: "You can join the Suggester Canary program to help test new bot features before they are released to the main bot. Join the [Support Server]({{support_invite}}) for info!",
+			context: "Protip for Canary",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_RICKROLL": {
+			string: "We're no strangers to love\n" +
+				"You know the rules and so do I\n" +
+				"A full commitment's what I'm thinking of\n" +
+				"You wouldn't get this from any other guy\n" +
+				"I just wanna tell you how I'm feeling\n" +
+				"Gotta make you understand\n" +
+				"Never gonna give you up\n" +
+				"Never gonna let you down\n" +
+				"Never gonna run around and desert you\n" +
+				"Never gonna make you cry\n" +
+				"Never gonna say goodbye\n" +
+				"Never gonna tell a lie and hurt you\n" +
+				"We've known each other for so long\n" +
+				"Your heart's been aching but you're too shy to say it\n" +
+				"Inside we both know what's been going on\n" +
+				"We know the game and we're gonna play it\n" +
+				"And if you ask me how I'm feeling\n" +
+				"Don't tell me you're too blind to see\n" +
+				"Never gonna give you up\n" +
+				"Never gonna let you down\n" +
+				"Never gonna run around and desert you\n" +
+				"Never gonna make you cry\n" +
+				"Never gonna say goodbye\n" +
+				"Never gonna tell a lie and hurt you\n" +
+				"Never gonna give you up\n" +
+				"Never gonna let you down\n" +
+				"Never gonna run around and desert you\n" +
+				"Never gonna make you cry\n" +
+				"Never gonna say goodbye",
+			context: "Protip for a rick-roll"
+		},
+		"PROTIPS_TITLE": {
+			string: "**Protips:**",
+			context: "Denotes the protips section in the verify embed"
+		},
+		"PROTIPS_SHOWN_TITLE": {
+			string: "**Protips Shown:**",
+			context: "Denotes the protips shown section in the verify embed"
+		},
+		"IMPORTED_REASON": {
+			string: "This suggestion was denied before it was imported into Suggester.",
+			context: "Reason for suggestion denial for importing"
+		},
+		"IMPORTED_SUCCESS": {
+			string: "Successfully imported {{count}} suggestion(s)!",
+			context: "Success message for importing",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The number of imported suggestions"
+				}
+			}
+		},
+		"IMPORTED_SOME_ERROR": {
+			string: "Successfully imported {{count}} suggestion(s)! Some suggestions weren't imported, possibly because they were already imported or were above the 1024 character limit.",
+			context: "Success message for importing when some were not imported",
+			replaced: {
+				count: {
+					to_replace: "{{count}}",
+					description: "The number of imported suggestions"
+				}
+			}
+		},
+		"IMPORTED_NONE": {
+			string: "No suggestions were imported",
+			context: "Error shown when no suggestions are imported"
+		},
+		"IMPORT_START": {
+			string: "Beginning import... Under optimal conditions this should take {{time}}.",
+			context: "Shown when a user begins an import",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The estimated time that the import will take"
+				}
+			}
+		},
+		"IMPORT_TITLE": {
+			string: "Importing Suggestions",
+			context: "Title for the importing embed"
+		},
+		"IMPORT_DESC": {
+			string: "Suggester can import suggestions from your existing suggestions channel, allowing you to utilize all of Suggester's features on them!\nSuggester can import suggestions sent by users, as well as ones submitted through these bots:\n{{bots}}\n\nThe last **30** messages sent in __this channel__ will be imported. If you need to import more messages, stop this import and contact our [support team]({{support_invite}}).\nTo continue with this import, select {{check}}. To cancel, select {{x}}.",
+			context: "Description for the suggestion embed",
+			replaced: {
+				bots: {
+					to_replace: "{{bots}}",
+					description: "The list of supported bots for import"
+				},
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				},
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"IMPORT_OVERRIDE_TITLE": {
+			string: "Message Override",
+			context: "Title for the override header of the import embed"
+		},
+		"IMPORT_OVERRIDE_DESC": {
+			string: "**{{num}}** messages will be imported",
+			context: "Shows how many messages will be imported if the limit is overriden",
+			replaced: {
+				num: {
+					to_replace: "{{num}}",
+					description: "The number of messages to import"
+				}
+			}
+		},
+		"IMPORT_TOO_MANY_ERROR": {
+			string: "You must specify an integer between 1 and 100.",
+			context: "Error shown when the number of messages to import is invalid"
+		},
+		"VOTES_TITLE": {
+			string: "Votes",
+			context: "Header for the votes section of the suggestion embed"
+		},
+		"ALREADY_AWAITING_REVIEW_CONFIRM": {
+			string: "You already have a suggestion awaiting review. Are you sure you would like to submit another? Select {{check}} to submit and {{x}} to cancel.",
+			context: "Warning shown when a user tries to submit a suggestion and already has one awaiting review",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
+		"NO_TOP_FOUND": {
+			string: "No suggestions with votes were found",
+			context: "Error shown when no suggestions are found for the top command"
+		},
+		"TOP_TITLE": {
+			string: "Top 10 Highest Voted Suggestions",
+			context: "Header for the top suggestions embed"
+		},
+		"TOP_LOADING": {
+			string: "Collecting top suggestion data, this may take a moment...",
+			context: "Message shown when waiting for top 10 data to collect"
 		}
 	}
 };
