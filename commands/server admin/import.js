@@ -18,7 +18,6 @@ module.exports = {
 		usage: "import",
 		description: "Imports suggestions from a channel",
 		enabled: true,
-		docs: "admin/import",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 60
 	},

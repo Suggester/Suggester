@@ -9,10 +9,10 @@ module.exports = {
 		name: "removeattachment",
 		permission: 3,
 		aliases: ["rmattachment", "rmattach", "delattachment", "deleteattachment"],
-		usage: "removeattachment <suggestion id>",
-		description: "Removes a file from a suggestion",
+		usage: "removeattachment [suggestion id]",
+		description: "Removes an attachment from a suggestion",
 		enabled: true,
-		docs: "staff/removeattachment",
+		examples: "`{{p}}removeattachment 1`\nRemoves the attachment from suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},

@@ -8,11 +8,11 @@ module.exports = {
 	controls: {
 		name: "comment",
 		permission: 3,
-		usage: "comment <suggestion id> <comment>",
+		usage: "comment [suggestion id] [comment]",
 		description: "Adds a comment to an approved suggestion",
 		image: "images/Comment.gif",
 		enabled: true,
-		docs: "staff/comment",
+		examples: "`{{p}}comment 1 This is a comment`\nComments on suggestion #1 with \"This is a comment\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},

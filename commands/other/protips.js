@@ -4,11 +4,11 @@ module.exports = {
 	controls: {
 		name: "protips",
 		permission: 10,
-		aliases: ["tip", "tips", "protip"],
-		usage: "protips <on|off|toggle>",
-		description: "Changes your protip settings",
+		aliases: ["tip", "tips", "protip", "hint", "hints"],
+		usage: "protips (on|off|toggle)",
+		description: "Views/edits your protip setting",
 		enabled: true,
-		docs: "all/protips",
+		examples: "`{{p}}protips`\nShows your protips setting\n\n`{{p}}protips on`\nEnables showing protips\n\n`{{p}}protips off`\nDisables showing protips\n\n`{{p}}protips toggle`\nToggles showing protips",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
 		dmAvailable: true

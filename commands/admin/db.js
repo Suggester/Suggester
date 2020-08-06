@@ -5,8 +5,9 @@ module.exports = {
 		name: "db",
 		permission: 0,
 		aliases: ["query"],
-		usage: "db <query|modify> <collection> <query field> <query value> (modify:field) (modify:value)",
-		description: "Gets a database entry",
+		usage: "db [query|modify] [collection] [query field] [query value] (modify:field) (modify:value)",
+		examples: "`{{p}}db query Suggestion suggestionId 1`\nGets data for a document in the `Suggestion` collection with a `suggestionId` of `1`\n\n`{{p}}db modify Suggestion suggestionId 1 suggester 327887845270487041`\nSets the `suggester` value of a document in the `Suggestion` collection with a `suggestionId` of `1` to `327887845270487041`",
+		description: "Gets or modifies a database entry",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
 	},

@@ -7,10 +7,10 @@ module.exports = {
 	controls: {
 		name: "silentdeny",
 		permission: 3,
-		usage: "silentdeny <suggestion id> (reason)",
+		usage: "silentdeny [suggestion id] (reason)",
 		description: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
-		docs: "staff/silentdeny",
+		examples: "`{{p}}silentdeny 1`\nSilently denies suggestion #1\n\n`{{p}}silentdeny 1 This isn't something we're interested in`\nSilently denies suggestion #1 with the reason \"This isn't something we're interested in\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},

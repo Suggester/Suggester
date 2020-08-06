@@ -8,12 +8,12 @@ module.exports = {
 	controls: {
 		name: "block",
 		permission: 3,
-		usage: "block <user>",
+		usage: "block [user]",
 		aliases: ["disallow", "bl"],
-		description: "Blocks a user from using the bot in the server",
+		description: "Blocks a user from using the bot in this server",
 		enabled: true,
-		docs: "staff/block",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
+		examples: "`{{p}}block @Brightness™`\nBlocks Brightness™ from using the bot in this server\n\n`{{p}}block 255834596766253057 Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"",
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS", "ADD_REACTIONS"],
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {

@@ -7,10 +7,11 @@ module.exports = {
 	controls: {
 		name: "deploy",
 		permission: 0,
-		usage: "deploy",
-		description: "Updates the bot",
+		usage: "deploy (branch)",
+		description: "Pulls an update from git and reboots with changes",
+		examples: "`{{p}}deploy`\nDeploys an update from the `production` branch\n\n`{{p}}deploy staging`\nDeploys an update from the `staging` branch",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"]
 	},
 	do: async (locale, message, client, args, Discord) => {
 		if (!client.admins.has(message.author.id)) return;

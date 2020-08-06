@@ -10,7 +10,6 @@ module.exports = {
 		usage: "autosetup",
 		description: "Automatically sets up channels and configures the bot",
 		enabled: true,
-		docs: "admin/autosetup",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "MANAGE_CHANNELS"],
 		cooldown: 60
 	},

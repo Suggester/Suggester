@@ -8,11 +8,11 @@ module.exports = {
 	controls: {
 		name: "attach",
 		permission: 3,
-		usage: "attach <suggestion id> <attachment link>",
+		usage: "attach [suggestion id] [attachment link]",
 		description: "Attaches a file to an approved suggestion",
 		image: "images/Attach.gif",
 		enabled: true,
-		docs: "staff/attach",
+		examples: "`{{p}}attach 1 https://i.imgur.com/zmntNve.png`\nAttaches https://i.imgur.com/zmntNve.png to suggestion #1\n\n`{{p}}attach 1`\nIf you attach an image via Discord's native uploader, it will be added to suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"],
 		cooldown: 5
 	},

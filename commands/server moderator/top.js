@@ -10,7 +10,6 @@ module.exports = {
 		usage: "top",
 		description: "Shows the top 10 most highly voted suggestions",
 		enabled: true,
-		docs: "staff/top",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 60
 	},

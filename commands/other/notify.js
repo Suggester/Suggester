@@ -5,10 +5,10 @@ module.exports = {
 		name: "notify",
 		permission: 10,
 		aliases: ["notifications"],
-		usage: "notify <on|off|toggle>",
-		description: "Changes your notification settings",
+		usage: "notify (on|off|toggle)",
+		description: "Views/edits your notification settings",
 		enabled: true,
-		docs: "all/notify",
+		examples: "`{{p}}notify`\nShows your DM notification setting\n\n`{{p}}notify on`\nEnables DM notifications for suggestion changes\n\n`{{p}}notify off`\nDisables DM notifications for suggestion changes\n\n`{{p}}notify toggle`\nToggles DM notifications for suggestion changes",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
 		dmAvailable: true

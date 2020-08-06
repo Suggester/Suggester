@@ -5,11 +5,11 @@ module.exports = {
 	controls: {
 		name: "flags",
 		permission: 0,
-		usage: "flags <guild|user> <id> (add|remove) (flag)",
-		aliases: ["flag"],
+		usage: "flags [guild|user [id] (add|remove) (flag)",
+		aliases: ["flag", "f"],
 		description: "Sets internal flags for a user",
 		enabled: true,
-		docs: "",
+		examples: "`{{p}}flags user @Brightness™`\nShows flags for Brightness™\n\n`{{p}}flags user @Brightness™ add STAFF`\nAdds the `STAFF` flag to Brightness™\n\n`{{p}}flags user @Brightness™ remove STAFF`\nRemoves the `STAFF` flag from Brightness™\n\n`{{p}}flags guild 635632859998060554`\nShows flags for guild 635632859998060554\n\n`{{p}}flags guild 635632859998060554 add PROTECTED`\nAdds the `PROTECTED` flag to guild 635632859998060554\n\n`{{p}}flags guild 635632859998060554 remove PROTECTED`\nRemoves the `PROTECTED` flag from guild 635632859998060554",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args) => {

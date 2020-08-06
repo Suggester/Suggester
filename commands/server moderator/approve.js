@@ -8,11 +8,11 @@ module.exports = {
 		name: "approve",
 		permission: 3,
 		aliases: ["accept"],
-		usage: "approve <suggestion id> (comment)",
+		usage: "approve [suggestion id] (comment)",
 		description: "Approves a suggestion",
 		image: "images/Approve.gif",
+		examples: "`{{p}}approve 1`\nApproves suggestion #1\n\n`{{p}}approve 1 This is a comment`\nApproves suggestion #1 and adds a comment from the approver saying \"This is a comment\"",
 		enabled: true,
-		docs: "staff/approve",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
 		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"

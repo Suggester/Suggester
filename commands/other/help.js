@@ -1,6 +1,6 @@
 const { permLevelToRole } = require("../../utils/misc");
 const { dbQuery } = require("../../utils/db");
-const { checkConfig } = require("../../utils/checks");
+const { checkConfig, checkPermissions } = require("../../utils/checks");
 const { MessageAttachment } = require("discord.js");
 const { prefix, support_invite } = require("../../config.json");
 const { url } = require("./invite");
@@ -13,10 +13,10 @@ module.exports = {
 		aliases: ["command", "howto", "prefix"],
 		usage: "help (command name)",
 		description: "Shows command information",
+		examples: "`{{p}}help`\nShows the list of commands\n\n`{{p}}help suggest`\nShows information about the \"suggest\" command",
 		image: "images/Help.gif",
 		enabled: true,
-		docs: "all/help",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
 		dmAvailable: true
 	},
@@ -48,19 +48,19 @@ module.exports = {
 
 		let commandInfo = command.controls;
 
+		let additionalInfo = [];
+		if (!commandInfo.enabled || commandInfo.permission === -1) additionalInfo.push(`⚠️ ${string(locale, "COMMAND_DISABLED")}`);
+		if (permLevelToRole(locale, commandInfo.permission)) additionalInfo.push(permLevelToRole(locale, commandInfo.permission));
+		let permission = await checkPermissions(message.member || message.author, client);
+		additionalInfo.push(string(locale, permission <= commandInfo.permission ? "HAS_COMMAND_PERMISSION" : "HAS_NOT_COMMAND_PERMISSION"));
 		let returnEmbed = new Discord.MessageEmbed()
 			.setColor(client.colors.default)
-			.setDescription(string(locale, `COMMAND:${commandInfo.name.toUpperCase()}`))
-			.addField(string(locale, "HELP_PERMISSION_LEVEL"), permLevelToRole(locale, commandInfo.permission), true)
-			.addField(string(locale, "HELP_USAGE"), `\`${serverPrefix}${commandInfo.usage}\``, true)
-			.setAuthor(commandName, client.user.displayAvatarURL({dynamic: true, format: "png"}));
+			.setDescription(`${string(locale, `COMMAND_DESC:${commandInfo.name.toUpperCase()}`) || commandInfo.description}\n${additionalInfo.join("\n")}`)
+			.addField(string(locale, "HELP_USAGE"), `\`${serverPrefix}${string(locale, `COMMAND_USAGE:${commandInfo.name.toUpperCase()}`) || commandInfo.usage}\``, true)
+			.setAuthor(`${serverPrefix}${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
-		commandInfo.aliases ? returnEmbed.addField(string(locale, commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.join(", ")) : "";
-		if (commandInfo.docs && commandInfo.docs !== "") {
-			let localeFull = client.locales.find(l => l.settings.code === locale);
-			returnEmbed.addField(string(locale, "HELP_DOCUMENTATION"), `${localeFull.settings.docs || "https://suggester.js.org/#/"}${commandInfo.docs}`);
-		}
-		if (!commandInfo.enabled) returnEmbed.addField(string(locale, "HELP_ADDITIONAL_INFO"), `⚠️ ${string(locale, "COMMAND_DISABLED")}`);
+		commandInfo.aliases ? returnEmbed.addField(string(locale, commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.map(c => `\`${serverPrefix}${c}\``).join(", "), true) : "";
+		returnEmbed.addField(string(locale, "HELP_EXAMPLES"), (commandInfo.examples ? (string(locale, `COMMAND_EXAMPLES:${commandInfo.name.toUpperCase()}`) || commandInfo.examples).replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(serverPrefix)) : null) || string(locale, "NONE"));
 
 		if (commandInfo.image) returnEmbed.attachFiles([new MessageAttachment(commandInfo.image, `image.${commandInfo.image.split(".")[1]}`)]).setImage(`attachment://image.${commandInfo.image.split(".")[1]}`);
 

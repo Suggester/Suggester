@@ -9,8 +9,7 @@ module.exports = {
 		usage: "changelog",
 		description: "Shows the latest Suggester release",
 		enabled: true,
-		docs: "all/changelog",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS"],
 		cooldown: 25,
 		dmAvailable: true
 	},

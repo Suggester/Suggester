@@ -8,12 +8,12 @@ module.exports = {
 	controls: {
 		name: "massapprove",
 		permission: 3,
-		usage: "massapprove <suggestion ids> -r (comment)",
+		usage: "massapprove [suggestion ids] -r (comment)",
 		aliases: ["mapprove", "multiapprove"],
-		description: "Approves all specified suggestions",
+		description: "Approves multiple suggestions at once",
 		image: "images/Mapprove.gif",
 		enabled: true,
-		docs: "staff/massapprove",
+		examples: "`{{p}}massapprove 1 2 3`\nApproves suggestions 1, 2, and 3\n\n`{{p}}massapprove 1 2 3 -r Nice suggestion!`\nApproves suggestions 1, 2, and 3 and comments on each of them with \"Nice suggestion!\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 20
 	},

@@ -10,10 +10,10 @@ module.exports = {
 		name: "setup",
 		permission: 2,
 		usage: "setup",
-		description: "Initiates a walkthrough for server configuration",
+		description: "Walks you through an interactive configuration process",
 		image: "images/Setup.gif",
+		examples: "The bot will send a prompt, and you send your response in the channel. The bot will then send another prompt, and the cycle continues until your server is configured.",
 		enabled: true,
-		docs: "admin/setup",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 45
 	},
@@ -76,7 +76,7 @@ module.exports = {
 				} else return;
 			}
 			case 1: {
-				let staffRolesEmbed = setupEmbed(string(locale, "CFG_STAFF_ROLES_TITLE"), string(locale, "SETUP_STAFF_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 2);
+				let staffRolesEmbed = setupEmbed(string(locale, "CFG_STAFF_ROLES_TITLE"), string(locale, "SETUP_STAFF_ROLES_DESC_ND"), string(locale, "SETUP_ROLES_INPUT"), 2);
 				if (db.config.staff_roles.length >= 1) staffRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
 				await message.channel.send(staffRolesEmbed);
 				let returnCollect = await awaitMessage(message);
@@ -234,7 +234,7 @@ module.exports = {
 					.setTitle(string(locale, "SETUP_COMPLETE_HEADER"))
 					.setColor(client.colors.default)
 					.setDescription(string(locale, "SETUP_COMPLETE_DESC", { prefix: Discord.escapeMarkdown(db.config.prefix) }))
-					.addField(string(locale, "SETUP_ADDITIONAL_CONFIG_HEADER"), string(locale, "SETUP_ADDITIONAL_CONFIG_DESC"));
+					.addField(string(locale, "SETUP_ADDITIONAL_CONFIG_HEADER"), string(locale, "SETUP_ADDITIONAL_CONFIG_DESC_ND", { prefix: Discord.escapeMarkdown(db.config.prefix) }));
 				return message.channel.send(doneEmbed);
 			}
 			default:

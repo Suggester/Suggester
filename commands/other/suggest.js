@@ -14,11 +14,11 @@ module.exports = {
 		name: "suggest",
 		permission: 10,
 		aliases: ["submit"],
-		usage: "suggest <suggestion>",
+		usage: "suggest [suggestion]",
 		description: "Submits a suggestion",
 		image: "images/Suggest.gif",
 		enabled: true,
-		docs: "all/suggest",
+		examples: "`{{p}}suggest This is a suggestion`\nSubmits a suggestion\n\nYou can also attach images to your suggestion by uploading an image when you send the command",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 20
 	},

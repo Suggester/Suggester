@@ -5,8 +5,9 @@ module.exports = {
 		name: "allowlist",
 		permission: 1,
 		aliases: ["al"],
-		usage: "allowlist <add/remove> <guild id>",
-		description: "Allowlists a server",
+		usage: "allowlist [add/remove] [guild id]",
+		description: "Adds a server to the allowed list",
+		examples: "`{{p}}allowlist add 681490407862829073`\nAdds server 681490407862829073 to the allowed list\n\n`{{p}}allowlist remove 681490407862829073`\nRemoves server 681490407862829073 from the allowed list",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},

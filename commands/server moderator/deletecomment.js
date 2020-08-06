@@ -8,11 +8,11 @@ module.exports = {
 	controls: {
 		name: "deletecomment",
 		permission: 3,
-		aliases: ["delcomment", "dcomment", "rmcomment"],
-		usage: "deletecomment <comment id>",
-		description: "Deletes a comment on a suggestion",
+		aliases: ["delcomment", "dcomment", "rmcomment", "dc"],
+		usage: "deletecomment [comment id]",
+		description: "Deletes a comment from a suggestion",
 		enabled: true,
-		docs: "staff/deletecomment",
+		examples: "`{{p}}deletecomment 27_1`\nDeletes a comment with the ID `27_1`",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 10
 	},

@@ -7,11 +7,11 @@ module.exports = {
 	controls: {
 		name: "deny",
 		permission: 3,
-		usage: "deny <suggestion id> (reason)",
+		usage: "deny [suggestion id] (reason)",
 		description: "Denies a suggestion",
 		image: "images/Deny.gif",
 		enabled: true,
-		docs: "staff/deny",
+		examples: "`{{p}}deny 1`\nDenies suggestion #1\n\n`{{p}}deny 1 This isn't something we're interested in`\nDenies suggestion #1 with the reason \"This isn't something we're interested in\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
 		cooldownMessage: "Need to deny multiple suggestions? Try the `mdeny` command!"

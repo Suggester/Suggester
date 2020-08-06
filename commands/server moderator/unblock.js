@@ -7,11 +7,11 @@ module.exports = {
 	controls: {
 		name: "unblock",
 		permission: 3,
-		usage: "unblock <user>",
+		usage: "unblock [user]",
 		aliases: ["allow", "unbl"],
-		description: "Unblocks a server member from using the bot",
+		description: "Unblocks a user from using the bot in this server",
 		enabled: true,
-		docs: "staff/unblock",
+		examples: "`{{p}}unblock @Brightness™`\nUnblocks Brightness™ from using the bot in this server\n\n`{{p}}unblock 255834596766253057 Accidentally blocked`\nUnblocks a user with ID 255834596766253057 from using the bot in this server with reason \"Accidentally blocked\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},

@@ -9,8 +9,7 @@ module.exports = {
 		usage: "tutorial",
 		description: "Shows information about setting up the bot and using it",
 		enabled: true,
-		docs: "all/tutorial",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
 		cooldown: 10
 	},
 	do: async (locale, message, client, args, Discord) => {

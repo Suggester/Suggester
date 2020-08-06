@@ -8,12 +8,12 @@ module.exports = {
 	controls: {
 		name: "massdeny",
 		permission: 3,
-		usage: "massdeny <suggestion ids> -r (reason)",
+		usage: "massdeny [suggestion ids] -r (reason)",
 		aliases: ["mdeny", "multideny"],
-		description: "Denies all specified suggestions",
+		description: "Denies multiple suggestions at once",
 		image: "images/Mdeny.gif",
 		enabled: true,
-		docs: "staff/massdeny",
+		examples: "`{{p}}massdeny 1 2 3`\nDenies suggestions 1, 2, and 3\n\n`{{p}}massdeny 1 2 3 -r This isn't something we're interested in doing`\nDenies suggestions 1, 2, and 3 with a reason of \"This isn't something we're interested in doing\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 20
 	},

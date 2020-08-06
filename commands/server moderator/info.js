@@ -6,11 +6,11 @@ module.exports = {
 	controls: {
 		name: "info",
 		permission: 3,
-		usage: "info <suggestion id>",
+		usage: "info [suggestion id]",
 		description: "Shows information about a suggestion",
 		image: "images/Info.gif",
 		enabled: true,
-		docs: "staff/info",
+		examples: "`{{p}}info 1`\nShows information about suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},

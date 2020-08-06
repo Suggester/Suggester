@@ -6,13 +6,12 @@ module.exports = {
 	controls: {
 		name: "listqueue",
 		permission: 3,
-		aliases: ["queue", "showqueue"],
+		aliases: ["queue", "showqueue", "q"],
 		usage: "listqueue",
 		description: "Shows the queue of suggestions awaiting review",
 		image: "images/Listqueue.gif",
 		enabled: true,
-		docs: "staff/listqueue",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 25
 	},
 	do: async (locale, message, client, args, Discord) => {

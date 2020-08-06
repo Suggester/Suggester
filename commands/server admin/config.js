@@ -15,7 +15,7 @@ module.exports = {
 		description: "Shows/edits server configuration",
 		image: "images/Config.gif",
 		enabled: true,
-		docs: "admin/config",
+		examples: "Use `{{p}}config help` to view detailed instructions",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
 		cooldown: 5
 	},
@@ -31,7 +31,7 @@ module.exports = {
 
 		let qServerDB = await dbQuery("Server", {id: server.id});
 
-		if (!args[0]) {
+		if (!args[0] || args[0].toLowerCase() === "help") {
 			let embed = new Discord.MessageEmbed();
 			embed.setDescription(string(locale, "CONFIG_HELP", { prefix: qServerDB.config.prefix }));
 			embed.setColor(client.colors.default);

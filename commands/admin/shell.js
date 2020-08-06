@@ -13,11 +13,11 @@ module.exports = {
 	controls: {
 		name: "shell",
 		permission: 0,
-		usage: "shell <code>",
+		usage: "shell [code]",
 		aliases: ["exec"],
 		description: "Runs shell code",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args) => {
 		if (!client.admins.has(message.author.id)) return;

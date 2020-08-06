@@ -12,10 +12,10 @@ module.exports = {
 		permission: 10,
 		aliases: ["language", "translate", "translation", "locales", "lang"],
 		usage: "locale <locale to set>",
-		description: "Sets your personal locale",
+		description: "Sets the language the bot responds to you in",
+		examples: "`{{p}}locale`\nShows the list of available languages\n\n`{{p}}locale fr`\nSets your language to French",
 		enabled: true,
-		docs: "all/locale",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS"],
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {

@@ -6,20 +6,18 @@ const { string } = require("./strings");
 module.exports = {
 	permLevelToRole: (locale, permLevel) => {
 		switch (permLevel) {
-		case -1:
-			return string(locale, "NO_USERS_PERMISSION");
 		case 0:
-			return string(locale, "BOT_ADMIN_PERMISSION");
+			return string(locale, "BOT_ADMIN_PERMISSION_SENTENCE");
 		case 1:
-			return string(locale, "GLOBAL_STAFF_PERMISSION");
+			return string(locale, "GLOBAL_STAFF_PERMISSION_SENTENCE");
 		case 2:
-			return string(locale, "SERVER_ADMIN_PERMISSION");
+			return string(locale, "SERVER_ADMIN_PERMISSION_SENTENCE");
 		case 3:
-			return string(locale, "SERVER_STAFF_PERMISSION");
+			return string(locale, "SERVER_STAFF_PERMISSION_SENTENCE");
 		case 10:
-			return string(locale, "ALL_USERS_PERMISSION");
+			return string(locale, "ALL_USERS_PERMISSION_SENTENCE");
 		default:
-			return string(locale, "UNKNOWN");
+			return null;
 		}
 	},
 	/**

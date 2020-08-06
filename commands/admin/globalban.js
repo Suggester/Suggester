@@ -6,10 +6,12 @@ module.exports = {
 	controls: {
 		name: "globalban",
 		permission: 1,
-		usage: "globalban <guild|user> <id> [true|false]",
+		usage: "globalban [guild|user] [id] (true|false)",
+		aliases: ["globalblock", "gban", "gblock"],
 		description: "Excludes a user or server from using the bot globally",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
+		examples: "`{{p}}globalban user 327887845270487041`\nChecks block status for user 327887845270487041\n\n`{{p}}globalban user 327887845270487041 true`\nBlocks user 327887845270487041 globally\n\n`{{p}}globalban user 327887845270487041 false`\nUnblocks user 327887845270487041 globally\n\n`{{p}}globalban guild 693209117220929596`\nChecks block status for guild 693209117220929596\n\n`{{p}}globalban guild 693209117220929596 true`\nBlocks guild 327887845270487041 from using the bot\n\n`{{p}}globalban guild 693209117220929596 false`\nUnblocks guild 327887845270487041 from using the bot"
 	},
 	do: async (locale, message, client, args) => {
 		let type = args.shift();

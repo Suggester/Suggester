@@ -4,7 +4,7 @@ module.exports = {
 		name: "shard",
 		permission: 10,
 		usage: "shard",
-		description: "Shows the shard of this server",
+		description: "Shows the shard this server is on",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 20

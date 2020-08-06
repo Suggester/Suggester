@@ -5,9 +5,10 @@ module.exports = {
 	controls: {
 		name: "acknowledgement",
 		permission: 1,
-		usage: "acknowledgement <user> (new acknowledgement)",
+		usage: "acknowledgement [user] (new acknowledgement)",
 		aliases: ["ack", "setack", "setacknowledgement", "addack"],
 		description: "Sets a verify acknowledgement for a user",
+		examples: "`{{p}}acknowledgement`\nShows your acknowledgement\n\n`{{p}}acknowledgement @Brightness™`\nShows Brightness™'s acknowledgement\n\n`{{p}}acknowledgement @Brightness™ Test`\nSets Brightness™'s acknowledgement to \"Test\"\n\n`{{p}}acknowledgement @Brightness™ reset`\nResets Brightness™'s acknowledgement",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"]
 	},

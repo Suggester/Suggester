@@ -9,12 +9,12 @@ module.exports = {
 	controls: {
 		name: "massdelete",
 		permission: 3,
-		usage: "massdelete <suggestion ids> -r (reason)",
+		usage: "massdelete [suggestion ids] -r (reason)",
 		aliases: ["mdelete", "multidelete"],
-		description: "Deletes all specified suggestions",
+		description: "Deletes multiple suggestions at once, removing them from the suggestions feed",
 		image: "images/Mdelete.gif",
 		enabled: true,
-		docs: "staff/massdelete",
+		examples: "`{{p}}massdelete 1 2 3`\nDeletes suggestions 1, 2, and 3\n\n`{{p}}massdelete 1 2 3 -r Cleaning up suggestions`\nDeletes suggestions 1, 2, and 3 with a reason of \"Cleaning up suggestions\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 20
 	},

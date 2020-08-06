@@ -15,10 +15,11 @@ module.exports = {
 	controls: {
 		name: "eval",
 		permission: 0,
-		usage: "eval <javascript code>",
+		usage: "eval [code]",
 		description: "Runs JavaScript code",
+		examples: "`{{p}}eval return 2+2`\nEvaluates the value of 2+2 and returns it",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
 	},
 	do: async (locale, message, client, args) => {
 		if (!client.admins.has(message.author.id)) return;
