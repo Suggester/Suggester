@@ -1,0 +1,5 @@
+{
+  "name": "Review",
+  "description": "Commands for reviewing suggestions (only available when the bot is in the `review` mode)",
+  "position": 2
+}

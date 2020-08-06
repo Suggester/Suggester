@@ -5,6 +5,7 @@ const { MessageAttachment } = require("discord.js");
 const { prefix, support_invite } = require("../../config.json");
 const { url } = require("./invite");
 const { string } = require("../../utils/strings");
+const { pages } = require("../../utils/actions");
 
 module.exports = {
 	controls: {
@@ -22,22 +23,29 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let serverPrefix = prefix;
-		let missingConfig;
+		//let missingConfig;
 		if (message.guild) {
 			let qServerDB = await dbQuery("Server", { id: message.guild.id });
-			missingConfig = await checkConfig(locale, qServerDB, client);
+			//missingConfig = await checkConfig(locale, qServerDB, client);
 			serverPrefix = qServerDB.config.prefix;
 		}
 
-		if (!args[0]) {
-			let embed = new Discord.MessageEmbed()
-				.setDescription(string(locale, "HELP_BASE_DESCRIPTION"))
-				.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC", { support_invite, bot_invite: url.replace("[ID]", client.user.id) }))
-				.setFooter(message.guild ? string(locale, "HELP_PREFIX_INFO", { prefix: serverPrefix }) : "")
-				.setColor(client.colors.default);
+		let permission = await checkPermissions(message.member || message.author, client);
 
-			if (missingConfig) embed.addField(string(locale, "MISSING_CONFIG_TITLE"), string(locale, "MISSING_CONFIG_DESCRIPTION", { prefix: serverPrefix }));
-			return message.channel.send(embed);
+		if (!args[0]) {
+			let embeds = [];
+			for await (let module of new Set(client.commands.map(c => c.controls.module).sort((a, b) => (require(`../${a}/module`)).position - (require(`../${b}/module`)).position))) {
+				let moduleCommands = client.commands.filter(c => c.controls.module === module && c.controls.permission >= permission);
+				if (moduleCommands.size > 0) embeds.push(new Discord.MessageEmbed()
+					.setAuthor(`${string(locale, "HELP_AUTHOR", { name: client.user.username })} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, client.user.displayAvatarURL({ format: "png", dynamic: true }))
+					.setTitle(string(locale, "HELP_MODULE_TITLE", { module: string(locale, `MODULE_NAME:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).name }))
+					.setColor(client.colors.default)
+					.setDescription((string(locale, `MODULE_DESC:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).description) + "\n\n" + moduleCommands.map(c => `\`${serverPrefix}${string(locale, `COMMAND_USAGE:${c.controls.name.toUpperCase()}`) || c.controls.usage}\` - ${string(locale, `COMMAND_DESC:${c.controls.name.toUpperCase()}`) || c.controls.description}`).join("\n"))
+					.addField(string(locale, "HELP_ADDITIONAL_INFO"), string(locale, "HELP_UNDERSTANDING", { prefix: serverPrefix }))
+					.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC", { support_invite, bot_invite: url.replace("[ID]", client.user.id) })));
+			}
+			if (embeds.length > 1) for await (let e of embeds) e.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			return pages(locale, message, embeds);
 		}
 
 		let commandName = args[0].toLowerCase();
@@ -51,7 +59,6 @@ module.exports = {
 		let additionalInfo = [];
 		if (!commandInfo.enabled || commandInfo.permission === -1) additionalInfo.push(`⚠️ ${string(locale, "COMMAND_DISABLED")}`);
 		if (permLevelToRole(locale, commandInfo.permission)) additionalInfo.push(permLevelToRole(locale, commandInfo.permission));
-		let permission = await checkPermissions(message.member || message.author, client);
 		additionalInfo.push(string(locale, permission <= commandInfo.permission ? "HAS_COMMAND_PERMISSION" : "HAS_NOT_COMMAND_PERMISSION"));
 		let returnEmbed = new Discord.MessageEmbed()
 			.setColor(client.colors.default)

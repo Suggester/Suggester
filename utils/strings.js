@@ -582,6 +582,36 @@ module.exports = {
 				}
 			}
 		},
+		"HELP_AUTHOR": {
+			string: "{{name}} Help",
+			context: "Author title for the help embed",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The bot name"
+				}
+			}
+		},
+		"HELP_MODULE_TITLE": {
+			string: "Module: {{module}}",
+			context: "Title for the module in the help embed",
+			replaced: {
+				module: {
+					to_replace: "{{module}}",
+					description: "The command module"
+				}
+			}
+		},
+		"HELP_UNDERSTANDING": {
+			string: "Use `{{prefix}}help [command]` to view more information about a specific command, including usage examples.\nRequired arguments are surrounded by `[brackets]`, optional arguments are surrounded by `(parenthesis)`",
+			context: "Information in help that helps with understanding the format",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
+		},
 		"HELP_PREFIX_INFO": {
 			string: "My prefix in this server is {{prefix}}",
 			context: "Shows prefix in the help command",
@@ -619,20 +649,6 @@ module.exports = {
 		"COMMAND_DISABLED": {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"
-		},
-		"MISSING_CONFIG_TITLE": {
-			string: "Missing Config!",
-			context: "Title to any missing configuration warning embed"
-		},
-		"MISSING_CONFIG_DESCRIPTION": {
-			string: "This server has an incomplete configuration.\nA server manager can run `{{prefix}}setup` to configure it.",
-			context: "Description to any missing configuration warning embed",
-			replaced: {
-				prefix: {
-					to_replace: "{{prefix}}",
-					description: "The server's prefix"
-				}
-			}
 		},
 		"INVITE_BOT": {
 			string: "You can invite {{name}} to your server with this link: {{link}}",
@@ -3978,6 +3994,50 @@ module.exports = {
 				"Unblocks a user with ID 255834596766253057 from using the bot in this server with reason \"Accidentally blocked\"",
 			context: "Examples for the unblock command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"MODULE_NAME:CONFIGURATION": {
+			string: "Configuration",
+			context: "The name of the Configuration module"
+		},
+		"MODULE_DESC:CONFIGURATION": {
+			string: "Commands for configuring the bot",
+			context: "The description for the Configuration module"
+		},
+		"MODULE_NAME:DEVELOPER": { string: "Developer", context: "The name of the Developer module" },
+		"MODULE_DESC:DEVELOPER": {
+			string: "Commands for developers/global administrators",
+			context: "The description for the Developer module"
+		},
+		"MODULE_NAME:GLOBAL STAFF": {
+			string: "Global Staff",
+			context: "The name of the Global Staff module"
+		},
+		"MODULE_DESC:GLOBAL STAFF": {
+			string: "Commands usable by global Suggester staff members",
+			context: "The description for the Global Staff module"
+		},
+		"MODULE_NAME:MODERATOR": { string: "Moderator", context: "The name of the Moderator module" },
+		"MODULE_DESC:MODERATOR": {
+			string: "Commands for moderating who can submit suggestions",
+			context: "The description for the Moderator module"
+		},
+		"MODULE_NAME:OTHER": { string: "Other", context: "The name of the Other module" },
+		"MODULE_DESC:OTHER": {
+			string: "Miscellaneous commands",
+			context: "The description for the Other module"
+		},
+		"MODULE_NAME:REVIEW": { string: "Review", context: "The name of the Review module" },
+		"MODULE_DESC:REVIEW": {
+			string: "Commands for reviewing suggestions (only available when the bot is in the `review` mode)",
+			context: "The description for the Review module"
+		},
+		"MODULE_NAME:SUGGESTIONS": {
+			string: "Suggestions",
+			context: "The name of the Suggestions module"
+		},
+		"MODULE_DESC:SUGGESTIONS": {
+			string: "Commands for submitting and interacting with suggestions",
+			context: "The description for the Suggestions module"
 		}
 	}
 };

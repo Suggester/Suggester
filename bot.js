@@ -7,7 +7,7 @@ const { errorLog } = require("./utils/logs");
 const { fileLoader } = require("./utils/misc.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
-const { basename } = require("path");
+const { basename, dirname } = require("path");
 const fs = require("fs");
 if (process.env.SENTRY_DSN) {
 	const {init} = require("@sentry/node");
@@ -76,11 +76,12 @@ connection.on("error", (err) => {
 
 	let commandFiles = await fileLoader("commands");
 	for await (let file of commandFiles) {
-		if (!file.endsWith(".js")) return;
-
+		if (!file.endsWith(".js")) continue;
 		let command = require(file);
 		let commandName = basename(file).split(".")[0];
 
+		let dirArray = dirname(file).split("/");
+		command.controls.module = dirArray[dirArray.length-1];
 		client.commands.set(commandName, command);
 		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
 	}
