@@ -950,6 +950,10 @@ module.exports = {
 			string: "Suggester Staff Team",
 			context: "Verify acknowledgement for Suggester Staff Team"
 		},
+		"VERIFY_ACK_TRANSLATOR": {
+			string: "Translator",
+			context: "Verify acknowledgement for Translator"
+		},
 		"VERIFY_ACK_GLOBAL_NO_COOLDOWN": {
 			string: "Exempt From Cooldowns",
 			context: "Verify acknowledgement for Exempt from Cooldowns"
@@ -1927,6 +1931,50 @@ module.exports = {
 		"PING_SHARD_STATS_HEADER": {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
+		},
+		"PING_SHARD_STATS": {
+			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} MB of memory",
+			context: "Statistics for a shard",
+			replaced: {
+				num: {
+					to_replace: "{{num}}",
+					description: "The shard number"
+				},
+				guilds: {
+					to_replace: "{{guilds}}",
+					description: "The number of guilds on the shard"
+				},
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The number of channels on the shard"
+				},
+				members: {
+					to_replace: "{{members}}",
+					description: "The number of members on the shard"
+				},
+				ping: {
+					to_replace: "{{ping}}",
+					description: "The shard's ping"
+				},
+				uptime: {
+					to_replace: "{{uptime}}",
+					description: "How long the shard has been up"
+				},
+				memory: {
+					to_replace: "{{memory}}",
+					description: "The memory used by the shard"
+				}
+			}
+		},
+		"PING_SHARD_FOOTER": {
+			string: "Shard {{shard}}",
+			context: "The shard shown in the footer of the ping embed",
+			replaced: {
+				shard: {
+					to_replace: "{{shard}}",
+					description: "The shard the server is on"
+				}
+			}
 		},
 		"BLOCK_NO_ARGS_ERROR": {
 			string: "You must specify a user or `list` to show a list of blocked users.",

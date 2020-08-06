@@ -1,6 +1,6 @@
 const { permLevelToRole } = require("../../utils/misc");
 const { dbQuery } = require("../../utils/db");
-const { checkConfig, checkPermissions } = require("../../utils/checks");
+const { checkPermissions } = require("../../utils/checks");
 const { MessageAttachment } = require("discord.js");
 const { prefix, support_invite } = require("../../config.json");
 const { url } = require("./invite");

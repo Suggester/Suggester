@@ -93,7 +93,7 @@ module.exports = {
 		let startTime = Date.now();
 		message.channel.messages.fetch({ limit: num, before: message.id }).then(async messages => {
 			const importedIds = (await dbQueryAll("Suggestion", { id: message.guild.id, imported: { $ne: null } })).map(s => s.imported);
-			let sent = await message.channel.send(string(locale, "IMPORT_START", { time: humanizeDuration(4000*messages.size) }));
+			let sent = await message.channel.send(string(locale, "IMPORT_START", { time: humanizeDuration(4000*messages.size, { language: locale, fallbacks: ["en"] }) }));
 			let successCount = 0;
 			let errorCount = 0;
 			for await (let m of messages.array().reverse()) {

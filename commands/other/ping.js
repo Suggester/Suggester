@@ -38,8 +38,8 @@ module.exports = {
 			.addField(string(locale, "PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime)}\nAvg: ${humanizeDuration(shardInfo.reduce((t, c) => t + c[0].uptime)/shardInfo.length)}`, true)
 			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`, true)
 			.addField(string(locale, "PING_MEMORY_HEADER"), pretty(shardInfo.reduce((t, c) => t + parseFloat(c[0].memory), 0)))
-			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${shardInfo.map(s => `**Shard ${s[0].id}:** ${s[0].guilds} servers with ${s[0].channels} channels and ${s[0].members} members combined, ${Math.round(s[0].ping)} ms ping, up for ${humanizeDuration(s[0].uptime)}, using ${pretty(s[0].memory)} MB of memory`).join("\n")}`)
-			.setFooter(`Shard: ${client.shard.ids[0]} • ${client.user.tag} v4.2`, client.user.displayAvatarURL({format: "png"}))
+			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${shardInfo.map(s => string(locale, "PING_SHARD_STATS", { num: s[0].id.toString(), guilds: s[0].guilds.toString(), channels: s[0].channels.toString(), members: s[0].members.toString(), ping: Math.round(s[0].ping), uptime: humanizeDuration(s[0].uptime, { language: locale, fallbacks: ["en"] }), memory: pretty(s[0].memory)})).join("\n")}`)
+			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v4.2`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(client.colors.default);
 

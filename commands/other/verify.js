@@ -29,6 +29,7 @@ module.exports = {
 
 		if (qUserDB) {
 			if (qUserDB.flags.includes("STAFF")) globalPosArr.push(`<:sstaff:740196140061818911>  ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
+			if (qUserDB.flags.includes("TRANSLATOR")) globalPosArr.push(`<:stranslator:741037425761058898>  ${string(locale, "VERIFY_ACK_TRANSLATOR")}`);
 			if (qUserDB.flags.includes("NO_COOLDOWN")) globalPosArr.push(`<:sunlock:740204044928155788> ${string(locale, "VERIFY_ACK_GLOBAL_NO_COOLDOWN")}`);
 			if (qUserDB.flags.includes("PROTECTED")) globalPosArr.push(`<:sprotected:740234389484470272> ${string(locale, "VERIFY_ACK_GLOBAL_PROTECTED")}`);
 			if (qUserDB.blocked) globalPosArr.push(`<:slock:740204044450005103> ${string(locale, "VERIFY_ACK_GLOBAL_BLOCK")}`);
