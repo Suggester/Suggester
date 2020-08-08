@@ -3314,16 +3314,16 @@ module.exports = {
 			string: "Collecting top suggestion data, this may take a moment...",
 			context: "Message shown when waiting for top 10 data to collect"
 		},
-		"COMMAND_DESC:acknowledgement": {
+		"COMMAND_DESC:ACKNOWLEDGEMENT": {
 			string: "Sets a verify acknowledgement for a user",
 			context: "Description for the acknowledgement command"
 		},
-		"COMMAND_USAGE:acknowledgement": {
+		"COMMAND_USAGE:ACKNOWLEDGEMENT": {
 			string: "acknowledgement [user] (new acknowledgement)",
 			context: "Description for the acknowledgement command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:acknowledgement": {
+		"COMMAND_EXAMPLES:ACKNOWLEDGEMENT": {
 			string: "`{{p}}acknowledgement`\n" +
 				"Shows your acknowledgement\n" +
 				"\n" +
@@ -3338,16 +3338,16 @@ module.exports = {
 			context: "Examples for the acknowledgement command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:allowlist": {
+		"COMMAND_DESC:ALLOWLIST": {
 			string: "Adds a server to the allowed list",
 			context: "Description for the allowlist command"
 		},
-		"COMMAND_USAGE:allowlist": {
+		"COMMAND_USAGE:ALLOWLIST": {
 			string: "allowlist [add/remove] [guild id]",
 			context: "Description for the allowlist command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:allowlist": {
+		"COMMAND_EXAMPLES:ALLOWLIST": {
 			string: "`{{p}}allowlist add 681490407862829073`\n" +
 				"Adds server 681490407862829073 to the allowed list\n" +
 				"\n" +
@@ -3356,16 +3356,16 @@ module.exports = {
 			context: "Examples for the allowlist command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:db": {
+		"COMMAND_DESC:DB": {
 			string: "Gets or modifies a database entry",
 			context: "Description for the db command"
 		},
-		"COMMAND_USAGE:db": {
+		"COMMAND_USAGE:DB": {
 			string: "db [query|modify] [collection] [query field] [query value] (modify:field) (modify:value)",
 			context: "Description for the db command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:db": {
+		"COMMAND_EXAMPLES:DB": {
 			string: "`{{p}}db query Suggestion suggestionId 1`\n" +
 				"Gets data for a document in the `Suggestion` collection with a `suggestionId` of `1`\n" +
 				"\n" +
@@ -3374,16 +3374,16 @@ module.exports = {
 			context: "Examples for the db command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:deploy": {
+		"COMMAND_DESC:DEPLOY": {
 			string: "Pulls an update from git and reboots with changes",
 			context: "Description for the deploy command"
 		},
-		"COMMAND_USAGE:deploy": {
+		"COMMAND_USAGE:DEPLOY": {
 			string: "deploy (branch)",
 			context: "Description for the deploy command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:deploy": {
+		"COMMAND_EXAMPLES:DEPLOY": {
 			string: "`{{p}}deploy`\n" +
 				"Deploys an update from the `production` branch\n" +
 				"\n" +
@@ -3392,30 +3392,30 @@ module.exports = {
 			context: "Examples for the deploy command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:eval": {
+		"COMMAND_DESC:EVAL": {
 			string: "Runs JavaScript code",
 			context: "Description for the eval command"
 		},
-		"COMMAND_USAGE:eval": {
+		"COMMAND_USAGE:EVAL": {
 			string: "eval [code]",
 			context: "Description for the eval command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:eval": {
+		"COMMAND_EXAMPLES:EVAL": {
 			string: "`{{p}}eval return 2+2`\nEvaluates the value of 2+2 and returns it",
 			context: "Examples for the eval command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:flags": {
+		"COMMAND_DESC:FLAGS": {
 			string: "Sets internal flags for a user",
 			context: "Description for the flags command"
 		},
-		"COMMAND_USAGE:flags": {
+		"COMMAND_USAGE:FLAGS": {
 			string: "flags [guild|user [id] (add|remove) (flag)",
 			context: "Description for the flags command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:flags": {
+		"COMMAND_EXAMPLES:FLAGS": {
 			string: "`{{p}}flags user @Brightness™`\n" +
 				"Shows flags for Brightness™\n" +
 				"\n" +
@@ -3436,16 +3436,16 @@ module.exports = {
 			context: "Examples for the flags command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:globalban": {
+		"COMMAND_DESC:GLOBALBAN": {
 			string: "Excludes a user or server from using the bot globally",
 			context: "Description for the globalban command"
 		},
-		"COMMAND_USAGE:globalban": {
+		"COMMAND_USAGE:GLOBALBAN": {
 			string: "globalban [guild|user] [id] (true|false)",
 			context: "Description for the globalban command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:globalban": {
+		"COMMAND_EXAMPLES:GLOBALBAN": {
 			string: "`{{p}}globalban user 327887845270487041`\n" +
 				"Checks block status for user 327887845270487041\n" +
 				"\n" +
@@ -3466,16 +3466,16 @@ module.exports = {
 			context: "Examples for the globalban command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:reboot": {
+		"COMMAND_DESC:REBOOT": {
 			string: "Reboots the bot by exiting the process",
 			context: "Description for the reboot command"
 		},
-		"COMMAND_USAGE:reboot": {
+		"COMMAND_USAGE:REBOOT": {
 			string: "reboot (shard id)",
 			context: "Description for the reboot command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:reboot": {
+		"COMMAND_EXAMPLES:REBOOT": {
 			string: "`{{p}}reboot`\n" +
 				"Reboots all shards of the bot\n" +
 				"\n" +
@@ -3484,34 +3484,34 @@ module.exports = {
 			context: "Examples for the reboot command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:shell": {
+		"COMMAND_DESC:SHELL": {
 			string: "Runs shell code",
 			context: "Description for the shell command"
 		},
-		"COMMAND_USAGE:shell": {
+		"COMMAND_USAGE:SHELL": {
 			string: "shell [code]",
 			context: "Description for the shell command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:changelog": {
+		"COMMAND_DESC:CHANGELOG": {
 			string: "Shows the latest Suggester release",
 			context: "Description for the changelog command"
 		},
-		"COMMAND_USAGE:changelog": {
+		"COMMAND_USAGE:CHANGELOG": {
 			string: "changelog",
 			context: "Description for the changelog command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:help": {
+		"COMMAND_DESC:HELP": {
 			string: "Shows command information",
 			context: "Description for the help command"
 		},
-		"COMMAND_USAGE:help": {
+		"COMMAND_USAGE:HELP": {
 			string: "help (command name)",
 			context: "Description for the help command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:help": {
+		"COMMAND_EXAMPLES:HELP": {
 			string: "`{{p}}help`\n" +
 				"Shows the list of commands\n" +
 				"\n" +
@@ -3520,25 +3520,25 @@ module.exports = {
 			context: "Examples for the help command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:invite": {
+		"COMMAND_DESC:INVITE": {
 			string: "Shows the link to invite the bot",
 			context: "Description for the invite command"
 		},
-		"COMMAND_USAGE:invite": {
+		"COMMAND_USAGE:INVITE": {
 			string: "invite",
 			context: "Description for the invite command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:locale": {
+		"COMMAND_DESC:LOCALE": {
 			string: "Sets the language the bot responds to you in",
 			context: "Description for the locale command"
 		},
-		"COMMAND_USAGE:locale": {
+		"COMMAND_USAGE:LOCALE": {
 			string: "locale <locale to set>",
 			context: "Description for the locale command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:locale": {
+		"COMMAND_EXAMPLES:LOCALE": {
 			string: "`{{p}}locale`\n" +
 				"Shows the list of available languages\n" +
 				"\n" +
@@ -3547,16 +3547,16 @@ module.exports = {
 			context: "Examples for the locale command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:notify": {
+		"COMMAND_DESC:NOTIFY": {
 			string: "Views/edits your notification settings",
 			context: "Description for the notify command"
 		},
-		"COMMAND_USAGE:notify": {
+		"COMMAND_USAGE:NOTIFY": {
 			string: "notify (on|off|toggle)",
 			context: "Description for the notify command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:notify": {
+		"COMMAND_EXAMPLES:NOTIFY": {
 			string: "`{{p}}notify`\n" +
 				"Shows your DM notification setting\n" +
 				"\n" +
@@ -3571,25 +3571,25 @@ module.exports = {
 			context: "Examples for the notify command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:ping": {
+		"COMMAND_DESC:PING": {
 			string: "Checks bot response time and shows information",
 			context: "Description for the ping command"
 		},
-		"COMMAND_USAGE:ping": {
+		"COMMAND_USAGE:PING": {
 			string: "ping",
 			context: "Description for the ping command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:protips": {
+		"COMMAND_DESC:PROTIPS": {
 			string: "Views/edits your protip setting",
 			context: "Description for the protips command"
 		},
-		"COMMAND_USAGE:protips": {
+		"COMMAND_USAGE:PROTIPS": {
 			string: "protips (on|off|toggle)",
 			context: "Description for the protips command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:protips": {
+		"COMMAND_EXAMPLES:PROTIPS": {
 			string: "`{{p}}protips`\n" +
 				"Shows your protips setting\n" +
 				"\n" +
@@ -3604,34 +3604,34 @@ module.exports = {
 			context: "Examples for the protips command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:shard": {
+		"COMMAND_DESC:SHARD": {
 			string: "Shows the shard this server is on",
 			context: "Description for the shard command"
 		},
-		"COMMAND_USAGE:shard": {
+		"COMMAND_USAGE:SHARD": {
 			string: "shard",
 			context: "Description for the shard command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:stats": {
+		"COMMAND_DESC:STATS": {
 			string: "Shows the link to bot statistics",
 			context: "Description for the stats command"
 		},
-		"COMMAND_USAGE:stats": {
+		"COMMAND_USAGE:STATS": {
 			string: "stats",
 			context: "Description for the stats command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:suggest": {
+		"COMMAND_DESC:SUGGEST": {
 			string: "Submits a suggestion",
 			context: "Description for the suggest command"
 		},
-		"COMMAND_USAGE:suggest": {
+		"COMMAND_USAGE:SUGGEST": {
 			string: "suggest [suggestion]",
 			context: "Description for the suggest command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:suggest": {
+		"COMMAND_EXAMPLES:SUGGEST": {
 			string: "`{{p}}suggest This is a suggestion`\n" +
 				"Submits a suggestion\n" +
 				"\n" +
@@ -3639,34 +3639,34 @@ module.exports = {
 			context: "Examples for the suggest command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:support": {
+		"COMMAND_DESC:SUPPORT": {
 			string: "Shows the link to the support server",
 			context: "Description for the support command"
 		},
-		"COMMAND_USAGE:support": {
+		"COMMAND_USAGE:SUPPORT": {
 			string: "support",
 			context: "Description for the support command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:tutorial": {
+		"COMMAND_DESC:TUTORIAL": {
 			string: "Shows information about setting up the bot and using it",
 			context: "Description for the tutorial command"
 		},
-		"COMMAND_USAGE:tutorial": {
+		"COMMAND_USAGE:TUTORIAL": {
 			string: "tutorial",
 			context: "Description for the tutorial command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:verify": {
+		"COMMAND_DESC:VERIFY": {
 			string: "Shows permissions of a user as they relate to the bot",
 			context: "Description for the verify command"
 		},
-		"COMMAND_USAGE:verify": {
+		"COMMAND_USAGE:VERIFY": {
 			string: "verify (user)",
 			context: "Description for the verify command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:verify": {
+		"COMMAND_EXAMPLES:VERIFY": {
 			string: "`{{p}}verify`\n" +
 				"Shows information about you\n" +
 				"\n" +
@@ -3675,86 +3675,86 @@ module.exports = {
 			context: "Examples for the verify command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:vote": {
+		"COMMAND_DESC:VOTE": {
 			string: "Help support the bot!",
 			context: "Description for the vote command"
 		},
-		"COMMAND_USAGE:vote": {
+		"COMMAND_USAGE:VOTE": {
 			string: "vote",
 			context: "Description for the vote command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:autosetup": {
+		"COMMAND_DESC:AUTOSETUP": {
 			string: "Automatically sets up channels and configures the bot",
 			context: "Description for the autosetup command"
 		},
-		"COMMAND_USAGE:autosetup": {
+		"COMMAND_USAGE:AUTOSETUP": {
 			string: "autosetup",
 			context: "Description for the autosetup command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:config": {
+		"COMMAND_DESC:CONFIG": {
 			string: "Shows/edits server configuration",
 			context: "Description for the config command"
 		},
-		"COMMAND_USAGE:config": {
+		"COMMAND_USAGE:CONFIG": {
 			string: "config (element) (additional parameters)",
 			context: "Description for the config command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:config": {
+		"COMMAND_EXAMPLES:CONFIG": {
 			string: "Use `{{p}}config help` to view detailed instructions",
 			context: "Examples for the config command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:import": {
+		"COMMAND_DESC:IMPORT": {
 			string: "Imports suggestions from a channel",
 			context: "Description for the import command"
 		},
-		"COMMAND_USAGE:import": {
+		"COMMAND_USAGE:IMPORT": {
 			string: "import",
 			context: "Description for the import command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:setup": {
+		"COMMAND_DESC:SETUP": {
 			string: "Walks you through an interactive configuration process",
 			context: "Description for the setup command"
 		},
-		"COMMAND_USAGE:setup": {
+		"COMMAND_USAGE:SETUP": {
 			string: "setup",
 			context: "Description for the setup command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:setup": {
+		"COMMAND_EXAMPLES:SETUP": {
 			string: "The bot will send a prompt, and you send your response in the channel. The bot will then send another prompt, and the cycle continues until your server is configured.",
 			context: "Examples for the setup command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:acomment": {
+		"COMMAND_DESC:ACOMMENT": {
 			string: "Adds a comment to an approved suggestion anonymously",
 			context: "Description for the acomment command"
 		},
-		"COMMAND_USAGE:acomment": {
+		"COMMAND_USAGE:ACOMMENT": {
 			string: "acomment [suggestion id] [comment]",
 			context: "Description for the acomment command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:acomment": {
+		"COMMAND_EXAMPLES:ACOMMENT": {
 			string: "`{{p}}acomment 1 This is a comment`\n" +
 				"Anonymously comments on suggestion #1 with \"This is a comment\"",
 			context: "Examples for the acomment command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:approve": {
+		"COMMAND_DESC:APPROVE": {
 			string: "Approves a suggestion",
 			context: "Description for the approve command"
 		},
-		"COMMAND_USAGE:approve": {
+		"COMMAND_USAGE:APPROVE": {
 			string: "approve [suggestion id] (comment)",
 			context: "Description for the approve command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:approve": {
+		"COMMAND_EXAMPLES:APPROVE": {
 			string: "`{{p}}approve 1`\n" +
 				"Approves suggestion #1\n" +
 				"\n" +
@@ -3763,16 +3763,16 @@ module.exports = {
 			context: "Examples for the approve command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:attach": {
+		"COMMAND_DESC:ATTACH": {
 			string: "Attaches a file to an approved suggestion",
 			context: "Description for the attach command"
 		},
-		"COMMAND_USAGE:attach": {
+		"COMMAND_USAGE:ATTACH": {
 			string: "attach [suggestion id] [attachment link]",
 			context: "Description for the attach command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:attach": {
+		"COMMAND_EXAMPLES:ATTACH": {
 			string: "`{{p}}attach 1 https://i.imgur.com/zmntNve.png`\n" +
 				"Attaches https://i.imgur.com/zmntNve.png to suggestion #1\n" +
 				"\n" +
@@ -3781,16 +3781,16 @@ module.exports = {
 			context: "Examples for the attach command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:block": {
+		"COMMAND_DESC:BLOCK": {
 			string: "Blocks a user from using the bot in this server",
 			context: "Description for the block command"
 		},
-		"COMMAND_USAGE:block": {
+		"COMMAND_USAGE:BLOCK": {
 			string: "block [user]",
 			context: "Description for the block command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:block": {
+		"COMMAND_EXAMPLES:BLOCK": {
 			string: "`{{p}}block @Brightness™`\n" +
 				"Blocks Brightness™ from using the bot in this server\n" +
 				"\n" +
@@ -3799,31 +3799,31 @@ module.exports = {
 			context: "Examples for the block command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:comment": {
+		"COMMAND_DESC:COMMENT": {
 			string: "Adds a comment to an approved suggestion",
 			context: "Description for the comment command"
 		},
-		"COMMAND_USAGE:comment": {
+		"COMMAND_USAGE:COMMENT": {
 			string: "comment [suggestion id] [comment]",
 			context: "Description for the comment command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:comment": {
+		"COMMAND_EXAMPLES:COMMENT": {
 			string: "`{{p}}comment 1 This is a comment`\n" +
 				"Comments on suggestion #1 with \"This is a comment\"",
 			context: "Examples for the comment command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:delete": {
+		"COMMAND_DESC:DELETE": {
 			string: "Deletes a suggestion, removing it from the suggestions feed",
 			context: "Description for the delete command"
 		},
-		"COMMAND_USAGE:delete": {
+		"COMMAND_USAGE:DELETE": {
 			string: "delete [suggestion id] (reason)",
 			context: "Description for the delete command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:delete": {
+		"COMMAND_EXAMPLES:DELETE": {
 			string: "`{{p}}delete 1`\n" +
 				"Deletes suggestion #1\n" +
 				"\n" +
@@ -3832,30 +3832,30 @@ module.exports = {
 			context: "Examples for the delete command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:deletecomment": {
+		"COMMAND_DESC:DELETECOMMENT": {
 			string: "Deletes a comment from a suggestion",
 			context: "Description for the deletecomment command"
 		},
-		"COMMAND_USAGE:deletecomment": {
+		"COMMAND_USAGE:DELETECOMMENT": {
 			string: "deletecomment [comment id]",
 			context: "Description for the deletecomment command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:deletecomment": {
+		"COMMAND_EXAMPLES:DELETECOMMENT": {
 			string: "`{{p}}deletecomment 27_1`\nDeletes a comment with the ID `27_1`",
 			context: "Examples for the deletecomment command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:deny": {
+		"COMMAND_DESC:DENY": {
 			string: "Denies a suggestion",
 			context: "Description for the deny command"
 		},
-		"COMMAND_USAGE:deny": {
+		"COMMAND_USAGE:DENY": {
 			string: "deny [suggestion id] (reason)",
 			context: "Description for the deny command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:deny": {
+		"COMMAND_EXAMPLES:DENY": {
 			string: "`{{p}}deny 1`\n" +
 				"Denies suggestion #1\n" +
 				"\n" +
@@ -3864,39 +3864,39 @@ module.exports = {
 			context: "Examples for the deny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:info": {
+		"COMMAND_DESC:INFO": {
 			string: "Shows information about a suggestion",
 			context: "Description for the info command"
 		},
-		"COMMAND_USAGE:info": {
+		"COMMAND_USAGE:INFO": {
 			string: "info [suggestion id]",
 			context: "Description for the info command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:info": {
+		"COMMAND_EXAMPLES:INFO": {
 			string: "`{{p}}info 1`\nShows information about suggestion #1",
 			context: "Examples for the info command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:listqueue": {
+		"COMMAND_DESC:LISTQUEUE": {
 			string: "Shows the queue of suggestions awaiting review",
 			context: "Description for the listqueue command"
 		},
-		"COMMAND_USAGE:listqueue": {
+		"COMMAND_USAGE:LISTQUEUE": {
 			string: "listqueue",
 			context: "Description for the listqueue command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:mark": {
+		"COMMAND_DESC:MARK": {
 			string: "Marks a status on a suggestion",
 			context: "Description for the mark command"
 		},
-		"COMMAND_USAGE:mark": {
+		"COMMAND_USAGE:MARK": {
 			string: "mark [suggestion id] [status] (comment)",
 			context: "Description for the mark command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:mark": {
+		"COMMAND_EXAMPLES:MARK": {
 			string: "`{{p}}mark 1 implemented`\n" +
 				"Marks suggestion #1 as implemented\n" +
 				"\n" +
@@ -3912,16 +3912,16 @@ module.exports = {
 			context: "Examples for the mark command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:massapprove": {
+		"COMMAND_DESC:MASSAPPROVE": {
 			string: "Approves multiple suggestions at once",
 			context: "Description for the massapprove command"
 		},
-		"COMMAND_USAGE:massapprove": {
+		"COMMAND_USAGE:MASSAPPROVE": {
 			string: "massapprove [suggestion ids] -r (comment)",
 			context: "Description for the massapprove command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:massapprove": {
+		"COMMAND_EXAMPLES:MASSAPPROVE": {
 			string: "`{{p}}massapprove 1 2 3`\n" +
 				"Approves suggestions 1, 2, and 3\n" +
 				"\n" +
@@ -3930,16 +3930,16 @@ module.exports = {
 			context: "Examples for the massapprove command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:massdelete": {
+		"COMMAND_DESC:MASSDELETE": {
 			string: "Deletes multiple suggestions at once, removing them from the suggestions feed",
 			context: "Description for the massdelete command"
 		},
-		"COMMAND_USAGE:massdelete": {
+		"COMMAND_USAGE:MASSDELETE": {
 			string: "massdelete [suggestion ids] -r (reason)",
 			context: "Description for the massdelete command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:massdelete": {
+		"COMMAND_EXAMPLES:MASSDELETE": {
 			string: "`{{p}}massdelete 1 2 3`\n" +
 				"Deletes suggestions 1, 2, and 3\n" +
 				"\n" +
@@ -3948,16 +3948,16 @@ module.exports = {
 			context: "Examples for the massdelete command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:massdeny": {
+		"COMMAND_DESC:MASSDENY": {
 			string: "Denies multiple suggestions at once",
 			context: "Description for the massdeny command"
 		},
-		"COMMAND_USAGE:massdeny": {
+		"COMMAND_USAGE:MASSDENY": {
 			string: "massdeny [suggestion ids] -r (reason)",
 			context: "Description for the massdeny command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:massdeny": {
+		"COMMAND_EXAMPLES:MASSDENY": {
 			string: "`{{p}}massdeny 1 2 3`\n" +
 				"Denies suggestions 1, 2, and 3\n" +
 				"\n" +
@@ -3966,30 +3966,30 @@ module.exports = {
 			context: "Examples for the massdeny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:removeattachment": {
+		"COMMAND_DESC:REMOVEATTACHMENT": {
 			string: "Removes an attachment from a suggestion",
 			context: "Description for the removeattachment command"
 		},
-		"COMMAND_USAGE:removeattachment": {
+		"COMMAND_USAGE:REMOVEATTACHMENT": {
 			string: "removeattachment [suggestion id]",
 			context: "Description for the removeattachment command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:removeattachment": {
+		"COMMAND_EXAMPLES:REMOVEATTACHMENT": {
 			string: "`{{p}}removeattachment 1`\nRemoves the attachment from suggestion #1",
 			context: "Examples for the removeattachment command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:silentdelete": {
+		"COMMAND_DESC:SILENTDELETE": {
 			string: "Deletes a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 			context: "Description for the silentdelete command"
 		},
-		"COMMAND_USAGE:silentdelete": {
+		"COMMAND_USAGE:SILENTDELETE": {
 			string: "silentdelete [suggestion id] (reason)",
 			context: "Description for the silentdelete command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:silentdelete": {
+		"COMMAND_EXAMPLES:SILENTDELETE": {
 			string: "`{{p}}silentdelete 1`\n" +
 				"Silently deletes suggestion #1\n" +
 				"\n" +
@@ -3998,16 +3998,16 @@ module.exports = {
 			context: "Examples for the silentdelete command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:silentdeny": {
+		"COMMAND_DESC:SILENTDENY": {
 			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 			context: "Description for the silentdeny command"
 		},
-		"COMMAND_USAGE:silentdeny": {
+		"COMMAND_USAGE:SILENTDENY": {
 			string: "silentdeny [suggestion id] (reason)",
 			context: "Description for the silentdeny command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:silentdeny": {
+		"COMMAND_EXAMPLES:SILENTDENY": {
 			string: "`{{p}}silentdeny 1`\n" +
 				"Silently denies suggestion #1\n" +
 				"\n" +
@@ -4016,25 +4016,25 @@ module.exports = {
 			context: "Examples for the silentdeny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:top": {
+		"COMMAND_DESC:TOP": {
 			string: "Shows the top 10 most highly voted suggestions",
 			context: "Description for the top command"
 		},
-		"COMMAND_USAGE:top": {
+		"COMMAND_USAGE:TOP": {
 			string: "top",
 			context: "Description for the top command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:unblock": {
+		"COMMAND_DESC:UNBLOCK": {
 			string: "Unblocks a user from using the bot in this server",
 			context: "Description for the unblock command"
 		},
-		"COMMAND_USAGE:unblock": {
+		"COMMAND_USAGE:UNBLOCK": {
 			string: "unblock [user]",
 			context: "Description for the unblock command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:unblock": {
+		"COMMAND_EXAMPLES:UNBLOCK": {
 			string: "`{{p}}unblock @Brightness™`\n" +
 				"Unblocks Brightness™ from using the bot in this server\n" +
 				"\n" +
