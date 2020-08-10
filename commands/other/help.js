@@ -23,10 +23,9 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let serverPrefix = prefix;
-		//let missingConfig;
+
 		if (message.guild) {
 			let qServerDB = await dbQuery("Server", { id: message.guild.id });
-			//missingConfig = await checkConfig(locale, qServerDB, client);
 			serverPrefix = qServerDB.config.prefix;
 		}
 
@@ -52,7 +51,20 @@ module.exports = {
 
 		const command = client.commands.find((c) => c.controls.name.toLowerCase() === commandName || c.controls.aliases && c.controls.aliases.includes(commandName));
 
-		if (!command) return;
+		if (!command) {
+			let module = args[0].toLowerCase();
+			if (new Set(client.commands.map(c => c.controls.module)).has(module)) {
+				let moduleCommands = client.commands.filter(c => c.controls.module === module && c.controls.permission >= permission);
+				if (moduleCommands.size > 0) return message.channel.send(new Discord.MessageEmbed()
+					.setAuthor(`${string(locale, "HELP_AUTHOR", { name: client.user.username })}`, client.user.displayAvatarURL({ format: "png", dynamic: true }))
+					.setTitle(string(locale, "HELP_MODULE_TITLE", { module: string(locale, `MODULE_NAME:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).name }))
+					.setColor(client.colors.default)
+					.setDescription((string(locale, `MODULE_DESC:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).description) + "\n\n" + moduleCommands.map(c => `\`${serverPrefix}${string(locale, `COMMAND_USAGE:${c.controls.name.toUpperCase()}`) || c.controls.usage}\` - ${string(locale, `COMMAND_DESC:${c.controls.name.toUpperCase()}`) || c.controls.description}`).join("\n"))
+					.addField(string(locale, "HELP_ADDITIONAL_INFO"), string(locale, "HELP_UNDERSTANDING", { prefix: serverPrefix }))
+					.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC", { support_invite, bot_invite: url.replace("[ID]", client.user.id) })));
+			}
+			return message.channel.send(string(locale, "UNKNOWN_COMMAND_ERROR", {}, "error"));
+		}
 
 		let commandInfo = command.controls;
 

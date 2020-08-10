@@ -4086,6 +4086,10 @@ module.exports = {
 		"MODULE_DESC:SUGGESTIONS": {
 			string: "Commands for submitting and interacting with suggestions",
 			context: "The description for the Suggestions module"
+		},
+		"UNKNOWN_COMMAND_ERROR": {
+			string: "No command was found based on your input!",
+			context: "Error shown when no command can be found in the help command"
 		}
 	}
 };

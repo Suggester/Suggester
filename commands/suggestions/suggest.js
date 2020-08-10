@@ -222,8 +222,7 @@ module.exports = {
 		if (suggestion) {
 			lngDetector.setLanguageType("iso2");
 			let detected = lngDetector.detect(suggestion)[0];
-			console.log(detected)
-			if (detected[1] > .3 && client.locales.find(l => l.settings.code === detected[0])) {
+			if (detected && detected[1] > .3 && client.locales.find(l => l.settings.code === detected[0])) {
 				return { protip: { locale: detected[0], force: "locale" } };
 			}
 		}
