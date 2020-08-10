@@ -4,7 +4,7 @@ const { string } = require("../../utils/strings");
 const { serverLog } = require("../../utils/logs");
 const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/checks");
 const { emoji } = require("../../config.json");
-const { deleteFeedMessage, checkVotes, editFeedMessage } = require("../../utils/actions");
+const { deleteFeedMessage, editFeedMessage } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "mark",
@@ -65,7 +65,7 @@ module.exports = {
 
 			let emote = emotes.find(em => em[0] === `${e.emoji.name}:${e.emoji.id}`);
 			if (emote[1] === "cancel") {
-				return m.edit(string(locale, "CANCELLED", {}, "success"))
+				return m.edit(string(locale, "CANCELLED", {}, "success"));
 			};
 			await m.delete();
 			statusInput = emote[1];

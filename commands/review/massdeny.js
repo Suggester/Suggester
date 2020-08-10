@@ -9,7 +9,7 @@ module.exports = {
 		name: "massdeny",
 		permission: 3,
 		usage: "massdeny [suggestion ids] -r (reason)",
-		aliases: ["mdeny", "multideny"],
+		aliases: ["mdeny", "multideny", "mreject", "mno"],
 		description: "Denies multiple suggestions at once",
 		image: "images/Mdeny.gif",
 		enabled: true,

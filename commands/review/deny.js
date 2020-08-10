@@ -8,6 +8,7 @@ module.exports = {
 		name: "deny",
 		permission: 3,
 		usage: "deny [suggestion id] (reason)",
+		aliases: ["reject", "refuse", "no"],
 		description: "Denies a suggestion",
 		image: "images/Deny.gif",
 		enabled: true,

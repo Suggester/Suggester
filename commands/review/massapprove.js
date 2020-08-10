@@ -9,7 +9,7 @@ module.exports = {
 		name: "massapprove",
 		permission: 3,
 		usage: "massapprove [suggestion ids] -r (comment)",
-		aliases: ["mapprove", "multiapprove"],
+		aliases: ["mapprove", "multiapprove", "maccept", "myes"],
 		description: "Approves multiple suggestions at once",
 		image: "images/Mapprove.gif",
 		enabled: true,

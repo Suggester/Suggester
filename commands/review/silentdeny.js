@@ -8,6 +8,7 @@ module.exports = {
 		name: "silentdeny",
 		permission: 3,
 		usage: "silentdeny [suggestion id] (reason)",
+		aliases: ["silentrefuse", "silentreject", "silentno"],
 		description: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
 		examples: "`{{p}}silentdeny 1`\nSilently denies suggestion #1\n\n`{{p}}silentdeny 1 This isn't something we're interested in`\nSilently denies suggestion #1 with the reason \"This isn't something we're interested in\"",

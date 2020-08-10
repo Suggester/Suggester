@@ -7,7 +7,7 @@ module.exports = {
 	controls: {
 		name: "approve",
 		permission: 3,
-		aliases: ["accept"],
+		aliases: ["accept", "yes"],
 		usage: "approve [suggestion id] (comment)",
 		description: "Approves a suggestion",
 		image: "images/Approve.gif",
