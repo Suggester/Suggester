@@ -837,7 +837,7 @@ module.exports = {
 			//Clean Suggestion Command
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEANCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
 			//In-Channel Suggestions
-			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:SENDINCHANNEL", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:INCHANNELSUGGESTIONS", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
 			//Locale
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
 
