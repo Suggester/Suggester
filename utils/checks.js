@@ -60,7 +60,7 @@ module.exports = {
 		if (channelPermissions.has("EMBED_LINKS")) {
 			returned = new Discord.MessageEmbed()
 				.setDescription(string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
-				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `<:${emoji.x}> ${missing.join(`\n<:${emoji.x}> `)}`)
+				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `${channelPermissions.has("USE_EXTERNAL_EMOJIS") ? `<:${emoji.x}>` : "❌"} ${missing.join(`\n${channelPermissions.has("USE_EXTERNAL_EMOJIS") ? `<:${emoji.x}>` : "❌"} `)}`)
 				.addField(string(locale, "HOW_TO_FIX_HEADER"), string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` }))
 				.setColor(client.colors.red);
 		} else returned = `${string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` })}\n- ${missing.join("\n- ")}\n\n${string(locale, "FIX_MISSING_PERMISSIONS_INFO", { name: client.user.username, channel: `<#${channel.id}>` })}`;
@@ -73,10 +73,10 @@ module.exports = {
 		let config = db.config;
 		let missing = [];
 
-		if (!config.admin_roles || config.admin_roles.length < 1) missing.push(string(locale, "CFG_ADMIN_ROLES_TITLE"));
-		if (!config.staff_roles || config.staff_roles.length < 1) missing.push(string(locale, "CFG_STAFF_ROLES_TITLE"));
-		if (!config.channels.suggestions) missing.push(string(locale, "CFG_SUGGESTION_CHANNEL_TITLE"));
-		if (config.mode === "review" && !config.channels.staff) missing.push(string(locale, "CFG_REVIEW_CHANNEL_TITLE"));
+		if (!config.admin_roles || config.admin_roles.length < 1) missing.push(string(locale, "CONFIG_NAME:ADMIN"));
+		if (!config.staff_roles || config.staff_roles.length < 1) missing.push(string(locale, "CONFIG_NAME:STAFF"));
+		if (!config.channels.suggestions) missing.push(string(locale, "CONFIG_NAME:SUGGESTIONS"));
+		if (config.mode === "review" && !config.channels.staff) missing.push(string(locale, "CONFIG_NAME:REVIEW"));
 
 		if (missing.length > 0) {
 			return (new Discord.MessageEmbed()

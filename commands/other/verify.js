@@ -52,7 +52,7 @@ module.exports = {
 
 		if (args[0] && args[args.length-1].toLowerCase() === "--flags" && senderPermissionLevel <= 1) {
 			embed.addField(string(locale, "VERIFY_FLAGS_TITLE"), `${qUserDB.flags.length > 0 ? qUserDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")}`)
-				.addField(string(locale, "HELP_ADDITIONAL_INFO"), `${string(locale, "CFG_LOCALE_TITLE")} ${qUserDB.locale ? client.locales.find(l => l.settings.code === qUserDB.locale).settings.native : string(locale, "NONE_CONFIGURED")}\n${string(locale, "CFG_NOTIFICATIONS_TITLE")} ${qUserDB.notify ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_TITLE")} ${qUserDB.protips ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_SHOWN_TITLE")} ${qUserDB.displayed_protips.join(", ")}`);
+				.addField(string(locale, "HELP_ADDITIONAL_INFO"), `**${string(locale, "CONFIG_NAME:LOCALE")}:** ${qUserDB.locale ? client.locales.find(l => l.settings.code === qUserDB.locale).settings.native : string(locale, "NONE_CONFIGURED")}\n**${string(locale, "CONFIG_NAME:NOTIFICATIONS")}:** ${qUserDB.notify ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_TITLE")} ${qUserDB.protips ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_SHOWN_TITLE")} ${qUserDB.displayed_protips.join(", ")}`);
 		}
 		if (qUserDB.ack) embed.setDescription(qUserDB.ack);
 		if (!embed.description && embed.fields.length < 1) embed.setDescription(string(locale, "VERIFY_NO_ACKS"));

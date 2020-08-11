@@ -83,7 +83,7 @@ module.exports = {
 			qServerDB.config.channels.denied = denied.id;
 			qServerDB.config.channels.log = log.id;
 			await dbModify("Server", {id: message.guild.id}, qServerDB);
-			return message.channel.send(string(locale, "AUTOMATIC_SETUP_COMPLETE", { prefix: Discord.escapeMarkdown(qServerDB.config.prefix) }, "success"));
+			return message.channel.send(string(locale, "AUTOMATIC_SETUP_COMPLETE_NEW", { prefix: Discord.escapeMarkdown(qServerDB.config.prefix) }, "success"));
 		}
 	}
 };

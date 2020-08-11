@@ -49,7 +49,7 @@ module.exports = {
 			switch (through) {
 			case 0: {
 				//Server Admin role
-				let adminRolesEmbed = setupEmbed(string(locale, "CFG_ADMIN_ROLES_TITLE"), string(locale, "SETUP_ADMIN_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 1);
+				let adminRolesEmbed = setupEmbed(string(locale, "CONFIG_NAME:ADMIN"), string(locale, "SETUP_ADMIN_ROLES_DESC"), string(locale, "SETUP_ROLES_INPUT"), 1);
 				if (db.config.admin_roles.length >= 1) adminRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
 				await message.channel.send(adminRolesEmbed);
 				let returnCollect = await awaitMessage(message);
@@ -76,7 +76,7 @@ module.exports = {
 				} else return;
 			}
 			case 1: {
-				let staffRolesEmbed = setupEmbed(string(locale, "CFG_STAFF_ROLES_TITLE"), string(locale, "SETUP_STAFF_ROLES_DESC_ND"), string(locale, "SETUP_ROLES_INPUT"), 2);
+				let staffRolesEmbed = setupEmbed(string(locale, "CONFIG_NAME:STAFF"), string(locale, "SETUP_STAFF_ROLES_DESC_ND"), string(locale, "SETUP_ROLES_INPUT"), 2);
 				if (db.config.staff_roles.length >= 1) staffRolesEmbed.addField(string(locale, "SETUP_ROLES_DONE_TITLE"), string(locale, "SETUP_ROLES_DONE_DESC"));
 				await message.channel.send(staffRolesEmbed);
 				let returnCollect = await awaitMessage(message);
@@ -103,7 +103,7 @@ module.exports = {
 			}
 			case 2: {
 				//Mode
-				let modeEmbed = setupEmbed(string(locale, "CFG_MODE_TITLE"), string(locale, "SETUP_MODE_DESC"), string(locale, "SETUP_MODE_INPUTS"), 3);
+				let modeEmbed = setupEmbed(string(locale, "CONFIG_NAME:MODE"), string(locale, "SETUP_MODE_DESC"), string(locale, "SETUP_MODE_INPUTS"), 3);
 				modeEmbed.addField(string(locale, "SETUP_REVIEW_TEXT"), string(locale, "SETUP_REVIEW_DESC"))
 					.addField(string(locale, "SETUP_AUTOAPPROVE_TEXT"), string(locale, "SETUP_AUTOAPPROVE_DESC"));
 				await message.channel.send(modeEmbed);
@@ -142,7 +142,7 @@ module.exports = {
 			}
 			case 3: {
 				//Suggestion channel
-				let suggestionChannelEmbed = setupEmbed(string(locale, "CFG_SUGGESTION_CHANNEL_TITLE"), string(locale, "SETUP_SUGGESTIONS_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 4);
+				let suggestionChannelEmbed = setupEmbed(string(locale, "CONFIG_NAME:SUGGESTIONS"), string(locale, "SETUP_SUGGESTIONS_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 4);
 				await message.channel.send(suggestionChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
@@ -154,7 +154,7 @@ module.exports = {
 			case 4:
 				//Review channel (if mode is review)
 				if (db.config.mode === "review") {
-					let reviewChannelEmbed = setupEmbed(string(locale, "CFG_REVIEW_CHANNEL_TITLE"), string(locale, "SETUP_REVIEW_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 5);
+					let reviewChannelEmbed = setupEmbed(string(locale, "CONFIG_NAME:REVIEW"), string(locale, "SETUP_REVIEW_CHANNEL_DESC"), string(locale, "SETUP_CHANNELS_INPUT"), 5);
 					await message.channel.send(reviewChannelEmbed);
 					let returnCollect = await awaitMessage(message);
 					if (returnCollect.content) {
@@ -165,7 +165,7 @@ module.exports = {
 				} else return setup(5);
 			case 5: {
 				//Denied channel
-				let deniedChannelEmbed = setupEmbed(string(locale, "CFG_DENIED_CHANNEL_TITLE"), string(locale, "SETUP_DENIED_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 6);
+				let deniedChannelEmbed = setupEmbed(string(locale, "CONFIG_NAME:DENIED"), string(locale, "SETUP_DENIED_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 6);
 				await message.channel.send(deniedChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
@@ -177,7 +177,7 @@ module.exports = {
 			}
 			case 6: {
 				//Logs
-				let logChannelEmbed = setupEmbed(string(locale, "CFG_LOG_CHANNEL_TITLE"), string(locale, "SETUP_LOG_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 7);
+				let logChannelEmbed = setupEmbed(string(locale, "CONFIG_NAME:LOG"), string(locale, "SETUP_LOG_CHANNEL_DESC"), `${string(locale, "SETUP_CHANNELS_INPUT")}\n${string(locale, "SETUP_SKIP_CHANNEL")}`, 7);
 				await message.channel.send(logChannelEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {
@@ -189,7 +189,7 @@ module.exports = {
 			}
 			case 7: {
 				//Prefix
-				let prefixEmbed = setupEmbed(string(locale, "CFG_PREFIX_TITLE"), string(locale, "SETUP_PREFIX_DESC"), string(locale, "SETUP_PREFIX_INPUT"), 8);
+				let prefixEmbed = setupEmbed(string(locale, "CONFIG_NAME:PREFIX"), string(locale, "SETUP_PREFIX_DESC"), string(locale, "SETUP_PREFIX_INPUT"), 8);
 				await message.channel.send(prefixEmbed);
 				let returnCollect = await awaitMessage(message);
 				if (returnCollect.content) {

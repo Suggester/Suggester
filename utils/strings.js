@@ -380,34 +380,6 @@ module.exports = {
 			string: "None",
 			context: "Filler for when there is none of something"
 		},
-		"CFG_ADMIN_ROLES_TITLE": {
-			string: "**Admin Roles:**",
-			context: "Denotes the list of admin roles when configuration is listed"
-		},
-		"CFG_BLOCKED_ROLES_TITLE": {
-			string: "**Blocked Roles:**",
-			context: "Denotes the list of blocked roles when configuration is listed"
-		},
-		"CFG_STAFF_ROLES_TITLE": {
-			string: "**Staff Roles:**",
-			context: "Denotes the list of staff roles when configuration is listed"
-		},
-		"CFG_ALLOWED_ROLES_TITLE": {
-			string: "**Allowed Suggesting Roles:**",
-			context: "Denotes the list of allowed suggesting roles when configuration is listed"
-		},
-		"CFG_ALLOWED_ROLES_APPEND": {
-			string: "(all users can submit suggestions)",
-			context: "Appended to the end of the configuration value for allowed suggesting roles if none are configured"
-		},
-		"CFG_ALLOWED_ROLES_APPEND_NOW": {
-			string: "(All users can now submit suggestions)",
-			context: "Appended to the end of the role removed message when no more allowed roles exist"
-		},
-		"CFG_VOTING_ROLES_TITLE": {
-			string: "**Voting Roles:**",
-			context: "Denotes the list of voting roles when configuration is listed"
-		},
 		"CFG_VOTING_ROLES_APPEND": {
 			string: "(all users can vote on suggestions)",
 			context: "Appended to the end of the configuration value for voting roles if none are configured"
@@ -416,37 +388,9 @@ module.exports = {
 			string: "(All users can now vote on suggestions)",
 			context: "Appended to the end of the role removed message when no more voting roles exist"
 		},
-		"CFG_APPROVED_ROLE_TITLE": {
-			string: "**Approved Suggestion Role:**",
-			context: "Denotes the approved suggestion role when configuration is listed"
-		},
-		"CFG_SUGGESTION_CHANNEL_TITLE": {
-			string: "**Approved Suggestions Channel:**",
-			context: "Denotes the approved suggestion channel when configuration is listed"
-		},
-		"CFG_REVIEW_CHANNEL_TITLE": {
-			string: "**Suggestion Review Channel:**",
-			context: "Denotes the suggestion review channel when configuration is listed"
-		},
 		"CFG_REVIEW_NOT_NECESSARY_APPEND": {
 			string: "(Unnecessary because the mode is set to autoapprove)",
 			context: "Appended to the end of the review channel configuration element when none is set and the mode is set to autoapprove"
-		},
-		"CFG_DENIED_CHANNEL_TITLE": {
-			string: "**Denied Suggestions Channel:**",
-			context: "Denotes the denied suggestions channel when configuration is listed"
-		},
-		"CFG_LOG_CHANNEL_TITLE": {
-			string: "**Log Channel:**",
-			context: "Denotes the log channel when configuration is listed"
-		},
-		"CFG_ARCHIVE_CHANNEL_TITLE": {
-			string: "**Implemented Suggestions Archive Channel:**",
-			context: "Denotes the implemented suggestions archive channel when configuration is listed"
-		},
-		"CFG_COMMANDS_CHANNEL_TITLE": {
-			string: "**Suggestion Command Channel:**",
-			context: "Denotes the implemented suggestions archive channel when configuration is listed"
 		},
 		"CFG_COMMANDS_CHANNEL_APPEND": {
 			string: "(Suggestions can be made in all channels)",
@@ -464,10 +408,6 @@ module.exports = {
 			string: "(Downvote Reaction Disabled)",
 			context: "Shown when the downvote reaction config element is disabled"
 		},
-		"CFG_REACTION_EMOJIS_TITLE": {
-			string: "**Suggestion Feed Reactions:**",
-			context: "Denotes the suggestion feed reactions when configuration is listed"
-		},
 		"ENABLED": {
 			string: "Enabled",
 			context: "Used when something is enabled"
@@ -475,10 +415,6 @@ module.exports = {
 		"DISABLED": {
 			string: "Disabled",
 			context: "Used when something is disabled"
-		},
-		"CFG_MODE_TITLE": {
-			string: "**Mode:**",
-			context: "Denotes the mode when configuration is listed"
 		},
 		"CFG_MODE_REVIEW": {
 			string: "All suggestions are held for review",
@@ -491,22 +427,6 @@ module.exports = {
 		"ERROR": {
 			string: "An error occurred. Please try again.",
 			context: "Used when an unknown error occurs."
-		},
-		"CFG_PREFIX_TITLE": {
-			string: "**Prefix:**",
-			context: "Denotes the prefix when configuration is listed"
-		},
-		"CFG_NOTIFICATIONS_TITLE": {
-			string: "**DM Notifications:**",
-			context: "Denotes the notification setting when configuration is listed"
-		},
-		"CFG_CLEAN_COMMANDS_TITLE": {
-			string: "**Clean Suggestion Commands:**",
-			context: "Denotes the clean commands setting when configuration is listed"
-		},
-		"CFG_INCHANNEL_TITLE": {
-			string: "**In-Suggestions Channel Suggestion Submission:**",
-			context: "Denotes the in-channel suggestions setting when configuration is listed"
 		},
 		"SERVER_CONFIGURATION_TITLE": {
 			string: "Server Configuration for {{server}}",
@@ -1062,8 +982,8 @@ module.exports = {
 			string: "Remove old log channel",
 			context: "Audit log reason for log channel webhook deletion"
 		},
-		"AUTOMATIC_SETUP_COMPLETE": {
-			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command: https://suggester.js.org/#/admin/config",
+		"AUTOMATIC_SETUP_COMPLETE_NEW": {
+			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command",
 			context: "Message sent when automatic setup is complete",
 			replaced: {
 				prefix: {
@@ -1072,15 +992,41 @@ module.exports = {
 				}
 			}
 		},
-		"CONFIG_HELP": {
-			string: "Please see https://suggester.js.org/#/admin/config for information about the config command. You can use `{{prefix}}autosetup` or `{{prefix}}setup` to automatically setup or walkthrough setting up your server",
-			context: "General help when the config command is used with no parameters",
+		"CFG_HELP_TITLE": {
+			string: "Configuration Help",
+			context: "Title for the configuration help embed"
+		},
+		"CFG_HELP_INFO": {
+			string: "Use `{{p}}config help [element name]` to view help for a specific element, or use the arrow reactions to navigate through the list!",
+			context: "Description for navigating the config help embed",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The bot prefix"
+				}
+			}
+		},
+		"CFG_HELP_COMMAND": {
+			string: "Command",
+			context: "Command title for the config help embed"
+		},
+		"CFG_HELP_COMMAND_INFO": {
+			string: "You can use `{{prefix}}config {{subcommand}}` to view the current value or set a new one",
+			context: "Command description for the config help embed",
 			replaced: {
 				prefix: {
 					to_replace: "{{prefix}}",
-					description: "The server's prefix"
+					replaced: "The bot prefix"
+				},
+				subcommand: {
+					to_replace: "{{subcommand}}",
+					replaced: "The help subcommand (ex. admin)"
 				}
 			}
+		},
+		"CFG_LIST_TITLE": {
+			string: "List of Configuration Elements",
+			context: "Title for the list of config elements in the config help embed"
 		},
 		"CFG_NO_ROLE_SPECIFIED_ERROR": {
 			string: "You must specify a role name, @mention, or ID!",
@@ -2544,8 +2490,8 @@ module.exports = {
 			string: "What's Next?",
 			context: "Header for the What's Next? section of the tutorial embed"
 		},
-		"TUTORIAL_NEXT_DESCRIPTION": {
-			string: "After you run `{{prefix}}setup`, users can submit suggestions and the bot will work. If you are looking for more advanced configuration options like custom suggestion feed reactions and auto-cleaning of suggestion commands, take a look at https://suggester.js.org/#/admin/config.\n\nIf you're having an issue, or just want to find out more about the bot, head over to the __Suggester support server__: {{invite}}\nThis embed can be shown at any time using the `{{prefix}}tutorial` command.",
+		"TUTORIAL_NEXT_DESCRIPTION_NEW": {
+			string: "After you run `{{prefix}}setup`, users can submit suggestions and the bot will work. If you are looking for more advanced configuration options like custom suggestion feed reactions and auto-cleaning of suggestion commands, try out `{{prefix}}config`.\n\nIf you're having an issue, or just want to find out more about the bot, head over to the __Suggester support server__: {{invite}}\nThis embed can be shown at any time using the `{{prefix}}tutorial` command.",
 			context: "Description for the What's Next? section of the tutorial embed",
 			replaced: {
 				prefix: {
@@ -2794,10 +2740,6 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_PING_ROLE_TITLE": {
-			string: "**Suggestion Submitted Mention Role:**",
-			context: "Title for the suggestion submitted mention role in config"
-		},
 		"CFG_RESET_PING_ROLE_SUCCESS": {
 			string: "Successfully reset the suggestion submitted mention role.",
 			context: "Success message when the mention on submitted suggestion role is reset"
@@ -2880,10 +2822,6 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_LOCALE_TITLE": {
-			string: "**Locale:**",
-			context: "Title for the locale in the config embed"
-		},
 		"LOCALE_FOOTER": {
 			string: "Don't see your language listed here? Apply to translate it in the support server!",
 			context: "Shown in the locale list embed informing users of how they can help translate"
@@ -2931,18 +2869,6 @@ module.exports = {
 		"CFG_INTERNAL_TITLE": {
 			string: "Internal Configuration",
 			context: "Header for the internal configuration section of the config list embed"
-		},
-		"CFG_COLOR_CHANGE_TITLE": {
-			string: "**Color Change:**",
-			context: "Title for color change in the config embed"
-		},
-		"CFG_SELF_VOTE_TITLE": {
-			string: "**Voting on Own Suggestions:**",
-			context: "Title for self voting in the config embed"
-		},
-		"CFG_ONE_VOTE_TITLE": {
-			string: "**Multiple Reaction Voting:**",
-			context: "Title for choosing multiple vote reactions in the config embed"
 		},
 		"COMMAND_SERVER_ONLY": {
 			string: "This command is not available in DMs.",
@@ -4090,6 +4016,436 @@ module.exports = {
 		"UNKNOWN_COMMAND_ERROR": {
 			string: "No command was found based on your input!",
 			context: "Error shown when no command can be found in the help command"
+		},
+		"UNKNOWN_ELEMENT_ERROR": {
+			string: "No configuration element was found based on your input!",
+			context: "Error shown when no element can be found in the config help command"
+		},
+		"CFG_OTHER_SERVER_ERROR": {
+			string: "Configurations of other servers are view-only via the `list` subcommand.",
+			context: "Error shown when a server that is not the current one has a config subcommand run"
+		},
+		"CONFIG_NAME:ADMIN": {
+			string: "Admin Roles",
+			context: "Name of the Admin Roles config element"
+		},
+		"CONFIG_DESC:ADMIN": {
+			string: "Roles that are allowed to edit server configuration, as well as use all staff commands. (Members with the **Manage Server** permission also have access to these commands)",
+			context: "Description of the Admin Roles config element"
+		},
+		"CONFIG_EXAMPLES:ADMIN": {
+			string: "`{{p}}config admin add Owner`\n" +
+				"Adds the \"Owner\" role as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin add @Management`\n" +
+				"Adds the mentioned \"Management\" role as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin remove Owner`\n" +
+				"Removes the \"Owner\" role from the list of admin roles",
+			context: "Examples for the Admin Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `admin`"
+		},
+		"CONFIG_NAME:STAFF": {
+			string: "Staff Roles",
+			context: "Name of the Staff Roles config element"
+		},
+		"CONFIG_DESC:STAFF": {
+			string: "Roles that have access to suggestion management commands like `approve`, `deny`, `comment`, and `mark`.",
+			context: "Description of the Staff Roles config element"
+		},
+		"CONFIG_EXAMPLES:STAFF": {
+			string: "`{{p}}config staff add Staff`\n" +
+				"Adds the \"Staff\" role as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff add @Moderator`\n" +
+				"Adds the mentioned \"Moderator\" role as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff remove Moderator`\n" +
+				"Removes the \"Moderator\" role from the list of staff roles",
+			context: "Examples for the Staff Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `staff`"
+		},
+		"CONFIG_NAME:ALLOWED": {
+			string: "Allowed Suggesting Roles",
+			context: "Name of the Allowed Suggesting Roles config element"
+		},
+		"CONFIG_DESC:ALLOWED": {
+			string: "Roles that are allowed to submit suggestions. If no roles are configured, all users can submit suggestions.",
+			context: "Description of the Allowed Suggesting Roles config element"
+		},
+		"CONFIG_EXAMPLES:ALLOWED": {
+			string: "`{{p}}config allowed add Trusted`\n" +
+				"Adds the \"Trusted\" role to the list of allowed roles\n" +
+				"\n" +
+				"`{{p}}config allowed add @Cool Person`\n" +
+				"Adds the mentioned \"Cool Person\" role as an allowed role\n" +
+				"\n" +
+				"`{{p}}config allowed add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of allowed roles\n" +
+				"\n" +
+				"`{{p}}config allowed remove Trusted`\n" +
+				"Removes the \"Trusted\" role from the list of allowed roles",
+			context: "Examples for the Allowed Suggesting Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `allowed`"
+		},
+		"CONFIG_NAME:VOTING": {
+			string: "Voting Roles",
+			context: "Name of the Voting Roles config element"
+		},
+		"CONFIG_DESC:VOTING": {
+			string: "Roles that are allowed to vote on suggestions in the approved suggestion feed. If no roles are configured, all users can vote on suggestions.",
+			context: "Description of the Voting Roles config element"
+		},
+		"CONFIG_EXAMPLES:VOTING": {
+			string: "`{{p}}config voting add Trusted`\n" +
+				"Adds the \"Trusted\" role to the list of allowed voting roles\n" +
+				"\n" +
+				"`{{p}}config voting add @Cool Person`\n" +
+				"Adds the mentioned \"Cool Person\" role as an allowed voting role\n" +
+				"\n" +
+				"`{{p}}config voting add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of allowed voting roles\n" +
+				"\n" +
+				"`{{p}}config voting remove Trusted`\n" +
+				"Removes the \"Trusted\" role from the list of allowed voting roles",
+			context: "Examples for the Voting Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `voting`"
+		},
+		"CONFIG_NAME:BLOCKED": {
+			string: "Blocked Roles",
+			context: "Name of the Blocked Roles config element"
+		},
+		"CONFIG_DESC:BLOCKED": {
+			string: "Roles that are blocked from using the bot on this server. If you want to block one specific user, use the `block` command.",
+			context: "Description of the Blocked Roles config element"
+		},
+		"CONFIG_EXAMPLES:BLOCKED": {
+			string: "`{{p}}config blocked add Restricted`\n" +
+				"Adds the \"Restricted\" role to the list of blocked roles\n" +
+				"\n" +
+				"`{{p}}config blocked add @Bad Person`\n" +
+				"Adds the mentioned \"Bad Person\" role as a blocked role\n" +
+				"\n" +
+				"`{{p}}config blocked add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of blocked roles\n" +
+				"\n" +
+				"`{{p}}config blocked remove Annoying`\n" +
+				"Removes the \"Annoying\" role from the list of blocked roles, allowing members with that role to use the bot again",
+			context: "Examples for the Blocked Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `blocked`"
+		},
+		"CONFIG_NAME:APPROVEROLE": {
+			string: "Approved Suggestion Role",
+			context: "Name of the Approved Suggestion Role config element"
+		},
+		"CONFIG_DESC:APPROVEROLE": {
+			string: "The role that is given to members that have a suggestion approved.",
+			context: "Description of the Approved Suggestion Role config element"
+		},
+		"CONFIG_EXAMPLES:APPROVEROLE": {
+			string: "`{{p}}config approverole Suggestion Submitter`\n" +
+				"Sets the \"Suggestion Submitter\" as the role given when a member has their suggestion approved\n" +
+				"\n" +
+				"`{{p}}config approverole none`\n" +
+				"Resets the role given when a member has their suggestion approved, meaning no role will be given",
+			context: "Examples for the Approved Suggestion Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `approverole`"
+		},
+		"CONFIG_NAME:PINGROLE": {
+			string: "Suggestion Submitted Mention Role",
+			context: "Name of the Suggestion Submitted Mention Role config element"
+		},
+		"CONFIG_DESC:PINGROLE": {
+			string: "The role that is mentioned when a new suggestion is submitted for review.",
+			context: "Description of the Suggestion Submitted Mention Role config element"
+		},
+		"CONFIG_EXAMPLES:PINGROLE": {
+			string: "`{{p}}config pingrole Staff`\n" +
+				"Sets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n" +
+				"\n" +
+				"`{{p}}config pingrole none`\n" +
+				"Resets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			context: "Examples for the Suggestion Submitted Mention Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
+		},
+		"CONFIG_NAME:REVIEW": {
+			string: "Suggestion Review Channel",
+			context: "Name of the Suggestion Review Channel config element"
+		},
+		"CONFIG_DESC:REVIEW": {
+			string: "The channel where suggestions are sent once they are submitted for review.",
+			context: "Description of the Suggestion Review Channel config element"
+		},
+		"CONFIG_EXAMPLES:REVIEW": {
+			string: "`{{p}}config review #suggestions-review`\n" +
+				"Sets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			context: "Examples for the Suggestion Review Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `review`"
+		},
+		"CONFIG_NAME:SUGGESTIONS": {
+			string: "Approved Suggestions Channel",
+			context: "Name of the Approved Suggestions Channel config element"
+		},
+		"CONFIG_DESC:SUGGESTIONS": {
+			string: "The channel where suggestions are sent once they are approved (or submitted when the mode is set to `autoapprove`).",
+			context: "Description of the Approved Suggestions Channel config element"
+		},
+		"CONFIG_EXAMPLES:SUGGESTIONS": {
+			string: "`{{p}}config suggestions #suggestions`\n" +
+				"Sets the #suggestions channel as the channel where approved suggestions are sent",
+			context: "Examples for the Approved Suggestions Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `suggestions`"
+		},
+		"CONFIG_NAME:DENIED": {
+			string: "Denied Suggestions Channel",
+			context: "Name of the Denied Suggestions Channel config element"
+		},
+		"CONFIG_DESC:DENIED": {
+			string: "The channel where suggestions are sent when they are denied or deleted.",
+			context: "Description of the Denied Suggestions Channel config element"
+		},
+		"CONFIG_EXAMPLES:DENIED": {
+			string: "`{{p}}config denied #denied-suggestions`\n" +
+				"Sets the #denied-suggestions channel as the channel where denied or deleted suggestions are sent\n" +
+				"\n" +
+				"`{{p}}config denied none`\n" +
+				"Resets the denied suggestions channel, making there be none set",
+			context: "Examples for the Denied Suggestions Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `denied`"
+		},
+		"CONFIG_NAME:LOG": {
+			string: "Log Channel",
+			context: "Name of the Log Channel config element"
+		},
+		"CONFIG_DESC:LOG": {
+			string: "The channel where suggestions submitted and actions taken on them are logged.",
+			context: "Description of the Log Channel config element"
+		},
+		"CONFIG_EXAMPLES:LOG": {
+			string: "`{{p}}config log #suggestion-log`\n" +
+				"Sets the #suggestion-log channel as log channel for suggestions and actions taken on them\n" +
+				"\n" +
+				"`{{p}}config log none`\n" +
+				"Resets the log channel, making there be none set",
+			context: "Examples for the Log Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `log`"
+		},
+		"CONFIG_NAME:COMMANDS": {
+			string: "Suggestion Command Channel",
+			context: "Name of the Suggestion Command Channel config element"
+		},
+		"CONFIG_DESC:COMMANDS": {
+			string: "This setting locks using the `suggest` command to only the configured channel. Configuring no channel will allow the command to be used in any channel.",
+			context: "Description of the Suggestion Command Channel config element"
+		},
+		"CONFIG_EXAMPLES:COMMANDS": {
+			string: "`{{p}}config commands #bot-commands`\n" +
+				"Limits using the `suggest` command to the #bot-commands channel\n" +
+				"\n" +
+				"`{{p}}config commands none`\n" +
+				"Resets the commands channel, allowing the `suggest` command to be used in any channel",
+			context: "Examples for the Suggestion Command Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `commands`"
+		},
+		"CONFIG_NAME:IMPLEMENTED": {
+			string: "Implemented Suggestions Archive Channel",
+			context: "Name of the Implemented Suggestions Archive Channel config element"
+		},
+		"CONFIG_DESC:IMPLEMENTED": {
+			string: "The channel where suggestions marked as \"Implemented\" via the `mark` command are sent. If no channel is configured, implemented suggestions will remain in the suggestions feed",
+			context: "Description of the Implemented Suggestions Archive Channel config element"
+		},
+		"CONFIG_EXAMPLES:IMPLEMENTED": {
+			string: "`{{p}}config implemented #implemented-suggestions`\n" +
+				"Sets the #implemented-suggestions channel as the channel where implemented suggestions are sent\n" +
+				"\n" +
+				"`{{p}}config implemented none`\n" +
+				"Resets the implemented suggestions archive channel, making there be none set",
+			context: "Examples for the Implemented Suggestions Archive Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `implemented`"
+		},
+		"CONFIG_NAME:PREFIX": { string: "Prefix", context: "Name of the Prefix config element" },
+		"CONFIG_DESC:PREFIX": {
+			string: "The string of characters (usually a symbol) used to invoke a bot command. For example, in `.vote` the prefix is `.`",
+			context: "Description of the Prefix config element"
+		},
+		"CONFIG_EXAMPLES:PREFIX": {
+			string: "`{{p}}config prefix ?`\nSets the bot prefix to `?`",
+			context: "Examples for the Prefix config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `prefix`"
+		},
+		"CONFIG_NAME:MODE": { string: "Mode", context: "Name of the Mode config element" },
+		"CONFIG_DESC:MODE": {
+			string: "The mode of handling suggestions. This can be `review` (all suggestions are held for manual review by staff) or `autoapprove` (all suggestions are automatically posted to the suggestions feed)",
+			context: "Description of the Mode config element"
+		},
+		"CONFIG_EXAMPLES:MODE": {
+			string: "`{{p}}config mode review`\n" +
+				"Sets the mode to `review`\n" +
+				"\n" +
+				"`{{p}}config mode autoapprove`\n" +
+				"Sets the mode to `autoapprove`",
+			context: "Examples for the Mode config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `mode`"
+		},
+		"CONFIG_NAME:EMOJIS": {
+			string: "Suggestion Feed Reactions",
+			context: "Name of the Suggestion Feed Reactions config element"
+		},
+		"CONFIG_DESC:EMOJIS": {
+			string: "Settings for managing the emojis that are added to suggestions posted to the suggestions feed",
+			context: "Description of the Suggestion Feed Reactions config element"
+		},
+		"CONFIG_EXAMPLES:EMOJIS": {
+			string: "`{{p}}config emojis up 👍`\n" +
+				"Sets the upvote emoji to 👍\n" +
+				"\n" +
+				"`{{p}}config emojis mid 🤷`\n" +
+				"Sets the shrug/no opinion emoji to 🤷\n" +
+				"\n" +
+				"`{{p}}config emojis down 👎`\n" +
+				"Sets the downvote emoji to 👎\n" +
+				"\n" +
+				"`{{p}}config emojis up disable`\n" +
+				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
+				"\n" +
+				"`{{p}}config emojis disable`\n" +
+				"Disables all suggestion feed reactions\n" +
+				"\n" +
+				"`{{p}}config emojis enable`\n" +
+				"Enables suggestion feed reactions if they are disabled",
+			context: "Examples for the Suggestion Feed Reactions config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `emojis`"
+		},
+		"CONFIG_NAME:NOTIFICATIONS": {
+			string: "DM Notifications",
+			context: "Name of the DM Notifications config element"
+		},
+		"CONFIG_DESC:NOTIFICATIONS": {
+			string: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
+			context: "Description of the DM Notifications config element"
+		},
+		"CONFIG_EXAMPLES:NOTIFICATIONS": {
+			string: "`{{p}}config emojis up 👍`\n" +
+				"Sets the upvote emoji to 👍\n" +
+				"\n" +
+				"`{{p}}config emojis mid 🤷`\n" +
+				"Sets the shrug/no opinion emoji to 🤷\n" +
+				"\n" +
+				"`{{p}}config emojis down 👎`\n" +
+				"Sets the downvote emoji to 👎\n" +
+				"\n" +
+				"`{{p}}config emojis up disable`\n" +
+				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
+				"\n" +
+				"`{{p}}config emojis disable`\n" +
+				"Disables all suggestion feed reactions\n" +
+				"\n" +
+				"`{{p}}config emojis enable`\n" +
+				"Enables suggestion feed reactions if they are disabled",
+			context: "Examples for the DM Notifications config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
+		},
+		"CONFIG_NAME:CLEANCOMMANDS": {
+			string: "Clean Suggestion Commands",
+			context: "Name of the Clean Suggestion Commands config element"
+		},
+		"CONFIG_DESC:CLEANCOMMANDS": {
+			string: "This setting controls whether or not the `suggest` command and the response are removed after a few seconds. This is useful for keeping your command channel clean!",
+			context: "Description of the Clean Suggestion Commands config element"
+		},
+		"CONFIG_EXAMPLES:CLEANCOMMANDS": {
+			string: "`{{p}}config cleancommands on`\n" +
+				"Enables cleaning of suggestion commands\n" +
+				"\n" +
+				"`{{p}}config cleancommands off`\n" +
+				"Disables cleaning of suggestion commands",
+			context: "Examples for the Clean Suggestion Commands config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `cleancommands`"
+		},
+		"CONFIG_NAME:SELFVOTE": {
+			string: "Voting on Own Suggestions",
+			context: "Name of the Voting on Own Suggestions config element"
+		},
+		"CONFIG_DESC:SELFVOTE": {
+			string: "This setting controls whether or not the user who made a suggestion can vote on their own suggestion when it has been approved.",
+			context: "Description of the Voting on Own Suggestions config element"
+		},
+		"CONFIG_EXAMPLES:SELFVOTE": {
+			string: "`{{p}}config selfvote on`\n" +
+				"Allows suggestion authors to vote on their own suggestions\n" +
+				"\n" +
+				"`{{p}}config selfvote off`\n" +
+				"Prevents suggestion authors from voting on their own suggestions",
+			context: "Examples for the Voting on Own Suggestions config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `selfvote`"
+		},
+		"CONFIG_NAME:ONEVOTE": {
+			string: "Multiple Reaction Voting",
+			context: "Name of the Multiple Reaction Voting config element"
+		},
+		"CONFIG_DESC:ONEVOTE": {
+			string: "This setting controls whether or not users can choose multiple voting options on a suggestion (For example, both upvote and downvote).",
+			context: "Description of the Multiple Reaction Voting config element"
+		},
+		"CONFIG_EXAMPLES:ONEVOTE": {
+			string: "`{{p}}config onevote on`\n" +
+				"Allows users to choose only one option when voting\n" +
+				"\n" +
+				"`{{p}}config onevote off`\n" +
+				"Allows users to choose multiple options when voting",
+			context: "Examples for the Multiple Reaction Voting config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `onevote`"
+		},
+		"CONFIG_NAME:INCHANNELSUGGESTIONS": {
+			string: "In-Suggestions Channel Suggestion Submission",
+			context: "Name of the In-Suggestions Channel Suggestion Submission config element"
+		},
+		"CONFIG_DESC:INCHANNELSUGGESTIONS": {
+			string: "This setting controls whether or not users can submit suggestions via sending a message in the suggestions feed channel.",
+			context: "Description of the In-Suggestions Channel Suggestion Submission config element"
+		},
+		"CONFIG_EXAMPLES:INCHANNELSUGGESTIONS": {
+			string: "`{{p}}config inchannelsuggestions on`\n" +
+				"Allows users to submit suggestions via any message in the suggestions feed channel\n" +
+				"\n" +
+				"`{{p}}config inchannelsuggestions off`\n" +
+				"Prevents users from submitting suggestions via any message in the suggestions feed channel",
+			context: "Examples for the In-Suggestions Channel Suggestion Submission config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `inchannelsuggestions`"
+		},
+		"CONFIG_NAME:COLORCHANGE": {
+			string: "Color Change",
+			context: "Name of the Color Change config element"
+		},
+		"CONFIG_DESC:COLORCHANGE": {
+			string: "This setting controls the color of the suggestion embed changing based on the number of net upvotes. You can customize the color, and the number of net upvotes necessary to change the color!",
+			context: "Description of the Color Change config element"
+		},
+		"CONFIG_EXAMPLES:COLORCHANGE": {
+			string: "`{{p}}config colorchange color gold`\n" +
+				"Sets the color to change the embed to `gold`. This element supports hex colors, CSS colors, and more!\n" +
+				"\n" +
+				"`{{p}}config colorchange number 5`\n" +
+				"Sets the number of net upvotes to change the embed color to `5`.",
+			context: "Examples for the Color Change config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `colorchange`"
+		},
+		"CONFIG_NAME:LOCALE": { string: "Locale", context: "Name of the Locale config element" },
+		"CONFIG_DESC:LOCALE": {
+			string: "The language the bot will respond in. If a user has a locale configured via the `locale` command, the bot will respond to them in their preferred language. If they don't, the bot will respond in the language configured here.",
+			context: "Description of the Locale config element"
+		},
+		"CONFIG_EXAMPLES:LOCALE": {
+			string: "`{{p}}config locale en`\nSets the server language to English.",
+			context: "Examples for the Locale config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `locale`"
 		}
 	}
 };
