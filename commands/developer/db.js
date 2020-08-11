@@ -29,7 +29,7 @@ module.exports = {
 			if (args.length < 6) return message.channel.send(string(locale, "NO_MODIFICATION_PARAMS_ERROR", {}, "error"));
 			modifyField = args[4];
 			oldValue = eval(`result.${modifyField}`);
-			modifyValue = args[5];
+			modifyValue = args.splice(5).join(" ");
 			eval(`result.${modifyField} = ${modifyValue}`);
 			await dbModify(collection, query, result);
 			modified = true;

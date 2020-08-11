@@ -45,7 +45,7 @@ module.exports = {
 		let senderPermissionLevel = await checkPermissions(message.member, client);
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(user.tag, user.displayAvatarURL({format: "png", dynamic: true}))
-			.setColor(client.colors.default)
+			.setColor(qUserDB.verifyColor || client.colors.default)
 			.setFooter(string(locale, "VERIFY_PERMISSION_LEVEL_FOOTER", { level: permissionLevel.toString() }));
 		if (globalPosArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_GLOBAL_ACKS"), `${globalPosArr.join("\n")}`);
 		if (posArr.length > 0) embed.addField(string(locale, "VERIFY_TITLE_SERVER_ACKS"), `${posArr.join("\n")}`);

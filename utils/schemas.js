@@ -92,7 +92,8 @@ const user = new Schema({
 	locale: { type: String },
 	protips: { type: Boolean, default: true },
 	displayed_protips: [String],
-	flags: [ String ]
+	flags: [ String ],
+	verifyColor: String
 });
 
 const command = new Schema({
