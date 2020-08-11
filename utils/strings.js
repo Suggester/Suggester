@@ -2772,6 +2772,20 @@ module.exports = {
 			string: "Available Locales",
 			context: "Title for the list of locales"
 		},
+		"LOCALE_LIST_INCOMPLETE_TITLE": {
+			string: "Incomplete Locales",
+			context: "Title for the list of incomplete locales"
+		},
+		"LOCALE_LIST_INCOMPLETE_DESC": {
+			string: "Locales in this list have not been completely translated, some parts of the bot may still appear in English. (Help translate by joining the [Support Server]({{support_invite}}))",
+			context: "Description for the list of incomplete locales",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The invite to the support server"
+				}
+			}
+		},
 		"SELECTED": {
 			string: "Selected",
 			context: "Indicates a selected locale"

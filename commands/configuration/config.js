@@ -4,7 +4,7 @@ const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("..
 const { checkPermissions } = require("../../utils/checks");
 const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
-const { string } = require("../../utils/strings");
+const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
 module.exports = {
 	controls: {
@@ -683,12 +683,15 @@ module.exports = {
 			examples: "`{{p}}config locale en`\nSets the server language to English.",
 			cfg: async function() {
 				if (!args[1]) {
-					let embed = new Discord.MessageEmbed()
+					let totalStrings = Object.keys(list).length;
+					let localesDone = client.locales.filter(l => (Object.keys(l.list).filter(s => list[s]).length/totalStrings) > 0.65 || l.settings.force);
+					let localesProgress = client.locales.filter(l => !localesDone.find(d => d.settings.code === l.settings.code));
+					return message.channel.send(new Discord.MessageEmbed()
 						.setTitle(string(locale, "LOCALE_LIST_TITLE"))
-						.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qServerDB.config.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+						.setDescription(localesDone.filter(l => !l.settings.hidden || qServerDB.config.locale === l.settings.code).map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+						.addField(string(locale, "LOCALE_LIST_INCOMPLETE_TITLE"), `${string(locale, "LOCALE_LIST_INCOMPLETE_DESC", { support_invite: `https://discord.gg/${support_invite}` })}\n${localesProgress.filter(l => !l.settings.hidden || qServerDB.config.locale === l.settings.code).map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qServerDB.config.locale && qServerDB.config.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n")}`)
 						.setFooter(string(locale, "LOCALE_FOOTER"))
-						.setColor(client.colors.default);
-					return message.channel.send(embed);
+						.setColor(client.colors.default));
 				}
 				let selection = args[1].toLowerCase();
 				let found = client.locales.find(l => l.settings.code === selection || l.settings.native.toLowerCase() === selection || l.settings.english.toLowerCase() === selection);
