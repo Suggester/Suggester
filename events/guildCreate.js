@@ -36,7 +36,7 @@ module.exports = async (Discord, client, guild) => {
 		.setColor(client.colors.default)
 		.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
 		.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: prefix }))
-		.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION", { prefix: prefix, invite: `https://discord.gg/${support_invite}` }));
+		.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "AUTOMATIC_SETUP_COMPLETE_NEW", { prefix: prefix, invite: `https://discord.gg/${support_invite}` }));
 	let names = ["staff", "admin", "mod", "bot", "general"];
 	let channelsFetch = guild.channels.cache.filter(c => names.filter(a => c.name.includes(a)).length > 0 && c.type === "text" && c.permissionsFor(client.user.id).has(["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]) && !c.name.includes("log"));
 	if (channelsFetch.size > 0) return channelsFetch.first().send(embed);

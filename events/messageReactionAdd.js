@@ -31,7 +31,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		}];
 		if (!emotes.map(e => e.emoji).includes(nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) return;
 		let commandName = emotes.find(e => e.emoji === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)).cmd;
-		let command = require(`../commands/server moderator/${commandName}`);
+		let command = require(`../commands/review/${commandName}`);
 		let permission = await checkPermissions(messageReaction.message.guild.members.cache.get(user.id), client);
 		if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
 		let qUserDB = await dbQuery("User", { id: user.id });

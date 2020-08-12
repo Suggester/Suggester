@@ -23,6 +23,7 @@
     "mongoose-sequence": "^5.2.2",
     "ms": "^2.1.2",
     "node-emoji": "^1.10.0",
+    "prettysize": "^2.0.0",
     "string-similarity": "^4.0.1",
     "valid-url": "1.0.9"
   },

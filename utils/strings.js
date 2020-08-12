@@ -13,7 +13,7 @@ module.exports = {
 		const { list } = require(`../i18n/${locale}`);
 		const defaultList = module.exports.list;
 		const string = defaultList[string_name];
-		if (!string) return `String ${string_name} Not Found`;
+		if (!string) return null;
 		let newString = list[string_name] || string.string;
 		if (string.replaced) {
 			Object.keys(string.replaced).forEach(r => {
@@ -87,6 +87,20 @@ module.exports = {
 		"NO_STATUS_ERROR": {
 			string: "You must specify a valid status!",
 			context: "Error that shows when the botconfig or mark commands are run without any status parameter"
+		},
+		"NONE_OR_INVALID_STATUS_ERROR": {
+			string: "You provided none or an invalid status. Please choose a reaction below to select a status, or {{x}} to cancel.\n\n>>> **Status List:**\n{{list}}",
+			context: "Error that shows the mark command is run without any status parameter",
+			replaced: {
+				x: {
+					to_replace: "{{x}}",
+					description: "The x emoji"
+				},
+				list: {
+					to_replace: "{{list}}",
+					description: "The list of statuses"
+				}
+			}
 		},
 		"INVALID_AVATAR_ERROR": {
 			string: "Please provide a valid image URL! Images can have extensions of `jpeg`, `jpg`, `png`, or `gif`",
@@ -362,33 +376,9 @@ module.exports = {
 			string: "None Configured",
 			context: "Used when a configuration element is not configured"
 		},
-		"CFG_ADMIN_ROLES_TITLE": {
-			string: "**Admin Roles:**",
-			context: "Denotes the list of admin roles when configuration is listed"
-		},
-		"CFG_BLOCKED_ROLES_TITLE": {
-			string: "**Blocked Roles:**",
-			context: "Denotes the list of blocked roles when configuration is listed"
-		},
-		"CFG_STAFF_ROLES_TITLE": {
-			string: "**Staff Roles:**",
-			context: "Denotes the list of staff roles when configuration is listed"
-		},
-		"CFG_ALLOWED_ROLES_TITLE": {
-			string: "**Allowed Suggesting Roles:**",
-			context: "Denotes the list of allowed suggesting roles when configuration is listed"
-		},
-		"CFG_ALLOWED_ROLES_APPEND": {
-			string: "(all users can submit suggestions)",
-			context: "Appended to the end of the configuration value for allowed suggesting roles if none are configured"
-		},
-		"CFG_ALLOWED_ROLES_APPEND_NOW": {
-			string: "(All users can now submit suggestions)",
-			context: "Appended to the end of the role removed message when no more allowed roles exist"
-		},
-		"CFG_VOTING_ROLES_TITLE": {
-			string: "**Voting Roles:**",
-			context: "Denotes the list of voting roles when configuration is listed"
+		"NONE": {
+			string: "None",
+			context: "Filler for when there is none of something"
 		},
 		"CFG_VOTING_ROLES_APPEND": {
 			string: "(all users can vote on suggestions)",
@@ -398,37 +388,9 @@ module.exports = {
 			string: "(All users can now vote on suggestions)",
 			context: "Appended to the end of the role removed message when no more voting roles exist"
 		},
-		"CFG_APPROVED_ROLE_TITLE": {
-			string: "**Approved Suggestion Role:**",
-			context: "Denotes the approved suggestion role when configuration is listed"
-		},
-		"CFG_SUGGESTION_CHANNEL_TITLE": {
-			string: "**Approved Suggestions Channel:**",
-			context: "Denotes the approved suggestion channel when configuration is listed"
-		},
-		"CFG_REVIEW_CHANNEL_TITLE": {
-			string: "**Suggestion Review Channel:**",
-			context: "Denotes the suggestion review channel when configuration is listed"
-		},
 		"CFG_REVIEW_NOT_NECESSARY_APPEND": {
 			string: "(Unnecessary because the mode is set to autoapprove)",
 			context: "Appended to the end of the review channel configuration element when none is set and the mode is set to autoapprove"
-		},
-		"CFG_DENIED_CHANNEL_TITLE": {
-			string: "**Denied Suggestions Channel:**",
-			context: "Denotes the denied suggestions channel when configuration is listed"
-		},
-		"CFG_LOG_CHANNEL_TITLE": {
-			string: "**Log Channel:**",
-			context: "Denotes the log channel when configuration is listed"
-		},
-		"CFG_ARCHIVE_CHANNEL_TITLE": {
-			string: "**Implemented Suggestions Archive Channel:**",
-			context: "Denotes the implemented suggestions archive channel when configuration is listed"
-		},
-		"CFG_COMMANDS_CHANNEL_TITLE": {
-			string: "**Suggestion Command Channel:**",
-			context: "Denotes the implemented suggestions archive channel when configuration is listed"
 		},
 		"CFG_COMMANDS_CHANNEL_APPEND": {
 			string: "(Suggestions can be made in all channels)",
@@ -446,10 +408,6 @@ module.exports = {
 			string: "(Downvote Reaction Disabled)",
 			context: "Shown when the downvote reaction config element is disabled"
 		},
-		"CFG_REACTION_EMOJIS_TITLE": {
-			string: "**Suggestion Feed Reactions:**",
-			context: "Denotes the suggestion feed reactions when configuration is listed"
-		},
 		"ENABLED": {
 			string: "Enabled",
 			context: "Used when something is enabled"
@@ -457,10 +415,6 @@ module.exports = {
 		"DISABLED": {
 			string: "Disabled",
 			context: "Used when something is disabled"
-		},
-		"CFG_MODE_TITLE": {
-			string: "**Mode:**",
-			context: "Denotes the mode when configuration is listed"
 		},
 		"CFG_MODE_REVIEW": {
 			string: "All suggestions are held for review",
@@ -473,22 +427,6 @@ module.exports = {
 		"ERROR": {
 			string: "An error occurred. Please try again.",
 			context: "Used when an unknown error occurs."
-		},
-		"CFG_PREFIX_TITLE": {
-			string: "**Prefix:**",
-			context: "Denotes the prefix when configuration is listed"
-		},
-		"CFG_NOTIFICATIONS_TITLE": {
-			string: "**DM Notifications:**",
-			context: "Denotes the notification setting when configuration is listed"
-		},
-		"CFG_CLEAN_COMMANDS_TITLE": {
-			string: "**Clean Suggestion Commands:**",
-			context: "Denotes the clean commands setting when configuration is listed"
-		},
-		"CFG_INCHANNEL_TITLE": {
-			string: "**In-Suggestions Channel Suggestion Submission:**",
-			context: "Denotes the in-channel suggestions setting when configuration is listed"
 		},
 		"SERVER_CONFIGURATION_TITLE": {
 			string: "Server Configuration for {{server}}",
@@ -564,9 +502,35 @@ module.exports = {
 				}
 			}
 		},
-		"HELP_BASE_DESCRIPTION": {
-			string: "Please see https://suggester.js.org/ for a command list and usage information!",
-			context: "Help command description directing to the documentation"
+		"HELP_AUTHOR": {
+			string: "{{name}} Help",
+			context: "Author title for the help embed",
+			replaced: {
+				name: {
+					to_replace: "{{name}}",
+					description: "The bot name"
+				}
+			}
+		},
+		"HELP_MODULE_TITLE": {
+			string: "Module: {{module}}",
+			context: "Title for the module in the help embed",
+			replaced: {
+				module: {
+					to_replace: "{{module}}",
+					description: "The command module"
+				}
+			}
+		},
+		"HELP_UNDERSTANDING": {
+			string: "Use `{{prefix}}help [command]` to view more information about a specific command, including usage examples.\nRequired arguments are surrounded by `[brackets]`, optional arguments are surrounded by `(parenthesis)`",
+			context: "Information in help that helps with understanding the format",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server's prefix"
+				}
+			}
 		},
 		"HELP_PREFIX_INFO": {
 			string: "My prefix in this server is {{prefix}}",
@@ -578,13 +542,13 @@ module.exports = {
 				}
 			}
 		},
-		"HELP_PERMISSION_LEVEL": {
-			string: "Permission Level",
-			context: "Permission Level field name in help command"
-		},
 		"HELP_USAGE": {
 			string: "Usage",
 			context: "Usage field name in help command"
+		},
+		"HELP_EXAMPLES": {
+			string: "Examples",
+			context: "Examples field name in help command"
 		},
 		"HELP_DOCUMENTATION": {
 			string: "Documentation",
@@ -605,20 +569,6 @@ module.exports = {
 		"COMMAND_DISABLED": {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"
-		},
-		"MISSING_CONFIG_TITLE": {
-			string: "Missing Config!",
-			context: "Title to any missing configuration warning embed"
-		},
-		"MISSING_CONFIG_DESCRIPTION": {
-			string: "This server has an incomplete configuration.\nA server manager can run `{{prefix}}setup` to configure it.",
-			context: "Description to any missing configuration warning embed",
-			replaced: {
-				prefix: {
-					to_replace: "{{prefix}}",
-					description: "The server's prefix"
-				}
-			}
 		},
 		"INVITE_BOT": {
 			string: "You can invite {{name}} to your server with this link: {{link}}",
@@ -699,6 +649,10 @@ module.exports = {
 		"PING_BOT_LATENCY_HEADER": {
 			string: "Bot Latency",
 			context: "Bot latency (previously 'Edit Time') header for the ping command"
+		},
+		"PING_MEMORY_HEADER": {
+			string: "Memory Usage",
+			context: "Memory Usage header for the ping command"
 		},
 		"UNCONFIGURED_ERROR": {
 			string: "You must configure your server to use this command. Please use the `setup` command.",
@@ -908,17 +862,25 @@ module.exports = {
 				}
 			}
 		},
-		"VERIFY_ACK_DEVELOPER": {
-			string: "Developer",
-			context: "Verify acknowledgement for Developer"
-		},
-		"VERIFY_ACK_GLOBAL_ADMIN": {
-			string: "Global Administrator",
-			context: "Verify acknowledgement for Global Administrator"
+		"VERIFY_ACK_DEVELOPER_GA": {
+			string: "Developer/Global Administrator",
+			context: "Verify acknowledgement for Developer/Global Administrator"
 		},
 		"VERIFY_ACK_GLOBAL_STAFF": {
 			string: "Suggester Staff Team",
 			context: "Verify acknowledgement for Suggester Staff Team"
+		},
+		"VERIFY_ACK_TRANSLATOR": {
+			string: "Translator",
+			context: "Verify acknowledgement for Translator"
+		},
+		"VERIFY_ACK_GLOBAL_NO_COOLDOWN": {
+			string: "Exempt From Cooldowns",
+			context: "Verify acknowledgement for Exempt from Cooldowns"
+		},
+		"VERIFY_ACK_GLOBAL_PROTECTED": {
+			string: "Protected",
+			context: "Verify acknowledgement for Protected"
 		},
 		"VERIFY_ACK_GLOBAL_BLOCK": {
 			string: "Blocked Globally",
@@ -1020,8 +982,8 @@ module.exports = {
 			string: "Remove old log channel",
 			context: "Audit log reason for log channel webhook deletion"
 		},
-		"AUTOMATIC_SETUP_COMPLETE": {
-			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command: https://suggester.js.org/#/admin/config",
+		"AUTOMATIC_SETUP_COMPLETE_NEW": {
+			string: "Automatic setup complete!\n>>> Want to use more advanced configuration elements like custom reactions, a role given on approved suggestions, and more? Try the `{{prefix}}config` command",
 			context: "Message sent when automatic setup is complete",
 			replaced: {
 				prefix: {
@@ -1030,15 +992,41 @@ module.exports = {
 				}
 			}
 		},
-		"CONFIG_HELP": {
-			string: "Please see https://suggester.js.org/#/admin/config for information about the config command. You can use `{{prefix}}autosetup` or `{{prefix}}setup` to automatically setup or walkthrough setting up your server",
-			context: "General help when the config command is used with no parameters",
+		"CFG_HELP_TITLE": {
+			string: "Configuration Help",
+			context: "Title for the configuration help embed"
+		},
+		"CFG_HELP_INFO": {
+			string: "Use `{{p}}config help [element name]` to view help for a specific element, or use the arrow reactions to navigate through the list!",
+			context: "Description for navigating the config help embed",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The bot prefix"
+				}
+			}
+		},
+		"CFG_HELP_COMMAND": {
+			string: "Command",
+			context: "Command title for the config help embed"
+		},
+		"CFG_HELP_COMMAND_INFO": {
+			string: "You can use `{{prefix}}config {{subcommand}}` to view the current value or set a new one",
+			context: "Command description for the config help embed",
 			replaced: {
 				prefix: {
 					to_replace: "{{prefix}}",
-					description: "The server's prefix"
+					replaced: "The bot prefix"
+				},
+				subcommand: {
+					to_replace: "{{subcommand}}",
+					replaced: "The help subcommand (ex. admin)"
 				}
 			}
+		},
+		"CFG_LIST_TITLE": {
+			string: "List of Configuration Elements",
+			context: "Title for the list of config elements in the config help embed"
 		},
 		"CFG_NO_ROLE_SPECIFIED_ERROR": {
 			string: "You must specify a role name, @mention, or ID!",
@@ -1728,12 +1716,16 @@ module.exports = {
 			string: "Setup has timed out. Please rerun the setup command if you would like to continue.",
 			context: "Error shown when setup times out"
 		},
+		"MARK_TIMEOUT_ERROR": {
+			string: "Reaction selection timed out. Please rerun this command if you would like to continue.",
+			context: "Error shown when reaction selection times out in the mark command"
+		},
 		"SETUP_ADMIN_ROLES_DESC": {
 			string: "Any member with a server admin role can use all staff commands, as well as edit bot configuration. Anyone who has the `Manage Server` permission is automatically counted as an admin regardless of server configuration.",
 			context: "Description for the server admin setting in setup"
 		},
-		"SETUP_STAFF_ROLES_DESC": {
-			string: "Any member with a server staff role can use all [staff commands](https://suggester.js.org/) to manage suggestions.",
+		"SETUP_STAFF_ROLES_DESC_ND": {
+			string: "Any member with a server staff role can use all staff commands to manage suggestions.",
 			context: "Description for the server staff setting in setup"
 		},
 		"SETUP_ROLES_INPUT": {
@@ -1844,9 +1836,15 @@ module.exports = {
 			string: "Additional Configuration",
 			context: "Header for the Additional Configuration aspect of the setup complete embed"
 		},
-		"SETUP_ADDITIONAL_CONFIG_DESC": {
-			string: "There are a few other configuration options such as reaction emojis, user notifications, and more! See https://suggester.js.org/#/admin/config for more information.",
-			context: "Description for the Additional Configuration aspect of the setup complete embed"
+		"SETUP_ADDITIONAL_CONFIG_DESC_ND": {
+			string: "There are a few other configuration options such as reaction emojis, user notifications, cleaning suggestion commands, and more! Use `{{prefix}}config help` for more information.",
+			context: "Description for the Additional Configuration aspect of the setup complete embed",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
 		},
 		"EVERYONE_PERMISSION_WARNING": {
 			string: "Adding the everyone role to the configuration will give __all members of your server__ enhanced permissions on the bot. React with {{check}} if you would like to add the everyone role, and {{x}} if you would like to cancel.",
@@ -1879,6 +1877,50 @@ module.exports = {
 		"PING_SHARD_STATS_HEADER": {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
+		},
+		"PING_SHARD_STATS": {
+			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} MB of memory",
+			context: "Statistics for a shard",
+			replaced: {
+				num: {
+					to_replace: "{{num}}",
+					description: "The shard number"
+				},
+				guilds: {
+					to_replace: "{{guilds}}",
+					description: "The number of guilds on the shard"
+				},
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The number of channels on the shard"
+				},
+				members: {
+					to_replace: "{{members}}",
+					description: "The number of members on the shard"
+				},
+				ping: {
+					to_replace: "{{ping}}",
+					description: "The shard's ping"
+				},
+				uptime: {
+					to_replace: "{{uptime}}",
+					description: "How long the shard has been up"
+				},
+				memory: {
+					to_replace: "{{memory}}",
+					description: "The memory used by the shard"
+				}
+			}
+		},
+		"PING_SHARD_FOOTER": {
+			string: "Shard {{shard}}",
+			context: "The shard shown in the footer of the ping embed",
+			replaced: {
+				shard: {
+					to_replace: "{{shard}}",
+					description: "The shard the server is on"
+				}
+			}
 		},
 		"BLOCK_NO_ARGS_ERROR": {
 			string: "You must specify a user or `list` to show a list of blocked users.",
@@ -2448,8 +2490,8 @@ module.exports = {
 			string: "What's Next?",
 			context: "Header for the What's Next? section of the tutorial embed"
 		},
-		"TUTORIAL_NEXT_DESCRIPTION": {
-			string: "After you run `{{prefix}}setup`, users can submit suggestions and the bot will work. If you are looking for more advanced configuration options like custom suggestion feed reactions and auto-cleaning of suggestion commands, take a look at https://suggester.js.org/#/admin/config.\n\nIf you're having an issue, or just want to find out more about the bot, head over to the __Suggester support server__: {{invite}}\nThis embed can be shown at any time using the `{{prefix}}tutorial` command.",
+		"TUTORIAL_NEXT_DESCRIPTION_NEW": {
+			string: "After you run `{{prefix}}setup`, users can submit suggestions and the bot will work. If you are looking for more advanced configuration options like custom suggestion feed reactions and auto-cleaning of suggestion commands, try out `{{prefix}}config`.\n\nIf you're having an issue, or just want to find out more about the bot, head over to the __Suggester support server__: {{invite}}\nThis embed can be shown at any time using the `{{prefix}}tutorial` command.",
 			context: "Description for the What's Next? section of the tutorial embed",
 			replaced: {
 				prefix: {
@@ -2632,29 +2674,33 @@ module.exports = {
 			string: "View Guild Insights",
 			context: "String representing the View Guild Insights permission"
 		},
-		"NO_USERS_PERMISSION": {
-			string: "No Users",
-			context: "Permission shown in the help command if no users can use the command"
-		},
-		"BOT_ADMIN_PERMISSION": {
-			string: "Bot Administrator",
+		"BOT_ADMIN_PERMISSION_SENTENCE": {
+			string: "<:sdev:740193484685967450> This command is only usable by bot administrators",
 			context: "Permission shown in the help command if only bot admins can use the command"
 		},
-		"GLOBAL_STAFF_PERMISSION": {
-			string: "Global Staff+",
+		"GLOBAL_STAFF_PERMISSION_SENTENCE": {
+			string: "<:sstaff:740196140061818911> This command is only usable by global Suggester staff",
 			context: "Permission shown in the help command if global staff+ can use the command"
 		},
-		"SERVER_ADMIN_PERMISSION": {
-			string: "Server Administrator (Manage Server or Admin Role)+",
+		"SERVER_ADMIN_PERMISSION_SENTENCE": {
+			string: "<:ssadmin:740199955981140030> This command is only usable by members with the \"Manage Server\" permission or a configured admin role",
 			context: "Permission shown in the help command if server admins+ can use the command"
 		},
-		"SERVER_STAFF_PERMISSION": {
-			string: "Server Staff (Staff Role)+",
+		"SERVER_STAFF_PERMISSION_SENTENCE": {
+			string: "<:ssstaff:740199956429799515> This command is only usable by members with a configured staff role or those with admin permissions",
 			context: "Permission shown in the help command if server staff+ can use the command"
 		},
-		"ALL_USERS_PERMISSION": {
-			string: "All Users",
+		"ALL_USERS_PERMISSION_SENTENCE": {
+			string: "<:sall:740199956325072998> This command is usable by all users",
 			context: "Permission shown in the help command if all users can use the command"
+		},
+		"HAS_NOT_COMMAND_PERMISSION": {
+			string: "<:slock:740204044450005103> You do not have permission to use this command",
+			context: "Shown in help if a user does not have permission to use a command"
+		},
+		"HAS_COMMAND_PERMISSION": {
+			string: "<:sunlock:740204044928155788> You are able to use this command",
+			context: "Shown in help if a user has permission to use a command"
 		},
 		"CFG_ALREADY_BLOCKED_ROLE_ERROR": {
 			string: "This role has already been blocked from using the bot on this server.",
@@ -2694,10 +2740,6 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_PING_ROLE_TITLE": {
-			string: "**Suggestion Submitted Mention Role:**",
-			context: "Title for the suggestion submitted mention role in config"
-		},
 		"CFG_RESET_PING_ROLE_SUCCESS": {
 			string: "Successfully reset the suggestion submitted mention role.",
 			context: "Success message when the mention on submitted suggestion role is reset"
@@ -2729,6 +2771,20 @@ module.exports = {
 		"LOCALE_LIST_TITLE": {
 			string: "Available Locales",
 			context: "Title for the list of locales"
+		},
+		"LOCALE_LIST_INCOMPLETE_TITLE": {
+			string: "Incomplete Locales",
+			context: "Title for the list of incomplete locales"
+		},
+		"LOCALE_LIST_INCOMPLETE_DESC": {
+			string: "Locales in this list have not been completely translated, some parts of the bot may still appear in English. (Help translate by joining the [Support Server]({{support_invite}}))",
+			context: "Description for the list of incomplete locales",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The invite to the support server"
+				}
+			}
 		},
 		"SELECTED": {
 			string: "Selected",
@@ -2780,10 +2836,6 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_LOCALE_TITLE": {
-			string: "**Locale:**",
-			context: "Title for the locale in the config embed"
-		},
 		"LOCALE_FOOTER": {
 			string: "Don't see your language listed here? Apply to translate it in the support server!",
 			context: "Shown in the locale list embed informing users of how they can help translate"
@@ -2791,182 +2843,6 @@ module.exports = {
 		"LOCALE_EASTER_EGG_ACTIVATED": {
 			string: "OwO mode activated!",
 			context: "If you misspell a language name, there is a small chance OwO mode will be activated."
-		},
-		"COMMAND:ACKNOWLEDGEMENT": {
-			string: "Sets a verify acknowledgement for a user",
-			context: "Description for the acknowledgement command"
-		},
-		"COMMAND:BOTCONFIG": {
-			string: "Configures elements of the bot user",
-			context: "Description for the botconfig command"
-		},
-		"COMMAND:DB": {
-			string: "Gets a database entry",
-			context: "Description for the db command"
-		},
-		"COMMAND:PROTIPS": {
-			string: "Changes your protip settings",
-			context: "Description for the protips command"
-		},
-		"COMMAND:DEPLOY": {
-			string: "Updates the bot",
-			context: "Description for the deploy command"
-		},
-		"COMMAND:EVAL": {
-			string: "run JavaScript code",
-			context: "Description for the eval command"
-		},
-		"COMMAND:FLAGS": {
-			string: "Sets internal flags for a user",
-			context: "Description for the flags command"
-		},
-		"COMMAND:GLOBALBAN": {
-			string: "Excludes a user or server from using the bot globally",
-			context: "Description for the globalban command"
-		},
-		"COMMAND:REBOOT": {
-			string: "Reboots the bot by exiting the process",
-			context: "Description for the reboot command"
-		},
-		"COMMAND:ALLOWLIST": {
-			string: "Allowlists a server",
-			context: "Description for the allowlist command"
-		},
-		"COMMAND:CHANGELOG": {
-			string: "Shows the latest Suggester release",
-			context: "Description for the changelog command"
-		},
-		"COMMAND:HELP": {
-			string: "Shows command information",
-			context: "Description for the help command"
-		},
-		"COMMAND:INVITE": {
-			string: "Shows the link to invite the bot",
-			context: "Description for the invite command"
-		},
-		"COMMAND:IMPORT": {
-			string: "Imports suggestions from a channel",
-			context: "Description for the import command"
-		},
-		"COMMAND:LOCALE": {
-			string: "Sets your personal locale",
-			context: "Description for the locale command"
-		},
-		"COMMAND:NOTIFY": {
-			string: "Changes your notification settings",
-			context: "Description for the notify command"
-		},
-		"COMMAND:PING": {
-			string: "Checks bot response time and shows information",
-			context: "Description for the ping command"
-		},
-		"COMMAND:SHARD": {
-			string: "Shows the shard of this server",
-			context: "Description for the shard command"
-		},
-		"COMMAND:STATS": {
-			string: "Shows the link to bot statistics",
-			context: "Description for the stats command"
-		},
-		"COMMAND:SUGGEST": {
-			string: "Submits a suggestion",
-			context: "Description for the suggest command"
-		},
-		"COMMAND:SUPPORT": {
-			string: "Shows the link to the support server",
-			context: "Description for the support command"
-		},
-		"COMMAND:TUTORIAL": {
-			string: "Shows information about setting up the bot and using it",
-			context: "Description for the tutorial command"
-		},
-		"COMMAND:VERIFY": {
-			string: "Shows permissions of a user as they relate to the bot",
-			context: "Description for the verify command"
-		},
-		"COMMAND:VOTE": {
-			string: "Shows the link to info about voting",
-			context: "Description for the vote command"
-		},
-		"COMMAND:AUTOSETUP": {
-			string: "Automatically sets up channels and configures the bot",
-			context: "Description for the autosetup command"
-		},
-		"COMMAND:CONFIG": {
-			string: "Shows/edits server configuration",
-			context: "Description for the config command"
-		},
-		"COMMAND:SETUP": {
-			string: "Initiates a walkthrough for server configuration",
-			context: "Description for the setup command"
-		},
-		"COMMAND:ACOMMENT": {
-			string: "Adds a comment to an approved suggestion anonymously",
-			context: "Description for the acomment command"
-		},
-		"COMMAND:APPROVE": {
-			string: "Approves a suggestion",
-			context: "Description for the approve command"
-		},
-		"COMMAND:ATTACH": {
-			string: "Attaches a file to an approved suggestion",
-			context: "Description for the attach command"
-		},
-		"COMMAND:BLOCK": {
-			string: "Blocks a user from using the bot in the server",
-			context: "Description for the block command"
-		},
-		"COMMAND:COMMENT": {
-			string: "Adds a comment to an approved suggestion",
-			context: "Description for the comment command"
-		},
-		"COMMAND:DELETE": {
-			string: "Deletes a suggestion",
-			context: "Description for the delete command"
-		},
-		"COMMAND:DELETECOMMENT": {
-			string: "Deletes a comment on a suggestion",
-			context: "Description for the deletecomment command"
-		},
-		"COMMAND:DENY": {
-			string: "Denies a suggestion",
-			context: "Description for the deny command"
-		},
-		"COMMAND:INFO": {
-			string: "Shows information about a suggestion",
-			context: "Description for the info command"
-		},
-		"COMMAND:LISTQUEUE": {
-			string: "Shows the queue of suggestions awaiting review",
-			context: "Description for the listqueue command"
-		},
-		"COMMAND:MARK": {
-			string: "Marks a status for a suggestion",
-			context: "Description for the mark command"
-		},
-		"COMMAND:MASSAPPROVE": {
-			string: "Approves all specified suggestions",
-			context: "Description for the massapprove command"
-		},
-		"COMMAND:MASSDELETE": {
-			string: "Deletes all specified suggestions",
-			context: "Description for the massdelete command"
-		},
-		"COMMAND:MASSDENY": {
-			string: "Denies all specified suggestions",
-			context: "Description for the massdeny command"
-		},
-		"COMMAND:REMOVEATTACHMENT": {
-			string: "Removes a file from a suggestion",
-			context: "Description for the removeattachment command"
-		},
-		"COMMAND:SILENTDELETE": {
-			string: "Deletes a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
-			context: "Description for the silentdelete command"
-		},
-		"COMMAND:SILENTDENY": {
-			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
-			context: "Description for the silentdeny command"
 		},
 		"LOCALE_REFRESH_SUCCESS": {
 			string: "Successfully loaded {{count}} locales.",
@@ -2977,14 +2853,6 @@ module.exports = {
 					description: "The amount of locales that were loaded"
 				}
 			}
-		},
-		"COMMAND:UNBLOCK": {
-			string: "Unblocks a server member from using the bot",
-			context: "Description for the unblock command"
-		},
-		"COMMAND:SHELL": {
-			string: "Runs shell code",
-			context: "Description for the shell command"
 		},
 		"CFG_COLOR_CHANGE_INFO": {
 			string: "At **{{number}}** net upvote(s), the embed color will change to {{color}}.",
@@ -3015,18 +2883,6 @@ module.exports = {
 		"CFG_INTERNAL_TITLE": {
 			string: "Internal Configuration",
 			context: "Header for the internal configuration section of the config list embed"
-		},
-		"CFG_COLOR_CHANGE_TITLE": {
-			string: "**Color Change:**",
-			context: "Title for color change in the config embed"
-		},
-		"CFG_SELF_VOTE_TITLE": {
-			string: "**Voting on Own Suggestions:**",
-			context: "Title for self voting in the config embed"
-		},
-		"CFG_ONE_VOTE_TITLE": {
-			string: "**Multiple Reaction Voting:**",
-			context: "Title for choosing multiple vote reactions in the config embed"
 		},
 		"COMMAND_SERVER_ONLY": {
 			string: "This command is not available in DMs.",
@@ -3397,6 +3253,1213 @@ module.exports = {
 		"TOP_LOADING": {
 			string: "Collecting top suggestion data, this may take a moment...",
 			context: "Message shown when waiting for top 10 data to collect"
+		},
+		"COMMAND_DESC:ACKNOWLEDGEMENT": {
+			string: "Sets a verify acknowledgement for a user",
+			context: "Description for the acknowledgement command"
+		},
+		"COMMAND_USAGE:ACKNOWLEDGEMENT": {
+			string: "acknowledgement [user] (new acknowledgement)",
+			context: "Description for the acknowledgement command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:ACKNOWLEDGEMENT": {
+			string: "`{{p}}acknowledgement`\n" +
+				"Shows your acknowledgement\n" +
+				"\n" +
+				"`{{p}}acknowledgement @Brightness™`\n" +
+				"Shows Brightness™'s acknowledgement\n" +
+				"\n" +
+				"`{{p}}acknowledgement @Brightness™ Test`\n" +
+				"Sets Brightness™'s acknowledgement to \"Test\"\n" +
+				"\n" +
+				"`{{p}}acknowledgement @Brightness™ reset`\n" +
+				"Resets Brightness™'s acknowledgement",
+			context: "Examples for the acknowledgement command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:ALLOWLIST": {
+			string: "Adds a server to the allowed list",
+			context: "Description for the allowlist command"
+		},
+		"COMMAND_USAGE:ALLOWLIST": {
+			string: "allowlist [add/remove] [guild id]",
+			context: "Description for the allowlist command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:ALLOWLIST": {
+			string: "`{{p}}allowlist add 681490407862829073`\n" +
+				"Adds server 681490407862829073 to the allowed list\n" +
+				"\n" +
+				"`{{p}}allowlist remove 681490407862829073`\n" +
+				"Removes server 681490407862829073 from the allowed list",
+			context: "Examples for the allowlist command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DB": {
+			string: "Gets or modifies a database entry",
+			context: "Description for the db command"
+		},
+		"COMMAND_USAGE:DB": {
+			string: "db [query|modify] [collection] [query field] [query value] (modify:field) (modify:value)",
+			context: "Description for the db command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DB": {
+			string: "`{{p}}db query Suggestion suggestionId 1`\n" +
+				"Gets data for a document in the `Suggestion` collection with a `suggestionId` of `1`\n" +
+				"\n" +
+				"`{{p}}db modify Suggestion suggestionId 1 suggester 327887845270487041`\n" +
+				"Sets the `suggester` value of a document in the `Suggestion` collection with a `suggestionId` of `1` to `327887845270487041`",
+			context: "Examples for the db command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DEPLOY": {
+			string: "Pulls an update from git and reboots with changes",
+			context: "Description for the deploy command"
+		},
+		"COMMAND_USAGE:DEPLOY": {
+			string: "deploy (branch)",
+			context: "Description for the deploy command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DEPLOY": {
+			string: "`{{p}}deploy`\n" +
+				"Deploys an update from the `production` branch\n" +
+				"\n" +
+				"`{{p}}deploy staging`\n" +
+				"Deploys an update from the `staging` branch",
+			context: "Examples for the deploy command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:EVAL": {
+			string: "Runs JavaScript code",
+			context: "Description for the eval command"
+		},
+		"COMMAND_USAGE:EVAL": {
+			string: "eval [code]",
+			context: "Description for the eval command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EVAL": {
+			string: "`{{p}}eval return 2+2`\nEvaluates the value of 2+2 and returns it",
+			context: "Examples for the eval command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:FLAGS": {
+			string: "Sets internal flags for a user",
+			context: "Description for the flags command"
+		},
+		"COMMAND_USAGE:FLAGS": {
+			string: "flags [guild|user [id] (add|remove) (flag)",
+			context: "Description for the flags command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:FLAGS": {
+			string: "`{{p}}flags user @Brightness™`\n" +
+				"Shows flags for Brightness™\n" +
+				"\n" +
+				"`{{p}}flags user @Brightness™ add STAFF`\n" +
+				"Adds the `STAFF` flag to Brightness™\n" +
+				"\n" +
+				"`{{p}}flags user @Brightness™ remove STAFF`\n" +
+				"Removes the `STAFF` flag from Brightness™\n" +
+				"\n" +
+				"`{{p}}flags guild 635632859998060554`\n" +
+				"Shows flags for guild 635632859998060554\n" +
+				"\n" +
+				"`{{p}}flags guild 635632859998060554 add PROTECTED`\n" +
+				"Adds the `PROTECTED` flag to guild 635632859998060554\n" +
+				"\n" +
+				"`{{p}}flags guild 635632859998060554 remove PROTECTED`\n" +
+				"Removes the `PROTECTED` flag from guild 635632859998060554",
+			context: "Examples for the flags command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:GLOBALBAN": {
+			string: "Excludes a user or server from using the bot globally",
+			context: "Description for the globalban command"
+		},
+		"COMMAND_USAGE:GLOBALBAN": {
+			string: "globalban [guild|user] [id] (true|false)",
+			context: "Description for the globalban command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:GLOBALBAN": {
+			string: "`{{p}}globalban user 327887845270487041`\n" +
+				"Checks block status for user 327887845270487041\n" +
+				"\n" +
+				"`{{p}}globalban user 327887845270487041 true`\n" +
+				"Blocks user 327887845270487041 globally\n" +
+				"\n" +
+				"`{{p}}globalban user 327887845270487041 false`\n" +
+				"Unblocks user 327887845270487041 globally\n" +
+				"\n" +
+				"`{{p}}globalban guild 693209117220929596`\n" +
+				"Checks block status for guild 693209117220929596\n" +
+				"\n" +
+				"`{{p}}globalban guild 693209117220929596 true`\n" +
+				"Blocks guild 327887845270487041 from using the bot\n" +
+				"\n" +
+				"`{{p}}globalban guild 693209117220929596 false`\n" +
+				"Unblocks guild 327887845270487041 from using the bot",
+			context: "Examples for the globalban command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:REBOOT": {
+			string: "Reboots the bot by exiting the process",
+			context: "Description for the reboot command"
+		},
+		"COMMAND_USAGE:REBOOT": {
+			string: "reboot (shard id)",
+			context: "Description for the reboot command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:REBOOT": {
+			string: "`{{p}}reboot`\n" +
+				"Reboots all shards of the bot\n" +
+				"\n" +
+				"`{{p}}reboot 2`\n" +
+				"Reboots shard 2",
+			context: "Examples for the reboot command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SHELL": {
+			string: "Runs shell code",
+			context: "Description for the shell command"
+		},
+		"COMMAND_USAGE:SHELL": {
+			string: "shell [code]",
+			context: "Description for the shell command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:CHANGELOG": {
+			string: "Shows the latest Suggester release",
+			context: "Description for the changelog command"
+		},
+		"COMMAND_USAGE:CHANGELOG": {
+			string: "changelog",
+			context: "Description for the changelog command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:HELP": {
+			string: "Shows command information",
+			context: "Description for the help command"
+		},
+		"COMMAND_USAGE:HELP": {
+			string: "help (command name)",
+			context: "Description for the help command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:HELP": {
+			string: "`{{p}}help`\n" +
+				"Shows the list of commands\n" +
+				"\n" +
+				"`{{p}}help suggest`\n" +
+				"Shows information about the \"suggest\" command",
+			context: "Examples for the help command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:INVITE": {
+			string: "Shows the link to invite the bot",
+			context: "Description for the invite command"
+		},
+		"COMMAND_USAGE:INVITE": {
+			string: "invite",
+			context: "Description for the invite command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:LOCALE": {
+			string: "Sets the language the bot responds to you in",
+			context: "Description for the locale command"
+		},
+		"COMMAND_USAGE:LOCALE": {
+			string: "locale <locale to set>",
+			context: "Description for the locale command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:LOCALE": {
+			string: "`{{p}}locale`\n" +
+				"Shows the list of available languages\n" +
+				"\n" +
+				"`{{p}}locale fr`\n" +
+				"Sets your language to French",
+			context: "Examples for the locale command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:NOTIFY": {
+			string: "Views/edits your notification settings",
+			context: "Description for the notify command"
+		},
+		"COMMAND_USAGE:NOTIFY": {
+			string: "notify (on|off|toggle)",
+			context: "Description for the notify command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:NOTIFY": {
+			string: "`{{p}}notify`\n" +
+				"Shows your DM notification setting\n" +
+				"\n" +
+				"`{{p}}notify on`\n" +
+				"Enables DM notifications for suggestion changes\n" +
+				"\n" +
+				"`{{p}}notify off`\n" +
+				"Disables DM notifications for suggestion changes\n" +
+				"\n" +
+				"`{{p}}notify toggle`\n" +
+				"Toggles DM notifications for suggestion changes",
+			context: "Examples for the notify command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:PING": {
+			string: "Checks bot response time and shows information",
+			context: "Description for the ping command"
+		},
+		"COMMAND_USAGE:PING": {
+			string: "ping",
+			context: "Description for the ping command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:PROTIPS": {
+			string: "Views/edits your protip setting",
+			context: "Description for the protips command"
+		},
+		"COMMAND_USAGE:PROTIPS": {
+			string: "protips (on|off|toggle)",
+			context: "Description for the protips command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:PROTIPS": {
+			string: "`{{p}}protips`\n" +
+				"Shows your protips setting\n" +
+				"\n" +
+				"`{{p}}protips on`\n" +
+				"Enables showing protips\n" +
+				"\n" +
+				"`{{p}}protips off`\n" +
+				"Disables showing protips\n" +
+				"\n" +
+				"`{{p}}protips toggle`\n" +
+				"Toggles showing protips",
+			context: "Examples for the protips command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SHARD": {
+			string: "Shows the shard this server is on",
+			context: "Description for the shard command"
+		},
+		"COMMAND_USAGE:SHARD": {
+			string: "shard",
+			context: "Description for the shard command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:STATS": {
+			string: "Shows the link to bot statistics",
+			context: "Description for the stats command"
+		},
+		"COMMAND_USAGE:STATS": {
+			string: "stats",
+			context: "Description for the stats command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:SUGGEST": {
+			string: "Submits a suggestion",
+			context: "Description for the suggest command"
+		},
+		"COMMAND_USAGE:SUGGEST": {
+			string: "suggest [suggestion]",
+			context: "Description for the suggest command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SUGGEST": {
+			string: "`{{p}}suggest This is a suggestion`\n" +
+				"Submits a suggestion\n" +
+				"\n" +
+				"You can also attach images to your suggestion by uploading an image when you send the command",
+			context: "Examples for the suggest command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SUPPORT": {
+			string: "Shows the link to the support server",
+			context: "Description for the support command"
+		},
+		"COMMAND_USAGE:SUPPORT": {
+			string: "support",
+			context: "Description for the support command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:TUTORIAL": {
+			string: "Shows information about setting up the bot and using it",
+			context: "Description for the tutorial command"
+		},
+		"COMMAND_USAGE:TUTORIAL": {
+			string: "tutorial",
+			context: "Description for the tutorial command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:VERIFY": {
+			string: "Shows permissions of a user as they relate to the bot",
+			context: "Description for the verify command"
+		},
+		"COMMAND_USAGE:VERIFY": {
+			string: "verify (user)",
+			context: "Description for the verify command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:VERIFY": {
+			string: "`{{p}}verify`\n" +
+				"Shows information about you\n" +
+				"\n" +
+				"`{{p}}verify @Brightness™`\n" +
+				"Shows Brightness™'s information",
+			context: "Examples for the verify command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:VOTE": {
+			string: "Help support the bot!",
+			context: "Description for the vote command"
+		},
+		"COMMAND_USAGE:VOTE": {
+			string: "vote",
+			context: "Description for the vote command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:AUTOSETUP": {
+			string: "Automatically sets up channels and configures the bot",
+			context: "Description for the autosetup command"
+		},
+		"COMMAND_USAGE:AUTOSETUP": {
+			string: "autosetup",
+			context: "Description for the autosetup command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:CONFIG": {
+			string: "Shows/edits server configuration",
+			context: "Description for the config command"
+		},
+		"COMMAND_USAGE:CONFIG": {
+			string: "config (element) (additional parameters)",
+			context: "Description for the config command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:CONFIG": {
+			string: "Use `{{p}}config help` to view detailed instructions",
+			context: "Examples for the config command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:IMPORT": {
+			string: "Imports suggestions from a channel",
+			context: "Description for the import command"
+		},
+		"COMMAND_USAGE:IMPORT": {
+			string: "import",
+			context: "Description for the import command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:SETUP": {
+			string: "Walks you through an interactive configuration process",
+			context: "Description for the setup command"
+		},
+		"COMMAND_USAGE:SETUP": {
+			string: "setup",
+			context: "Description for the setup command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SETUP": {
+			string: "The bot will send a prompt, and you send your response in the channel. The bot will then send another prompt, and the cycle continues until your server is configured.",
+			context: "Examples for the setup command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:ACOMMENT": {
+			string: "Adds a comment to an approved suggestion anonymously",
+			context: "Description for the acomment command"
+		},
+		"COMMAND_USAGE:ACOMMENT": {
+			string: "acomment [suggestion id] [comment]",
+			context: "Description for the acomment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:ACOMMENT": {
+			string: "`{{p}}acomment 1 This is a comment`\n" +
+				"Anonymously comments on suggestion #1 with \"This is a comment\"",
+			context: "Examples for the acomment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:APPROVE": {
+			string: "Approves a suggestion",
+			context: "Description for the approve command"
+		},
+		"COMMAND_USAGE:APPROVE": {
+			string: "approve [suggestion id] (comment)",
+			context: "Description for the approve command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:APPROVE": {
+			string: "`{{p}}approve 1`\n" +
+				"Approves suggestion #1\n" +
+				"\n" +
+				"`{{p}}approve 1 This is a comment`\n" +
+				"Approves suggestion #1 and adds a comment from the approver saying \"This is a comment\"",
+			context: "Examples for the approve command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:ATTACH": {
+			string: "Attaches a file to an approved suggestion",
+			context: "Description for the attach command"
+		},
+		"COMMAND_USAGE:ATTACH": {
+			string: "attach [suggestion id] [attachment link]",
+			context: "Description for the attach command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:ATTACH": {
+			string: "`{{p}}attach 1 https://i.imgur.com/zmntNve.png`\n" +
+				"Attaches https://i.imgur.com/zmntNve.png to suggestion #1\n" +
+				"\n" +
+				"`{{p}}attach 1`\n" +
+				"If you attach an image via Discord's native uploader, it will be added to suggestion #1",
+			context: "Examples for the attach command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:BLOCK": {
+			string: "Blocks a user from using the bot in this server",
+			context: "Description for the block command"
+		},
+		"COMMAND_USAGE:BLOCK": {
+			string: "block [user]",
+			context: "Description for the block command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:BLOCK": {
+			string: "`{{p}}block @Brightness™`\n" +
+				"Blocks Brightness™ from using the bot in this server\n" +
+				"\n" +
+				"`{{p}}block 255834596766253057 Spamming suggestions`\n" +
+				"Blocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"",
+			context: "Examples for the block command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:COMMENT": {
+			string: "Adds a comment to an approved suggestion",
+			context: "Description for the comment command"
+		},
+		"COMMAND_USAGE:COMMENT": {
+			string: "comment [suggestion id] [comment]",
+			context: "Description for the comment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:COMMENT": {
+			string: "`{{p}}comment 1 This is a comment`\n" +
+				"Comments on suggestion #1 with \"This is a comment\"",
+			context: "Examples for the comment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DELETE": {
+			string: "Deletes a suggestion, removing it from the suggestions feed",
+			context: "Description for the delete command"
+		},
+		"COMMAND_USAGE:DELETE": {
+			string: "delete [suggestion id] (reason)",
+			context: "Description for the delete command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DELETE": {
+			string: "`{{p}}delete 1`\n" +
+				"Deletes suggestion #1\n" +
+				"\n" +
+				"`{{p}}delete 1 This has already been suggested`\n" +
+				"Deletes suggestion #1 with the reason \"This has already been suggested\"",
+			context: "Examples for the delete command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DELETECOMMENT": {
+			string: "Deletes a comment from a suggestion",
+			context: "Description for the deletecomment command"
+		},
+		"COMMAND_USAGE:DELETECOMMENT": {
+			string: "deletecomment [comment id]",
+			context: "Description for the deletecomment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DELETECOMMENT": {
+			string: "`{{p}}deletecomment 27_1`\nDeletes a comment with the ID `27_1`",
+			context: "Examples for the deletecomment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DENY": {
+			string: "Denies a suggestion",
+			context: "Description for the deny command"
+		},
+		"COMMAND_USAGE:DENY": {
+			string: "deny [suggestion id] (reason)",
+			context: "Description for the deny command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DENY": {
+			string: "`{{p}}deny 1`\n" +
+				"Denies suggestion #1\n" +
+				"\n" +
+				"`{{p}}deny 1 This isn't something we're interested in`\n" +
+				"Denies suggestion #1 with the reason \"This isn't something we're interested in\"",
+			context: "Examples for the deny command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:INFO": {
+			string: "Shows information about a suggestion",
+			context: "Description for the info command"
+		},
+		"COMMAND_USAGE:INFO": {
+			string: "info [suggestion id]",
+			context: "Description for the info command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:INFO": {
+			string: "`{{p}}info 1`\nShows information about suggestion #1",
+			context: "Examples for the info command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:LISTQUEUE": {
+			string: "Shows the queue of suggestions awaiting review",
+			context: "Description for the listqueue command"
+		},
+		"COMMAND_USAGE:LISTQUEUE": {
+			string: "listqueue",
+			context: "Description for the listqueue command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:MARK": {
+			string: "Marks a status on a suggestion",
+			context: "Description for the mark command"
+		},
+		"COMMAND_USAGE:MARK": {
+			string: "mark [suggestion id] [status] (comment)",
+			context: "Description for the mark command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:MARK": {
+			string: "`{{p}}mark 1 implemented`\n" +
+				"Marks suggestion #1 as implemented\n" +
+				"\n" +
+				"`{{p}}mark 1 working This will be released soon!`\n" +
+				"Marks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n" +
+				"\n" +
+				">>> **Status List:**\n" +
+				"<:simplemented:740935015109492758> Implemented (`implemented`)\n" +
+				"<:sprogress:740935462163841137> In Progress (`working`)\n" +
+				"<:sconsider:740935462067372112> In Consideration (`considered`)\n" +
+				"<:sdefault:740935462117703831> Default (`default`)\n" +
+				"<:sno:740935462079954996> Not Happening (`no`)",
+			context: "Examples for the mark command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:MASSAPPROVE": {
+			string: "Approves multiple suggestions at once",
+			context: "Description for the massapprove command"
+		},
+		"COMMAND_USAGE:MASSAPPROVE": {
+			string: "massapprove [suggestion ids] -r (comment)",
+			context: "Description for the massapprove command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:MASSAPPROVE": {
+			string: "`{{p}}massapprove 1 2 3`\n" +
+				"Approves suggestions 1, 2, and 3\n" +
+				"\n" +
+				"`{{p}}massapprove 1 2 3 -r Nice suggestion!`\n" +
+				"Approves suggestions 1, 2, and 3 and comments on each of them with \"Nice suggestion!\"",
+			context: "Examples for the massapprove command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:MASSDELETE": {
+			string: "Deletes multiple suggestions at once, removing them from the suggestions feed",
+			context: "Description for the massdelete command"
+		},
+		"COMMAND_USAGE:MASSDELETE": {
+			string: "massdelete [suggestion ids] -r (reason)",
+			context: "Description for the massdelete command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:MASSDELETE": {
+			string: "`{{p}}massdelete 1 2 3`\n" +
+				"Deletes suggestions 1, 2, and 3\n" +
+				"\n" +
+				"`{{p}}massdelete 1 2 3 -r Cleaning up suggestions`\n" +
+				"Deletes suggestions 1, 2, and 3 with a reason of \"Cleaning up suggestions\"",
+			context: "Examples for the massdelete command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:MASSDENY": {
+			string: "Denies multiple suggestions at once",
+			context: "Description for the massdeny command"
+		},
+		"COMMAND_USAGE:MASSDENY": {
+			string: "massdeny [suggestion ids] -r (reason)",
+			context: "Description for the massdeny command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:MASSDENY": {
+			string: "`{{p}}massdeny 1 2 3`\n" +
+				"Denies suggestions 1, 2, and 3\n" +
+				"\n" +
+				"`{{p}}massdeny 1 2 3 -r This isn't something we're interested in doing`\n" +
+				"Denies suggestions 1, 2, and 3 with a reason of \"This isn't something we're interested in doing\"",
+			context: "Examples for the massdeny command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:REMOVEATTACHMENT": {
+			string: "Removes an attachment from a suggestion",
+			context: "Description for the removeattachment command"
+		},
+		"COMMAND_USAGE:REMOVEATTACHMENT": {
+			string: "removeattachment [suggestion id]",
+			context: "Description for the removeattachment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:REMOVEATTACHMENT": {
+			string: "`{{p}}removeattachment 1`\nRemoves the attachment from suggestion #1",
+			context: "Examples for the removeattachment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SILENTDELETE": {
+			string: "Deletes a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
+			context: "Description for the silentdelete command"
+		},
+		"COMMAND_USAGE:SILENTDELETE": {
+			string: "silentdelete [suggestion id] (reason)",
+			context: "Description for the silentdelete command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SILENTDELETE": {
+			string: "`{{p}}silentdelete 1`\n" +
+				"Silently deletes suggestion #1\n" +
+				"\n" +
+				"`{{p}}silentdelete 1 This has already been suggested`\n" +
+				"Silently deletes suggestion #1 with the reason \"This has already been suggested\"",
+			context: "Examples for the silentdelete command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SILENTDENY": {
+			string: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
+			context: "Description for the silentdeny command"
+		},
+		"COMMAND_USAGE:SILENTDENY": {
+			string: "silentdeny [suggestion id] (reason)",
+			context: "Description for the silentdeny command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SILENTDENY": {
+			string: "`{{p}}silentdeny 1`\n" +
+				"Silently denies suggestion #1\n" +
+				"\n" +
+				"`{{p}}silentdeny 1 This isn't something we're interested in`\n" +
+				"Silently denies suggestion #1 with the reason \"This isn't something we're interested in\"",
+			context: "Examples for the silentdeny command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:TOP": {
+			string: "Shows the top 10 most highly voted suggestions",
+			context: "Description for the top command"
+		},
+		"COMMAND_USAGE:TOP": {
+			string: "top",
+			context: "Description for the top command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:UNBLOCK": {
+			string: "Unblocks a user from using the bot in this server",
+			context: "Description for the unblock command"
+		},
+		"COMMAND_USAGE:UNBLOCK": {
+			string: "unblock [user]",
+			context: "Description for the unblock command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:UNBLOCK": {
+			string: "`{{p}}unblock @Brightness™`\n" +
+				"Unblocks Brightness™ from using the bot in this server\n" +
+				"\n" +
+				"`{{p}}unblock 255834596766253057 Accidentally blocked`\n" +
+				"Unblocks a user with ID 255834596766253057 from using the bot in this server with reason \"Accidentally blocked\"",
+			context: "Examples for the unblock command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"MODULE_NAME:CONFIGURATION": {
+			string: "Configuration",
+			context: "The name of the Configuration module"
+		},
+		"MODULE_DESC:CONFIGURATION": {
+			string: "Commands for configuring the bot",
+			context: "The description for the Configuration module"
+		},
+		"MODULE_NAME:DEVELOPER": { string: "Developer", context: "The name of the Developer module" },
+		"MODULE_DESC:DEVELOPER": {
+			string: "Commands for developers/global administrators",
+			context: "The description for the Developer module"
+		},
+		"MODULE_NAME:GLOBAL STAFF": {
+			string: "Global Staff",
+			context: "The name of the Global Staff module"
+		},
+		"MODULE_DESC:GLOBAL STAFF": {
+			string: "Commands usable by global Suggester staff members",
+			context: "The description for the Global Staff module"
+		},
+		"MODULE_NAME:MODERATOR": { string: "Moderator", context: "The name of the Moderator module" },
+		"MODULE_DESC:MODERATOR": {
+			string: "Commands for moderating who can submit suggestions",
+			context: "The description for the Moderator module"
+		},
+		"MODULE_NAME:OTHER": { string: "Other", context: "The name of the Other module" },
+		"MODULE_DESC:OTHER": {
+			string: "Miscellaneous commands",
+			context: "The description for the Other module"
+		},
+		"MODULE_NAME:REVIEW": { string: "Review", context: "The name of the Review module" },
+		"MODULE_DESC:REVIEW": {
+			string: "Commands for reviewing suggestions (only available when the bot is in the `review` mode)",
+			context: "The description for the Review module"
+		},
+		"MODULE_NAME:SUGGESTIONS": {
+			string: "Suggestions",
+			context: "The name of the Suggestions module"
+		},
+		"MODULE_DESC:SUGGESTIONS": {
+			string: "Commands for submitting and interacting with suggestions",
+			context: "The description for the Suggestions module"
+		},
+		"UNKNOWN_COMMAND_ERROR": {
+			string: "No command was found based on your input!",
+			context: "Error shown when no command can be found in the help command"
+		},
+		"UNKNOWN_ELEMENT_ERROR": {
+			string: "No configuration element was found based on your input!",
+			context: "Error shown when no element can be found in the config help command"
+		},
+		"CFG_OTHER_SERVER_ERROR": {
+			string: "Configurations of other servers are view-only via the `list` subcommand.",
+			context: "Error shown when a server that is not the current one has a config subcommand run"
+		},
+		"CONFIG_NAME:ADMIN": {
+			string: "Admin Roles",
+			context: "Name of the Admin Roles config element"
+		},
+		"CONFIG_DESC:ADMIN": {
+			string: "Roles that are allowed to edit server configuration, as well as use all staff commands. (Members with the **Manage Server** permission also have access to these commands)",
+			context: "Description of the Admin Roles config element"
+		},
+		"CONFIG_EXAMPLES:ADMIN": {
+			string: "`{{p}}config admin add Owner`\n" +
+				"Adds the \"Owner\" role as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin add @Management`\n" +
+				"Adds the mentioned \"Management\" role as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 as an admin role\n" +
+				"\n" +
+				"`{{p}}config admin remove Owner`\n" +
+				"Removes the \"Owner\" role from the list of admin roles",
+			context: "Examples for the Admin Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `admin`"
+		},
+		"CONFIG_NAME:STAFF": {
+			string: "Staff Roles",
+			context: "Name of the Staff Roles config element"
+		},
+		"CONFIG_DESC:STAFF": {
+			string: "Roles that have access to suggestion management commands like `approve`, `deny`, `comment`, and `mark`.",
+			context: "Description of the Staff Roles config element"
+		},
+		"CONFIG_EXAMPLES:STAFF": {
+			string: "`{{p}}config staff add Staff`\n" +
+				"Adds the \"Staff\" role as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff add @Moderator`\n" +
+				"Adds the mentioned \"Moderator\" role as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 as a staff role\n" +
+				"\n" +
+				"`{{p}}config staff remove Moderator`\n" +
+				"Removes the \"Moderator\" role from the list of staff roles",
+			context: "Examples for the Staff Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `staff`"
+		},
+		"CONFIG_NAME:ALLOWED": {
+			string: "Allowed Suggesting Roles",
+			context: "Name of the Allowed Suggesting Roles config element"
+		},
+		"CONFIG_DESC:ALLOWED": {
+			string: "Roles that are allowed to submit suggestions. If no roles are configured, all users can submit suggestions.",
+			context: "Description of the Allowed Suggesting Roles config element"
+		},
+		"CONFIG_EXAMPLES:ALLOWED": {
+			string: "`{{p}}config allowed add Trusted`\n" +
+				"Adds the \"Trusted\" role to the list of allowed roles\n" +
+				"\n" +
+				"`{{p}}config allowed add @Cool Person`\n" +
+				"Adds the mentioned \"Cool Person\" role as an allowed role\n" +
+				"\n" +
+				"`{{p}}config allowed add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of allowed roles\n" +
+				"\n" +
+				"`{{p}}config allowed remove Trusted`\n" +
+				"Removes the \"Trusted\" role from the list of allowed roles",
+			context: "Examples for the Allowed Suggesting Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `allowed`"
+		},
+		"CONFIG_NAME:VOTING": {
+			string: "Voting Roles",
+			context: "Name of the Voting Roles config element"
+		},
+		"CONFIG_DESC:VOTING": {
+			string: "Roles that are allowed to vote on suggestions in the approved suggestion feed. If no roles are configured, all users can vote on suggestions.",
+			context: "Description of the Voting Roles config element"
+		},
+		"CONFIG_EXAMPLES:VOTING": {
+			string: "`{{p}}config voting add Trusted`\n" +
+				"Adds the \"Trusted\" role to the list of allowed voting roles\n" +
+				"\n" +
+				"`{{p}}config voting add @Cool Person`\n" +
+				"Adds the mentioned \"Cool Person\" role as an allowed voting role\n" +
+				"\n" +
+				"`{{p}}config voting add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of allowed voting roles\n" +
+				"\n" +
+				"`{{p}}config voting remove Trusted`\n" +
+				"Removes the \"Trusted\" role from the list of allowed voting roles",
+			context: "Examples for the Voting Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `voting`"
+		},
+		"CONFIG_NAME:BLOCKED": {
+			string: "Blocked Roles",
+			context: "Name of the Blocked Roles config element"
+		},
+		"CONFIG_DESC:BLOCKED": {
+			string: "Roles that are blocked from using the bot on this server. If you want to block one specific user, use the `block` command.",
+			context: "Description of the Blocked Roles config element"
+		},
+		"CONFIG_EXAMPLES:BLOCKED": {
+			string: "`{{p}}config blocked add Restricted`\n" +
+				"Adds the \"Restricted\" role to the list of blocked roles\n" +
+				"\n" +
+				"`{{p}}config blocked add @Bad Person`\n" +
+				"Adds the mentioned \"Bad Person\" role as a blocked role\n" +
+				"\n" +
+				"`{{p}}config blocked add 658753146910408724`\n" +
+				"Adds a role with ID 658753146910408724 to the list of blocked roles\n" +
+				"\n" +
+				"`{{p}}config blocked remove Annoying`\n" +
+				"Removes the \"Annoying\" role from the list of blocked roles, allowing members with that role to use the bot again",
+			context: "Examples for the Blocked Roles config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `blocked`"
+		},
+		"CONFIG_NAME:APPROVEROLE": {
+			string: "Approved Suggestion Role",
+			context: "Name of the Approved Suggestion Role config element"
+		},
+		"CONFIG_DESC:APPROVEROLE": {
+			string: "The role that is given to members that have a suggestion approved.",
+			context: "Description of the Approved Suggestion Role config element"
+		},
+		"CONFIG_EXAMPLES:APPROVEROLE": {
+			string: "`{{p}}config approverole Suggestion Submitter`\n" +
+				"Sets the \"Suggestion Submitter\" as the role given when a member has their suggestion approved\n" +
+				"\n" +
+				"`{{p}}config approverole none`\n" +
+				"Resets the role given when a member has their suggestion approved, meaning no role will be given",
+			context: "Examples for the Approved Suggestion Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `approverole`"
+		},
+		"CONFIG_NAME:PINGROLE": {
+			string: "Suggestion Submitted Mention Role",
+			context: "Name of the Suggestion Submitted Mention Role config element"
+		},
+		"CONFIG_DESC:PINGROLE": {
+			string: "The role that is mentioned when a new suggestion is submitted for review.",
+			context: "Description of the Suggestion Submitted Mention Role config element"
+		},
+		"CONFIG_EXAMPLES:PINGROLE": {
+			string: "`{{p}}config pingrole Staff`\n" +
+				"Sets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n" +
+				"\n" +
+				"`{{p}}config pingrole none`\n" +
+				"Resets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			context: "Examples for the Suggestion Submitted Mention Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
+		},
+		"CONFIG_NAME:REVIEW": {
+			string: "Suggestion Review Channel",
+			context: "Name of the Suggestion Review Channel config element"
+		},
+		"CONFIG_DESC:REVIEW": {
+			string: "The channel where suggestions are sent once they are submitted for review.",
+			context: "Description of the Suggestion Review Channel config element"
+		},
+		"CONFIG_EXAMPLES:REVIEW": {
+			string: "`{{p}}config review #suggestions-review`\n" +
+				"Sets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			context: "Examples for the Suggestion Review Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `review`"
+		},
+		"CONFIG_NAME:SUGGESTIONS": {
+			string: "Approved Suggestions Channel",
+			context: "Name of the Approved Suggestions Channel config element"
+		},
+		"CONFIG_DESC:SUGGESTIONS": {
+			string: "The channel where suggestions are sent once they are approved (or submitted when the mode is set to `autoapprove`).",
+			context: "Description of the Approved Suggestions Channel config element"
+		},
+		"CONFIG_EXAMPLES:SUGGESTIONS": {
+			string: "`{{p}}config suggestions #suggestions`\n" +
+				"Sets the #suggestions channel as the channel where approved suggestions are sent",
+			context: "Examples for the Approved Suggestions Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `suggestions`"
+		},
+		"CONFIG_NAME:DENIED": {
+			string: "Denied Suggestions Channel",
+			context: "Name of the Denied Suggestions Channel config element"
+		},
+		"CONFIG_DESC:DENIED": {
+			string: "The channel where suggestions are sent when they are denied or deleted.",
+			context: "Description of the Denied Suggestions Channel config element"
+		},
+		"CONFIG_EXAMPLES:DENIED": {
+			string: "`{{p}}config denied #denied-suggestions`\n" +
+				"Sets the #denied-suggestions channel as the channel where denied or deleted suggestions are sent\n" +
+				"\n" +
+				"`{{p}}config denied none`\n" +
+				"Resets the denied suggestions channel, making there be none set",
+			context: "Examples for the Denied Suggestions Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `denied`"
+		},
+		"CONFIG_NAME:LOG": {
+			string: "Log Channel",
+			context: "Name of the Log Channel config element"
+		},
+		"CONFIG_DESC:LOG": {
+			string: "The channel where suggestions submitted and actions taken on them are logged.",
+			context: "Description of the Log Channel config element"
+		},
+		"CONFIG_EXAMPLES:LOG": {
+			string: "`{{p}}config log #suggestion-log`\n" +
+				"Sets the #suggestion-log channel as log channel for suggestions and actions taken on them\n" +
+				"\n" +
+				"`{{p}}config log none`\n" +
+				"Resets the log channel, making there be none set",
+			context: "Examples for the Log Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `log`"
+		},
+		"CONFIG_NAME:COMMANDS": {
+			string: "Suggestion Command Channel",
+			context: "Name of the Suggestion Command Channel config element"
+		},
+		"CONFIG_DESC:COMMANDS": {
+			string: "This setting locks using the `suggest` command to only the configured channel. Configuring no channel will allow the command to be used in any channel.",
+			context: "Description of the Suggestion Command Channel config element"
+		},
+		"CONFIG_EXAMPLES:COMMANDS": {
+			string: "`{{p}}config commands #bot-commands`\n" +
+				"Limits using the `suggest` command to the #bot-commands channel\n" +
+				"\n" +
+				"`{{p}}config commands none`\n" +
+				"Resets the commands channel, allowing the `suggest` command to be used in any channel",
+			context: "Examples for the Suggestion Command Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `commands`"
+		},
+		"CONFIG_NAME:IMPLEMENTED": {
+			string: "Implemented Suggestions Archive Channel",
+			context: "Name of the Implemented Suggestions Archive Channel config element"
+		},
+		"CONFIG_DESC:IMPLEMENTED": {
+			string: "The channel where suggestions marked as \"Implemented\" via the `mark` command are sent. If no channel is configured, implemented suggestions will remain in the suggestions feed",
+			context: "Description of the Implemented Suggestions Archive Channel config element"
+		},
+		"CONFIG_EXAMPLES:IMPLEMENTED": {
+			string: "`{{p}}config implemented #implemented-suggestions`\n" +
+				"Sets the #implemented-suggestions channel as the channel where implemented suggestions are sent\n" +
+				"\n" +
+				"`{{p}}config implemented none`\n" +
+				"Resets the implemented suggestions archive channel, making there be none set",
+			context: "Examples for the Implemented Suggestions Archive Channel config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `implemented`"
+		},
+		"CONFIG_NAME:PREFIX": { string: "Prefix", context: "Name of the Prefix config element" },
+		"CONFIG_DESC:PREFIX": {
+			string: "The string of characters (usually a symbol) used to invoke a bot command. For example, in `.vote` the prefix is `.`",
+			context: "Description of the Prefix config element"
+		},
+		"CONFIG_EXAMPLES:PREFIX": {
+			string: "`{{p}}config prefix ?`\nSets the bot prefix to `?`",
+			context: "Examples for the Prefix config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `prefix`"
+		},
+		"CONFIG_NAME:MODE": { string: "Mode", context: "Name of the Mode config element" },
+		"CONFIG_DESC:MODE": {
+			string: "The mode of handling suggestions. This can be `review` (all suggestions are held for manual review by staff) or `autoapprove` (all suggestions are automatically posted to the suggestions feed)",
+			context: "Description of the Mode config element"
+		},
+		"CONFIG_EXAMPLES:MODE": {
+			string: "`{{p}}config mode review`\n" +
+				"Sets the mode to `review`\n" +
+				"\n" +
+				"`{{p}}config mode autoapprove`\n" +
+				"Sets the mode to `autoapprove`",
+			context: "Examples for the Mode config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `mode`"
+		},
+		"CONFIG_NAME:EMOJIS": {
+			string: "Suggestion Feed Reactions",
+			context: "Name of the Suggestion Feed Reactions config element"
+		},
+		"CONFIG_DESC:EMOJIS": {
+			string: "Settings for managing the emojis that are added to suggestions posted to the suggestions feed",
+			context: "Description of the Suggestion Feed Reactions config element"
+		},
+		"CONFIG_EXAMPLES:EMOJIS": {
+			string: "`{{p}}config emojis up 👍`\n" +
+				"Sets the upvote emoji to 👍\n" +
+				"\n" +
+				"`{{p}}config emojis mid 🤷`\n" +
+				"Sets the shrug/no opinion emoji to 🤷\n" +
+				"\n" +
+				"`{{p}}config emojis down 👎`\n" +
+				"Sets the downvote emoji to 👎\n" +
+				"\n" +
+				"`{{p}}config emojis up disable`\n" +
+				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
+				"\n" +
+				"`{{p}}config emojis disable`\n" +
+				"Disables all suggestion feed reactions\n" +
+				"\n" +
+				"`{{p}}config emojis enable`\n" +
+				"Enables suggestion feed reactions if they are disabled",
+			context: "Examples for the Suggestion Feed Reactions config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `emojis`"
+		},
+		"CONFIG_NAME:NOTIFICATIONS": {
+			string: "DM Notifications",
+			context: "Name of the DM Notifications config element"
+		},
+		"CONFIG_DESC:NOTIFICATIONS": {
+			string: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
+			context: "Description of the DM Notifications config element"
+		},
+		"CONFIG_EXAMPLES:NOTIFICATIONS": {
+			string: "`{{p}}config emojis up 👍`\n" +
+				"Sets the upvote emoji to 👍\n" +
+				"\n" +
+				"`{{p}}config emojis mid 🤷`\n" +
+				"Sets the shrug/no opinion emoji to 🤷\n" +
+				"\n" +
+				"`{{p}}config emojis down 👎`\n" +
+				"Sets the downvote emoji to 👎\n" +
+				"\n" +
+				"`{{p}}config emojis up disable`\n" +
+				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
+				"\n" +
+				"`{{p}}config emojis disable`\n" +
+				"Disables all suggestion feed reactions\n" +
+				"\n" +
+				"`{{p}}config emojis enable`\n" +
+				"Enables suggestion feed reactions if they are disabled",
+			context: "Examples for the DM Notifications config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
+		},
+		"CONFIG_NAME:CLEANCOMMANDS": {
+			string: "Clean Suggestion Commands",
+			context: "Name of the Clean Suggestion Commands config element"
+		},
+		"CONFIG_DESC:CLEANCOMMANDS": {
+			string: "This setting controls whether or not the `suggest` command and the response are removed after a few seconds. This is useful for keeping your command channel clean!",
+			context: "Description of the Clean Suggestion Commands config element"
+		},
+		"CONFIG_EXAMPLES:CLEANCOMMANDS": {
+			string: "`{{p}}config cleancommands on`\n" +
+				"Enables cleaning of suggestion commands\n" +
+				"\n" +
+				"`{{p}}config cleancommands off`\n" +
+				"Disables cleaning of suggestion commands",
+			context: "Examples for the Clean Suggestion Commands config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `cleancommands`"
+		},
+		"CONFIG_NAME:SELFVOTE": {
+			string: "Voting on Own Suggestions",
+			context: "Name of the Voting on Own Suggestions config element"
+		},
+		"CONFIG_DESC:SELFVOTE": {
+			string: "This setting controls whether or not the user who made a suggestion can vote on their own suggestion when it has been approved.",
+			context: "Description of the Voting on Own Suggestions config element"
+		},
+		"CONFIG_EXAMPLES:SELFVOTE": {
+			string: "`{{p}}config selfvote on`\n" +
+				"Allows suggestion authors to vote on their own suggestions\n" +
+				"\n" +
+				"`{{p}}config selfvote off`\n" +
+				"Prevents suggestion authors from voting on their own suggestions",
+			context: "Examples for the Voting on Own Suggestions config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `selfvote`"
+		},
+		"CONFIG_NAME:ONEVOTE": {
+			string: "Multiple Reaction Voting",
+			context: "Name of the Multiple Reaction Voting config element"
+		},
+		"CONFIG_DESC:ONEVOTE": {
+			string: "This setting controls whether or not users can choose multiple voting options on a suggestion (For example, both upvote and downvote).",
+			context: "Description of the Multiple Reaction Voting config element"
+		},
+		"CONFIG_EXAMPLES:ONEVOTE": {
+			string: "`{{p}}config onevote on`\n" +
+				"Allows users to choose only one option when voting\n" +
+				"\n" +
+				"`{{p}}config onevote off`\n" +
+				"Allows users to choose multiple options when voting",
+			context: "Examples for the Multiple Reaction Voting config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `onevote`"
+		},
+		"CONFIG_NAME:INCHANNELSUGGESTIONS": {
+			string: "In-Suggestions Channel Suggestion Submission",
+			context: "Name of the In-Suggestions Channel Suggestion Submission config element"
+		},
+		"CONFIG_DESC:INCHANNELSUGGESTIONS": {
+			string: "This setting controls whether or not users can submit suggestions via sending a message in the suggestions feed channel.",
+			context: "Description of the In-Suggestions Channel Suggestion Submission config element"
+		},
+		"CONFIG_EXAMPLES:INCHANNELSUGGESTIONS": {
+			string: "`{{p}}config inchannelsuggestions on`\n" +
+				"Allows users to submit suggestions via any message in the suggestions feed channel\n" +
+				"\n" +
+				"`{{p}}config inchannelsuggestions off`\n" +
+				"Prevents users from submitting suggestions via any message in the suggestions feed channel",
+			context: "Examples for the In-Suggestions Channel Suggestion Submission config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `inchannelsuggestions`"
+		},
+		"CONFIG_NAME:COLORCHANGE": {
+			string: "Color Change",
+			context: "Name of the Color Change config element"
+		},
+		"CONFIG_DESC:COLORCHANGE": {
+			string: "This setting controls the color of the suggestion embed changing based on the number of net upvotes. You can customize the color, and the number of net upvotes necessary to change the color!",
+			context: "Description of the Color Change config element"
+		},
+		"CONFIG_EXAMPLES:COLORCHANGE": {
+			string: "`{{p}}config colorchange color gold`\n" +
+				"Sets the color to change the embed to `gold`. This element supports hex colors, CSS colors, and more!\n" +
+				"\n" +
+				"`{{p}}config colorchange number 5`\n" +
+				"Sets the number of net upvotes to change the embed color to `5`.",
+			context: "Examples for the Color Change config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `colorchange`"
+		},
+		"CONFIG_NAME:LOCALE": { string: "Locale", context: "Name of the Locale config element" },
+		"CONFIG_DESC:LOCALE": {
+			string: "The language the bot will respond in. If a user has a locale configured via the `locale` command, the bot will respond to them in their preferred language. If they don't, the bot will respond in the language configured here.",
+			context: "Description of the Locale config element"
+		},
+		"CONFIG_EXAMPLES:LOCALE": {
+			string: "`{{p}}config locale en`\nSets the server language to English.",
+			context: "Examples for the Locale config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `locale`"
 		}
 	}
 };

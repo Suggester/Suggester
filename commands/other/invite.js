@@ -7,8 +7,7 @@ module.exports = {
 		usage: "invite",
 		description: "Shows the link to invite the bot",
 		enabled: true,
-		docs: "all/invite",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 5,
 		dmAvailable: true
 	},

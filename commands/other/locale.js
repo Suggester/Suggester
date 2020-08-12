@@ -1,7 +1,7 @@
 const { access } = require("fs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { support_invite } = require("../../config.json");
-const { string } = require("../../utils/strings");
+const { string, list } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
 const { reloadLocales } = require("../../utils/misc");
@@ -12,19 +12,23 @@ module.exports = {
 		permission: 10,
 		aliases: ["language", "translate", "translation", "locales", "lang"],
 		usage: "locale <locale to set>",
-		description: "Sets your personal locale",
+		description: "Sets the language the bot responds to you in",
+		examples: "`{{p}}locale`\nShows the list of available languages\n\n`{{p}}locale fr`\nSets your language to French",
 		enabled: true,
-		docs: "all/locale",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS"],
 		cooldown: 5
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
 		if (!args[0]) {
+			let totalStrings = Object.keys(list).length;
+			let localesDone = client.locales.filter(l => (Object.keys(l.list).filter(s => list[s]).length/totalStrings) > 0.65 || l.settings.force);
+			let localesProgress = client.locales.filter(l => !localesDone.find(d => d.settings.code === l.settings.code));
 			let embed = new Discord.MessageEmbed()
 				.setTitle(string(locale, "LOCALE_LIST_TITLE"))
-				.setDescription(client.locales.filter(l => l.settings.code !== "owo" || qUserDB.locale === "owo").map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+				.setDescription(localesDone.filter(l => !l.settings.hidden || qUserDB.locale === l.settings.code).map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n"))
+				.addField(string(locale, "LOCALE_LIST_INCOMPLETE_TITLE"), `${string(locale, "LOCALE_LIST_INCOMPLETE_DESC", { support_invite: `https://discord.gg/${support_invite}` })}\n${localesProgress.filter(l => !l.settings.hidden || qUserDB.locale === l.settings.code).map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n")}`)
 				.setFooter(string(locale, "LOCALE_FOOTER"))
 				.setColor(client.colors.default);
 			return message.channel.send(embed);

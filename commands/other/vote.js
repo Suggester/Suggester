@@ -5,9 +5,8 @@ module.exports = {
 		name: "vote",
 		permission: 10,
 		usage: "vote",
-		description: "Shows the link to info about voting",
+		description: "Help support the bot!",
 		enabled: true,
-		docs: "all/vote",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		dmAvailable: true
 	},

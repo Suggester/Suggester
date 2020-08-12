@@ -9,8 +9,7 @@ module.exports = {
 		usage: "tutorial",
 		description: "Shows information about setting up the bot and using it",
 		enabled: true,
-		docs: "all/tutorial",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
 		cooldown: 10
 	},
 	do: async (locale, message, client, args, Discord) => {
@@ -22,7 +21,7 @@ module.exports = {
 			.setColor(client.colors.default)
 			.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
 			.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: serverPrefix }))
-			.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION", { prefix: serverPrefix, invite: `https://discord.gg/${support_invite}` }));
+			.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "AUTOMATIC_SETUP_COMPLETE_NEW", { prefix: serverPrefix, invite: `https://discord.gg/${support_invite}` }));
 		return message.channel.send(embed);
 	}
 };
