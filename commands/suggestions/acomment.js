@@ -42,7 +42,7 @@ module.exports = {
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
 
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "ANONYMOUS_COMMENT_ADDED_TITLE"))

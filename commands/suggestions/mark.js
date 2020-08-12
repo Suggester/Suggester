@@ -136,11 +136,11 @@ module.exports = {
 					serverLog(logs, qServerDB, client);
 				}
 			});
-			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 			return;
 		}
 
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client, qSuggestionDB.displayStatus === "no" && !qServerDB.config.channels.denied);
 		if (editFeed) return message.channel.send(editFeed);

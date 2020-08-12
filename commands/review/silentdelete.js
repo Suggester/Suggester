@@ -42,7 +42,7 @@ module.exports = {
 		let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 		if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
 
-		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "SUGGESTION_DELETED_TITLE"))

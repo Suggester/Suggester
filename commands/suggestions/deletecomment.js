@@ -46,7 +46,7 @@ module.exports = {
 		let author = await fetchUser(comment.author, client);
 		if (!author) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
-		await dbModify("Suggestion", {suggestionId: id}, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "COMMENT_DELETED_TITLE"))

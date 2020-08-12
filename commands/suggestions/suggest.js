@@ -133,7 +133,7 @@ module.exports = {
 			await reviewMessage.react(emoji.check).then(() => newSuggestion.reviewEmojis.approve = emoji.check);
 			await reviewMessage.react(emoji.x).then(() => newSuggestion.reviewEmojis.deny = emoji.x);
 			newSuggestion.reviewMessage = reviewMessage.id;
-			await dbModify("Suggestion", { suggestionId: id }, newSuggestion);
+			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, newSuggestion);
 
 			if (qServerDB.config.channels.log) {
 				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
@@ -191,7 +191,7 @@ module.exports = {
 							down: reactEmojiDown
 						};
 					}
-					await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+					await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 				});
 
 			let replyEmbed = new Discord.MessageEmbed()

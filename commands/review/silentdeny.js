@@ -60,7 +60,7 @@ module.exports = {
 			if (returned) return;
 		}
 
-		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "SUGGESTION_DENIED_TITLE"))

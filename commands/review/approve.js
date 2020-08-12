@@ -71,7 +71,7 @@ module.exports = {
 			if (returned) return;
 		}
 
-		await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "SUGGESTION_APPROVED_TITLE"))
@@ -114,7 +114,7 @@ module.exports = {
 					down: reactEmojiDown
 				};
 			}
-			await dbModify("Suggestion", { suggestionId: id }, qSuggestionDB);
+			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 			let qUserDB = await dbQuery("User", { id: suggester.id });
 			if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || guildLocale, client, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, isComment ? { header: string(qUserDB.locale || guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), reason: comment } : null))).catch(() => {});
 		});
