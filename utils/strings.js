@@ -1324,7 +1324,7 @@ module.exports = {
 		},
 		"CFG_EMOJI_MID_TITLE": {
 			string: "Shrug/No Opinion",
-			context: "Middile reaction header when emojis are listed in the config command"
+			context: "Middle reaction header when emojis are listed in the config command"
 		},
 		"CFG_EMOJI_DOWNVOTE_TITLE": {
 			string: "Downvote",
@@ -1879,7 +1879,7 @@ module.exports = {
 			context: "Header for the shard statistics section of the ping embed"
 		},
 		"PING_SHARD_STATS": {
-			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} MB of memory",
+			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} of memory",
 			context: "Statistics for a shard",
 			replaced: {
 				num: {
@@ -2788,7 +2788,7 @@ module.exports = {
 		},
 		"SELECTED": {
 			string: "Selected",
-			context: "Indicates a selected locale"
+			context: "Indicates the selected locale"
 		},
 		"NO_LOCALE_ERROR": {
 			string: "No locale was found based on that input! Run this command with no parameters to see a list of available locales.",
