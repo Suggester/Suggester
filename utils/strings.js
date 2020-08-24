@@ -924,6 +924,10 @@ module.exports = {
 				}
 			}
 		},
+		"VERIFY_ALL_FLAGS_INFO": {
+			string: "Cursive means you have the flag",
+			context: "Verify footer addition if you use the command modifier --all-flags"
+		},
 		"VOTE_INFO": {
 			string: "You can vote for Suggester on various bot lists, which is a great way to support the bot! If you're in the Suggester support server ({{link}}), you can get special rewards for voting 🤩\n>>> __Links to Vote:__\n{{links}}",
 			context: "Response to the vote command",
