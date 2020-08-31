@@ -1878,7 +1878,7 @@ module.exports = {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
 		},
-		"PING_SHARD_STATS": {
+		"PING_SHARD_STATS_NEW": {
 			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} of memory",
 			context: "Statistics for a shard",
 			replaced: {
