@@ -21,7 +21,7 @@ module.exports = {
 			.setColor(client.colors.default)
 			.setDescription(string(locale, "TUTORIAL_DESC", { prefix: prefix }))
 			.addField(string(locale, "TUTORIAL_GET_STARTED_HEADER"), string(locale, "TUTORIAL_GET_STARTED_DESCRIPTION", { prefix: serverPrefix }))
-			.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "AUTOMATIC_SETUP_COMPLETE_NEW", { prefix: serverPrefix, invite: `https://discord.gg/${support_invite}` }));
+			.addField(string(locale, "TUTORIAL_NEXT_HEADER"), string(locale, "TUTORIAL_NEXT_DESCRIPTION_NEW", { prefix: serverPrefix, invite: `https://discord.gg/${support_invite}` }));
 		return message.channel.send(embed);
 	}
 };
