@@ -1,4 +1,3 @@
-const { dbQuery } = require("../../utils/db");
 const { prefix, support_invite } = require("../../config.json");
 const { string } = require("../../utils/strings");
 
@@ -13,7 +12,7 @@ module.exports = {
 		cooldown: 10
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let qServerDB = await dbQuery("Server", { id: message.guild.id });
+		let qServerDB = await message.guild.db;
 		let serverPrefix = (qServerDB && qServerDB.config && qServerDB.config.prefix) || prefix;
 
 		let embed = new Discord.MessageEmbed()
