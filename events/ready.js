@@ -40,9 +40,14 @@ module.exports = async (Discord, client) => {
 		p = p+1 === presences.length ? 0 : p+1;
 	}
 	await setPresence();
-	setInterval(async function() {
+	client.setInterval(async function() {
 		await setPresence();
 	}, 600000); //Change presence every 10 minutes
+
+	client.setInterval(async function() {
+		client.guilds.cache.forEach(g => g.members.cache.sweep(() => true));
+		client.users.cache.sweep(() => true);
+	}, 600000*30); //Change presence every 30 minutes
 
 	//Post to bot lists
 	async function post() {
@@ -53,7 +58,7 @@ module.exports = async (Discord, client) => {
 
 	if (client.user.id === "564426594144354315" && client.shard.ids[0] === client.shard.count-1 && process.env.NODE_ENV === "production" && lists) {
 		await post();
-		setInterval(async function() {
+		client.setInterval(async function() {
 			await post();
 		}, 1800000);
 	}
