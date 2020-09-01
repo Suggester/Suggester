@@ -24,20 +24,24 @@ module.exports = async (Discord, client) => {
 
 	let presences = [
 		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`],
-		["WATCHING", `${(await Suggestion.countDocuments())} suggestions`],
+		["WATCHING", async () => `${(await Suggestion.countDocuments())} suggestions`],
 		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info`],
 		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`]
 	];
 
 	let p = 0;
-	function setPresence() {
+	async function setPresence() {
 		let presence = presences[p];
-		client.user.setActivity(`${presence[1]} • @${client.user.username} help`, { type: presence[0] });
+		let type = presence[0];
+		let text = presence[1];
+		if (typeof text == "function")
+			text = await text();
+		client.user.setActivity(`${text} • @${client.user.username} help`, { type });
 		p = p+1 === presences.length ? 0 : p+1;
 	}
-	setPresence();
-	setInterval(function() {
-		setPresence();
+	await setPresence();
+	setInterval(async function() {
+		await setPresence();
 	}, 600000); //Change presence every 10 minutes
 
 	//Post to bot lists
