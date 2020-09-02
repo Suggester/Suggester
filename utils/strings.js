@@ -1338,6 +1338,10 @@ module.exports = {
 			string: "The specified emoji was not found. Make sure to specify an emoji from __this server__ or a default Discord emoji.",
 			context: "Error when the specified emoji is not found"
 		},
+		"CFG_EMOJI_ALREADY_SET_ERROR": {
+			string: "This emoji has already been set for a different emoji setting.",
+			context: "Error when the specified emoji is already set for a different emoji setting"
+		},
 		"CFG_EMOJI_DISABLED_ERROR": {
 			string: "This emoji is already disabled.",
 			context: "Error shown when an emoji is already disabled"
