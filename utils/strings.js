@@ -4346,23 +4346,7 @@ module.exports = {
 			context: "Description of the DM Notifications config element"
 		},
 		"CONFIG_EXAMPLES:NOTIFY": {
-			string: "`{{p}}config emojis up 👍`\n" +
-				"Sets the upvote emoji to 👍\n" +
-				"\n" +
-				"`{{p}}config emojis mid 🤷`\n" +
-				"Sets the shrug/no opinion emoji to 🤷\n" +
-				"\n" +
-				"`{{p}}config emojis down 👎`\n" +
-				"Sets the downvote emoji to 👎\n" +
-				"\n" +
-				"`{{p}}config emojis up disable`\n" +
-				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
-				"\n" +
-				"`{{p}}config emojis disable`\n" +
-				"Disables all suggestion feed reactions\n" +
-				"\n" +
-				"`{{p}}config emojis enable`\n" +
-				"Enables suggestion feed reactions if they are disabled",
+			string: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
 			context: "Examples for the DM Notifications config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
 		},

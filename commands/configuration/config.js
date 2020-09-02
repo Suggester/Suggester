@@ -707,13 +707,14 @@ module.exports = {
 			if (args[1]) {
 				let e = elements.find(e => e.names.includes(args[1].toLowerCase()));
 				if (!e) return message.channel.send(string(locale, "UNKNOWN_ELEMENT_ERROR", {}, "error"));
+				let nameString = e.names[0].toUpperCase();
 				let elementEmbed = new Discord.MessageEmbed()
 					.setAuthor(string(locale, "CFG_HELP_TITLE"), client.user.displayAvatarURL({ format: "png", dynamic: true }))
 					.setColor(client.colors.default)
-					.setTitle(e.name)
-					.setDescription(e.description)
+					.setTitle(string(locale, `CONFIG_NAME:${nameString}`) || e.name)
+					.setDescription(string(locale, `CONFIG_DESC:${nameString}`) || e.description)
 					.addField(string(locale, "CFG_HELP_COMMAND"), string(locale, "CFG_HELP_COMMAND_INFO", { prefix: qServerDB.config.prefix, subcommand: e.names[0] }))
-					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? e.examples : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
+					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
 				return message.channel.send(elementEmbed);
@@ -724,7 +725,7 @@ module.exports = {
 				.setDescription(string(locale, "CFG_HELP_INFO", { p: qServerDB.config.prefix }))
 				.addField(string(locale, "CFG_LIST_TITLE"), elements.map(e => `\`${e.names[0]}\``).join("\n"))];
 			for await (let e of elements) {
-				let nameString = e.name.toUpperCase();
+				let nameString = e.names[0].toUpperCase();
 				let elementEmbed = new Discord.MessageEmbed()
 					.setAuthor(`${string(locale, "CFG_HELP_TITLE")} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, client.user.displayAvatarURL({ format: "png", dynamic: true }))
 					.setColor(client.colors.default)
