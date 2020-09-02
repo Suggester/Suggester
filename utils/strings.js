@@ -1324,7 +1324,7 @@ module.exports = {
 		},
 		"CFG_EMOJI_MID_TITLE": {
 			string: "Shrug/No Opinion",
-			context: "Middile reaction header when emojis are listed in the config command"
+			context: "Middle reaction header when emojis are listed in the config command"
 		},
 		"CFG_EMOJI_DOWNVOTE_TITLE": {
 			string: "Downvote",
@@ -1878,8 +1878,8 @@ module.exports = {
 			string: "Shard Statistics",
 			context: "Header for the shard statistics section of the ping embed"
 		},
-		"PING_SHARD_STATS": {
-			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} MB of memory",
+		"PING_SHARD_STATS_NEW": {
+			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} of memory",
 			context: "Statistics for a shard",
 			replaced: {
 				num: {
@@ -2788,7 +2788,7 @@ module.exports = {
 		},
 		"SELECTED": {
 			string: "Selected",
-			context: "Indicates a selected locale"
+			context: "Indicates the selected locale"
 		},
 		"NO_LOCALE_ERROR": {
 			string: "No locale was found based on that input! Run this command with no parameters to see a list of available locales.",
@@ -4337,32 +4337,16 @@ module.exports = {
 			context: "Examples for the Suggestion Feed Reactions config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `emojis`"
 		},
-		"CONFIG_NAME:NOTIFICATIONS": {
+		"CONFIG_NAME:NOTIFY": {
 			string: "DM Notifications",
 			context: "Name of the DM Notifications config element"
 		},
-		"CONFIG_DESC:NOTIFICATIONS": {
+		"CONFIG_DESC:NOTIFY": {
 			string: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
 			context: "Description of the DM Notifications config element"
 		},
-		"CONFIG_EXAMPLES:NOTIFICATIONS": {
-			string: "`{{p}}config emojis up 👍`\n" +
-				"Sets the upvote emoji to 👍\n" +
-				"\n" +
-				"`{{p}}config emojis mid 🤷`\n" +
-				"Sets the shrug/no opinion emoji to 🤷\n" +
-				"\n" +
-				"`{{p}}config emojis down 👎`\n" +
-				"Sets the downvote emoji to 👎\n" +
-				"\n" +
-				"`{{p}}config emojis up disable`\n" +
-				"Disables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n" +
-				"\n" +
-				"`{{p}}config emojis disable`\n" +
-				"Disables all suggestion feed reactions\n" +
-				"\n" +
-				"`{{p}}config emojis enable`\n" +
-				"Enables suggestion feed reactions if they are disabled",
+		"CONFIG_EXAMPLES:NOTIFY": {
+			string: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
 			context: "Examples for the DM Notifications config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
 		},

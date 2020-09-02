@@ -24,21 +24,30 @@ module.exports = async (Discord, client) => {
 
 	let presences = [
 		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`],
-		["WATCHING", `${(await Suggestion.countDocuments())} suggestions`],
+		["WATCHING", async () => `${(await Suggestion.countDocuments())} suggestions`],
 		["PLAYING", `Vote for Suggester and get rewards! Use "@${client.user.username} vote" for more info`],
 		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`]
 	];
 
 	let p = 0;
-	function setPresence() {
+	async function setPresence() {
 		let presence = presences[p];
-		client.user.setActivity(`${presence[1]} • @${client.user.username} help`, { type: presence[0] });
+		let type = presence[0];
+		let text = presence[1];
+		if (typeof text == "function")
+			text = await text();
+		client.user.setActivity(`${text} • @${client.user.username} help`, { type });
 		p = p+1 === presences.length ? 0 : p+1;
 	}
-	setPresence();
-	setInterval(function() {
-		setPresence();
+	await setPresence();
+	client.setInterval(async function() {
+		await setPresence();
 	}, 600000); //Change presence every 10 minutes
+
+	client.setInterval(async function() {
+		client.guilds.cache.forEach(g => g.members.cache.sweep(() => true));
+		client.users.cache.sweep(() => true);
+	}, 600000*30); //Change presence every 30 minutes
 
 	//Post to bot lists
 	async function post() {
@@ -49,7 +58,7 @@ module.exports = async (Discord, client) => {
 
 	if (client.user.id === "564426594144354315" && client.shard.ids[0] === client.shard.count-1 && process.env.NODE_ENV === "production" && lists) {
 		await post();
-		setInterval(async function() {
+		client.setInterval(async function() {
 			await post();
 		}, 1800000);
 	}

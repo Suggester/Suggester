@@ -5,21 +5,12 @@
   ],
   "prefix": ".",
   "support_invite": "G5pEdUp",
-  "staff_alert_role": ""
-  "colors": {
-    "default": "#7289da",
-    "red": "#e74c3c",
-    "green": "#2ecc71",
-    "blue": "#3498db",
-    "gray": "#979c9f",
-    "orange": "#e67e22",
-    "yellow": "#f1c40f"
-  },
+  "staff_alert_role": "",
   "release": "special",
   "emoji": {
-    "x": "x_alt:704665482828972113",
-    "mid": "mid_alt:704666116294705212",
-    "check": "check_alt:704665656573952040"
+    "x": "suggester_x:704665482828972113",
+    "mid": "suggester_mid:704666116294705212",
+    "check": "suggester_check:704665656573952040"
   },
   "log_hooks": {
     "commands": {

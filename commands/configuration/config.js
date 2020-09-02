@@ -477,10 +477,10 @@ module.exports = {
 			}
 		},
 		{
-			names: ["notifications", "notif", "notify", "notification"],
+			names: ["notify", "notif", "notifications", "notification"],
 			name: "DM Notifications",
 			description: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
-			examples: "`{{p}}config emojis up 👍`\nSets the upvote emoji to 👍\n\n`{{p}}config emojis mid 🤷`\nSets the shrug/no opinion emoji to 🤷\n\n`{{p}}config emojis down 👎`\nSets the downvote emoji to 👎\n\n`{{p}}config emojis up disable`\nDisables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n\n`{{p}}config emojis disable`\nDisables all suggestion feed reactions\n\n`{{p}}config emojis enable`\nEnables suggestion feed reactions if they are disabled",
+			examples: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -707,13 +707,14 @@ module.exports = {
 			if (args[1]) {
 				let e = elements.find(e => e.names.includes(args[1].toLowerCase()));
 				if (!e) return message.channel.send(string(locale, "UNKNOWN_ELEMENT_ERROR", {}, "error"));
+				let nameString = e.names[0].toUpperCase();
 				let elementEmbed = new Discord.MessageEmbed()
 					.setAuthor(string(locale, "CFG_HELP_TITLE"), client.user.displayAvatarURL({ format: "png", dynamic: true }))
 					.setColor(client.colors.default)
-					.setTitle(e.name)
-					.setDescription(e.description)
+					.setTitle(string(locale, `CONFIG_NAME:${nameString}`) || e.name)
+					.setDescription(string(locale, `CONFIG_DESC:${nameString}`) || e.description)
 					.addField(string(locale, "CFG_HELP_COMMAND"), string(locale, "CFG_HELP_COMMAND_INFO", { prefix: qServerDB.config.prefix, subcommand: e.names[0] }))
-					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? e.examples : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
+					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
 				return message.channel.send(elementEmbed);
@@ -724,7 +725,7 @@ module.exports = {
 				.setDescription(string(locale, "CFG_HELP_INFO", { p: qServerDB.config.prefix }))
 				.addField(string(locale, "CFG_LIST_TITLE"), elements.map(e => `\`${e.names[0]}\``).join("\n"))];
 			for await (let e of elements) {
-				let nameString = e.name.toUpperCase();
+				let nameString = e.names[0].toUpperCase();
 				let elementEmbed = new Discord.MessageEmbed()
 					.setAuthor(`${string(locale, "CFG_HELP_TITLE")} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, client.user.displayAvatarURL({ format: "png", dynamic: true }))
 					.setColor(client.colors.default)
