@@ -477,10 +477,10 @@ module.exports = {
 			}
 		},
 		{
-			names: ["notifications", "notif", "notify", "notification"],
+			names: ["notify", "notif", "notifications", "notification"],
 			name: "DM Notifications",
 			description: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
-			examples: "`{{p}}config emojis up 👍`\nSets the upvote emoji to 👍\n\n`{{p}}config emojis mid 🤷`\nSets the shrug/no opinion emoji to 🤷\n\n`{{p}}config emojis down 👎`\nSets the downvote emoji to 👎\n\n`{{p}}config emojis up disable`\nDisables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n\n`{{p}}config emojis disable`\nDisables all suggestion feed reactions\n\n`{{p}}config emojis enable`\nEnables suggestion feed reactions if they are disabled",
+			examples: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED"));
 				switch (args[1].toLowerCase()) {

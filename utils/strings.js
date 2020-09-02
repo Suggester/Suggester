@@ -4337,15 +4337,15 @@ module.exports = {
 			context: "Examples for the Suggestion Feed Reactions config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `emojis`"
 		},
-		"CONFIG_NAME:NOTIFICATIONS": {
+		"CONFIG_NAME:NOTIFY": {
 			string: "DM Notifications",
 			context: "Name of the DM Notifications config element"
 		},
-		"CONFIG_DESC:NOTIFICATIONS": {
+		"CONFIG_DESC:NOTIFY": {
 			string: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
 			context: "Description of the DM Notifications config element"
 		},
-		"CONFIG_EXAMPLES:NOTIFICATIONS": {
+		"CONFIG_EXAMPLES:NOTIFY": {
 			string: "`{{p}}config emojis up 👍`\n" +
 				"Sets the upvote emoji to 👍\n" +
 				"\n" +
