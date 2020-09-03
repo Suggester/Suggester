@@ -1,0 +1,21 @@
+name: Suggester CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to repository
+      uses: actions/checkout@v2
+      - name: Configure files
+      run: mv .env.example .env | mv config.json.example config.json
+      - name: Setup Node.js v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+      - name: Install dependencies
+      run: npm ci
+      - name: Run ESLint
+      uses: icrawl/action-eslint@v1
