@@ -45,9 +45,9 @@ module.exports = async (Discord, client) => {
 	}, 600000); //Change presence every 10 minutes
 
 	client.setInterval(async function() {
-		client.guilds.cache.forEach(g => g.members.cache.sweep(() => true));
+		client.guilds.cache.forEach(g => g.members.cache.sweep(m => m.id !== client.user.id));
 		client.users.cache.sweep(() => true);
-	}, 600000*30); //Change presence every 30 minutes
+	}, 600000*3); //Change presence every 30 minutes
 
 	//Post to bot lists
 	async function post() {
