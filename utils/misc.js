@@ -178,11 +178,11 @@ module.exports = {
 	async reloadLocales ({ locales }, path = "i18n") {
 		return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
 			try {
-				locales.sweep(() => true);
-
 				for (const [code] of locales) {
 					delete require.cache[require.resolve(`../${path}/${code}.json`)];
 				}
+
+				locales.sweep(() => true);
 
 				const files = (await promises.readdir(path))
 					.filter((f) => f.endsWith(".json"));
