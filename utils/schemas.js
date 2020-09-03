@@ -69,6 +69,10 @@ const suggestion = new Schema({
 		approve: String,
 		deny: String
 	},
+	channels: {
+		suggestions: String,
+		staff: String
+	},
 	messageId: String,
 	comments: [
 		{

@@ -133,6 +133,7 @@ module.exports = {
 			await reviewMessage.react(emoji.check).then(() => newSuggestion.reviewEmojis.approve = emoji.check);
 			await reviewMessage.react(emoji.x).then(() => newSuggestion.reviewEmojis.deny = emoji.x);
 			newSuggestion.reviewMessage = reviewMessage.id;
+			newSuggestion.channels.staff = reviewMessage.channel.id;
 			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, newSuggestion);
 
 			if (qServerDB.config.channels.log) {
@@ -168,6 +169,7 @@ module.exports = {
 				.send(embedSuggest)
 				.then(async (posted) => {
 					qSuggestionDB.messageId = posted.id;
+					qSuggestionDB.channels.suggestions = posted.channel.id;
 
 					if (qServerDB.config.react) {
 						let reactEmojiUp = qServerDB.config.emojis.up;
