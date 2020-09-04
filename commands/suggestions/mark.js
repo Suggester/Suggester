@@ -66,7 +66,7 @@ module.exports = {
 			let emote = emotes.find(em => em[0] === `${e.emoji.name}:${e.emoji.id}`);
 			if (emote[1] === "cancel") {
 				return m.edit(string(locale, "CANCELLED", {}, "success"));
-			};
+			}
 			await m.delete();
 			statusInput = emote[1];
 			shifted = true;
