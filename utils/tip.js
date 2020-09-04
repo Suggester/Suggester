@@ -28,42 +28,42 @@ module.exports = {
 			approve_mass: {
 				string: "PROTIP_MASS_APPROVE",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["approve"]
 			},
 			deny_reason: {
 				string: "PROTIP_REASON_DENY",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["deny"]
 			},
 			deny_mass: {
 				string: "PROTIP_MASS_DENY",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["deny"]
 			},
 			in_channel_config: {
 				string: "PROTIP_INCHANNEL",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				admin: true
 			},
 			emote_config: {
 				string: "PROTIP_EMOTES",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				admin: true
 			},
 			voting: {
 				string: "PROTIP_VOTING",
 				use: {
-					prefix: (await message.guild.db).config.prefix || ".",
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || ".",
 					list: lists[Object.keys(lists)[Math.floor(Math.random()*Object.keys(lists).length)]],
 					support_invite: `https://discord.gg/${support_invite}`
 				}
@@ -71,54 +71,54 @@ module.exports = {
 			notify: {
 				string: "PROTIP_NOTIFY",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				}
 			},
 			locale: {
 				string: "PROTIP_LOCALE",
 				use: {
-					prefix: (await message.guild.db).config.prefix || ".",
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || ".",
 					support_invite: `https://discord.gg/${support_invite}`
 				}
 			},
 			changelog: {
 				string: "PROTIP_CHANGELOG",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				}
 			},
 			acomment: {
 				string: "PROTIP_ACOMMENT",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["comment"]
 			},
 			markcomment: {
 				string: "PROTIP_MARKCOMMENT",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["mark"]
 			},
 			block: {
 				string: "PROTIP_BLOCK",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				admin: true
 			},
 			colorchange: {
 				string: "PROTIP_COLORCHANGE",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				admin: true
 			},
 			queue: {
 				string: "PROTIP_QUEUE",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				admin: true
 			},
