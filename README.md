@@ -12,6 +12,9 @@
   <a href="https://suggester.js.org" target="_blank">
     <img src="https://img.shields.io/website-up-down-green-red/https/suggester.js.org.svg" alt="Website Status" />
   </a>
+  <a href="https://github.com/Suggester-Bot/Suggester/actions" target="_blank">
+    <img src="https://github.com/Suggester-Bot/Suggester/workflows/Suggester%20CI/badge.svg" alt="Suggester CI" />
+  </a>
 </p>
 
 ### Suggester is a bot that manages server suggestions, allowing staff to review suggestions before they are posted and manage them in many ways.
