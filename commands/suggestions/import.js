@@ -292,6 +292,7 @@ module.exports = {
 						continue;
 					}
 					suggestionInfo.suggester = fastMatch[1];
+					// eslint-disable-next-line no-case-declarations
 					let sugMatch = embed.description.match(/\*\*Suggestion:\*\* \n > ([\s\S]+)/);
 					if (!sugMatch) {
 						errorCount++;

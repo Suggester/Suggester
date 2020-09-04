@@ -21,7 +21,7 @@ module.exports = {
 			approve_reason: {
 				string: "PROTIP_REASON_APPROVE",
 				use: {
-					prefix: (await message.guild.db).config.prefix || "."
+					prefix: (message.guild ? (await message.guild.db).config.prefix : null) || "."
 				},
 				command: ["approve"]
 			},
