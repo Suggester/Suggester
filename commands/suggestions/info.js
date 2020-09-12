@@ -44,7 +44,7 @@ module.exports = {
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":
 			embed.setColor(client.colors.yellow)
-				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), `${string(locale, "AWAITING_REVIEW_STATUS")} ([${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
+				.addField(string(locale, "INFO_INTERNAL_STATUS_HEADER"), `${string(locale, "AWAITING_REVIEW_STATUS")} ([${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.staff || qServerDB.config.channels.staff}/${qSuggestionDB.reviewMessage}))`);
 			break;
 		case "denied": {
 			let denier = await fetchUser(qSuggestionDB.staff_member, client);
@@ -81,7 +81,7 @@ module.exports = {
 
 			if (!qSuggestionDB.implemented) {
 				let messageFetched;
-				await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+				await client.channels.cache.get(qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 					let votes = checkVotes(locale, qSuggestionDB, f);
 					messageFetched = true;
 					if (votes[0] || votes[1]) embed.addField(string(locale, "VOTES_TITLE"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]} \`${((votes[0]/(votes[0]+votes[1]))*100).toFixed(2)}%\`\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]} \`${((votes[1]/(votes[0]+votes[1]))*100).toFixed(2)}%\``);
@@ -89,7 +89,7 @@ module.exports = {
 
 				if (!messageFetched) return message.channel.send(string(locale, "SUGGESTION_FEED_MESSAGE_NOT_FETCHED_ERROR", {}, "error"));
 
-				embed.addField(string(locale, "SUGGESTION_FEED_LINK"), `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
+				embed.addField(string(locale, "SUGGESTION_FEED_LINK"), `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`);
 			} else embed.addField(string(locale, "HELP_ADDITIONAL_INFO"), string(locale, "INFO_IMPLEMENTED"));
 			break;
 		}

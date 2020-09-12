@@ -25,9 +25,9 @@ module.exports = {
 		let approvedSuggestions = await dbQueryAll("Suggestion", { status: "approved", implemented: false, id: message.guild.id });
 		console.log(approvedSuggestions.length);
 		for await (let suggestion of approvedSuggestions) {
-			await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
+			await client.channels.cache.get(suggestion.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
 				let votes = checkVotes(locale, suggestion, f);
-				listArray.push({
+				if (votes[2]) listArray.push({
 					suggestion,
 					opinion: votes[2]
 				});

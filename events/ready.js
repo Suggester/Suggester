@@ -5,6 +5,16 @@ const blapi = require("blapi");
 const chalk = require("chalk");
 
 module.exports = async (Discord, client) => {
+	function checkReact(c, callback) {
+		while (c.reactInProgress) {
+			setTimeout(function() {
+				checkReact(c, callback);
+			}, 5000);
+			return;
+		}
+		callback();
+	}
+
 	const team = await client.fetchTeam()
 		.catch(() => console.log(chalk`{red [{bold ERROR}] Error fetching team members.}`));
 
@@ -47,7 +57,15 @@ module.exports = async (Discord, client) => {
 	client.setInterval(async function() {
 		client.guilds.cache.forEach(g => g.members.cache.sweep(m => m.id !== client.user.id));
 		client.users.cache.sweep(() => true);
-	}, 600000*3); //Change presence every 30 minutes
+		if ((process.memoryUsage().heapUsed).toFixed(2) > 314572800) {
+			checkReact(client,function() {
+				coreLog(`🎛️ Rebooting shard ${client.shard.ids[0]} due to memory usage`, client);
+				setTimeout(function() {
+					process.exit();
+				}, 1000);
+			});
+		}
+	}, 60000); //Memory management every 30 minutes
 
 	//Post to bot lists
 	async function post() {

@@ -130,11 +130,13 @@ module.exports = {
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
 			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview);
+			client.reactInProgress = true;
 			await reviewMessage.react(emoji.check).then(() => newSuggestion.reviewEmojis.approve = emoji.check);
 			await reviewMessage.react(emoji.x).then(() => newSuggestion.reviewEmojis.deny = emoji.x);
 			newSuggestion.reviewMessage = reviewMessage.id;
 			newSuggestion.channels.staff = reviewMessage.channel.id;
 			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, newSuggestion);
+			client.reactInProgress = false;
 
 			if (qServerDB.config.channels.log) {
 				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
@@ -172,6 +174,7 @@ module.exports = {
 					qSuggestionDB.channels.suggestions = posted.channel.id;
 
 					if (qServerDB.config.react) {
+						client.reactInProgress = true;
 						let reactEmojiUp = qServerDB.config.emojis.up;
 						let reactEmojiMid = qServerDB.config.emojis.mid;
 						let reactEmojiDown = qServerDB.config.emojis.down;
@@ -194,6 +197,7 @@ module.exports = {
 						};
 					}
 					await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
+					client.reactInProgress = false;
 				});
 
 			let replyEmbed = new Discord.MessageEmbed()

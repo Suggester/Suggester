@@ -115,7 +115,10 @@ module.exports = {
 					messageId: null,
 					comments: [],
 					implemented: false,
-					imported: m.id
+					imported: m.id,
+					channels: {
+						suggestions: ""
+					}
 				};
 				let embed = m.embeds.length > 0 ? m.embeds[0] : null;
 				switch (m.author.id) {
@@ -624,6 +627,7 @@ module.exports = {
 				} else {
 					let err = await client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
 						suggestionInfo.messageId = posted.id;
+						suggestionInfo.channels.suggestions = posted.channel.id;
 
 						if (qServerDB.config.react) {
 							let reactEmojiUp = qServerDB.config.emojis.up;

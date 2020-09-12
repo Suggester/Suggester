@@ -91,11 +91,11 @@ module.exports = {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return returned;
 
-		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
-		if (suggestionsCheck) return [suggestionsCheck];
-
 		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
 		if (suggestion[0]) return [suggestion[0]];
+
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, suggestion[1]);
+		if (suggestionsCheck) return [suggestionsCheck];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
@@ -104,14 +104,14 @@ module.exports = {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return [returned];
 
-		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
+		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
+		if (suggestion[0]) return [suggestion[0]];
+
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, suggestion[1]);
 		if (suggestionsCheck) return [suggestionsCheck];
 
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return [deniedCheck];
-
-		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
-		if (suggestion[0]) return [suggestion[0]];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
@@ -140,16 +140,16 @@ module.exports = {
 		if (missingConfig) return [missingConfig];
 		return [null, qServerDB];
 	},
-	checkSuggestions: function (locale, guild, db) {
+	checkSuggestions: function (locale, guild, db, suggestion) {
 		const { channelPermissions } = require("./checks");
-		if (guild.channels.cache.get(db.config.channels.suggestions)) {
+		if (guild.channels.cache.get((suggestion ? suggestion.channels.suggestions : null) || db.config.channels.suggestions)) {
 			let perms = channelPermissions(locale,  "suggestions", guild.channels.cache.get(db.config.channels.suggestions), guild.client);
 			if (perms) return perms;
 		} else return string(locale, "NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
 	},
-	checkReview: function (locale, guild, db) {
+	checkReview: function (locale, guild, db, suggestion) {
 		const { channelPermissions } = require("./checks");
-		if (guild.channels.cache.get(db.config.channels.staff)) {
+		if (guild.channels.cache.get((suggestion ? suggestion.channels.staff : null) || db.config.channels.staff)) {
 			let perms = channelPermissions(locale,  "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
 			if (perms) return perms;
 		} else return string(locale, "NO_REVIEW_CHANNEL_ERROR", {}, "error");

@@ -21,8 +21,8 @@ module.exports = {
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let reviewCheck = checkReview(locale, message.guild, qServerDB);
+		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
+			let reviewCheck = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 			if (reviewCheck) return message.channel.send(reviewCheck);
 		}
 
@@ -57,7 +57,7 @@ module.exports = {
 		}
 		message.channel.send(replyEmbed);
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
+		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")

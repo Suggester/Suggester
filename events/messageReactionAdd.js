@@ -44,7 +44,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		}
 		messageReaction.message.author = user;
 		try {
-			command.do(locale, messageReaction.message, client, [awaiting.suggestionId], Discord)
+			command.do(locale, messageReaction.message, client, [awaiting.suggestionId], Discord, true)
 				.catch((err) => {
 					let errorText;
 					if (err.stack) errorText = err.stack;
