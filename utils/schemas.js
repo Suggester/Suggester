@@ -97,7 +97,13 @@ const user = new Schema({
 	protips: { type: Boolean, default: true },
 	displayed_protips: [String],
 	flags: [ String ],
-	verifyColor: String
+	verifyColor: String,
+	auto_subscribe: { type: Boolean, default: true },
+	subscribed: [{
+		id: Number,
+		guild: String,
+		auto: { type: Boolean, default: false }
+	}]
 });
 
 const command = new Schema({
