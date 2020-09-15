@@ -41,9 +41,9 @@ module.exports = {
 
 		const r = new RegExp(".*/(?<img>.*)$");
 		const execd = r.exec(link);
-		if (!execd.groups.img) return null;
+		if (!execd || !execd.groups || !execd.groups.img) return null;
 
-		const filename = execd.groups.img;
+		const filename = execd.groups.img || "unknown.png";
 
 		const img = await fetch(link).then((res) => res.buffer());
 
