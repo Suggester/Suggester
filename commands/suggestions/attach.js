@@ -1,6 +1,6 @@
 const { suggestionEditCommandCheck, checkURL } = require("../../utils/checks");
 const { editFeedMessage } = require("../../utils/actions");
-const { serverLog } = require("../../utils/logs");
+const { serverLog, mediaLog } = require("../../utils/logs");
 const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
@@ -29,7 +29,13 @@ module.exports = {
 
 		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error"));
 
-		qSuggestionDB.attachment = attachment;
+		const res = await mediaLog(message, id, attachment)
+			.catch(console.error);
+
+		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error"));
+		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error"));
+
+		qSuggestionDB.attachment = res.attachments[0].url;
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
