@@ -79,24 +79,26 @@ module.exports = {
 
 		let id = await Suggestion.countDocuments() + 1;
 
-		const res = await mediaLog(message, id, attachment)
-			.catch(console.error);
+		if (attachment) {
+			const res = await mediaLog(message, id, attachment)
+				.catch(console.error);
 
-		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => {
-			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-				message.delete();
-				sent.delete();
-			}, 7500);
-		});
+			if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
-		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => {
-			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-				message.delete();
-				sent.delete();
-			}, 7500);
-		});
+			if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
 
-		attachment = res.attachments[0].url;
+			attachment = res.attachments[0].url;
+		}
 
 		//Review
 		if (qServerDB.config.mode === "review") {
