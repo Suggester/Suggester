@@ -3,6 +3,8 @@ const { log_hooks } = require("../config.json");
 const chalk = require("chalk");
 const { dbModify } = require("./db");
 let models = require("./schemas");
+const fetch = require("node-fetch");
+const FormData = require("form-data");
 /**
  * Send a message from a webhook
  * @param {module:"discord.js".Client} client - Client
@@ -25,6 +27,39 @@ function sendWebhook (client, cfg, input, options={}) {
 }
 
 module.exports = {
+	/**
+	 * Log media for the attach command
+	 * @param {Discord.Message} msg
+	 * @param {number} suggestionId
+	 * @param {string} link - Image/file link
+	 */
+	mediaLog: async function (msg, suggestionId, link) {
+		if (!log_hooks.media || !log_hooks.media.id || !log_hooks.media.token) {
+			console.log(chalk`{red {bold Media} log webhook not found}`);
+			return;
+		}
+
+		const r = new RegExp(".*/(?<img>.*)$");
+		const execd = r.exec(link);
+		if (!execd.groups.img) return null;
+
+		const filename = execd.groups.img;
+
+		const img = await fetch(link).then((res) => res.buffer());
+
+		if (img.length >= 1e6) {
+			return { code: 40005 };
+		}
+
+		const body = new FormData();
+		body.append("image", img, { filename });
+		body.append("content", `**Suggestion ID**: ${suggestionId}\n**Filename**: ${filename}`);
+
+		return await fetch(`https://discord.com/api/webhooks/${log_hooks.media.id}/${log_hooks.media.token}?wait=1`, {
+			method: "post",
+			body
+		}).then((res) => res.json());
+	},
 	guildLog: (input, options, client) => {
 		if (!(sendWebhook(client, log_hooks.guild, input))) console.log(chalk`{red {bold Guild} log webhook not found}`);
 	},

@@ -1694,6 +1694,10 @@ module.exports = {
 			string: "Attachment Added",
 			context: "Title of the reply embed when an attachment is added"
 		},
+		"ATTACHMENT_TOO_BIG": {
+			string: "The attached file is too big. Please upload an image under 8mb",
+			context: "The error message to be sent if an image is larger than 8mb (webhook max filesize)"
+		},
 		"ATTACHED_LOG": {
 			string: "{{user}} added an attachment to #{{id}}",
 			context: "Title for the log embed when an attachment is added to a suggestion",
