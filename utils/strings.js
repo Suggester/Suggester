@@ -4584,6 +4584,34 @@ module.exports = {
 		"NONE_FOLLOWED": {
 			string: "You are not following any suggestions",
 			context: "Message shown when you are not following any suggestions"
+		},
+		"COMMAND_DESC:FOLLOW": {
+			string: "Views/edits your following settings",
+			context: "Description for the follow command"
+		},
+		"COMMAND_USAGE:FOLLOW": {
+			string: "follow [suggestion id|list|auto] (on|off|toggle)",
+			context: "Description for the follow command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:FOLLOW": {
+			string: "`{{p}}follow 123`\nFollows suggestion #123\n\n`{{p}}follow list`\nLists the suggestions you are following\n\n`{{p}}follow auto on`\nEnables following suggestions when you upvote them\n\n`{{p}}notify off`\nDisables following suggestions when you upvote them\n\n`{{p}}notify toggle`\nToggles following suggestions when you upvote them",
+			context: "Examples for the follow command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:UNFOLLOW": {
+			string: "Unfollows a suggestion",
+			context: "Description for the unfollow command"
+		},
+		"COMMAND_USAGE:UNFOLLOW": {
+			string: "unfollow [suggestion id]",
+			context: "Description for the unfollow command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:UNFOLLOW": {
+			string: "`{{p}}unfollow 123`\nUnfollows suggestion #123",
+			context: "Examples for the unfollow command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		}
 	}
 };

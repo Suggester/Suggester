@@ -1,6 +1,5 @@
-const { dbQuery, dbModify, dbQueryAll } = require("../../utils/db");
+const { dbQuery } = require("../../utils/db");
 const { checkSuggestion } = require("../../utils/checks");
-const { pages } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 module.exports = {
 	controls: {
