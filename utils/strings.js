@@ -4599,7 +4599,7 @@ module.exports = {
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_EXAMPLES:FOLLOW": {
-			string: "`{{p}}follow 123`\nFollows suggestion #123\n\n`{{p}}follow list`\nLists the suggestions you are following\n\n`{{p}}follow auto on`\nEnables following suggestions when you upvote them\n\n`{{p}}notify off`\nDisables following suggestions when you upvote them\n\n`{{p}}notify toggle`\nToggles following suggestions when you upvote them",
+			string: "`{{p}}follow 123`\nFollows suggestion #123\n\n`{{p}}follow list`\nLists the suggestions you are following\n\n`{{p}}follow auto on`\nEnables following suggestions when you upvote them\n\n`{{p}}follow auto off`\nDisables following suggestions when you upvote them\n\n`{{p}}follow auto toggle`\nToggles following suggestions when you upvote them",
 			context: "Examples for the follow command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
