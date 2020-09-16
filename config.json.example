@@ -32,6 +32,10 @@
     "staff_alert": {
       "id": "",
       "token": ""
+    },
+    "media": {
+      "id": "",
+      "token": ""
     }
   },
   "lists": {}
