@@ -1,7 +1,7 @@
 const { string } = require("../../utils/strings");
 const { fetchUser, suggestionEmbed, logEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery, dbModify, dbQueryNoNew } = require("../../utils/db");
+const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 module.exports = {

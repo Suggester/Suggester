@@ -1,7 +1,6 @@
 const { string } = require("../../utils/strings");
 const { fetchUser, logEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery } = require("../../utils/db");
 const { Suggestion } = require("../../utils/schemas");
 const { checkDenied, baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");

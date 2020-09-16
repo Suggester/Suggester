@@ -1,5 +1,5 @@
 const { suggestionEmbed, fetchUser, logEmbed } = require("../../utils/misc.js");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { serverLog } = require("../../utils/logs");
 const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/checks");
@@ -121,7 +121,6 @@ module.exports = {
 				if (isComment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 				message.channel.send(replyEmbed);
 
-				let qUserDB = await dbQuery("User", { id: suggester.id });
 				await notifyFollowers(client, qServerDB, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: "INFO_PUBLIC_STATUS_HEADER", reason: str }, function(e, l) {
 					if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					e.addField(string(l, "IMPLEMENTED_LINK"), `[${string(l, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);

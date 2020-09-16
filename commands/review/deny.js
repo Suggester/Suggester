@@ -1,4 +1,4 @@
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbModify } = require("../../utils/db");
 const { serverLog } = require("../../utils/logs");
 const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
 const { notifyFollowers } = require("../../utils/actions");
@@ -86,7 +86,6 @@ module.exports = {
 			await message.channel.send(replyEmbed);
 		}
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
 		await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: "REASON_GIVEN", reason: reason } : null);
 
 		if (qServerDB.config.channels.denied) {

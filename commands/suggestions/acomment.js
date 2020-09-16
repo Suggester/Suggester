@@ -1,7 +1,7 @@
 const { string } = require("../../utils/strings");
 const { fetchUser, logEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 module.exports = {
