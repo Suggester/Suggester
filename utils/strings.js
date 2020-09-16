@@ -4616,6 +4616,10 @@ module.exports = {
 			string: "`{{p}}unfollow 123`\nUnfollows suggestion #123",
 			context: "Examples for the unfollow command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMENT_TITLE_LOG": {
+			string: "Comment",
+			context: "Comment title for the log embed"
 		}
 	}
 };

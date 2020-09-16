@@ -62,7 +62,7 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "COMMENT_ADDED_LOG", "blue")
-				.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
+				.addField(string(guildLocale, "COMMENT_TITLE_LOG"), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
 
