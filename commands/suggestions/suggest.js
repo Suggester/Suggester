@@ -2,7 +2,7 @@ const { emoji } = require("../../config.json");
 const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
 const { dbQuery, dbModify, dbQueryAll } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig, checkReview } = require("../../utils/checks");
-const { serverLog } = require("../../utils/logs");
+const { serverLog, mediaLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
 const { checkURL } = require("../../utils/checks");
 const { confirmation } = require("../../utils/actions");
@@ -79,6 +79,27 @@ module.exports = {
 
 		let id = await Suggestion.countDocuments() + 1;
 
+		if (attachment) {
+			const res = await mediaLog(message, id, attachment)
+				.catch(console.error);
+
+			if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
+
+			if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
+
+			attachment = res.attachments[0].url;
+		}
+
 		//Review
 		if (qServerDB.config.mode === "review") {
 			let checkStaff = checkReview(locale, message.guild, qServerDB);
@@ -102,10 +123,10 @@ module.exports = {
 			let newSuggestion = await new Suggestion({
 				id: message.guild.id,
 				suggester: message.author.id,
-				suggestion: suggestion,
+				suggestion,
 				status: "awaiting_review",
 				suggestionId: id,
-				attachment: attachment,
+				attachment,
 				submitted: new Date()
 			}).save();
 
@@ -157,11 +178,11 @@ module.exports = {
 			await new Suggestion({
 				id: message.guild.id,
 				suggester: message.author.id,
-				suggestion: suggestion,
+				suggestion,
 				status: "approved",
 				suggestionId: id,
 				staff_member: client.user.id,
-				attachment: attachment,
+				attachment,
 				submitted: new Date()
 			}).save();
 

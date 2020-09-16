@@ -1,3 +1,3 @@
-module.exports = async (Discord, client, m) => {
-	console.log(m);
+module.exports = async (_Discord, _client, m) => {
+	if (process.env.NODE_ENV === "development") console.log(m);
 };
