@@ -1,10 +1,10 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
+const { fetchUser, logEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery } = require("../../utils/db");
 const { Suggestion } = require("../../utils/schemas");
 const { checkDenied, baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
-const { deleteFeedMessage, checkVotes } = require("../../utils/actions");
+const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "massdelete",
@@ -87,8 +87,7 @@ module.exports = {
 
 				let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 
-				let qUserDB = await dbQuery("User", { id: suggester.id });
-				if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+				await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
 
 				if (qServerDB.config.channels.denied) {
 					let deniedEmbed = new Discord.MessageEmbed()

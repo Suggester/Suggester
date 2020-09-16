@@ -1,9 +1,9 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, dmEmbed, logEmbed } = require("../../utils/misc");
+const { fetchUser, logEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
-const { editFeedMessage } = require("../../utils/actions");
+const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "acomment",
@@ -53,8 +53,7 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE_ANONYMOUS"), reason: comment }))).catch(() => {});
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: "COMMENT_TITLE_ANONYMOUS", reason: comment });
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")

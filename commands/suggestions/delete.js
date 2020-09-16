@@ -1,9 +1,9 @@
-const { fetchUser, reviewEmbed, dmEmbed, logEmbed } = require("../../utils/misc.js");
+const { fetchUser, reviewEmbed, logEmbed } = require("../../utils/misc.js");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
-const { deleteFeedMessage, checkVotes } = require("../../utils/actions");
+const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "delete",
@@ -57,8 +57,7 @@ module.exports = {
 		}
 		message.channel.send(replyEmbed);
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
 
 		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 

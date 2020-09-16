@@ -1,6 +1,7 @@
 const { dbQuery, dbModify } = require("../../utils/db");
 const { serverLog } = require("../../utils/logs");
-const { dmEmbed, reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
+const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
+const { notifyFollowers } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 module.exports = {
@@ -86,7 +87,7 @@ module.exports = {
 		}
 
 		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: string(locale, "REASON_GIVEN"), reason: reason } : null))).catch(() => {});
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DENIED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null,reason ? { header: "REASON_GIVEN", reason: reason } : null);
 
 		if (qServerDB.config.channels.denied) {
 			let deniedEmbed = new Discord.MessageEmbed()

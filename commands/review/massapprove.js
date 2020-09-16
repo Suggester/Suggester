@@ -1,7 +1,8 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
+const { fetchUser, suggestionEmbed, logEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery } = require("../../utils/db");
+const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { Suggestion } = require("../../utils/schemas");
 module.exports = {
@@ -122,16 +123,15 @@ module.exports = {
 						};
 					}
 
-					let qUserDB = await dbQuery("User", { id: suggester.id });
-					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "green", {
+					await notifyFollowers(client, qServerDB, qSuggestionDB, "green", {
 						string: "APPROVED_DM_TITLE",
 						guild: message.guild.name
-					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, reason ? {
-						header: string(locale, "COMMENT_TITLE", {
+					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, null, function (e, l) {
+						if (reason) e.addField(string(l, "COMMENT_TITLE", {
 							user: message.author.tag,
 							id: `${qSuggestionDB.suggestionId.toString()}_1`
-						}), reason: reason
-					} : null))).catch(() => {
+						}), reason);
+						return e;
 					});
 
 					if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));

@@ -99,6 +99,7 @@ const user = new Schema({
 	flags: [ String ],
 	verifyColor: String,
 	auto_subscribe: { type: Boolean, default: true },
+	notified_about_auto: { type: Boolean, default: false },
 	subscribed: [{
 		id: Number,
 		guild: String,

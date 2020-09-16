@@ -2,6 +2,7 @@ const { dbQueryNoNew, dbQuery } = require("../utils/db");
 const { editFeedMessage } = require("../utils/actions");
 const { checkPermissions, channelPermissions } = require("../utils/checks");
 const { string } = require("../utils/strings");
+const { prefix } = require("../config.json");
 const { errorLog } = require("../utils/logs");
 module.exports = async (Discord, client, messageReaction, user) => {
 	if (user.id === client.user.id) return;
@@ -18,6 +19,38 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		if (!db.config.reactionOptions.suggester && user.id === suggestion.suggester) return messageReaction.users.remove(user.id);
 		for await (let users of messageReaction.message.reactions.cache.map(r => r.users)) await users.fetch();
 		if (db.config.reactionOptions.one && emotes.filter(r => messageReaction.message.reactions.cache.get(r) && messageReaction.message.reactions.cache.get(r).users.cache.has(user.id)).length >= 2) return messageReaction.users.remove(user.id);
+		if (emotes.findIndex(i => i === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) === 0) {
+			let qUserDB = await dbQuery("User", { id: user.id });
+			let locale = qUserDB.locale || db.config.locale || "en";
+			if (qUserDB.auto_subscribe) {
+				if (!qUserDB.notify) {
+					qUserDB.auto_subscribe = false;
+					qUserDB.save();
+				} else if (!qUserDB.subscribed.includes(suggestion.suggestionId)) {
+					if (!qUserDB.notified_about_auto) user.send(string(locale, "AUTOFOLLOW_FIRST_NOTIF", { suggestion: suggestion.suggestionId.toString(), server: messageReaction.message.guild.name, prefix: db.config.prefix || prefix })).then(() => {
+						qUserDB.subscribed.push({
+							id: suggestion.suggestionId,
+							guild: db.id,
+							auto: true
+						});
+						qUserDB.notified_about_auto = true;
+						qUserDB.save();
+					}).catch(() => {
+						qUserDB.auto_subscribe = false;
+						qUserDB.notify = false;
+						qUserDB.save();
+					});
+					else {
+						qUserDB.subscribed.push({
+							id: suggestion.suggestionId,
+							guild: db.id,
+							auto: true
+						});
+						qUserDB.save();
+					}
+				}
+			}
+		}
 		await editFeedMessage({guild: db.config.locale}, suggestion, db, client);
 	} else {
 		let awaiting = await dbQueryNoNew("Suggestion", { id: messageReaction.message.guild.id, reviewMessage: messageReaction.message.id, status: "awaiting_review" });

@@ -610,6 +610,22 @@ module.exports = {
 			string: "DM Notifications are already disabled.",
 			context: "Shown when notifications are disabled and a user tries to disable them"
 		},
+		"AUTOFOLLOW_ENABLED": {
+			string: "Automatic following is **enabled**. You will automatically follow suggestions when you upvote them.",
+			context: "Shown when a user has enabled automatic following"
+		},
+		"AUTOFOLLOW_DISABLED": {
+			string: "Automatic following is **disabled**. You will not automatically follow suggestions when you upvote them, and you will not receive notifications for any suggestions you've automatically followed in the past.",
+			context: "Shown when a user has disabled automatic following"
+		},
+		"AUTOFOLLOW_ALREADY_ENABLED": {
+			string: "Automatic following is already enabled.",
+			context: "Shown when automatic following is enabled and a user tries to enable it"
+		},
+		"AUTOFOLLOW_ALREADY_DISABLED": {
+			string: "Automatic following is already disabled.",
+			context: "Shown when automatic following is disabled and a user tries to disable them"
+		},
 		"PROTIPS_ENABLED": {
 			string: "Protips are **enabled**.",
 			context: "Shown when a user has enabled protips"
@@ -1582,6 +1598,16 @@ module.exports = {
 				}
 			}
 		},
+		"COMMENT_ADDED_DM_TITLE_FOLLOW": {
+			string: "A comment was added to a suggestion you follow in **{{server}}**!",
+			context: "Title for the DM notification of a comment being added to a suggestion when a user is following the suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
 		"ANONYMOUS_COMMENT_ADDED_LOG": {
 			string: "{{user}} added an anonymous comment to #{{id}}",
 			context: "Title for the log embed when an anonymous comment is added",
@@ -1657,6 +1683,16 @@ module.exports = {
 		"APPROVED_DM_TITLE": {
 			string: "Your suggestion was approved in **{{server}}**!",
 			context: "Title for the DM notification of a suggestion being approved",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"APPROVED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was approved in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being approved on a suggestion followed",
 			replaced: {
 				server: {
 					to_replace: "{{server}}",
@@ -2062,6 +2098,16 @@ module.exports = {
 				}
 			}
 		},
+		"DELETED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was deleted in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being deleted on a followed suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
 		"DELETED_LOG": {
 			string: "{{user}} deleted #{{id}}",
 			context: "Title for the log embed when a suggestion is deleted",
@@ -2139,6 +2185,16 @@ module.exports = {
 		"DENIED_DM_TITLE": {
 			string: "Your suggestion was denied in **{{server}}**!",
 			context: "Title for the DM notification of a suggestion being denied",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"DENIED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was denied in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being denied on a followed suggestion",
 			replaced: {
 				server: {
 					to_replace: "{{server}}",
@@ -2237,6 +2293,16 @@ module.exports = {
 		"STATUS_MARK_DM_TITLE": {
 			string: "The status of your suggestion in **{{server}}** was edited!",
 			context: "Title for the DM notification of a status being marked on a suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"STATUS_MARK_DM_TITLE_FOLLOW": {
+			string: "The status of a suggestion you follow in **{{server}}** was edited!",
+			context: "Title for the DM notification of a status being marked on a suggestion on a followed suggestion",
 			replaced: {
 				server: {
 					to_replace: "{{server}}",
@@ -4448,6 +4514,76 @@ module.exports = {
 			string: "`{{p}}config locale en`\nSets the server language to English.",
 			context: "Examples for the Locale config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `locale`"
+		},
+		"AUTOFOLLOW_FIRST_NOTIF": {
+			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
+			context: "Notification when a user upvotes a suggestion and automatically follows it (only for the first follow)",
+			replaced: {
+				suggestion: {
+					to_replace: "{{suggestion}}",
+					description: "The suggestion ID"
+				},
+				server: {
+					to_replace: "{{server}}",
+					description: "The server name"
+				},
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"FOLLOW_NO_PARAMS_ERROR": {
+			string: "You must specify `list`, `auto` or a suggestion ID.",
+			context: "Shown when no parameters or specified for the follow command"
+		},
+		"FOLLOW_SUCCESS": {
+			string: "You are now following suggestion #{{id}}",
+			context: "Success message when you follow a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"UNFOLLOW_SUCCESS": {
+			string: "You are no longer following suggestion #{{id}}",
+			context: "Success message when you unfollow a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"ALREADY_FOLLOWING_ERROR": {
+			string: "You are already following suggestion #{{id}}",
+			context: "Error message when you are already following a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"NOT_FOLLOWING_ERROR": {
+			string: "You are not following suggestion #{{id}}",
+			context: "Error message when you are not following a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"FOLLOWING_TITLE": {
+			string: "Followed Suggestions:",
+			context: "Title for the followed suggestions embed"
+		},
+		"NONE_FOLLOWED": {
+			string: "You are not following any suggestions",
+			context: "Message shown when you are not following any suggestions"
 		}
 	}
 };

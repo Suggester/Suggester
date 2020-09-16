@@ -98,7 +98,7 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(client.colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
-		if (reason) embed.addField(reason.header, reason.reason);
+		if (reason) embed.addField(string(locale, reason.header), reason.reason);
 		return embed;
 	},
 	reviewEmbed: function (locale, qSuggestionDB, user, color, change) {

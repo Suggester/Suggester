@@ -1,9 +1,9 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, logEmbed, dmEmbed } = require("../../utils/misc");
+const { fetchUser, logEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
 const { dbQuery, dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
-const { editFeedMessage } = require("../../utils/actions");
+const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "comment",
@@ -55,8 +55,10 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), reason: comment }))).catch(() => {});
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, null, function (e, l) {
+			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
+			return e;
+		});
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "COMMENT_ADDED_LOG", "blue")
