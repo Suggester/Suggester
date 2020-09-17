@@ -570,6 +570,10 @@ module.exports = {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"
 		},
+		"COMMAND_DISABLED_FLAG": {
+			string: "This command has been disabled on this server by a global administrator",
+			context: "Error shown when a command is disabled for a server"
+		},
 		"INVITE_BOT": {
 			string: "You can invite {{name}} to your server with this link: {{link}}",
 			context: "The response to the invite command",

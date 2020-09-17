@@ -22,6 +22,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
+		if (qServerDB.flags.includes(`DISABLE_CHANNEL:${message.channel.id}`)) return;
 		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\") && !message.content.startsWith(qServerDB.config.prefix) && !message.content.startsWith(`<@${client.user.id}>`) && !message.content.startsWith(`<@!${client.user.id}>`) && qServerDB.config.in_channel_suggestions) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
@@ -53,10 +54,10 @@ module.exports = async (Discord, client, message) => {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
 	}
-	if (command.controls.enabled === false) {
+	if (command.controls.enabled === false || qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase())) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return message.channel.send(string(locale, "COMMAND_DISABLED", {}, "error"));
+		return message.channel.send(string(locale, !command.controls.enabled ? "COMMAND_DISABLED" : "COMMAND_DISABLED_FLAG", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });

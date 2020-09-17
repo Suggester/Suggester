@@ -47,7 +47,7 @@ module.exports = {
 		}
 		if (!embedArray[0]) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
 
-		if (!qServerDB.flags.includes("LARGE")) {
+		if (!qServerDB.flags.includes("LARGE") && !qServerDB.flags.includes("MORE_TOP")) {
 			let embed = new Discord.MessageEmbed()
 				.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
 				.setColor(client.colors.green);
