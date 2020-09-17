@@ -23,7 +23,8 @@ const settings = new Schema({
 			log: { type: String },
 			denied: { type: String },
 			archive: { type: String },
-			commands: { type: String }
+			commands: { type: String },
+			commands_new: [ String ]
 		},
 		reactionOptions: {
 			suggester: { type: Boolean, default: true },

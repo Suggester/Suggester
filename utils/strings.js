@@ -684,13 +684,13 @@ module.exports = {
 				}
 			}
 		},
-		"NOT_COMMAND_CHANNEL_ERROR": {
-			string: "Suggestions can only be submitted in the {{channel}} channel.",
+		"SUBMIT_NOT_COMMAND_CHANNEL_ERROR": {
+			string: "Suggestions can only be submitted in the following channels: {{channels}}",
 			context: "Error when a user uses suggest in a non-command channel",
 			replaced: {
-				channel: {
-					to_replace: "{{channel}}",
-					description: "The mention of the commands channel"
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The mentions of the commands channels"
 				}
 			}
 		},
@@ -1266,8 +1266,8 @@ module.exports = {
 			string: "Successfully reset the log channel.",
 			context: "Success message when the log channel is reset"
 		},
-		"CFG_COMMANDS_SET_SUCCESS": {
-			string: "Successfully set {{channel}} as the suggestion commands channel.",
+		"CFG_COMMANDS_ADD_SUCCESS": {
+			string: "Successfully added {{channel}} as a suggestion commands channel.",
 			context: "Success message when the suggestion commands channel is configured",
 			replaced: {
 				channel: {
@@ -1276,9 +1276,15 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_COMMANDS_RESET_SUCCESS": {
-			string: "Successfully reset the suggestion commands channel.",
-			context: "Success message when the suggestion commands channel is reset"
+		"CFG_COMMANDS_REMOVED_SUCCESS": {
+			string: "Successfully removed {{channel}} from the list of suggestion commands channels.",
+			context: "Success message when a suggestion commands channel is removed",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
 		},
 		"CFG_ARCHIVE_SET_SUCCESS": {
 			string: "Successfully set {{channel}} as the implemented suggestions archive channel.",
@@ -4324,21 +4330,17 @@ module.exports = {
 			context: "Examples for the Log Channel config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `log`"
 		},
-		"CONFIG_NAME:COMMANDS": {
-			string: "Suggestion Command Channel",
-			context: "Name of the Suggestion Command Channel config element"
+		"CONFIG_NAME:COMMANDSCHANNELS": {
+			string: "Suggestion Commands Channels",
+			context: "Name of the Suggestion Commands Channels config element"
 		},
-		"CONFIG_DESC:COMMANDS": {
-			string: "This setting locks using the `suggest` command to only the configured channel. Configuring no channel will allow the command to be used in any channel.",
-			context: "Description of the Suggestion Command Channel config element"
+		"CONFIG_DESC:COMMANDSCHANNELS": {
+			string: "This setting locks using the `suggest` command to only the configured channels. Configuring no channels will allow the command to be used in any channel.",
+			context: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels"
 		},
-		"CONFIG_EXAMPLES:COMMANDS": {
-			string: "`{{p}}config commands #bot-commands`\n" +
-				"Limits using the `suggest` command to the #bot-commands channel\n" +
-				"\n" +
-				"`{{p}}config commands none`\n" +
-				"Resets the commands channel, allowing the `suggest` command to be used in any channel",
-			context: "Examples for the Suggestion Command Channel config element\n" +
+		"CONFIG_EXAMPLES:COMMANDSCHANNELS": {
+			string: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels",
+			context: "Examples for the Suggestion Commands Channels config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `commands`"
 		},
 		"CONFIG_NAME:IMPLEMENTED": {
@@ -4620,6 +4622,14 @@ module.exports = {
 		"COMMENT_TITLE_LOG": {
 			string: "Comment",
 			context: "Comment title for the log embed"
+		},
+		"CFG_COMMANDS_ALREADY_ADDED_ERROR": {
+			string: "This channel has already been added as a commands channel!",
+			context: "Error message shown when a channel is already a commands channel"
+		},
+		"CFG_COMMANDS_NOT_ADDED_ERROR": {
+			string: "This channel has not been added as a commands channel!",
+			context: "Error message shown when a channel is not a commands channel"
 		}
 	}
 };

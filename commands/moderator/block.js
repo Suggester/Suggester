@@ -34,7 +34,7 @@ module.exports = {
 			for await (let chunk of chunks) {
 				let list = [];
 				for await (let blocked of chunk) {
-					let u = await fetchUser(typeof blocked === "string" ? blocked.id : blocked, client);
+					let u = await fetchUser(typeof blocked === "string" ? blocked : blocked.id, client);
 					u ? list.push(`${u.tag} (\`${u.id}\`)`) : "";
 				}
 

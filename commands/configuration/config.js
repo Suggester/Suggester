@@ -1,7 +1,7 @@
 const { emoji, support_invite } = require("../../config.json");
 const { dbQueryNoNew, dbQuery, dbModify } = require("../../utils/db");
-const { findRole, handleChannelInput, findEmoji, handleRoleInput } = require("../../utils/config");
-const { checkPermissions } = require("../../utils/checks");
+const { findRole, handleChannelInput, findEmoji, handleRoleInput, findChannel } = require("../../utils/config");
+const { checkPermissions, channelPermissions } = require("../../utils/checks");
 const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
 const { string, list } = require("../../utils/strings");
@@ -83,6 +83,17 @@ module.exports = {
 			return [`**${string(locale, title, {}, "success")}:** <#${foundChannel.id}> (\`${foundChannel.id}\`)`];
 		}
 
+		async function showCommandsChannels (channels, oldChannel, server, title, fatal, append) {
+			let channelsToTest = channels;
+			if (oldChannel) channelsToTest.push(oldChannel);
+			let foundChannels = [];
+			for await (let c of channelsToTest) {
+				let foundChannel = server.channels.cache.get(c);
+				if (foundChannel && ["text", 0].includes(foundChannel.type)) foundChannels.push(foundChannel);
+			}
+			return foundChannels.length > 0 ? [`**${string(locale, title, {}, "success")}:** ${foundChannels.map(c => `<#${c.id}> (\`${c.id}\`)`).join(", ")}`] : [`**${string(locale, title, {}, "error")}:** ${string(locale, "NONE_CONFIGURED")} ${append ? append : ""}`, true];
+		}
+
 		function checkEmoji(emoji) {
 			if (emoji === "none") return string(locale, "DISABLED");
 			else if (nodeEmoji.find(emoji)) return emoji;
@@ -105,6 +116,34 @@ module.exports = {
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return string(locale, success_str, { emote: emote[1] }, "success");
 			} else return string(locale, "CFG_EMOJI_NOT_FOUND_ERROR", {}, "error");
+		}
+
+		async function handleCommandsChannelInput (locale, input, server, current_name, check_perms, done_str, action) {
+			if (!input) return string(locale, "CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
+			let qServerDB = await server.db;
+
+			let channel = await findChannel(input, server.channels.cache);
+			if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+			let permissions = await channelPermissions(locale, check_perms, channel, server.client);
+			if (permissions) return permissions;
+
+			if (qServerDB.config.channels.commands) {
+				qServerDB.config.channels.commands_new.push(qServerDB.config.channels.commands);
+				qServerDB.config.channels.commands = "";
+			}
+			switch (action) {
+			case "add":
+				if (qServerDB.config.channels.commands_new.includes(channel.id)) return string(locale, "CFG_COMMANDS_ALREADY_ADDED_ERROR", {}, "error");
+				qServerDB.config.channels.commands_new.push(channel.id);
+				break;
+			case "remove":
+				if (!qServerDB.config.channels.commands_new.includes(channel.id)) return string(locale, "CFG_COMMANDS_NOT_ADDED_ERROR", {}, "error");
+				qServerDB.config.channels.commands_new.splice(qServerDB.config.channels.commands_new.findIndex(c => c.toString() === channel.id), 1);
+				break;
+			}
+
+			await dbModify("Server", {id: server.id}, qServerDB);
+			return string(locale, done_str, { channel: `<#${channel.id}>` }, "success");
 		}
 
 		let elements = [{
@@ -358,13 +397,30 @@ module.exports = {
 			}
 		},
 		{
-			names: ["commands", "command", "commandchannel", "commandschannel"],
-			name: "Suggestion Command Channel",
-			description: "This setting locks using the `suggest` command to only the configured channel. Configuring no channel will allow the command to be used in any channel.",
-			examples: "`{{p}}config commands #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands none`\nResets the commands channel, allowing the `suggest` command to be used in any channel",
+			names: ["commandschannels", "commandchannels", "command", "commandchannel", "commands"],
+			name: "Suggestion Commands Channels",
+			description: "This setting locks using the `suggest` command to only the configured channels. Configuring no channels will allow the command to be used in any channel.",
+			examples: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND")))[0]);
-				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_SET_SUCCESS", "CFG_COMMANDS_RESET_SUCCESS")));
+				switch (args[1] || "") {
+				case "add":
+				case "+": {
+					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_ADD_SUCCESS", "add")));
+				}
+				case "remove":
+				case "-":
+				case "rm":
+				case "delete": {
+					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_REMOVED_SUCCESS", "remove")));
+				}
+				case "list": {
+					return message.channel.send((await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND")))[0]);
+				}
+				default: {
+					if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+					else return message.channel.send((await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND")))[0]);
+				}
+				}
 			}
 		},
 		{
@@ -803,11 +859,7 @@ module.exports = {
 			}
 			cfgChannelsArr.push(archiveChannel[0]);
 			// Commands channel
-			let commandsChannel = await showChannel(qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND"));
-			if (commandsChannel[1]) {
-				qServerDB.config.channels.commands = "";
-				await dbModify("Server", {id: server.id}, qServerDB);
-			}
+			let commandsChannel = await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND"));
 			cfgChannelsArr.push(commandsChannel[0]);
 			// Emojis
 			let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string(locale, "CFG_UPVOTE_REACTION_DISABLED") : "👍");
