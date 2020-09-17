@@ -73,7 +73,7 @@ module.exports = {
 			.setDescription(string(locale, "IMPORT_DESC", { support_invite: `https://discord.gg/${support_invite}`, check: `<:${emoji.check}>`, x: `<:${emoji.x}>`, bots: botArr.join("\n") }))
 			.setColor(client.colors.default);
 		let num = 30;
-		if ((permission <= 1 || qServerDB.flags.includes("NO_IMPORT_LIMIT")) && args[0]) {
+		if ((permission <= 1 || qServerDB.flags.includes("NO_IMPORT_LIMIT") || qServerDB.flags.includes("LARGE")) && args[0]) {
 			num = parseInt(args[0]);
 			if (!num || num < 1 || num > 100) return message.channel.send(string(locale, "IMPORT_TOO_MANY_ERROR", {}, "error"));
 			cEmbed.addField(string(locale, "IMPORT_OVERRIDE_TITLE"), string(locale, "IMPORT_OVERRIDE_DESC", { num }));

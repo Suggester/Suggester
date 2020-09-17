@@ -74,7 +74,7 @@ module.exports = async (Discord, client, message) => {
 	}
 
 	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
-	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && (!qUserDB.flags || (!qUserDB.flags.includes("NO_COOLDOWN") && !qUserDB.flags.includes("PROTECTED"))) && (!message.guild || !qServerDB.flags || !qServerDB.flags.includes("NO_COOLDOWN"))) {
+	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && !["PROTECTED", "NO_COOLDOWN"].some(f => qUserDB.flags.includes(f)) && (message.guild ? (!qServerDB.flags.includes("NO_COOLDOWN") && (permission <= 3 ? !qServerDB.flags.includes("LARGE") : true)) : true)) {
 		/*
 			Cooldown collection:
 			[

@@ -3330,9 +3330,15 @@ module.exports = {
 			string: "No suggestions that matched your query were found",
 			context: "Error shown when no suggestions are found for the top/down command"
 		},
-		"TOP_TITLE": {
-			string: "Top 10 Highest Voted Suggestions",
-			context: "Header for the top suggestions embed"
+		"TOP_TITLE_NEW": {
+			string: "Top {{number}} Highest Voted Suggestions",
+			context: "Header for the top suggestions embed",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The number of suggestions shown"
+				}
+			}
 		},
 		"DOWN_TITLE": {
 			string: "Top 10 Lowest Voted Suggestions",

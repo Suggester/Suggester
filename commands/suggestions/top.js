@@ -1,6 +1,6 @@
 const { dbQueryAll } = require("../../utils/db");
 const { string } = require("../../utils/strings");
-const { checkVotes } = require("../../utils/actions");
+const { checkVotes, pages } = require("../../utils/actions");
 const { baseConfig } = require("../../utils/checks");
 const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
@@ -39,7 +39,7 @@ module.exports = {
 				});
 			}).catch(() => {});
 		}
-		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, 10)) {
+		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 10)) {
 			embedArray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
 				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`
@@ -47,12 +47,40 @@ module.exports = {
 		}
 		if (!embedArray[0]) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
 
-		let embed = new Discord.MessageEmbed()
-			.setTitle(string(locale, "TOP_TITLE"))
-			.setColor(client.colors.green);
-		if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", { time: humanizeDuration(time, { language: locale, fallbacks: ["en"] }) }));
-		embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
-		message.channel.stopTyping(true);
-		return m.edit("", embed);
+		if (!qServerDB.flags.includes("LARGE")) {
+			let embed = new Discord.MessageEmbed()
+				.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
+				.setColor(client.colors.green);
+			if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", {
+				time: humanizeDuration(time, {
+					language: locale,
+					fallbacks: ["en"]
+				})
+			}));
+			embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
+			message.channel.stopTyping(true);
+			return m.edit("", embed);
+		} else {
+			let chunks = embedArray.chunk(10);
+			let embeds = [];
+			for await (let chunk of chunks) {
+				let embed = new Discord.MessageEmbed()
+					.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
+					.setColor(client.colors.green)
+					.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
+					.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : "");
+				if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", {
+					time: humanizeDuration(time, {
+						language: locale,
+						fallbacks: ["en"]
+					})
+				}));
+				chunk.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
+				embeds.push(embed);
+			}
+			message.channel.stopTyping(true);
+			pages(locale, message, embeds);
+			return m.delete();
+		}
 	}
 };
