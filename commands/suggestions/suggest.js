@@ -52,7 +52,7 @@ module.exports = {
 			}
 		}
 
-		if ((qServerDB.config.channels.commands ? message.channel.id !== qServerDB.config.channels.commands : true) && !qServerDB.config.channels.commands_new.includes(message.channel.id) && !noCommand) {
+		if ((qServerDB.config.channels.commands ? message.channel.id !== qServerDB.config.channels.commands : true) && (qServerDB.config.channels.commands_new.length > 0 ? !qServerDB.config.channels.commands_new.includes(message.channel.id) : false) && !noCommand) {
 			let channels = qServerDB.config.channels.commands_new;
 			if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
 			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error"));

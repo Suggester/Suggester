@@ -3326,16 +3326,20 @@ module.exports = {
 				}
 			}
 		},
-		"NO_TOP_FOUND": {
-			string: "No suggestions with votes were found",
-			context: "Error shown when no suggestions are found for the top command"
+		"NO_SUGGESTIONS_FOUND": {
+			string: "No suggestions that matched your query were found",
+			context: "Error shown when no suggestions are found for the top/down command"
 		},
 		"TOP_TITLE": {
 			string: "Top 10 Highest Voted Suggestions",
 			context: "Header for the top suggestions embed"
 		},
-		"TOP_LOADING": {
-			string: "Collecting top suggestion data, this may take a moment...",
+		"DOWN_TITLE": {
+			string: "Top 10 Lowest Voted Suggestions",
+			context: "Header for the lowest voted suggestions embed"
+		},
+		"SUGGESTION_LOADING": {
+			string: "Collecting suggestion data, this may take a moment...",
 			context: "Message shown when waiting for top 10 data to collect"
 		},
 		"COMMAND_DESC:ACKNOWLEDGEMENT": {
@@ -4036,14 +4040,33 @@ module.exports = {
 			context: "Examples for the silentdeny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:TOP": {
+		"COMMAND_DESC:TOPVOTED": {
 			string: "Shows the top 10 most highly voted suggestions",
 			context: "Description for the top command"
 		},
-		"COMMAND_USAGE:TOP": {
-			string: "top",
+		"COMMAND_USAGE:TOPVOTED": {
+			string: "top (time)",
 			context: "Description for the top command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:TOPVOTED": {
+			string: "`{{p}}top`\nShows the top 10 suggestions\n\n`{{p}}top 1w`\nShows the top 10 suggestions from the last week",
+			context: "Examples for the top command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DOWN": {
+			string: "Shows the top 10 lowest voted suggestions",
+			context: "Description for the down command"
+		},
+		"COMMAND_USAGE:DOWN": {
+			string: "down (time)",
+			context: "Description for the down command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DOWN": {
+			string: "`{{p}}down`\nShows the top 10 lowest voted suggestions\n\n`{{p}}down 1w`\nShows the top 10 lowest voted suggestions from the last week",
+			context: "Examples for the down command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
 		"COMMAND_DESC:UNBLOCK": {
 			string: "Unblocks a user from using the bot in this server",
@@ -4634,6 +4657,16 @@ module.exports = {
 		"UNAVAILABLE": {
 			string: "Unavailable",
 			context: "Describes something that is not available"
+		},
+		"TOP_TIME_INFO": {
+			string: "Search limited to suggestions {{time}} old or newer",
+			context: "Shows information about the time filter in the top command",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The amount of time to filter by"
+				}
+			}
 		}
 	}
 };
