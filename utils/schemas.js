@@ -36,7 +36,7 @@ const settings = new Schema({
 		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
 		in_channel_suggestions: { type: Boolean, default: false },
-		blocklist: [String],
+		blocklist: [Object | String],
 		emojis: {
 			up: { type: String, default: "👍" },
 			mid: { type: String, default: "🤷" },

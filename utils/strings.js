@@ -2002,6 +2002,10 @@ module.exports = {
 			string: "Reason:",
 			context: "Shown if a reason is specified for the block command"
 		},
+		"BLOCK_DURATION_HEADER": {
+			string: "Duration:",
+			context: "Shown if a duration is specified for the block command"
+		},
 		"BLOCK_SUCCESS": {
 			string: "**{{user}}** (`{{id}}`) has been blocked from using the bot on this server.",
 			context: "Success message when a user is blocked in a guild",
@@ -3795,21 +3799,17 @@ module.exports = {
 			context: "Examples for the attach command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:BLOCK": {
+		"COMMAND_DESC:BL": {
 			string: "Blocks a user from using the bot in this server",
 			context: "Description for the block command"
 		},
-		"COMMAND_USAGE:BLOCK": {
-			string: "block [user]",
+		"COMMAND_USAGE:BL": {
+			string: "block [user] (duration) (reason)",
 			context: "Description for the block command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:BLOCK": {
-			string: "`{{p}}block @Brightness™`\n" +
-				"Blocks Brightness™ from using the bot in this server\n" +
-				"\n" +
-				"`{{p}}block 255834596766253057 Spamming suggestions`\n" +
-				"Blocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"",
+		"COMMAND_EXAMPLES:BL": {
+			string: "`{{p}}block @Brightness™`\nBlocks Brightness™ from using the bot in this server\n\n`{{p}}block 255834596766253057 Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"\n\n`{{p}}block @Brightness™ 1h`\nBlocks Brightness™ from using the bot in this server for 1 hour\n\n`{{p}}block 255834596766253057 2h Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for 2 hours with reason \"Spamming suggestions\"",
 			context: "Examples for the block command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},

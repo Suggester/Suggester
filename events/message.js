@@ -138,7 +138,7 @@ module.exports = async (Discord, client, message) => {
 		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
-	if (message.guild && qServerDB.config.blocklist && qServerDB.config.blocklist.includes(message.author.id)) return commandExecuted(command, message, { pre, post: new Date(), success: false });
+	if (message.guild && qServerDB.config.blocklist && (qServerDB.config.blocklist.includes(message.author.id) || qServerDB.config.blocklist.find(b => b.id === message.author.id && b.expires > Date.now()))) return commandExecuted(command, message, { pre, post: new Date(), success: false });
 
 	try {
 		command.do(locale, message, client, args, Discord, noCommand)

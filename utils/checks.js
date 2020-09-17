@@ -28,7 +28,7 @@ module.exports = {
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
 		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
-		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
+		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocklist.find(b => b.id === member.id && b.expires > Date.now()) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
 		return 10;
 	},
 	channelPermissions: (locale, permissionCheckFor, channel, client) => {
