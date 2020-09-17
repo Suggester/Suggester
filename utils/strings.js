@@ -4630,6 +4630,10 @@ module.exports = {
 		"CFG_COMMANDS_NOT_ADDED_ERROR": {
 			string: "This channel has not been added as a commands channel!",
 			context: "Error message shown when a channel is not a commands channel"
+		},
+		"UNAVAILABLE": {
+			string: "Unavailable",
+			context: "Describes something that is not available"
 		}
 	}
 };
