@@ -12,6 +12,6 @@ module.exports = {
 		dmAvailable: true
 	},
 	do: (locale, message) => {
-		return message.channel.send(string(locale, "GITHUB_REPO", { link: `https://github.com/Suggester-Bot/Suggester` }));
+		return message.channel.send(string(locale, "GITHUB_REPO", { link: "https://github.com/Suggester/Suggester" }));
 	}
 };

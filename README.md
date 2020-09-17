@@ -6,14 +6,14 @@
   <a href="https://discord.com/invite/G5pEdUp" target="_blank">
     <img src="https://canary.discord.com/api/guilds/566002482166104066/widget.png" alt="Discord Server" />
   </a>
-  <a href="https://github.com/Suggester-Bot/Suggester/releases" target="_blank">
-    <img src="https://img.shields.io/github/release/Suggester-Bot/Suggester.svg" alt="Latest Release" />
+  <a href="https://github.com/Suggester/Suggester/releases" target="_blank">
+    <img src="https://img.shields.io/github/release/Suggester/Suggester.svg" alt="Latest Release" />
   </a>
   <a href="https://suggester.js.org" target="_blank">
     <img src="https://img.shields.io/website-up-down-green-red/https/suggester.js.org.svg" alt="Website Status" />
   </a>
-  <a href="https://github.com/Suggester-Bot/Suggester/actions" target="_blank">
-    <img src="https://github.com/Suggester-Bot/Suggester/workflows/Suggester%20CI/badge.svg" alt="Suggester CI" />
+  <a href="https://github.com/Suggester/Suggester/actions" target="_blank">
+    <img src="https://github.com/Suggester/Suggester/workflows/Suggester%20CI/badge.svg" alt="Suggester CI" />
   </a>
 </p>
 
@@ -25,4 +25,4 @@ The code of the bot is open source to allow for community contributions. Please 
 **You may not host your own clone of Suggester publicly and/or provide support for it.**
 
 ## How do I contribute?
-You can contribute by submitting a pull request to the [**staging** branch](https://github.com/Suggester-Bot/Suggester/tree/staging). Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the <a href="https://discord.com/invite/G5pEdUp" target="_blank">Support Server</a>.
+You can contribute by submitting a pull request to the [**staging** branch](https://github.com/Suggester/Suggester/tree/staging). Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the <a href="https://discord.com/invite/G5pEdUp" target="_blank">Support Server</a>.

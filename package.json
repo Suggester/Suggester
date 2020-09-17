@@ -1,7 +1,7 @@
 {
-  "name": "suggester-bot",
+  "name": "suggester",
   "description": "A bot that manages suggestions on Discord",
-  "repository": "https://github.com/Suggester-Bot/Suggester",
+  "repository": "https://github.com/Suggester/Suggester",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
