@@ -3560,7 +3560,16 @@ module.exports = {
 		},
 		"COMMAND_USAGE:INVITE": {
 			string: "invite",
-			context: "Description for the invite command\n" +
+			context: "Usage for the invite command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:GITHUB": {
+			string: "Shows the link to Suggester's GitHub repository",
+			context: "Description for the github command"
+		},
+		"COMMAND_USAGE:GITHUB": {
+			string: "github",
+			context: "Usage for the github command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_DESC:LOCALE": {
@@ -4671,6 +4680,16 @@ module.exports = {
 				time: {
 					to_replace: "{{time}}",
 					description: "The amount of time to filter by"
+				}
+			}
+		},
+		"GITHUB_REPO": {
+			string: "You can find Suggester's GitHub repository at {{link}}",
+			context: "Shows the link to Suggester's GitHub repository",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the repository"
 				}
 			}
 		}
