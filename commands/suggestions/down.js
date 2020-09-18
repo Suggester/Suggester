@@ -4,6 +4,9 @@ const { checkVotes } = require("../../utils/actions");
 const { baseConfig } = require("../../utils/checks");
 const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
+function timeout(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 module.exports = {
 	controls: {
 		name: "down",
@@ -29,6 +32,8 @@ module.exports = {
 		let embedArray = [];
 		let approvedSuggestions = await dbQueryAll("Suggestion", { status: "approved", implemented: false, id: message.guild.id });
 
+		if (approvedSuggestions.length > 40) await m.edit(`${m.content}\n${string(locale, "TOP_ESTIMATED_TIME", { time: humanizeDuration(2500*approvedSuggestions.length, { language: locale, fallbacks: ["en"] }) })}`);
+
 		for await (let suggestion of approvedSuggestions) {
 			if (time && new Date(suggestion.submitted).getTime()+time < Date.now()) continue;
 			await client.channels.cache.get(suggestion.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
@@ -38,6 +43,7 @@ module.exports = {
 					opinion: votes[2]
 				});
 			}).catch(() => {});
+			if (approvedSuggestions.length > 40) await timeout(2500);
 		}
 		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion)).sort((a, b) => a.opinion - b.opinion).splice(0, 10)) {
 			embedArray.push({

@@ -4696,6 +4696,16 @@ module.exports = {
 					description: "The link to the repository"
 				}
 			}
+		},
+		"TOP_ESTIMATED_TIME": {
+			string: "Due to the large number of suggestions that need fetched, collecting statistics is estimated to take {{time}}",
+			context: "The estimated time shown for the top command",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The time the command will take"
+				}
+			}
 		}
 	}
 };
