@@ -50,9 +50,9 @@ module.exports = {
 			qSuggestionDB.denial_reason = reason;
 		}
 
-		if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) {
-			let returned = await client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
-				let checkStaff = checkReview(locale, message.guild, qServerDB);
+		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
+			let returned = await client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+				let checkStaff = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 				if (checkStaff) return message.channel.send(checkStaff);
 				fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))));
 				fetched.reactions.removeAll();

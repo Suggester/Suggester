@@ -570,6 +570,10 @@ module.exports = {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"
 		},
+		"COMMAND_DISABLED_FLAG": {
+			string: "This command has been disabled on this server by a global administrator",
+			context: "Error shown when a command is disabled for a server"
+		},
 		"INVITE_BOT": {
 			string: "You can invite {{name}} to your server with this link: {{link}}",
 			context: "The response to the invite command",
@@ -609,6 +613,22 @@ module.exports = {
 		"NOTIFICATIONS_ALREADY_DISABLED": {
 			string: "DM Notifications are already disabled.",
 			context: "Shown when notifications are disabled and a user tries to disable them"
+		},
+		"AUTOFOLLOW_ENABLED": {
+			string: "Automatic following is **enabled**. You will automatically follow suggestions when you upvote them.",
+			context: "Shown when a user has enabled automatic following"
+		},
+		"AUTOFOLLOW_DISABLED": {
+			string: "Automatic following is **disabled**. You will not automatically follow suggestions when you upvote them, and you will not receive notifications for any suggestions you've automatically followed in the past.",
+			context: "Shown when a user has disabled automatic following"
+		},
+		"AUTOFOLLOW_ALREADY_ENABLED": {
+			string: "Automatic following is already enabled.",
+			context: "Shown when automatic following is enabled and a user tries to enable it"
+		},
+		"AUTOFOLLOW_ALREADY_DISABLED": {
+			string: "Automatic following is already disabled.",
+			context: "Shown when automatic following is disabled and a user tries to disable them"
 		},
 		"PROTIPS_ENABLED": {
 			string: "Protips are **enabled**.",
@@ -668,13 +688,13 @@ module.exports = {
 				}
 			}
 		},
-		"NOT_COMMAND_CHANNEL_ERROR": {
-			string: "Suggestions can only be submitted in the {{channel}} channel.",
+		"SUBMIT_NOT_COMMAND_CHANNEL_ERROR": {
+			string: "Suggestions can only be submitted in the following channels: {{channels}}",
 			context: "Error when a user uses suggest in a non-command channel",
 			replaced: {
-				channel: {
-					to_replace: "{{channel}}",
-					description: "The mention of the commands channel"
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The mentions of the commands channels"
 				}
 			}
 		},
@@ -1250,8 +1270,8 @@ module.exports = {
 			string: "Successfully reset the log channel.",
 			context: "Success message when the log channel is reset"
 		},
-		"CFG_COMMANDS_SET_SUCCESS": {
-			string: "Successfully set {{channel}} as the suggestion commands channel.",
+		"CFG_COMMANDS_ADD_SUCCESS": {
+			string: "Successfully added {{channel}} as a suggestion commands channel.",
 			context: "Success message when the suggestion commands channel is configured",
 			replaced: {
 				channel: {
@@ -1260,9 +1280,15 @@ module.exports = {
 				}
 			}
 		},
-		"CFG_COMMANDS_RESET_SUCCESS": {
-			string: "Successfully reset the suggestion commands channel.",
-			context: "Success message when the suggestion commands channel is reset"
+		"CFG_COMMANDS_REMOVED_SUCCESS": {
+			string: "Successfully removed {{channel}} from the list of suggestion commands channels.",
+			context: "Success message when a suggestion commands channel is removed",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
 		},
 		"CFG_ARCHIVE_SET_SUCCESS": {
 			string: "Successfully set {{channel}} as the implemented suggestions archive channel.",
@@ -1582,6 +1608,16 @@ module.exports = {
 				}
 			}
 		},
+		"COMMENT_ADDED_DM_TITLE_FOLLOW": {
+			string: "A comment was added to a suggestion you follow in **{{server}}**!",
+			context: "Title for the DM notification of a comment being added to a suggestion when a user is following the suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
 		"ANONYMOUS_COMMENT_ADDED_LOG": {
 			string: "{{user}} added an anonymous comment to #{{id}}",
 			context: "Title for the log embed when an anonymous comment is added",
@@ -1664,6 +1700,16 @@ module.exports = {
 				}
 			}
 		},
+		"APPROVED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was approved in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being approved on a suggestion followed",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
 		"APPROVED_LOG": {
 			string: "{{user}} approved #{{id}}",
 			context: "Title for the log embed when a suggestion is approved",
@@ -1693,6 +1739,10 @@ module.exports = {
 		"ATTACHMENT_ADDED_HEADER": {
 			string: "Attachment Added",
 			context: "Title of the reply embed when an attachment is added"
+		},
+		"ATTACHMENT_TOO_BIG": {
+			string: "The attached file is too big. Please upload an image under 8 MB",
+			context: "The error message to be sent if an image is larger than 8mb (webhook max filesize)"
 		},
 		"ATTACHED_LOG": {
 			string: "{{user}} added an attachment to #{{id}}",
@@ -1962,6 +2012,10 @@ module.exports = {
 			string: "Reason:",
 			context: "Shown if a reason is specified for the block command"
 		},
+		"BLOCK_DURATION_HEADER": {
+			string: "Duration:",
+			context: "Shown if a duration is specified for the block command"
+		},
 		"BLOCK_SUCCESS": {
 			string: "**{{user}}** (`{{id}}`) has been blocked from using the bot on this server.",
 			context: "Success message when a user is blocked in a guild",
@@ -2062,6 +2116,16 @@ module.exports = {
 				}
 			}
 		},
+		"DELETED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was deleted in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being deleted on a followed suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
 		"DELETED_LOG": {
 			string: "{{user}} deleted #{{id}}",
 			context: "Title for the log embed when a suggestion is deleted",
@@ -2139,6 +2203,16 @@ module.exports = {
 		"DENIED_DM_TITLE": {
 			string: "Your suggestion was denied in **{{server}}**!",
 			context: "Title for the DM notification of a suggestion being denied",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"DENIED_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was denied in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being denied on a followed suggestion",
 			replaced: {
 				server: {
 					to_replace: "{{server}}",
@@ -2237,6 +2311,16 @@ module.exports = {
 		"STATUS_MARK_DM_TITLE": {
 			string: "The status of your suggestion in **{{server}}** was edited!",
 			context: "Title for the DM notification of a status being marked on a suggestion",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"STATUS_MARK_DM_TITLE_FOLLOW": {
+			string: "The status of a suggestion you follow in **{{server}}** was edited!",
+			context: "Title for the DM notification of a status being marked on a suggestion on a followed suggestion",
 			replaced: {
 				server: {
 					to_replace: "{{server}}",
@@ -3246,16 +3330,26 @@ module.exports = {
 				}
 			}
 		},
-		"NO_TOP_FOUND": {
-			string: "No suggestions with votes were found",
-			context: "Error shown when no suggestions are found for the top command"
+		"NO_SUGGESTIONS_FOUND": {
+			string: "No suggestions that matched your query were found",
+			context: "Error shown when no suggestions are found for the top/down command"
 		},
-		"TOP_TITLE": {
-			string: "Top 10 Highest Voted Suggestions",
-			context: "Header for the top suggestions embed"
+		"TOP_TITLE_NEW": {
+			string: "Top {{number}} Highest Voted Suggestions",
+			context: "Header for the top suggestions embed",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The number of suggestions shown"
+				}
+			}
 		},
-		"TOP_LOADING": {
-			string: "Collecting top suggestion data, this may take a moment...",
+		"DOWN_TITLE": {
+			string: "Top 10 Lowest Voted Suggestions",
+			context: "Header for the lowest voted suggestions embed"
+		},
+		"SUGGESTION_LOADING": {
+			string: "Collecting suggestion data, this may take a moment...",
 			context: "Message shown when waiting for top 10 data to collect"
 		},
 		"COMMAND_DESC:ACKNOWLEDGEMENT": {
@@ -3470,7 +3564,16 @@ module.exports = {
 		},
 		"COMMAND_USAGE:INVITE": {
 			string: "invite",
-			context: "Description for the invite command\n" +
+			context: "Usage for the invite command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:GITHUB": {
+			string: "Shows the link to Suggester's GitHub repository",
+			context: "Description for the github command"
+		},
+		"COMMAND_USAGE:GITHUB": {
+			string: "github",
+			context: "Usage for the github command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_DESC:LOCALE": {
@@ -3725,21 +3828,17 @@ module.exports = {
 			context: "Examples for the attach command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:BLOCK": {
+		"COMMAND_DESC:BL": {
 			string: "Blocks a user from using the bot in this server",
 			context: "Description for the block command"
 		},
-		"COMMAND_USAGE:BLOCK": {
-			string: "block [user]",
+		"COMMAND_USAGE:BL": {
+			string: "block [user] (duration) (reason)",
 			context: "Description for the block command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:BLOCK": {
-			string: "`{{p}}block @Brightness™`\n" +
-				"Blocks Brightness™ from using the bot in this server\n" +
-				"\n" +
-				"`{{p}}block 255834596766253057 Spamming suggestions`\n" +
-				"Blocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"",
+		"COMMAND_EXAMPLES:BL": {
+			string: "`{{p}}block @Brightness™`\nBlocks Brightness™ from using the bot in this server\n\n`{{p}}block 255834596766253057 Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"\n\n`{{p}}block @Brightness™ 1h`\nBlocks Brightness™ from using the bot in this server for 1 hour\n\n`{{p}}block 255834596766253057 2h Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for 2 hours with reason \"Spamming suggestions\"",
 			context: "Examples for the block command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
@@ -3960,14 +4059,33 @@ module.exports = {
 			context: "Examples for the silentdeny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:TOP": {
+		"COMMAND_DESC:TOPVOTED": {
 			string: "Shows the top 10 most highly voted suggestions",
 			context: "Description for the top command"
 		},
-		"COMMAND_USAGE:TOP": {
-			string: "top",
+		"COMMAND_USAGE:TOPVOTED": {
+			string: "top (time)",
 			context: "Description for the top command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:TOPVOTED": {
+			string: "`{{p}}top`\nShows the top 10 suggestions\n\n`{{p}}top 1w`\nShows the top 10 suggestions from the last week",
+			context: "Examples for the top command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DOWN": {
+			string: "Shows the top 10 lowest voted suggestions",
+			context: "Description for the down command"
+		},
+		"COMMAND_USAGE:DOWN": {
+			string: "down (time)",
+			context: "Description for the down command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DOWN": {
+			string: "`{{p}}down`\nShows the top 10 lowest voted suggestions\n\n`{{p}}down 1w`\nShows the top 10 lowest voted suggestions from the last week",
+			context: "Examples for the down command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
 		"COMMAND_DESC:UNBLOCK": {
 			string: "Unblocks a user from using the bot in this server",
@@ -4254,21 +4372,17 @@ module.exports = {
 			context: "Examples for the Log Channel config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `log`"
 		},
-		"CONFIG_NAME:COMMANDS": {
-			string: "Suggestion Command Channel",
-			context: "Name of the Suggestion Command Channel config element"
+		"CONFIG_NAME:COMMANDSCHANNELS": {
+			string: "Suggestion Commands Channels",
+			context: "Name of the Suggestion Commands Channels config element"
 		},
-		"CONFIG_DESC:COMMANDS": {
-			string: "This setting locks using the `suggest` command to only the configured channel. Configuring no channel will allow the command to be used in any channel.",
-			context: "Description of the Suggestion Command Channel config element"
+		"CONFIG_DESC:COMMANDSCHANNELS": {
+			string: "This setting locks using the `suggest` command to only the configured channels. Configuring no channels will allow the command to be used in any channel.",
+			context: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels"
 		},
-		"CONFIG_EXAMPLES:COMMANDS": {
-			string: "`{{p}}config commands #bot-commands`\n" +
-				"Limits using the `suggest` command to the #bot-commands channel\n" +
-				"\n" +
-				"`{{p}}config commands none`\n" +
-				"Resets the commands channel, allowing the `suggest` command to be used in any channel",
-			context: "Examples for the Suggestion Command Channel config element\n" +
+		"CONFIG_EXAMPLES:COMMANDSCHANNELS": {
+			string: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels",
+			context: "Examples for the Suggestion Commands Channels config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `commands`"
 		},
 		"CONFIG_NAME:IMPLEMENTED": {
@@ -4448,6 +4562,140 @@ module.exports = {
 			string: "`{{p}}config locale en`\nSets the server language to English.",
 			context: "Examples for the Locale config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `locale`"
+		},
+		"AUTOFOLLOW_FIRST_NOTIF": {
+			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
+			context: "Notification when a user upvotes a suggestion and automatically follows it (only for the first follow)",
+			replaced: {
+				suggestion: {
+					to_replace: "{{suggestion}}",
+					description: "The suggestion ID"
+				},
+				server: {
+					to_replace: "{{server}}",
+					description: "The server name"
+				},
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"FOLLOW_NO_PARAMS_ERROR": {
+			string: "You must specify `list`, `auto` or a suggestion ID.",
+			context: "Shown when no parameters or specified for the follow command"
+		},
+		"FOLLOW_SUCCESS": {
+			string: "You are now following suggestion #{{id}}",
+			context: "Success message when you follow a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"UNFOLLOW_SUCCESS": {
+			string: "You are no longer following suggestion #{{id}}",
+			context: "Success message when you unfollow a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"ALREADY_FOLLOWING_ERROR": {
+			string: "You are already following suggestion #{{id}}",
+			context: "Error message when you are already following a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"NOT_FOLLOWING_ERROR": {
+			string: "You are not following suggestion #{{id}}",
+			context: "Error message when you are not following a suggestion",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"FOLLOWING_TITLE": {
+			string: "Followed Suggestions:",
+			context: "Title for the followed suggestions embed"
+		},
+		"NONE_FOLLOWED": {
+			string: "You are not following any suggestions",
+			context: "Message shown when you are not following any suggestions"
+		},
+		"COMMAND_DESC:FOLLOW": {
+			string: "Views/edits your following settings",
+			context: "Description for the follow command"
+		},
+		"COMMAND_USAGE:FOLLOW": {
+			string: "follow [suggestion id|list|auto] (on|off|toggle)",
+			context: "Description for the follow command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:FOLLOW": {
+			string: "`{{p}}follow 123`\nFollows suggestion #123\n\n`{{p}}follow list`\nLists the suggestions you are following\n\n`{{p}}follow auto on`\nEnables following suggestions when you upvote them\n\n`{{p}}follow auto off`\nDisables following suggestions when you upvote them\n\n`{{p}}follow auto toggle`\nToggles following suggestions when you upvote them",
+			context: "Examples for the follow command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:UNFOLLOW": {
+			string: "Unfollows a suggestion",
+			context: "Description for the unfollow command"
+		},
+		"COMMAND_USAGE:UNFOLLOW": {
+			string: "unfollow [suggestion id]",
+			context: "Description for the unfollow command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:UNFOLLOW": {
+			string: "`{{p}}unfollow 123`\nUnfollows suggestion #123",
+			context: "Examples for the unfollow command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMENT_TITLE_LOG": {
+			string: "Comment",
+			context: "Comment title for the log embed"
+		},
+		"CFG_COMMANDS_ALREADY_ADDED_ERROR": {
+			string: "This channel has already been added as a commands channel!",
+			context: "Error message shown when a channel is already a commands channel"
+		},
+		"CFG_COMMANDS_NOT_ADDED_ERROR": {
+			string: "This channel has not been added as a commands channel!",
+			context: "Error message shown when a channel is not a commands channel"
+		},
+		"UNAVAILABLE": {
+			string: "Unavailable",
+			context: "Describes something that is not available"
+		},
+		"TOP_TIME_INFO": {
+			string: "Search limited to suggestions {{time}} old or newer",
+			context: "Shows information about the time filter in the top command",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					description: "The amount of time to filter by"
+				}
+			}
+		},
+		"GITHUB_REPO": {
+			string: "You can find Suggester's GitHub repository at {{link}}",
+			context: "Shows the link to Suggester's GitHub repository",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the repository"
+				}
+			}
 		}
 	}
 };

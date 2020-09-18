@@ -2,7 +2,7 @@ const { emoji } = require("../../config.json");
 const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
 const { dbQuery, dbModify, dbQueryAll } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig, checkReview } = require("../../utils/checks");
-const { serverLog } = require("../../utils/logs");
+const { serverLog, mediaLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
 const { checkURL } = require("../../utils/checks");
 const { confirmation } = require("../../utils/actions");
@@ -52,7 +52,11 @@ module.exports = {
 			}
 		}
 
-		if (qServerDB.config.channels.commands && message.channel.id !== qServerDB.config.channels.commands && !noCommand) return message.channel.send(string(locale, "NOT_COMMAND_CHANNEL_ERROR", { channel: `<#${qServerDB.config.channels.commands}>` }, "error"));
+		if ((qServerDB.config.channels.commands ? message.channel.id !== qServerDB.config.channels.commands : true) && (qServerDB.config.channels.commands_new.length > 0 ? !qServerDB.config.channels.commands_new.includes(message.channel.id) : false) && !noCommand) {
+			let channels = qServerDB.config.channels.commands_new;
+			if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
+			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error"));
+		}
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
 		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => {
@@ -79,6 +83,27 @@ module.exports = {
 
 		let id = await Suggestion.countDocuments() + 1;
 
+		if (attachment) {
+			const res = await mediaLog(message, id, attachment)
+				.catch(console.error);
+
+			if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
+
+			if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => {
+				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+					message.delete();
+					sent.delete();
+				}, 7500);
+			});
+
+			attachment = res.attachments[0].url;
+		}
+
 		//Review
 		if (qServerDB.config.mode === "review") {
 			let checkStaff = checkReview(locale, message.guild, qServerDB);
@@ -102,10 +127,10 @@ module.exports = {
 			let newSuggestion = await new Suggestion({
 				id: message.guild.id,
 				suggester: message.author.id,
-				suggestion: suggestion,
+				suggestion,
 				status: "awaiting_review",
 				suggestionId: id,
-				attachment: attachment,
+				attachment,
 				submitted: new Date()
 			}).save();
 
@@ -130,11 +155,13 @@ module.exports = {
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
 			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview);
+			client.reactInProgress = true;
 			await reviewMessage.react(emoji.check).then(() => newSuggestion.reviewEmojis.approve = emoji.check);
 			await reviewMessage.react(emoji.x).then(() => newSuggestion.reviewEmojis.deny = emoji.x);
 			newSuggestion.reviewMessage = reviewMessage.id;
 			newSuggestion.channels.staff = reviewMessage.channel.id;
 			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, newSuggestion);
+			client.reactInProgress = false;
 
 			if (qServerDB.config.channels.log) {
 				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE", "yellow")
@@ -155,11 +182,11 @@ module.exports = {
 			await new Suggestion({
 				id: message.guild.id,
 				suggester: message.author.id,
-				suggestion: suggestion,
+				suggestion,
 				status: "approved",
 				suggestionId: id,
 				staff_member: client.user.id,
-				attachment: attachment,
+				attachment,
 				submitted: new Date()
 			}).save();
 
@@ -172,6 +199,7 @@ module.exports = {
 					qSuggestionDB.channels.suggestions = posted.channel.id;
 
 					if (qServerDB.config.react) {
+						client.reactInProgress = true;
 						let reactEmojiUp = qServerDB.config.emojis.up;
 						let reactEmojiMid = qServerDB.config.emojis.mid;
 						let reactEmojiDown = qServerDB.config.emojis.down;
@@ -194,6 +222,7 @@ module.exports = {
 						};
 					}
 					await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
+					client.reactInProgress = false;
 				});
 
 			let replyEmbed = new Discord.MessageEmbed()

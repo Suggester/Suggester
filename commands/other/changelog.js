@@ -14,7 +14,7 @@ module.exports = {
 		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
-		get("https://api.github.com/repos/Suggester-Bot/Suggester/releases/latest").then(({ data }) => {
+		get("https://api.github.com/repos/Suggester/Suggester/releases/latest").then(({ data }) => {
 			let split_body = Discord.Util.splitMessage(data.body, {
 				char: " "
 			});

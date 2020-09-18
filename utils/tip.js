@@ -4,7 +4,7 @@ const { string } = require("./strings");
 const { dbModify } = require("./db");
 const { support_invite } = require("../config.json");
 module.exports = {
-	protip: async function(locale, message, client, Discord, force=null, command=null, not=[], admin=false) {
+	protip: async function(locale, message, client, Discord, force=null, command=null, not=[], admin=false, clean=false) {
 		const list = {
 			invite: {
 				string: "PROTIP_INVITE",
@@ -149,11 +149,14 @@ module.exports = {
 				let ma = m.match(/\[([A-Za-z0-9]+)\]\(([A-Za-z:./0-9?=_&-<>]+)\)/);
 				desc = desc.replace(ma[0], `${ma[1]} (${ma[2]})`);
 			}
-			message.channel.send(`${string(locale, "PROTIP_TITLE")} ${desc}`);
+			let pm = await message.channel.send(`${string(locale, "PROTIP_TITLE")} ${desc}`);
+			if (clean) setTimeout(function() { pm.delete(); }, 7500);
 		} else {
-			message.channel.send(new Discord.MessageEmbed()
+			let pm = await message.channel.send(new Discord.MessageEmbed()
 				.setColor(client.colors.protip)
 				.setDescription(`${string(locale, "PROTIP_TITLE")} ${string(locale, str.string, str.use)}`));
+			if (clean) setTimeout(function() {
+				pm.delete(); }, 7500);
 		}
 		qUserDB.displayed_protips.push(key);
 		await dbModify("User", { id: message.author.id }, qUserDB);

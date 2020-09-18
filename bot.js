@@ -19,8 +19,8 @@ const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES",
 const client = new Client({
 	ws: { intents: intents },
 	disableMentions: "everyone",
-	messageCacheLifetime: 120,
-	messageSweepInterval: 300,
+	messageCacheLifetime: 450,
+	messageSweepInterval: 750,
 	partials: ["MESSAGE", "REACTION", "USER"]
 });
 

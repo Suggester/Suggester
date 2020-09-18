@@ -19,7 +19,6 @@ module.exports = {
 		"bfd": "https://botsfordiscord.com/bot/564426594144354315/vote",
 		"dbl": "https://discordbotlist.com/bots/564426594144354315/upvote",
 		"dboats": "https://discord.boats/bot/564426594144354315/vote",
-		"gbl": "https://glennbotlist.xyz/bot/suggester/vote",
 		"bod": "https://bots.ondiscord.xyz/bots/564426594144354315/review"
 	}
 };

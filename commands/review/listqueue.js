@@ -25,7 +25,7 @@ module.exports = {
 		queuedSuggestions.forEach(suggestion => {
 			listarray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${suggestion.suggestionId.toString()}`,
-				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${suggestion.id}/${qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
+				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${suggestion.id}/${suggestion.channels.staff || qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
 			});
 		});
 		if (!listarray[0]) return message.channel.send(string(locale, "NONE_AWAITING_REVIEW", {}, "success"));

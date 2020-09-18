@@ -1,6 +1,6 @@
 const { suggestionEditCommandCheck, checkURL } = require("../../utils/checks");
 const { editFeedMessage } = require("../../utils/actions");
-const { serverLog } = require("../../utils/logs");
+const { serverLog, mediaLog } = require("../../utils/logs");
 const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
@@ -29,7 +29,13 @@ module.exports = {
 
 		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error"));
 
-		qSuggestionDB.attachment = attachment;
+		const res = await mediaLog(message, id, attachment)
+			.catch(console.error);
+
+		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error"));
+		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error"));
+
+		qSuggestionDB.attachment = res.attachments[0].url;
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed);
@@ -38,7 +44,7 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "ATTACHMENT_ADDED_HEADER"))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.setImage(attachment)
 			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))

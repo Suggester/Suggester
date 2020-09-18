@@ -21,14 +21,14 @@ module.exports = {
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
-		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
-
 		if (!args[0]) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
 		let idsections = args[0].split("_");
 		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
 		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
+
+		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
+		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
 		if (qSuggestionDB.implemented) return message.channel.send(string(locale, "SUGGESTION_IMPLEMENTED_ERROR", {}, "error"));
 

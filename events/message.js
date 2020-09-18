@@ -22,6 +22,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
+		if (qServerDB.flags.includes(`DISABLE_CHANNEL:${message.channel.id}`)) return;
 		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\") && !message.content.startsWith(qServerDB.config.prefix) && !message.content.startsWith(`<@${client.user.id}>`) && !message.content.startsWith(`<@!${client.user.id}>`) && qServerDB.config.in_channel_suggestions) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
@@ -53,10 +54,10 @@ module.exports = async (Discord, client, message) => {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
 	}
-	if (command.controls.enabled === false) {
+	if (command.controls.enabled === false || qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase())) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return message.channel.send(string(locale, "COMMAND_DISABLED", {}, "error"));
+		return message.channel.send(string(locale, !command.controls.enabled ? "COMMAND_DISABLED" : "COMMAND_DISABLED_FLAG", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -74,7 +75,7 @@ module.exports = async (Discord, client, message) => {
 	}
 
 	commandLog(`🔧 ${message.author.tag} (\`${message.author.id}\`) ran command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" }`, message);
-	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && (!qUserDB.flags || (!qUserDB.flags.includes("NO_COOLDOWN") && !qUserDB.flags.includes("PROTECTED"))) && (!qServerDB.flags || !qServerDB.flags.includes("NO_COOLDOWN"))) {
+	if (command.controls.cooldown && command.controls.cooldown > 0 && permission > 1 && !["PROTECTED", "NO_COOLDOWN"].some(f => qUserDB.flags.includes(f)) && (message.guild ? (!qServerDB.flags.includes("NO_COOLDOWN") && (permission <= 3 ? !qServerDB.flags.includes("LARGE") : true)) : true)) {
 		/*
 			Cooldown collection:
 			[
@@ -138,13 +139,13 @@ module.exports = async (Discord, client, message) => {
 		setTimeout(() => times.delete(message.author.id), lengthMs);
 	}
 
-	if (message.guild && qServerDB.config.blocklist && qServerDB.config.blocklist.includes(message.author.id)) return commandExecuted(command, message, { pre, post: new Date(), success: false });
+	if (message.guild && qServerDB.config.blocklist && (qServerDB.config.blocklist.includes(message.author.id) || qServerDB.config.blocklist.find(b => b.id === message.author.id && b.expires > Date.now()))) return commandExecuted(command, message, { pre, post: new Date(), success: false });
 
 	try {
 		command.do(locale, message, client, args, Discord, noCommand)
 			.then(async r => {
 				commandExecuted(command, message, { pre, post: new Date(), success: true });
-				if (!noCommand && (command.controls.name === "suggest" ? !qServerDB.config.clean_suggestion_command : true)) await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2);
+				await protip(r && r.protip && r.protip.locale ? r.protip.locale : locale, message, client, Discord, r && r.protip && r.protip.force ? r.protip.force : null, r && r.protip && r.protip.command ? command.controls.name : null, r && r.protip && r.protip.not ? r.protip.not : [], permission < 2, noCommand || (command.controls.name === "suggest" ? qServerDB.config.clean_suggestion_command : false));
 			})
 			.catch((err) => {
 				let errorText;

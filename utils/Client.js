@@ -15,6 +15,7 @@ module.exports = class extends Client {
 		this.locales = new Collection();
 		this.cooldowns = new Collection();
 		this.config = config;
+		this.reactInProgress = false;
 		let baseColors = {
 			"default": "#7289da",
 			"red": "#e74c3c",

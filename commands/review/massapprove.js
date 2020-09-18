@@ -1,7 +1,7 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, suggestionEmbed, logEmbed, dmEmbed, reviewEmbed } = require("../../utils/misc");
+const { fetchUser, suggestionEmbed, logEmbed, reviewEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery } = require("../../utils/db");
+const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { Suggestion } = require("../../utils/schemas");
 module.exports = {
@@ -24,12 +24,6 @@ module.exports = {
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
-		let checkSuggest = checkSuggestions(locale, message.guild, qServerDB);
-		if (checkSuggest) return message.channel.send(checkSuggest);
-
-		let checkStaff = checkReview(locale, message.guild, qServerDB);
-		if (checkStaff) return message.channel.send(checkStaff);
-
 		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
 
 		let reason;
@@ -43,6 +37,13 @@ module.exports = {
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
 		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_APPROVE_ERROR", {}, "error"));
+
+		let checkSuggest = checkSuggestions(locale, message.guild, qServerDB);
+		if (checkSuggest) return message.channel.send(checkSuggest);
+
+		let checkStaff = checkReview(locale, message.guild, qServerDB);
+		if (checkStaff) return message.channel.send(checkStaff);
+
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send(string(locale, "PROCESSING"));
 
@@ -88,6 +89,11 @@ module.exports = {
 			// eslint-disable-next-line no-prototype-builtins
 			if (approved.hasOwnProperty(s)) {
 				let qSuggestionDB = approved[s];
+				if (qServerDB.config.channels.suggestions !== qSuggestionDB.channels.suggestions) {
+					let checkSuggest = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
+					if (checkSuggest) continue;
+				}
+
 				let suggester = await fetchUser(qSuggestionDB.suggester, client);
 				let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 				client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
@@ -116,16 +122,15 @@ module.exports = {
 						};
 					}
 
-					let qUserDB = await dbQuery("User", { id: suggester.id });
-					if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "green", {
+					await notifyFollowers(client, qServerDB, qSuggestionDB, "green", {
 						string: "APPROVED_DM_TITLE",
 						guild: message.guild.name
-					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, reason ? {
-						header: string(locale, "COMMENT_TITLE", {
+					}, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, null, function (e, l) {
+						if (reason) e.addField(string(l, "COMMENT_TITLE", {
 							user: message.author.tag,
 							id: `${qSuggestionDB.suggestionId.toString()}_1`
-						}), reason: reason
-					} : null))).catch(() => {
+						}), reason);
+						return e;
 					});
 
 					if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));
@@ -145,7 +150,14 @@ module.exports = {
 						serverLog(embedLog, qServerDB, client);
 					}
 
-					if (qSuggestionDB.reviewMessage && qServerDB.config.channels.staff) client.channels.cache.get(qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
+					if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
+						let doReview = true;
+						if (qSuggestionDB.channels.staff !== qServerDB.config.channels.staff) {
+							let checkStaff = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
+							if (checkStaff) doReview = false;
+						}
+						if (doReview) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
+					}
 					await approved[s].save();
 				});
 			}

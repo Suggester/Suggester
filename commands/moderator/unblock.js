@@ -25,7 +25,7 @@ module.exports = {
 		let user = await fetchUser(args[0], client);
 		if (!user || user.id === "0") return message.channel.send(string(locale, "INVALID_USER_ERROR", {}, "error"));
 
-		if (!qServerDB.config.blocklist.includes(user.id)) return message.channel.send(string(locale, "USER_NOT_BLOCKED_ERROR", {}, "error"));
+		if (!qServerDB.config.blocklist.includes(user.id) && !qServerDB.config.blocklist.find(b => b.id === user.id && b.expires > Date.now())) return message.channel.send(string(locale, "USER_NOT_BLOCKED_ERROR", {}, "error"));
 
 		let reason;
 		if (args[1]) {
@@ -33,9 +33,9 @@ module.exports = {
 			if (reason.length > 1024) return message.channel.send(string(locale, "BLOCK_REASON_TOO_LONG_ERROR", {}, "error"));
 		}
 
-		qServerDB.config.blocklist.splice(qServerDB.config.blocklist.findIndex(u => u === user.id), 1);
+		qServerDB.config.blocklist.splice(qServerDB.config.blocklist.findIndex(u => typeof u === "object" ? u.id === user.id : u === user.id), 1);
 		await dbModify("Server", { id: message.guild.id }, qServerDB);
-		message.channel.send(`${string(locale, "UNBLOCK_SUCCESS", { user: user.tag, id: user.id },"success")}${reason ? `\n${string(locale, "BLOCK_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
+		message.channel.send(`${string(locale, "UNBLOCK_SUCCESS", { user: user.tag, id: user.id },"success")}${reason ? `\n> ${string(locale, "BLOCK_REASON_HEADER")} ${reason}` : ""}`, { disableMentions: "all" });
 
 		if (qServerDB.config.channels.log) {
 			let logEmbed = new Discord.MessageEmbed()

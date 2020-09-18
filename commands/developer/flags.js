@@ -54,7 +54,7 @@ module.exports = {
 		case "server":
 			if (!args[1]) return message.channel.send(string(locale, "INVALID_GUILD_ID_ERROR", {}, "error"));
 			// eslint-disable-next-line no-case-declarations
-			let guild = args[1];
+			let guild = args[1].toLowerCase() === "this" ? message.guild.id : args[0];
 			// eslint-disable-next-line no-case-declarations
 			let dbGuild = await dbQuery("Server", { id: guild });
 			// eslint-disable-next-line no-case-declarations

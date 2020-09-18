@@ -41,7 +41,7 @@ module.exports = {
 			// Footer
 			.setTimestamp(suggestion.submitted)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
-		let votes = await client.channels.cache.get(server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
+		let votes = await client.channels.cache.get(suggestion.channels.suggestions || server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
 			return checkVotes(locale, suggestion, m);
 		}).catch(() => {});
 		// Embed Color
@@ -94,11 +94,11 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(string(locale, title.string, {server: title.guild}))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${suggestions}/${qSuggestionDB.messageId})` : ""}`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}${qSuggestionDB.status === "approved" && suggestions ? `\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || suggestions}/${qSuggestionDB.messageId})` : ""}`)
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(client.colors[color] || color);
 		if (attachment) embed.setImage(qSuggestionDB.attachment);
-		if (reason) embed.addField(reason.header, reason.reason);
+		if (reason) embed.addField(string(locale, reason.header), reason.reason);
 		return embed;
 	},
 	reviewEmbed: function (locale, qSuggestionDB, user, color, change) {

@@ -1,17 +1,17 @@
 const { dbQueryAll } = require("../../utils/db");
 const { string } = require("../../utils/strings");
-const { checkVotes, pages } = require("../../utils/actions");
+const { checkVotes } = require("../../utils/actions");
 const { baseConfig } = require("../../utils/checks");
 const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
 module.exports = {
 	controls: {
-		name: "topvoted",
+		name: "down",
 		permission: 3,
-		aliases: ["top"],
-		usage: "top (time)",
-		description: "Shows the top 10 most highly voted suggestions",
-		examples: "`{{p}}top`\nShows the top 10 suggestions\n\n`{{p}}top 1w`\nShows the top 10 suggestions from the last week",
+		aliases: ["downvoted", "worst", "lowest"],
+		usage: "down (time)",
+		description: "Shows the top 10 lowest voted suggestions",
+		examples: "`{{p}}down`\nShows the top 10 lowest voted suggestions\n\n`{{p}}down 1w`\nShows the top 10 lowest voted suggestions from the last week",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 60
@@ -39,7 +39,7 @@ module.exports = {
 				});
 			}).catch(() => {});
 		}
-		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 10)) {
+		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion)).sort((a, b) => a.opinion - b.opinion).splice(0, 10)) {
 			embedArray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
 				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`
@@ -47,40 +47,12 @@ module.exports = {
 		}
 		if (!embedArray[0]) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
 
-		if (!qServerDB.flags.includes("LARGE") && !qServerDB.flags.includes("MORE_TOP")) {
-			let embed = new Discord.MessageEmbed()
-				.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
-				.setColor(client.colors.green);
-			if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", {
-				time: humanizeDuration(time, {
-					language: locale,
-					fallbacks: ["en"]
-				})
-			}));
-			embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
-			message.channel.stopTyping(true);
-			return m.edit("", embed);
-		} else {
-			let chunks = embedArray.chunk(10);
-			let embeds = [];
-			for await (let chunk of chunks) {
-				let embed = new Discord.MessageEmbed()
-					.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
-					.setColor(client.colors.green)
-					.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
-					.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : "");
-				if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", {
-					time: humanizeDuration(time, {
-						language: locale,
-						fallbacks: ["en"]
-					})
-				}));
-				chunk.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
-				embeds.push(embed);
-			}
-			message.channel.stopTyping(true);
-			pages(locale, message, embeds);
-			return m.delete();
-		}
+		let embed = new Discord.MessageEmbed()
+			.setTitle(string(locale, "DOWN_TITLE"))
+			.setColor(client.colors.red);
+		if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", { time: humanizeDuration(time, { language: locale, fallbacks: ["en"] }) }));
+		embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
+		message.channel.stopTyping(true);
+		return m.edit("", embed);
 	}
 };

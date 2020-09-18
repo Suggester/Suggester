@@ -23,7 +23,8 @@ const settings = new Schema({
 			log: { type: String },
 			denied: { type: String },
 			archive: { type: String },
-			commands: { type: String }
+			commands: { type: String },
+			commands_new: [ String ]
 		},
 		reactionOptions: {
 			suggester: { type: Boolean, default: true },
@@ -36,7 +37,7 @@ const settings = new Schema({
 		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
 		in_channel_suggestions: { type: Boolean, default: false },
-		blocklist: [String],
+		blocklist: [Object | String],
 		emojis: {
 			up: { type: String, default: "👍" },
 			mid: { type: String, default: "🤷" },
@@ -97,7 +98,14 @@ const user = new Schema({
 	protips: { type: Boolean, default: true },
 	displayed_protips: [String],
 	flags: [ String ],
-	verifyColor: String
+	verifyColor: String,
+	auto_subscribe: { type: Boolean, default: true },
+	notified_about_auto: { type: Boolean, default: false },
+	subscribed: [{
+		id: Number,
+		guild: String,
+		auto: { type: Boolean, default: false }
+	}]
 });
 
 const command = new Schema({

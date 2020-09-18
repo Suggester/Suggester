@@ -1,4 +1,5 @@
-const { suggestionEmbed } = require("./misc");
+const { suggestionEmbed, fetchUser, dmEmbed } = require("./misc");
+const { dbQuery, dbQueryAll } = require("./db");
 const { string } = require("./strings");
 const { emoji } = require("../config.json");
 const Discord = require("discord.js");
@@ -6,7 +7,7 @@ module.exports = {
 	editFeedMessage: async function({ guild, user }, qSuggestionDB, qServerDB, client, removereactions=false) {
 		let suggestionEditEmbed = await suggestionEmbed(guild, qSuggestionDB, qServerDB, client);
 		let messageEdited;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+		await client.channels.cache.get(qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.edit(suggestionEditEmbed);
 			if (removereactions) f.reactions.removeAll();
 			messageEdited = true;
@@ -175,5 +176,25 @@ module.exports = {
 		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;
 		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
 		return [upCount, downCount, upCount-downCount];
+	},
+	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn) {
+		if (!db.config.notify) return;
+		let suggester = await dbQuery("User", { id: suggestion.suggester });
+		if (suggester.notify) {
+			let u = await fetchUser(suggestion.suggester, client);
+			let uEmbed = dmEmbed(u.locale || db.config.locale, client, suggestion, color, title, attachment, suggestions, reason);
+			if (efn) uEmbed = efn(uEmbed, u.locale || db.config.locale);
+			if (u && u.id !== "0") u.send(uEmbed).catch(() => {});
+		}
+		let followers = await dbQueryAll("User", { subscribed: {$elemMatch: { id: suggestion.suggestionId, guild: suggestion.id } } });
+		title.string += "_FOLLOW";
+		for await (let fid of followers) {
+			if (fid.id === suggestion.suggester || !fid.notify) continue;
+			let f = await fetchUser(fid.id, client);
+			if (fid.subscribed.find(s => s.id === suggestion.suggestionId && s.guild === suggestion.id).auto && !fid.auto_subscribe) continue;
+			let fEmbed = dmEmbed(fid.locale || db.config.locale, client, suggestion, color, title, attachment, suggestions, reason);
+			if (efn) fEmbed = efn(fEmbed, fid.locale || db.config.locale);
+			if (f && f.id !== "0") f.send(fEmbed).catch(() => {});
+		}
 	}
 };

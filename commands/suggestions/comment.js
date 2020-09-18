@@ -1,9 +1,9 @@
 const { string } = require("../../utils/strings");
-const { fetchUser, logEmbed, dmEmbed } = require("../../utils/misc");
+const { fetchUser, logEmbed } = require("../../utils/misc");
 const { serverLog } = require("../../utils/logs");
-const { dbQuery, dbModify } = require("../../utils/db");
+const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
-const { editFeedMessage } = require("../../utils/actions");
+const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "comment",
@@ -48,19 +48,21 @@ module.exports = {
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "COMMENT_ADDED_TITLE"))
-			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
+			.setDescription(`${qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT")}\n[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId})`)
 			.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment)
 			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed);
 
-		let qUserDB = await dbQuery("User", { id: suggester.id });
-		if (qServerDB.config.notify && qUserDB.notify) suggester.send((dmEmbed(qUserDB.locale || locale, client, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), reason: comment }))).catch(() => {});
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, null, function (e, l) {
+			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
+			return e;
+		});
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "COMMENT_ADDED_LOG", "blue")
-				.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
+				.addField(string(guildLocale, "COMMENT_TITLE_LOG"), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
 
