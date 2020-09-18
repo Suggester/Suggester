@@ -32,6 +32,8 @@ module.exports = {
 		const res = await mediaLog(message, id, attachment)
 			.catch(console.error);
 
+		console.log(res);
+
 		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error"));
 		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
