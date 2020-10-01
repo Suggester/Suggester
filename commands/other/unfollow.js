@@ -5,7 +5,7 @@ module.exports = {
 	controls: {
 		name: "unfollow",
 		permission: 10,
-		aliases: ["unsubscribe", "unsub"],
+		aliases: ["unsubscribe", "unsub", "defollow"],
 		usage: "unfollow [suggestion id|auto]",
 		description: "Unfollows a suggestion",
 		enabled: true,
