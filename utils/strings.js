@@ -3576,6 +3576,15 @@ module.exports = {
 			context: "Usage for the github command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
+		"COMMAND_DESC:PREFIX": {
+			string: "Shows the bot's prefix on this server",
+			context: "Description for the prefix command"
+		},
+		"COMMAND_USAGE:PREFIX": {
+			string: "prefix",
+			context: "Usage for the prefix command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
 		"COMMAND_DESC:LOCALE": {
 			string: "Sets the language the bot responds to you in",
 			context: "Description for the locale command"
@@ -4704,6 +4713,20 @@ module.exports = {
 				time: {
 					to_replace: "{{time}}",
 					description: "The time the command will take"
+				}
+			}
+		},
+		"SERVER_PREFIX": {
+			string: "My prefix is `{{prefix}}`, you can also just mention the bot like \"<@{{id}}> help\"",
+			context: "Shows the configured prefix",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The configured prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The bot's ID for the mention"
 				}
 			}
 		}
