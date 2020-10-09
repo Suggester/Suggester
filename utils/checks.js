@@ -137,7 +137,7 @@ module.exports = {
 		if (!qServerDB) return [string(locale, "UNCONFIGURED_ERROR", {}, "error")];
 
 		let missingConfig = await checkConfig(locale, qServerDB, guild.client);
-		if (missingConfig) return [missingConfig];
+		if (missingConfig) return [missingConfig, qServerDB];
 		return [null, qServerDB];
 	},
 	checkSuggestions: function (locale, guild, db, suggestion) {

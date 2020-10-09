@@ -20,9 +20,8 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
-		let guildLocale = qServerDB.config.locale;
-
 		if (returned) return message.channel.send(returned);
+		let guildLocale = qServerDB.config.locale;
 
 		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
 
