@@ -131,6 +131,10 @@ module.exports = {
 			rickroll: {
 				string: "PROTIP_RICKROLL",
 				command: ["rickroll"]
+			},
+			spooky: {
+				string: "PROTIP_SPOOKY",
+				command: ["rickroll"]
 			}
 		};
 		let qUserDB = await message.author.db;
@@ -139,7 +143,8 @@ module.exports = {
 		let filteredList = Object.keys(list).filter(k => !qUserDB.displayed_protips.includes(k) && (command ? (list[k].command && list[k].command.includes(command)) : !list[k].command) && !not.includes(k) && (!admin ? !list[k].admin : true));
 		if (force && qUserDB.displayed_protips.includes(force)) return;
 		let key = force || filteredList[Math.floor(Math.random()*filteredList.length)];
-		if (Math.floor(Math.random() * 100) === 5) key = "rickroll";
+		if (Math.floor(Math.random() * 100) < 5) key = "spooky";
+		else if (Math.floor(Math.random() * 100) === 5) key = "rickroll";
 		let str = list[key];
 		if (!str) return;
 		if (message.guild && !message.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {

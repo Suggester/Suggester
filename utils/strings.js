@@ -4896,6 +4896,10 @@ module.exports = {
 		"EXEMPT_ALREADY_ERROR": {
 			string: "This user has already been exempted from the suggestion cooldown",
 			context: "Error shown when a user has already been exempted from the suggestion cooldown"
+		},
+		"PROTIP_SPOOKY": {
+			string: ":ghost: :jack_o_lantern: :bat:",
+			context: "_Spooooooooky_\n(you don't need to translate this)"
 		}
 	}
 };
