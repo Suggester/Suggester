@@ -52,7 +52,7 @@ module.exports = {
 
 		let channels = qServerDB.config.channels.commands_new;
 		if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
-		if (!channels.includes(message.channel.id) && !noCommand) {
+		if (channels.length > 0 && !channels.includes(message.channel.id) && !noCommand) {
 			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		}
 
