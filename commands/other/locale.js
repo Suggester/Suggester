@@ -5,6 +5,7 @@ const { string, list } = require("../../utils/strings");
 const { checkPermissions } = require("../../utils/checks");
 const exec = (require("util").promisify((require("child_process").exec)));
 const { reloadLocales } = require("../../utils/misc");
+const { cleanCommand } = require("../../utils/actions");
 
 module.exports = {
 	controls: {
@@ -31,7 +32,7 @@ module.exports = {
 				.addField(string(locale, "LOCALE_LIST_INCOMPLETE_TITLE"), `${string(locale, "LOCALE_LIST_INCOMPLETE_DESC", { support_invite: `https://discord.gg/${support_invite}` })}\n${localesProgress.filter(l => !l.settings.hidden || qUserDB.locale === l.settings.code).map(l => ` - [${l.settings.code}] **${l.settings.native}** (${l.settings.english}) ${qUserDB.locale && qUserDB.locale === l.settings.code ? `:arrow_left: _${string(locale, "SELECTED")}_` : ""}`).join("\n")}`)
 				.setFooter(string(locale, "LOCALE_FOOTER"))
 				.setColor(client.colors.default);
-			return message.channel.send(embed);
+			return message.channel.send(embed).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 		let permission = await checkPermissions(message.member, client);
 		if (permission <= 1 && args[0].toLowerCase() === "pull") {
@@ -64,12 +65,12 @@ module.exports = {
 			if (easterEggChance === 7) {
 				found = client.locales.find((l) => l.settings.code === "owo");
 				console.log(easterEggChance);
-				message.channel.send(string(locale, "LOCALE_EASTER_EGG_ACTIVATED", {}, "<a:owo:717918218043260969>", "<a:owo:717918218043260969>"));
+				message.channel.send(string(locale, "LOCALE_EASTER_EGG_ACTIVATED", {}, "<a:owo:717918218043260969>", "<a:owo:717918218043260969>")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
-			else return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error"));
+			else return message.channel.send(string(locale, "NO_LOCALE_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 		qUserDB.locale = found.settings.code;
 		await dbModify("User", { id: message.author.id }, qUserDB);
-		message.channel.send(`${string(found.settings.code, "USER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success")}${permission <= 2 ? `\n\n${string(found.settings.code, "LOCALE_SERVER_SETTING_PROMPT", { prefix: qServerDB.config.prefix, code: found.settings.code })}` : ""}`);
+		message.channel.send(`${string(found.settings.code, "USER_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success")}${permission <= 2 ? `\n\n${string(found.settings.code, "LOCALE_SERVER_SETTING_PROMPT", { prefix: qServerDB.config.prefix, code: found.settings.code })}` : ""}`).then(sent => cleanCommand(message, sent, qServerDB));
 	}
 };

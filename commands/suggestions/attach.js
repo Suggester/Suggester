@@ -4,6 +4,7 @@ const { serverLog, mediaLog } = require("../../utils/logs");
 const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "attach",
@@ -18,27 +19,27 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
-		if (returned) return message.channel.send(returned);
+		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
-		if (qSuggestionDB.attachment) return message.channel.send(string(locale, "ALREADY_ATTACHMENT_ERROR", {}, "error"));
+		if (qSuggestionDB.attachment) return message.channel.send(string(locale, "ALREADY_ATTACHMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (!args[1] && !message.attachments.first()) return message.channel.send(string(locale, "NO_ATTACHMENT_ERROR", {}, "error"));
+		if (!args[1] && !message.attachments.first()) return message.channel.send(string(locale, "NO_ATTACHMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : args.splice(1).join(" ");
 
-		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error"));
+		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		const res = await mediaLog(message, id, attachment)
 			.catch(console.error);
 
-		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error"));
-		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		qSuggestionDB.attachment = res.attachments[0].url;
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
-		if (editFeed) return message.channel.send(editFeed);
+		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
@@ -49,7 +50,7 @@ module.exports = {
 			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
-		message.channel.send(replyEmbed);
+		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "ATTACHED_LOG", "blue")

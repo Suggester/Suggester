@@ -5,6 +5,7 @@ const { serverLog } = require("../../utils/logs");
 const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/checks");
 const { emoji } = require("../../config.json");
 const { deleteFeedMessage, editFeedMessage, notifyFollowers } = require("../../utils/actions");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "mark",
@@ -20,7 +21,7 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
-		if (returned) return message.channel.send(returned);
+		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
 		function status (input) {
@@ -60,7 +61,7 @@ module.exports = {
 			const e = (await m.awaitReactions(filter, { max: 1, time: 300000 })).first();
 			await m.reactions.removeAll();
 			if (!e) {
-				return m.edit(string(locale, "MARK_TIMEOUT_ERROR"));
+				return m.edit(string(locale, "MARK_TIMEOUT_ERROR")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 
 			let emote = emotes.find(em => em[0] === `${e.emoji.name}:${e.emoji.id}`);
@@ -73,15 +74,15 @@ module.exports = {
 		}
 
 		let [checkFor, str, guildstr, color] = status(statusInput);
-		if (!checkFor) return message.channel.send(string(locale, "NO_STATUS_ERROR", {}, "error"));
-		if (checkFor.includes(qSuggestionDB.displayStatus)) return message.channel.send(string(locale, "STATUS_ALREADY_SET_ERROR", { status: str }, "error"));
+		if (!checkFor) return message.channel.send(string(locale, "NO_STATUS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (checkFor.includes(qSuggestionDB.displayStatus)) return message.channel.send(string(locale, "STATUS_ALREADY_SET_ERROR", { status: str }, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let isComment = args[2];
 
 		let comment;
 		if (isComment) {
 			comment = args.splice(shifted ? 1 : 2).join(" ");
-			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
+			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			let commentId = qSuggestionDB.comments.length+1;
 			isComment = commentId;
 			qSuggestionDB.comments.push({
@@ -95,7 +96,7 @@ module.exports = {
 		qSuggestionDB.displayStatus = checkFor[0];
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qSuggestionDB.displayStatus === "implemented" && qServerDB.config.channels.archive) {
 			if (message.guild.channels.cache.get(qServerDB.config.channels.archive)) {
@@ -105,7 +106,7 @@ module.exports = {
 
 			let suggestionNewEmbed = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
-			if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
+			if (deleteMsg[0]) return message.channel.send(deleteMsg[0]).then(sent => cleanCommand(message, sent, qServerDB));
 
 			qSuggestionDB.implemented = true;
 
@@ -119,7 +120,7 @@ module.exports = {
 					.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str);
 
 				if (isComment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
-				message.channel.send(replyEmbed);
+				message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 				await notifyFollowers(client, qServerDB, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: "INFO_PUBLIC_STATUS_HEADER", reason: str }, function(e, l) {
 					if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
@@ -143,7 +144,7 @@ module.exports = {
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client, qSuggestionDB.displayStatus === "no" && !qServerDB.config.channels.denied);
-		if (editFeed) return message.channel.send(editFeed);
+		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let replyEmbed = new Discord.MessageEmbed()
 			.setTitle(string(locale, "STATUS_EDITED_TITLE"))
@@ -154,7 +155,7 @@ module.exports = {
 			.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str);
 
 		if (isComment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
-		message.channel.send(replyEmbed);
+		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (![null, "default"].includes(qSuggestionDB.displayStatus)) await notifyFollowers(client, qServerDB, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: "INFO_PUBLIC_STATUS_HEADER", reason: str }, function(e, l) {
 			if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);

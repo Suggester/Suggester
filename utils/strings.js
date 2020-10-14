@@ -1498,25 +1498,25 @@ module.exports = {
 			string: "Suggestions already cannot be submitted via any message the suggestions feed channel",
 			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
 		},
-		"CFG_CLEAN_COMMANDS_ENABLED": {
-			string: "Auto-cleaning of suggestion commands is **enabled**.",
-			context: "Shown when a guild has enabled cleaning of the suggest command"
+		"CFG_CLEAR_COMMANDS_ENABLED": {
+			string: "Auto-cleaning of commands is **enabled**.",
+			context: "Shown when a guild has enabled cleaning of commands"
 		},
-		"CFG_CLEAN_COMMANDS_DISABLED": {
-			string: "Auto-cleaning of suggestion commands is **disabled**.",
-			context: "Shown when a guild has cleaning of the suggest command"
+		"CFG_CLEAR_COMMANDS_DISABLED": {
+			string: "Auto-cleaning of commands is **disabled**.",
+			context: "Shown when a guild has cleaning of commands"
 		},
-		"CFG_CLEAN_COMMANDS_ALREADY_ENABLED": {
-			string: "Auto-cleaning of suggestion commands is already enabled.",
-			context: "Shown when cleaning of suggestion commands is enabled and a guild tries to enable them"
+		"CFG_CLEAR_COMMANDS_ALREADY_ENABLED": {
+			string: "Auto-cleaning of commands is already enabled.",
+			context: "Shown when cleaning of commands is enabled and a guild tries to enable them"
 		},
-		"CFG_CLEAN_COMMANDS_ALREADY_DISABLED": {
-			string: "Auto-cleaning of suggestion commands is already disabled.",
-			context: "Shown when cleaning of suggestion commands is disabled and a guild tries to disable them"
+		"CFG_CLEAR_COMMANDS_ALREADY_DISABLED": {
+			string: "Auto-cleaning of commands is already disabled.",
+			context: "Shown when cleaning of commands is disabled and a guild tries to disable them"
 		},
-		"CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES": {
-			string: "Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
-			context: "Error shown when the bot does not have Manage Messages and cleaning of suggestions commands is enabled"
+		"CFG_CLEAR_COMMANDS_NO_MANAGE_MESSAGES": {
+			string: "Auto-cleaning of commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
+			context: "Error shown when the bot does not have Manage Messages and cleaning of commands is enabled"
 		},
 		"CFG_NO_PARAMS_ERROR": {
 			string: "Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.",
@@ -3316,20 +3316,6 @@ module.exports = {
 			string: "Votes",
 			context: "Header for the votes section of the suggestion embed"
 		},
-		"ALREADY_AWAITING_REVIEW_CONFIRM": {
-			string: "You already have a suggestion awaiting review. Are you sure you would like to submit another? Select {{check}} to submit and {{x}} to cancel.",
-			context: "Warning shown when a user tries to submit a suggestion and already has one awaiting review",
-			replaced: {
-				check: {
-					to_replace: "{{check}}",
-					description: "The check emoji"
-				},
-				x: {
-					to_replace: "{{x}}",
-					description: "The X emoji"
-				}
-			}
-		},
 		"NO_SUGGESTIONS_FOUND": {
 			string: "No suggestions that matched your query were found",
 			context: "Error shown when no suggestions are found for the top/down command"
@@ -4477,21 +4463,17 @@ module.exports = {
 			context: "Examples for the DM Notifications config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
 		},
-		"CONFIG_NAME:CLEANCOMMANDS": {
-			string: "Clean Suggestion Commands",
-			context: "Name of the Clean Suggestion Commands config element"
+		"CONFIG_NAME:CLEARCOMMANDS": {
+			string: "Clean Commands",
+			context: "Name of the Clean Commands config element"
 		},
-		"CONFIG_DESC:CLEANCOMMANDS": {
-			string: "This setting controls whether or not the `suggest` command and the response are removed after a few seconds. This is useful for keeping your command channel clean!",
-			context: "Description of the Clean Suggestion Commands config element"
+		"CONFIG_DESC:CLEARCOMMANDS": {
+			string: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
+			context: "Description of the Clean Commands config element"
 		},
-		"CONFIG_EXAMPLES:CLEANCOMMANDS": {
-			string: "`{{p}}config cleancommands on`\n" +
-				"Enables cleaning of suggestion commands\n" +
-				"\n" +
-				"`{{p}}config cleancommands off`\n" +
-				"Disables cleaning of suggestion commands",
-			context: "Examples for the Clean Suggestion Commands config element\n" +
+		"CONFIG_EXAMPLES:CLEARCOMMANDS": {
+			string: "`{{p}}config cleancommands on`\nEnables cleaning of commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of commands",
+			context: "Examples for the Clean Commands config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `cleancommands`"
 		},
 		"CONFIG_NAME:SELFVOTE": {

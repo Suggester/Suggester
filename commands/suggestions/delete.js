@@ -4,6 +4,7 @@ const { dbModify } = require("../../utils/db");
 const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/checks");
 const { string } = require("../../utils/strings");
 const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "delete",
@@ -18,7 +19,7 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);
-		if (returned) return message.channel.send(returned);
+		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
 		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
@@ -27,7 +28,7 @@ module.exports = {
 		}
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		qSuggestionDB.status = "denied";
 		qSuggestionDB.staff_member = message.author.id;
@@ -35,12 +36,12 @@ module.exports = {
 		let reason;
 		if (args[1]) {
 			reason = args.splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.denial_reason = reason;
 		}
 
 		let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
-		if (deleteMsg[0]) return message.channel.send(deleteMsg[0]);
+		if (deleteMsg[0]) return message.channel.send(deleteMsg[0]).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
@@ -55,7 +56,7 @@ module.exports = {
 			replyEmbed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment)
 				.setImage(qSuggestionDB.attachment);
 		}
-		message.channel.send(replyEmbed);
+		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
 

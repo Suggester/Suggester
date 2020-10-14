@@ -2,6 +2,7 @@ const { dbQuery, dbModify, dbQueryAll } = require("../../utils/db");
 const { checkSuggestion } = require("../../utils/checks");
 const { pages } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "follow",
@@ -16,8 +17,9 @@ module.exports = {
 		dmAvailable: true
 	},
 	do: async (locale, message, client, args, Discord) => {
+		const qServerDB = message.guild ? await message.guild.db : null;
 		let qUserDB = await dbQuery("User", { id: message.author.id });
-		if (!args[0]) return message.channel.send(string(locale, "FOLLOW_NO_PARAMS_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "FOLLOW_NO_PARAMS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		switch (args[0].toLowerCase()) {
 		case "list": {
 			let suggestions = await dbQueryAll("Suggestion", { suggestionId: { $in: qUserDB.subscribed.map(s => s.id) } });
@@ -47,50 +49,50 @@ module.exports = {
 		}
 		case "auto":
 		case "automatic": {
-			if (!args[1]) return message.channel.send(string(locale, qUserDB.auto_subscribe ? "AUTOFOLLOW_ENABLED" : "AUTOFOLLOW_DISABLED"));
+			if (!args[1]) return message.channel.send(string(locale, qUserDB.auto_subscribe ? "AUTOFOLLOW_ENABLED" : "AUTOFOLLOW_DISABLED")).then(sent => cleanCommand(message, sent, qServerDB));
 			switch (args[1].toLowerCase()) {
 			case "enable":
 			case "on":
 			case "true":
 			case "yes": {
-				if (qUserDB.auto_subscribe) return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_ENABLED", {}, "error"));
+				if (qUserDB.auto_subscribe) return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_ENABLED", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 				qUserDB.auto_subscribe = true;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string(locale, "AUTOFOLLOW_ENABLED", {}, "success"));
+				return message.channel.send(string(locale, "AUTOFOLLOW_ENABLED", {}, "success")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 			case "disable":
 			case "off":
 			case "false":
 			case "no": {
-				if (!qUserDB.auto_subscribe) return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_DISABLED", {}, "error"));
+				if (!qUserDB.auto_subscribe) return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_DISABLED", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 				qUserDB.auto_subscribe = false;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string(locale, "AUTOFOLLOW_DISABLED", {}, "success"));
+				return message.channel.send(string(locale, "AUTOFOLLOW_DISABLED", {}, "success")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 			case "toggle":
 			case "switch": {
 				qUserDB.auto_subscribe = !qUserDB.auto_subscribe;
 				await dbModify("User", {id: qUserDB.id}, qUserDB);
-				return message.channel.send(string(locale, qUserDB.auto_subscribe ? "AUTOFOLLOW_ENABLED" : "AUTOFOLLOW_DISABLED", {}, "success"));
+				return message.channel.send(string(locale, qUserDB.auto_subscribe ? "AUTOFOLLOW_ENABLED" : "AUTOFOLLOW_DISABLED", {}, "success")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 			default:
-				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+				return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 		}
 		default:
-			if (!message.guild) return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
-			if (!args[0]) return message.channel.send(string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error"));
+			if (!message.guild) return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+			if (!args[0]) return message.channel.send(string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			// eslint-disable-next-line no-case-declarations
 			let [fetchSuggestion, qSuggestionDB] = await checkSuggestion(locale, message.guild, args[0]);
 			if (fetchSuggestion) return message.channel.send(fetchSuggestion);
-			if (qUserDB.subscribed.find(s => s.id === qSuggestionDB.suggestionId)) return message.channel.send(string(locale, "ALREADY_FOLLOWING_ERROR", { id: qSuggestionDB.suggestionId }, "error"));
+			if (qUserDB.subscribed.find(s => s.id === qSuggestionDB.suggestionId)) return message.channel.send(string(locale, "ALREADY_FOLLOWING_ERROR", { id: qSuggestionDB.suggestionId }, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qUserDB.subscribed.push({
 				id: qSuggestionDB.suggestionId,
 				guild: message.guild.id,
 				auto: false
 			});
 			qUserDB.save();
-			return message.channel.send(string(locale, "FOLLOW_SUCCESS", { id: qSuggestionDB.suggestionId }, "success"));
+			return message.channel.send(string(locale, "FOLLOW_SUCCESS", { id: qSuggestionDB.suggestionId }, "success")).then(sent => cleanCommand(message, sent, qServerDB)).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 	}
 };

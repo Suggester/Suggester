@@ -4,6 +4,7 @@ const { serverLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
 const { checkDenied, baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "massdelete",
@@ -31,19 +32,19 @@ module.exports = {
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return message.channel.send(deniedCheck);
 
-		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
-		if (!reasonSplit[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!reasonSplit[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let suggestions = reasonSplit[0].split(" ");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_DENY_ERROR", {}, "error"));
+		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_DENY_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let su = suggestions.map(Number);
 		let msg = await message.channel.send(string(locale, "PROCESSING"));
 
@@ -76,7 +77,7 @@ module.exports = {
 				.addField(string(locale, "RESULT_FIELD_TITLE"), `${deniedId.length > 0 ? string(locale, "MASS_DELETE_SUCCESS_RESULTS_DETAILED", { list: deniedId.join(", ") }, "success") : ""}\n${notDeniedId.length > 0 ? string(locale, "MASS_DELETE_FAIL_RESULTS_DETAILED", { list: notDeniedId.join(", ") }, "error") : ""}`)
 				.setColor(deniedId.length !== 0 ? client.colors.green : client.colors.red)
 				.setFooter(nModified !== su.length ? string(locale, "MASS_DELETE_ERROR_DETAILS") : "")
-		);
+		).then(sent => cleanCommand(message, sent, qServerDB));
 
 		for (let s in denied) {
 			// eslint-disable-next-line no-prototype-builtins

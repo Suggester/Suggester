@@ -4,6 +4,7 @@ const { serverLog } = require("../../utils/logs");
 const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { Suggestion } = require("../../utils/schemas");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "massapprove",
@@ -22,21 +23,21 @@ module.exports = {
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let reason;
 		let reasonSplit = args.join(" ").split("-r");
-		if (!reasonSplit[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error"));
+		if (!reasonSplit[0]) return message.channel.send(string(locale, "NONE_SPECIFIED_MASS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let suggestions = reasonSplit[0].split(" ");
 		if (reasonSplit[1]) {
 			reason = reasonSplit[1].split(" ").splice(1).join(" ");
-			if (reason.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
+			if (reason.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 
 		if (suggestions[suggestions.length - 1] === "") suggestions.pop();
-		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_APPROVE_ERROR", {}, "error"));
+		if (suggestions.some(isNaN)) return message.channel.send(string(locale, "NAN_MASS_APPROVE_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let checkSuggest = checkSuggestions(locale, message.guild, qServerDB);
 		if (checkSuggest) return message.channel.send(checkSuggest);
@@ -83,7 +84,7 @@ module.exports = {
 				.addField(string(locale, "RESULT_FIELD_TITLE"), `${approvedId.length > 0 ? string(locale, "MASS_APPROVE_APPROVE_RESULTS_DETAILED", { list: approvedId.join(", ") }, "success") : ""}\n${notApprovedId.length > 0 ? string(locale, "MASS_APPROVE_FAIL_RESULTS_DETAILED", { list: notApprovedId.join(", ") }, "error") : ""}`)
 				.setColor(approvedId.length !== 0 ? client.colors.green : client.colors.red)
 				.setFooter(nModified !== su.length ? string(locale, "MASS_APPROVE_ERROR_DETAILS") : "")
-		);
+		).then(sent => cleanCommand(message, sent, qServerDB));
 
 		for (let s in approved) {
 			// eslint-disable-next-line no-prototype-builtins
