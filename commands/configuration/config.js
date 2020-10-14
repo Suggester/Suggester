@@ -4,6 +4,8 @@ const { findRole, handleChannelInput, findEmoji, handleRoleInput, findChannel } 
 const { checkPermissions, channelPermissions } = require("../../utils/checks");
 const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
+const ms = require("ms");
+const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
 module.exports = {
@@ -757,6 +759,20 @@ module.exports = {
 				await dbModify("Server", { id: server.id }, qServerDB);
 				return message.channel.send(string(found.settings.code, "GUILD_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success"));
 			}
+		},
+		{
+			names: ["cooldown", "suggestcooldown", "cd", "suggestcd"],
+			name: "Suggestion Cooldown",
+			description: "The time users must wait between submitting suggestions",
+			examples: "`{{p}}config cooldown 5m`\nSets the suggestion cooldown time to 5 minutes.\n\n`{{p}}config cooldown 1 hour`\nSets the suggestion cooldown time to 1 hour.\n\n`{{p}}config cooldown 0`\nRemoves the suggestion cooldown time",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cooldown ? "CFG_COOLDOWN_INFO" : "CFG_COOLDOWN_NONE", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }));
+				let newValue = ms(args.splice(1).join(" "));
+				if ((!newValue && newValue !== 0) || newValue < 0) return message.channel.send(string(locale, "CFG_COOLDOWN_BAD_VALUE", {}, "error"));
+				qServerDB.config.suggestion_cooldown = newValue;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
+			}
 		}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
@@ -896,6 +912,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:INCHANNELSUGGESTIONS", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
 			//Locale
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
+			//Cooldown
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),

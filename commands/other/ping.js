@@ -35,7 +35,7 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.addField(string(locale, "PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
 			.addField(`${string(locale, "PING_GUILD_COUNT_HEADER")}`, string(locale, "PING_COUNT_CONTENT", { guilds: shardInfo.reduce((t, c) => t + c[0].guilds, 0), shards: shardInfo.length }), true)
-			.addField(string(locale, "PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime)}\nAvg: ${humanizeDuration(shardInfo.reduce((t, c) => t + parseFloat(c[0].uptime), 0)/shardInfo.length)}`, true)
+			.addField(string(locale, "PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime, { language: locale, fallbacks: ["en"] })}\nAvg: ${humanizeDuration(shardInfo.reduce((t, c) => t + parseFloat(c[0].uptime), 0)/shardInfo.length, { language: locale, fallbacks: ["en"] })}`, true)
 			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`, true)
 			.addField(string(locale, "PING_MEMORY_HEADER"), pretty(shardInfo.reduce((t, c) => t + parseFloat(c[0].memory), 0)))
 			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${shardInfo.map(s => string(locale, "PING_SHARD_STATS_NEW", { num: s[0].id.toString(), guilds: s[0].guilds.toString(), channels: s[0].channels.toString(), members: s[0].members.toString(), ping: Math.round(s[0].ping), uptime: humanizeDuration(s[0].uptime, { language: locale, fallbacks: ["en"] }), memory: pretty(s[0].memory)})).join("\n")}`)

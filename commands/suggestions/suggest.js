@@ -1,6 +1,6 @@
 const { emoji } = require("../../config.json");
 const { suggestionEmbed, reviewEmbed, logEmbed } = require("../../utils/misc");
-const { dbQuery, dbModify, } = require("../../utils/db");
+const { dbQuery, dbModify, dbQueryNoNew } = require("../../utils/db");
 const { checkPermissions, channelPermissions, checkConfig, checkReview } = require("../../utils/checks");
 const { serverLog, mediaLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
@@ -8,6 +8,7 @@ const { checkURL } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const lngDetector = new (require("languagedetect"));
+const humanizeDuration = require("humanize-duration");
 
 module.exports = {
 	controls: {
@@ -53,6 +54,16 @@ module.exports = {
 		if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
 		if (!channels.includes(message.channel.id) && !noCommand) {
 			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		}
+
+		if (qServerDB.config.suggestion_cooldown) {
+			if (qServerDB.config.cooldown_exempt.includes(message.author.id)) {
+				qServerDB.config.cooldown_exempt.splice(qServerDB.config.cooldown_exempt.findIndex(u => u === message.author.id), 1);
+				await qServerDB.save();
+			} else {
+				let foundCooldown = await dbQueryNoNew("Suggestion", { id: message.guild.id, suggester: message.author.id, submitted: { "$gte": new Date(Date.now()-qServerDB.config.suggestion_cooldown) } });
+				if (foundCooldown) return message.channel.send(string(locale, "CUSTOM_COOLDOWN_FLAG", { time: humanizeDuration(qServerDB.config.suggestion_cooldown+(new Date(foundCooldown.submitted).getTime())-Date.now(), { language: locale, fallbacks: ["en"] }) }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+			}
 		}
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";

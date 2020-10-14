@@ -3362,6 +3362,20 @@ module.exports = {
 			context: "Examples for the acknowledgement command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
+		"COMMAND_DESC:EXEMPT": {
+			string: "Allows a user to bypass the server's configured suggestion cooldown",
+			context: "Description for the exempt command"
+		},
+		"COMMAND_USAGE:EXEMPT": {
+			string: "exempt [user]",
+			context: "Usage for the exempt command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EXEMPT": {
+			string: "`{{p}}exempt @Brightness™`\nExempts Brightness™ from the configured suggestion cooldown\n\n`{{p}}exempt 255834596766253057`\nExempts a user with ID 255834596766253057 from the configured suggestion cooldown",
+			context: "Examples for the exempt command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
 		"COMMAND_DESC:ALLOWLIST": {
 			string: "Adds a server to the allowed list",
 			context: "Description for the allowlist command"
@@ -4568,6 +4582,19 @@ module.exports = {
 			context: "Examples for the Locale config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `locale`"
 		},
+		"CONFIG_NAME:COOLDOWN": {
+			string: "Suggestion Cooldown",
+			context: "Name of the Suggestion Cooldown config element"
+		},
+		"CONFIG_DESC:COOLDOWN": {
+			string: "The time users must wait between submitting suggestions",
+			context: "Description of the Suggestion Cooldown config element"
+		},
+		"CONFIG_EXAMPLES:COOLDOWN": {
+			string: "`{{p}}config cooldown 5m`\nSets the suggestion cooldown time to 5 minutes.\n\n`{{p}}config cooldown 1 hour`\nSets the suggestion cooldown time to 1 hour.\n\n`{{p}}config cooldown 0`\nRemoves the suggestion cooldown time",
+			context: "Examples for the Suggestion Cooldown config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `admin`"
+		},
 		"AUTOFOLLOW_FIRST_NOTIF": {
 			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
 			context: "Notification when a user upvotes a suggestion and automatically follows it (only for the first follow)",
@@ -4787,6 +4814,88 @@ module.exports = {
 		"DUPE_ORIGINAL_INVALID_ERROR": {
 			string: "You must provide a valid suggestion ID for the original suggestion",
 			context: "Error shown when a suggestion ID provided in the dupe command for the original suggestion is invalid"
+		},
+		"CFG_COOLDOWN_INFO": {
+			string: "The suggestion cooldown time is currently set to **{{time}}**",
+			context: "Shows the suggestion cooldown time in the config command",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time the cooldown is set to"
+				}
+			}
+		},
+		"CFG_COOLDOWN_NONE": {
+			string: "There is no suggestion cooldown time set.",
+			context: "Shows the suggestion cooldown time in the config command when none is set"
+		},
+		"CFG_COOLDOWN_SET": {
+			string: "The suggestion cooldown time is now **{{time}}**",
+			context: "Success message when the suggestion cooldown time is set",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time the cooldown is set to"
+				}
+			}
+		},
+		"CFG_COOLDOWN_BAD_VALUE": {
+			string: "You must specify a value that can be interpreted as a time and is greater than or equal to 0",
+			context: "Error shown when the value specified for the suggestion cooldown is invalid"
+		},
+		"CUSTOM_COOLDOWN_FLAG": {
+			string: "You must wait {{time}} before submitting another suggestion",
+			context: "Error shown when a user attempts to submit a suggestion and their cooldown has not ended",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time left before the cooldown expires"
+				}
+			}
+		},
+		"EXEMPT_NO_ARGS_ERROR": {
+			string: "You must specify a user to exempt",
+			context: "Error shown when no user is speciied for the exempt command"
+		},
+		"EXEMPT_USER_BOT_ERROR": {
+			string: "This user is a bot, and therefore cannot submit suggestions",
+			context: "Error shown when a user tries to exempt a bot"
+		},
+		"EXEMPT_USER_NOT_MEMBER_ERROR": {
+			string: "This user is not a member of this server",
+			context: "Error shown when a user tries to exempt a user who is not a member of the current server"
+		},
+		"EXEMPT_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been exempted from the suggestion cooldown. Next time they submit a suggestion they won't be affected by the configured cooldown. **This only applies to one suggestion, if they need exempted again you'll need to re-run this command.**",
+			context: "Success message when a user is exempted in a guild",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"EXEMPT_LOG_TITLE": {
+			string: "{{staff}} exempted {{user}} from the suggestion cooldown",
+			context: "Title of the log embed when a user is exempted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The exempted user's tag"
+				},
+				staff: {
+					to_replace: "{{staff}}",
+					description: "The staff member's tag"
+				}
+			}
+		},
+		"EXEMPT_ALREADY_ERROR": {
+			string: "This user has already been exempted from the suggestion cooldown",
+			context: "Error shown when a user has already been exempted from the suggestion cooldown"
 		}
 	}
 };
