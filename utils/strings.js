@@ -3902,6 +3902,20 @@ module.exports = {
 			context: "Examples for the deny command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
+		"COMMAND_DESC:DUPE": {
+			string: "Denies a suggestion as a duplicate of another",
+			context: "Description for the dupe command"
+		},
+		"COMMAND_USAGE:DUPE": {
+			string: "dupe [duplicate suggestion id] [original suggestion id]",
+			context: "Description for the dupe command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DUPE": {
+			string: "`{{p}}dupe 1 2`\nDenies suggestion #1 as a duplicate of suggestion #2",
+			context: "Examples for the dupe command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
 		"COMMAND_DESC:INFO": {
 			string: "Shows information about a suggestion",
 			context: "Description for the info command"
@@ -4711,6 +4725,68 @@ module.exports = {
 					description: "The bot's ID for the mention"
 				}
 			}
+		},
+		"DUPE_REASON": {
+			string: "Duplicate of suggestion [#{{id}}]({{link}})",
+			context: "The reason for a duplicate suggestion in the dupe command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the suggestion"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_DENIED": {
+			string: "Duplicate of suggestion #{{id}}, which has been denied.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is denied",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_DENIED_WITH_REASON": {
+			string: "Duplicate of suggestion #{{id}}, which has been denied with the following reason:\n{{reason}}",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is denied and there's enough space for the reason",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				},
+				reason: {
+					to_replace: "{{reason}}",
+					description: "The reason the original suggestion was denied"
+				}
+			}
+		},
+		"DUPE_REASON_IMPLEMENTED": {
+			string: "Duplicate of suggestion #{{id}}, which has been implemented.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is implemented",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_REVIEW": {
+			string: "Duplicate of suggestion #{{id}}, which is currently awaiting review.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is awaiting review",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_ORIGINAL_INVALID_ERROR": {
+			string: "You must provide a valid suggestion ID for the original suggestion",
+			context: "Error shown when a suggestion ID provided in the dupe command for the original suggestion is invalid"
 		}
 	}
 };
