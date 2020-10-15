@@ -57,10 +57,7 @@ module.exports = {
 		}
 
 		if (qServerDB.config.suggestion_cooldown && !qServerDB.config.cooldown_exempt.includes(message.author.id)) {
-			//let foundCooldown = await Suggestion.find({ id: message.guild.id, suggester: message.author.id, submitted: { "$gte": new Date(Date.now()-qServerDB.config.suggestion_cooldown) } }).sort({ "submitted" : -1 }).limit(1)[0];
-			//console.log(foundCooldown)
 			let foundCooldown = (await dbQueryAll("Suggestion", { id: message.guild.id, suggester: message.author.id, submitted: { "$gte": new Date(Date.now()-qServerDB.config.suggestion_cooldown) } })).sort((a, b) => b.submitted - a.submitted)[0];
-			console.log(foundCooldown)
 			if (foundCooldown) return message.channel.send(string(locale, "CUSTOM_COOLDOWN_FLAG", { time: humanizeDuration(qServerDB.config.suggestion_cooldown+(new Date(foundCooldown.submitted).getTime())-Date.now(), { language: locale, fallbacks: ["en"] }) }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		}
 

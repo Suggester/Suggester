@@ -11,7 +11,7 @@ function escapeRegExp(string) {
 
 module.exports = async (Discord, client, message) => {
 	const pre = new Date();
-	if (!["text", "news", "dm"].includes(message.channel.type) || message.author.bot) return;
+	if (!["text", "news", "dm"].includes(message.channel.type) || message.author.bot || message.system) return;
 
 	let permission = await checkPermissions(message.member || message.author, client);
 

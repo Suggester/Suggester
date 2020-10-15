@@ -157,7 +157,10 @@ module.exports = {
 							let checkStaff = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 							if (checkStaff) doReview = false;
 						}
-						if (doReview) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", {user: message.author.tag}))))).catch(() => {});
+						if (doReview) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
+							fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "green", string(guildLocale, "APPROVED_BY", {user: message.author.tag}))));
+							fetched.reactions.removeAll();
+						}).catch(() => {});
 					}
 					await approved[s].save();
 				});
