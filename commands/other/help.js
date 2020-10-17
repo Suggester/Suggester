@@ -11,7 +11,7 @@ module.exports = {
 	controls: {
 		name: "help",
 		permission: 10,
-		aliases: ["command", "howto", "prefix"],
+		aliases: ["command", "howto"],
 		usage: "help (command name)",
 		description: "Shows command information",
 		examples: "`{{p}}help`\nShows the list of commands\n\n`{{p}}help suggest`\nShows information about the \"suggest\" command",

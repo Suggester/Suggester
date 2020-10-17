@@ -196,5 +196,12 @@ module.exports = {
 			if (efn) fEmbed = efn(fEmbed, fid.locale || db.config.locale);
 			if (f && f.id !== "0") f.send(fEmbed).catch(() => {});
 		}
+	},
+	cleanCommand: async function(message, response, db, nc) {
+		if (!message.guild) return;
+		if ((db.config.clean_suggestion_command || nc) && message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
+			message.delete();
+			response.delete();
+		}, 7500);
 	}
 };

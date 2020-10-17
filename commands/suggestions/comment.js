@@ -4,6 +4,7 @@ const { serverLog } = require("../../utils/logs");
 const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "comment",
@@ -18,16 +19,16 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
-		if (returned) return message.channel.send(returned);
+		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
-		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error"));
+		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR", {}, "error"));
+		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 23) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let comment = args.splice(1).join(" ");
 
-		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
+		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let commentId = qSuggestionDB.comments.length+1;
 
@@ -39,10 +40,10 @@ module.exports = {
 		});
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
-		if (editFeed) return message.channel.send(editFeed);
+		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
@@ -53,7 +54,7 @@ module.exports = {
 			.setColor(client.colors.blue)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: id.toString() }))
 			.setTimestamp(qSuggestionDB.submitted);
-		message.channel.send(replyEmbed);
+		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, null, function (e, l) {
 			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);

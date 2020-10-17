@@ -4,6 +4,7 @@ const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
 const { fetchUser, logEmbed } = require("../../utils/misc");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "deletecomment",
@@ -21,30 +22,30 @@ module.exports = {
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		if (!args[0]) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
+		if (!args[0]) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let idsections = args[0].split("_");
-		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
+		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
-		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
+		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
-		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
+		if (suggestionsCheck) return message.channel.send(suggestionsCheck).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (qSuggestionDB.implemented) return message.channel.send(string(locale, "SUGGESTION_IMPLEMENTED_ERROR", {}, "error"));
+		if (qSuggestionDB.implemented) return message.channel.send(string(locale, "SUGGESTION_IMPLEMENTED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let id = qSuggestionDB.suggestionId;
 
 		let comment = qSuggestionDB.comments.find(comment => comment.id === idsections[1]) || null;
-		if (!comment) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error"));
-		if (comment.deleted) return message.channel.send(string(locale, "COMMENT_ALREADY_DELETED_ERROR", {}, "error"));
+		if (!comment) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (comment.deleted) return message.channel.send(string(locale, "COMMENT_ALREADY_DELETED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		comment.deleted = true;
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
-		if (editFeed) return message.channel.send(editFeed);
+		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let author = await fetchUser(comment.author, client);
-		if (!author) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (!author) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 
@@ -53,7 +54,7 @@ module.exports = {
 			.addField(author.id !== "0" ? string(locale, "COMMENT_TITLE", { user: author.tag, id: `${id}_${comment.id}` }) : string(locale, "COMMENT_TITLE_ANONYMOUS"), comment.comment)
 			.setColor(client.colors.red)
 			.setTimestamp();
-		message.channel.send(replyEmbed);
+		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")

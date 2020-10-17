@@ -1498,25 +1498,25 @@ module.exports = {
 			string: "Suggestions already cannot be submitted via any message the suggestions feed channel",
 			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
 		},
-		"CFG_CLEAN_COMMANDS_ENABLED": {
-			string: "Auto-cleaning of suggestion commands is **enabled**.",
-			context: "Shown when a guild has enabled cleaning of the suggest command"
+		"CFG_CLEAR_COMMANDS_ENABLED": {
+			string: "Auto-cleaning of commands is **enabled**.",
+			context: "Shown when a guild has enabled cleaning of commands"
 		},
-		"CFG_CLEAN_COMMANDS_DISABLED": {
-			string: "Auto-cleaning of suggestion commands is **disabled**.",
-			context: "Shown when a guild has cleaning of the suggest command"
+		"CFG_CLEAR_COMMANDS_DISABLED": {
+			string: "Auto-cleaning of commands is **disabled**.",
+			context: "Shown when a guild has cleaning of commands"
 		},
-		"CFG_CLEAN_COMMANDS_ALREADY_ENABLED": {
-			string: "Auto-cleaning of suggestion commands is already enabled.",
-			context: "Shown when cleaning of suggestion commands is enabled and a guild tries to enable them"
+		"CFG_CLEAR_COMMANDS_ALREADY_ENABLED": {
+			string: "Auto-cleaning of commands is already enabled.",
+			context: "Shown when cleaning of commands is enabled and a guild tries to enable them"
 		},
-		"CFG_CLEAN_COMMANDS_ALREADY_DISABLED": {
-			string: "Auto-cleaning of suggestion commands is already disabled.",
-			context: "Shown when cleaning of suggestion commands is disabled and a guild tries to disable them"
+		"CFG_CLEAR_COMMANDS_ALREADY_DISABLED": {
+			string: "Auto-cleaning of commands is already disabled.",
+			context: "Shown when cleaning of commands is disabled and a guild tries to disable them"
 		},
-		"CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES": {
-			string: "Auto-cleaning of suggestion commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
-			context: "Error shown when the bot does not have Manage Messages and cleaning of suggestions commands is enabled"
+		"CFG_CLEAR_COMMANDS_NO_MANAGE_MESSAGES": {
+			string: "Auto-cleaning of commands requires the bot have the **Manage Messages** permission in this server. Please give the bot this permission and try again.",
+			context: "Error shown when the bot does not have Manage Messages and cleaning of commands is enabled"
 		},
 		"CFG_NO_PARAMS_ERROR": {
 			string: "Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.",
@@ -3316,20 +3316,6 @@ module.exports = {
 			string: "Votes",
 			context: "Header for the votes section of the suggestion embed"
 		},
-		"ALREADY_AWAITING_REVIEW_CONFIRM": {
-			string: "You already have a suggestion awaiting review. Are you sure you would like to submit another? Select {{check}} to submit and {{x}} to cancel.",
-			context: "Warning shown when a user tries to submit a suggestion and already has one awaiting review",
-			replaced: {
-				check: {
-					to_replace: "{{check}}",
-					description: "The check emoji"
-				},
-				x: {
-					to_replace: "{{x}}",
-					description: "The X emoji"
-				}
-			}
-		},
 		"NO_SUGGESTIONS_FOUND": {
 			string: "No suggestions that matched your query were found",
 			context: "Error shown when no suggestions are found for the top/down command"
@@ -3374,6 +3360,20 @@ module.exports = {
 				"`{{p}}acknowledgement @Brightness™ reset`\n" +
 				"Resets Brightness™'s acknowledgement",
 			context: "Examples for the acknowledgement command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:EXEMPT": {
+			string: "Allows a user to bypass the server's configured suggestion cooldown",
+			context: "Description for the exempt command"
+		},
+		"COMMAND_USAGE:EXEMPT": {
+			string: "exempt [user]",
+			context: "Usage for the exempt command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EXEMPT": {
+			string: "`{{p}}exempt @Brightness™`\nExempts Brightness™ from the configured suggestion cooldown\n\n`{{p}}exempt 255834596766253057`\nExempts a user with ID 255834596766253057 from the configured suggestion cooldown",
+			context: "Examples for the exempt command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
 		"COMMAND_DESC:ALLOWLIST": {
@@ -3574,6 +3574,15 @@ module.exports = {
 		"COMMAND_USAGE:GITHUB": {
 			string: "github",
 			context: "Usage for the github command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:PREFIX": {
+			string: "Shows the bot's prefix on this server",
+			context: "Description for the prefix command"
+		},
+		"COMMAND_USAGE:PREFIX": {
+			string: "prefix",
+			context: "Usage for the prefix command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_DESC:LOCALE": {
@@ -3905,6 +3914,20 @@ module.exports = {
 				"`{{p}}deny 1 This isn't something we're interested in`\n" +
 				"Denies suggestion #1 with the reason \"This isn't something we're interested in\"",
 			context: "Examples for the deny command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DUPE": {
+			string: "Denies a suggestion as a duplicate of another",
+			context: "Description for the dupe command"
+		},
+		"COMMAND_USAGE:DUPE": {
+			string: "dupe [duplicate suggestion id] [original suggestion id]",
+			context: "Description for the dupe command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DUPE": {
+			string: "`{{p}}dupe 1 2`\nDenies suggestion #1 as a duplicate of suggestion #2",
+			context: "Examples for the dupe command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
 		"COMMAND_DESC:INFO": {
@@ -4468,21 +4491,17 @@ module.exports = {
 			context: "Examples for the DM Notifications config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `notifications`"
 		},
-		"CONFIG_NAME:CLEANCOMMANDS": {
-			string: "Clean Suggestion Commands",
-			context: "Name of the Clean Suggestion Commands config element"
+		"CONFIG_NAME:CLEARCOMMANDS": {
+			string: "Clean Commands",
+			context: "Name of the Clean Commands config element"
 		},
-		"CONFIG_DESC:CLEANCOMMANDS": {
-			string: "This setting controls whether or not the `suggest` command and the response are removed after a few seconds. This is useful for keeping your command channel clean!",
-			context: "Description of the Clean Suggestion Commands config element"
+		"CONFIG_DESC:CLEARCOMMANDS": {
+			string: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
+			context: "Description of the Clean Commands config element"
 		},
-		"CONFIG_EXAMPLES:CLEANCOMMANDS": {
-			string: "`{{p}}config cleancommands on`\n" +
-				"Enables cleaning of suggestion commands\n" +
-				"\n" +
-				"`{{p}}config cleancommands off`\n" +
-				"Disables cleaning of suggestion commands",
-			context: "Examples for the Clean Suggestion Commands config element\n" +
+		"CONFIG_EXAMPLES:CLEARCOMMANDS": {
+			string: "`{{p}}config cleancommands on`\nEnables cleaning of commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of commands",
+			context: "Examples for the Clean Commands config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `cleancommands`"
 		},
 		"CONFIG_NAME:SELFVOTE": {
@@ -4562,6 +4581,19 @@ module.exports = {
 			string: "`{{p}}config locale en`\nSets the server language to English.",
 			context: "Examples for the Locale config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `locale`"
+		},
+		"CONFIG_NAME:COOLDOWN": {
+			string: "Suggestion Cooldown",
+			context: "Name of the Suggestion Cooldown config element"
+		},
+		"CONFIG_DESC:COOLDOWN": {
+			string: "The time users must wait between submitting suggestions",
+			context: "Description of the Suggestion Cooldown config element"
+		},
+		"CONFIG_EXAMPLES:COOLDOWN": {
+			string: "`{{p}}config cooldown 5m`\nSets the suggestion cooldown time to 5 minutes.\n\n`{{p}}config cooldown 1 hour`\nSets the suggestion cooldown time to 1 hour.\n\n`{{p}}config cooldown 0`\nRemoves the suggestion cooldown time",
+			context: "Examples for the Suggestion Cooldown config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `admin`"
 		},
 		"AUTOFOLLOW_FIRST_NOTIF": {
 			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
@@ -4706,6 +4738,168 @@ module.exports = {
 					description: "The time the command will take"
 				}
 			}
+		},
+		"SERVER_PREFIX": {
+			string: "My prefix is `{{prefix}}`, you can also just mention the bot like \"<@{{id}}> help\"",
+			context: "Shows the configured prefix",
+			replaced: {
+				prefix: {
+					to_replace: "{{prefix}}",
+					description: "The configured prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The bot's ID for the mention"
+				}
+			}
+		},
+		"DUPE_REASON": {
+			string: "Duplicate of suggestion [#{{id}}]({{link}})",
+			context: "The reason for a duplicate suggestion in the dupe command",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the suggestion"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_DENIED": {
+			string: "Duplicate of suggestion #{{id}}, which has been denied.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is denied",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_DENIED_WITH_REASON": {
+			string: "Duplicate of suggestion #{{id}}, which has been denied with the following reason:\n{{reason}}",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is denied and there's enough space for the reason",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				},
+				reason: {
+					to_replace: "{{reason}}",
+					description: "The reason the original suggestion was denied"
+				}
+			}
+		},
+		"DUPE_REASON_IMPLEMENTED": {
+			string: "Duplicate of suggestion #{{id}}, which has been implemented.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is implemented",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_REASON_REVIEW": {
+			string: "Duplicate of suggestion #{{id}}, which is currently awaiting review.",
+			context: "The reason for a duplicate suggestion in the dupe command when the suggestion is awaiting review",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID of the original suggestion"
+				}
+			}
+		},
+		"DUPE_ORIGINAL_INVALID_ERROR": {
+			string: "You must provide a valid suggestion ID for the original suggestion",
+			context: "Error shown when a suggestion ID provided in the dupe command for the original suggestion is invalid"
+		},
+		"CFG_COOLDOWN_INFO": {
+			string: "The suggestion cooldown time is currently set to **{{time}}**",
+			context: "Shows the suggestion cooldown time in the config command",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time the cooldown is set to"
+				}
+			}
+		},
+		"CFG_COOLDOWN_NONE": {
+			string: "There is no suggestion cooldown time set.",
+			context: "Shows the suggestion cooldown time in the config command when none is set"
+		},
+		"CFG_COOLDOWN_SET": {
+			string: "The suggestion cooldown time is now **{{time}}**",
+			context: "Success message when the suggestion cooldown time is set",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time the cooldown is set to"
+				}
+			}
+		},
+		"CFG_COOLDOWN_BAD_VALUE": {
+			string: "You must specify a value that can be interpreted as a time and is greater than or equal to 0",
+			context: "Error shown when the value specified for the suggestion cooldown is invalid"
+		},
+		"CUSTOM_COOLDOWN_FLAG": {
+			string: "You must wait {{time}} before submitting another suggestion",
+			context: "Error shown when a user attempts to submit a suggestion and their cooldown has not ended",
+			replaced: {
+				time: {
+					to_replace: "{{time}}",
+					context: "The time left before the cooldown expires"
+				}
+			}
+		},
+		"EXEMPT_NO_ARGS_ERROR": {
+			string: "You must specify a user to exempt",
+			context: "Error shown when no user is speciied for the exempt command"
+		},
+		"EXEMPT_USER_BOT_ERROR": {
+			string: "This user is a bot, and therefore cannot submit suggestions",
+			context: "Error shown when a user tries to exempt a bot"
+		},
+		"EXEMPT_USER_NOT_MEMBER_ERROR": {
+			string: "This user is not a member of this server",
+			context: "Error shown when a user tries to exempt a user who is not a member of the current server"
+		},
+		"EXEMPT_SUCCESS": {
+			string: "**{{user}}** (`{{id}}`) has been exempted from the suggestion cooldown. Next time they submit a suggestion they won't be affected by the configured cooldown. **This only applies to one suggestion, if they need exempted again you'll need to re-run this command.**",
+			context: "Success message when a user is exempted in a guild",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"EXEMPT_LOG_TITLE": {
+			string: "{{staff}} exempted {{user}} from the suggestion cooldown",
+			context: "Title of the log embed when a user is exempted",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The exempted user's tag"
+				},
+				staff: {
+					to_replace: "{{staff}}",
+					description: "The staff member's tag"
+				}
+			}
+		},
+		"EXEMPT_ALREADY_ERROR": {
+			string: "This user has already been exempted from the suggestion cooldown",
+			context: "Error shown when a user has already been exempted from the suggestion cooldown"
+		},
+		"PROTIP_SPOOKY": {
+			string: ":ghost: :jack_o_lantern: :bat:",
+			context: "_Spooooooooky_\n(you don't need to translate this)"
 		}
 	}
 };

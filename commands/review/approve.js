@@ -4,6 +4,7 @@ const { serverLog } = require("../../utils/logs");
 const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
+const { cleanCommand } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "approve",
@@ -20,25 +21,24 @@ module.exports = {
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
+		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		if (returned) return message.channel.send(returned);
-
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error"));
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", { suggestionId: args[0], id: message.guild.id });
-		if (!qSuggestionDB) return message.channel.send(string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error"));
+		if (!qSuggestionDB) return message.channel.send(string(locale, "INVALID_SUGGESTION_ID_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let checkSuggest = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
-		if (checkSuggest) return message.channel.send(checkSuggest);
+		if (checkSuggest) return message.channel.send(checkSuggest).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let id = qSuggestionDB.suggestionId;
 		if (qSuggestionDB.status !== "awaiting_review") {
 			switch (qSuggestionDB.status) {
 			case "approved":
-				return message.channel.send(string(locale, "SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR", { prefix: qServerDB.config.prefix, id: id.toString() }, "error"));
+				return message.channel.send(string(locale, "SUGGESTION_ALREADY_APPROVED_APPROVE_ERROR", { prefix: qServerDB.config.prefix, id: id.toString() }, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			case "denied":
-				return message.channel.send(string(locale, "SUGGESTION_ALREADY_DENIED_APPROVE_ERROR", {}, "error"));
+				return message.channel.send(string(locale, "SUGGESTION_ALREADY_DENIED_APPROVE_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			}
 		}
 
@@ -47,7 +47,7 @@ module.exports = {
 		let comment;
 		if (isComment) {
 			comment = args.splice(1).join(" ");
-			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error"));
+			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.comments = [{
 				comment: comment,
 				author: message.author.id,
@@ -57,7 +57,7 @@ module.exports = {
 		}
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		qSuggestionDB.status = "approved";
 		qSuggestionDB.staff_member = message.author.id;
@@ -88,7 +88,7 @@ module.exports = {
 					.setImage(qSuggestionDB.attachment);
 			}
 
-			await message.channel.send(replyEmbed);
+			await message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 		}
 
 		let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);

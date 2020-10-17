@@ -89,29 +89,29 @@ module.exports = {
 	suggestionEditCommandCheck: async function (locale, message, args) {
 		const { baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
-		if (returned) return returned;
+		if (returned) return [returned, qServerDB];
 
 		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
-		if (suggestion[0]) return [suggestion[0]];
+		if (suggestion[0]) return [suggestion[0], qServerDB];
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, suggestion[1]);
-		if (suggestionsCheck) return [suggestionsCheck];
+		if (suggestionsCheck) return [suggestionsCheck, qServerDB];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
 	suggestionDeleteCommandCheck: async function (locale, message, args) {
 		const { checkDenied, baseConfig, checkSuggestions, checkApprovedSuggestion } = require("./checks");
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
-		if (returned) return [returned];
+		if (returned) return [returned, qServerDB];
 
 		let suggestion = await checkApprovedSuggestion(locale, message.guild, args[0]);
-		if (suggestion[0]) return [suggestion[0]];
+		if (suggestion[0]) return [suggestion[0], qServerDB];
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, suggestion[1]);
-		if (suggestionsCheck) return [suggestionsCheck];
+		if (suggestionsCheck) return [suggestionsCheck, qServerDB];
 
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
-		if (deniedCheck) return [deniedCheck];
+		if (deniedCheck) return [deniedCheck, qServerDB];
 
 		return [null, qServerDB, suggestion[1], suggestion[1].suggestionId];
 	},
@@ -137,7 +137,7 @@ module.exports = {
 		if (!qServerDB) return [string(locale, "UNCONFIGURED_ERROR", {}, "error")];
 
 		let missingConfig = await checkConfig(locale, qServerDB, guild.client);
-		if (missingConfig) return [missingConfig];
+		if (missingConfig) return [missingConfig, qServerDB];
 		return [null, qServerDB];
 	},
 	checkSuggestions: function (locale, guild, db, suggestion) {

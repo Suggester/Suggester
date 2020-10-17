@@ -11,7 +11,7 @@ function escapeRegExp(string) {
 
 module.exports = async (Discord, client, message) => {
 	const pre = new Date();
-	if (!["text", "news", "dm"].includes(message.channel.type) || message.author.bot) return;
+	if (!["text", "news", "dm"].includes(message.channel.type) || message.author.bot || message.system) return;
 
 	let permission = await checkPermissions(message.member || message.author, client);
 
@@ -54,7 +54,7 @@ module.exports = async (Discord, client, message) => {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
 	}
-	if (command.controls.enabled === false || qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase())) {
+	if (command.controls.enabled === false || (qServerDB ? qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase()) : false)) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, !command.controls.enabled ? "COMMAND_DISABLED" : "COMMAND_DISABLED_FLAG", {}, "error"));

@@ -46,7 +46,9 @@ const settings = new Schema({
 		loghook: {
 			id: String,
 			token: String
-		}
+		},
+		suggestion_cooldown: { type: Number, default: 0 },
+		cooldown_exempt: [String]
 	}
 });
 

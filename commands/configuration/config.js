@@ -4,6 +4,8 @@ const { findRole, handleChannelInput, findEmoji, handleRoleInput, findChannel } 
 const { checkPermissions, channelPermissions } = require("../../utils/checks");
 const { confirmation, pages } = require("../../utils/actions");
 const nodeEmoji = require("node-emoji");
+const ms = require("ms");
+const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
 module.exports = {
@@ -567,35 +569,35 @@ module.exports = {
 			}
 		},
 		{
-			names: ["cleancommands", "cleancommand", "clear", "clean", "clearcommands", "clearcommand"],
-			name: "Clean Suggestion Commands",
-			description: "This setting controls whether or not the `suggest` command and the response are removed after a few seconds. This is useful for keeping your command channel clean!",
-			examples: "`{{p}}config cleancommands on`\nEnables cleaning of suggestion commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of suggestion commands",
+			names: ["clearcommands", "cleancommand", "clear", "clean", "cleancommands", "clearcommand"],
+			name: "Clean Commands",
+			description: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
+			examples: "`{{p}}config cleancommands on`\nEnables cleaning of commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of commands",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAN_COMMANDS_ENABLED" : "CFG_CLEAN_COMMANDS_DISABLED"));
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAR_COMMANDS_ENABLED" : "CFG_CLEAR_COMMANDS_DISABLED"));
 				switch (args[1].toLowerCase()) {
 				case "enable":
 				case "on": {
 					if (!qServerDB.config.clean_suggestion_command) {
-						if (!server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
+						if (!server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
 						qServerDB.config.clean_suggestion_command = true;
 						await dbModify("Server", {id: server.id}, qServerDB);
-						return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_ENABLED", {}, "success"));
-					} else return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_ALREADY_ENABLED", {}, "error"));
+						return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_ENABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_ALREADY_ENABLED", {}, "error"));
 				}
 				case "disable":
 				case "off": {
 					if (qServerDB.config.clean_suggestion_command) {
 						qServerDB.config.clean_suggestion_command = false;
 						await dbModify("Server", {id: server.id}, qServerDB);
-						return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_DISABLED", {}, "success"));
-					} else return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_ALREADY_DISABLED", {}, "error"));
+						return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_DISABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_ALREADY_DISABLED", {}, "error"));
 				}
 				case "toggle":
-					if (!qServerDB.config.clean_suggestion_command && !server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string(locale, "CFG_CLEAN_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
+					if (!qServerDB.config.clean_suggestion_command && !server.me.permissions.has("MANAGE_MESSAGES")) return message.channel.send(string(locale, "CFG_CLEAR_COMMANDS_NO_MANAGE_MESSAGES", {}, "error"));
 					qServerDB.config.clean_suggestion_command = !qServerDB.config.clean_suggestion_command;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAN_COMMANDS_ENABLED" : "CFG_CLEAN_COMMANDS_DISABLED", {}, "success"));
+					return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAR_COMMANDS_ENABLED" : "CFG_CLEAR_COMMANDS_DISABLED", {}, "success"));
 				default:
 					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 				}
@@ -757,6 +759,20 @@ module.exports = {
 				await dbModify("Server", { id: server.id }, qServerDB);
 				return message.channel.send(string(found.settings.code, "GUILD_LOCALE_SET_SUCCESS", { name: found.settings.native, invite: `https://discord.gg/${support_invite}` }, "success"));
 			}
+		},
+		{
+			names: ["cooldown", "suggestcooldown", "cd", "suggestcd"],
+			name: "Suggestion Cooldown",
+			description: "The time users must wait between submitting suggestions",
+			examples: "`{{p}}config cooldown 5m`\nSets the suggestion cooldown time to 5 minutes.\n\n`{{p}}config cooldown 1 hour`\nSets the suggestion cooldown time to 1 hour.\n\n`{{p}}config cooldown 0`\nRemoves the suggestion cooldown time",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cooldown ? "CFG_COOLDOWN_INFO" : "CFG_COOLDOWN_NONE", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }));
+				let newValue = ms(args.splice(1).join(" "));
+				if ((!newValue && newValue !== 0) || newValue < 0) return message.channel.send(string(locale, "CFG_COOLDOWN_BAD_VALUE", {}, "error"));
+				qServerDB.config.suggestion_cooldown = newValue;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
+			}
 		}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
@@ -889,13 +905,15 @@ module.exports = {
 			// Prefix
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:PREFIX", {}, "success")}:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
-			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:NOTIFICATIONS", {}, "success")}:** ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:NOTIFY", {}, "success")}:** ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
 			//Clean Suggestion Command
-			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEANCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEARCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
 			//In-Channel Suggestions
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:INCHANNELSUGGESTIONS", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
 			//Locale
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
+			//Cooldown
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),

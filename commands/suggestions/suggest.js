@@ -5,9 +5,10 @@ const { checkPermissions, channelPermissions, checkConfig, checkReview } = requi
 const { serverLog, mediaLog } = require("../../utils/logs");
 const { Suggestion } = require("../../utils/schemas");
 const { checkURL } = require("../../utils/checks");
-const { confirmation } = require("../../utils/actions");
+const { cleanCommand } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const lngDetector = new (require("languagedetect"));
+const humanizeDuration = require("humanize-duration");
 
 module.exports = {
 	controls: {
@@ -44,42 +45,29 @@ module.exports = {
 					}
 				});
 				return message.channel.send(string(locale, "NO_ALLOWED_ROLE_ERROR", { roleList: roles.map(r => r.name).join(", ") }, "error"), {disableMentions: "everyone"}).then(sent => {
-					if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-						message.delete();
-						sent.delete();
-					}, 7500);
+					cleanCommand(message, sent, qServerDB, noCommand);
 				});
 			}
 		}
 
-		if ((qServerDB.config.channels.commands ? message.channel.id !== qServerDB.config.channels.commands : true) && (qServerDB.config.channels.commands_new.length > 0 ? !qServerDB.config.channels.commands_new.includes(message.channel.id) : false) && !noCommand) {
-			let channels = qServerDB.config.channels.commands_new;
-			if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
-			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error"));
+		let channels = qServerDB.config.channels.commands_new;
+		if (qServerDB.config.channels.commands) channels.push(qServerDB.config.channels.commands);
+		if (channels.length > 0 && !channels.includes(message.channel.id) && !noCommand) {
+			return message.channel.send(string(locale, "SUBMIT_NOT_COMMAND_CHANNEL_ERROR", { channels: channels.map(c => `<#${c}>`).join(", ") }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		}
+
+		if (qServerDB.config.suggestion_cooldown && !qServerDB.config.cooldown_exempt.includes(message.author.id)) {
+			let foundCooldown = (await dbQueryAll("Suggestion", { id: message.guild.id, suggester: message.author.id, submitted: { "$gte": new Date(Date.now()-qServerDB.config.suggestion_cooldown) } })).sort((a, b) => b.submitted - a.submitted)[0];
+			if (foundCooldown) return message.channel.send(string(locale, "CUSTOM_COOLDOWN_FLAG", { time: humanizeDuration(qServerDB.config.suggestion_cooldown+(new Date(foundCooldown.submitted).getTime())-Date.now(), { language: locale, fallbacks: ["en"] }) }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		}
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
-		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => {
-			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-				message.delete();
-				sent.delete();
-			}, 7500);
-		});
-		if (attachment && !(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => {
-			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-				message.delete();
-				sent.delete();
-			}, 7500);
-		});
+		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		if (attachment && !(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let suggestion = args.join(" ");
 
-		if (suggestion.length > 1024) return message.channel.send(string(locale, "TOO_LONG_SUGGESTION_ERROR", {}, "error")).then(sent => {
-			if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-				message.delete();
-				sent.delete();
-			}, 7500);
-		});
+		if (suggestion.length > 1024) return message.channel.send(string(locale, "TOO_LONG_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let id = await Suggestion.countDocuments() + 1;
 
@@ -87,19 +75,9 @@ module.exports = {
 			const res = await mediaLog(message, id, attachment)
 				.catch(console.error);
 
-			if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => {
-				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-					message.delete();
-					sent.delete();
-				}, 7500);
-			});
+			if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
-			if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => {
-				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-					message.delete();
-					sent.delete();
-				}, 7500);
-			});
+			if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 			attachment = res.attachments[0].url;
 		}
@@ -108,21 +86,6 @@ module.exports = {
 		if (qServerDB.config.mode === "review") {
 			let checkStaff = checkReview(locale, message.guild, qServerDB);
 			if (checkStaff) return message.channel.send(checkStaff);
-
-
-			if ((await dbQueryAll("Suggestion", { suggester: message.author.id, id: message.guild.id, status: "awaiting_review" })).length > 0) {
-				if (!(
-					await confirmation(
-						message,
-						string(locale, "ALREADY_AWAITING_REVIEW_CONFIRM", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>` }),
-						{
-							deleteAfterReaction: true
-						}
-					))) {
-					if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) message.delete();
-					return;
-				}
-			}
 
 			let newSuggestion = await new Suggestion({
 				id: message.guild.id,
@@ -144,12 +107,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(client.colors.default)
 				.setImage(attachment);
-			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS"), replyEmbed).then(sent => {
-				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-					message.delete();
-					sent.delete();
-				}, 7500);
-			});
+			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS"), replyEmbed).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 			let embedReview = reviewEmbed(guildLocale, qSuggestionDB, message.author, "yellow");
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
@@ -232,12 +190,7 @@ module.exports = {
 				.setTimestamp()
 				.setColor(client.colors.default)
 				.setImage(attachment);
-			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS", { channel: `<#${qServerDB.config.channels.suggestions}>` }), replyEmbed).then(sent => {
-				if ((qServerDB.config.clean_suggestion_command || noCommand) && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) setTimeout(function() {
-					message.delete();
-					sent.delete();
-				}, 7500);
-			});
+			message.channel.send(string(locale, "SUGGESTION_SUBMITTED_AUTOAPPROVE_SUCCESS", { channel: `<#${qServerDB.config.channels.suggestions}>` }), replyEmbed).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 			if (qServerDB.config.channels.log) {
 				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE", "green")
@@ -251,6 +204,11 @@ module.exports = {
 			}
 		}
 		if (suggestion) {
+			if (qServerDB.config.cooldown_exempt.includes(message.author.id)) {
+				qServerDB.config.cooldown_exempt.splice(qServerDB.config.cooldown_exempt.findIndex(u => u === message.author.id), 1);
+				await qServerDB.save();
+			}
+
 			lngDetector.setLanguageType("iso2");
 			let detected = lngDetector.detect(suggestion)[0];
 			if (detected && detected[1] > .3 && client.locales.find(l => l.settings.code === detected[0])) {
