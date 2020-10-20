@@ -88,7 +88,11 @@ const suggestion = new Schema({
 	],
 	attachment: String,
 	implemented: { type: Boolean, default: false },
-	imported: String
+	imported: String,
+	votes: {
+		up: { type: Number, default: 0 },
+		down: { type: Number, default: 0 }
+	}
 });
 
 const user = new Schema({
