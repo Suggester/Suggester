@@ -56,16 +56,16 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
-		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, null, function (e, l) {
-			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
-			return e;
-		});
-
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "COMMENT_ADDED_LOG", "blue")
 				.addField(string(guildLocale, "COMMENT_TITLE_LOG"), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, null, function (e, l) {
+			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
+			return e;
+		});
 
 		return { protip: { command: "comment" } };
 	}

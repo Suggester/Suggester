@@ -54,12 +54,12 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted);
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
-		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: "COMMENT_TITLE_ANONYMOUS", reason: comment });
-
 		if (qServerDB.config.channels.log) {
 			let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "ANONYMOUS_COMMENT_ADDED_LOG", "blue")
 				.addField(string(guildLocale, "COMMENT_TITLE_ANONYMOUS"), comment);
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		await notifyFollowers(client, qServerDB, qSuggestionDB, "blue", { string: "COMMENT_ADDED_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: "COMMENT_TITLE_ANONYMOUS", reason: comment });
 	}
 };
