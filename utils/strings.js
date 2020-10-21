@@ -4729,16 +4729,6 @@ module.exports = {
 				}
 			}
 		},
-		"TOP_ESTIMATED_TIME": {
-			string: "Due to the large number of suggestions that need fetched, collecting statistics is estimated to take {{time}}",
-			context: "The estimated time shown for the top command",
-			replaced: {
-				time: {
-					to_replace: "{{time}}",
-					description: "The time the command will take"
-				}
-			}
-		},
 		"SERVER_PREFIX": {
 			string: "My prefix is `{{prefix}}`, you can also just mention the bot like \"<@{{id}}> help\"",
 			context: "Shows the configured prefix",
