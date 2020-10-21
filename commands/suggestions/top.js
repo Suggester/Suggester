@@ -48,6 +48,7 @@ module.exports = {
 							opinion: votes[2]
 						});
 					}
+					console.log(`Fetched ${suggestion.suggestionId} from Discord - Votes ${votes[0]}, ${votes[1]} - Cached: ${suggestion.votes.cached}`)
 					if (votes[0]) suggestion.votes.up = votes[0];
 					if (votes[1]) suggestion.votes.down = votes[1];
 					if ((votes[0] || votes[0] === 0) || (votes[1] || votes[1] === 0)) {
@@ -58,6 +59,7 @@ module.exports = {
 				await timeout(750);
 			} else {
 				cache++;
+				console.log(`Fetched ${suggestion.suggestionId} from cache`);
 				if (!suggestion.votes.cached) {
 					suggestion.votes.cached = true;
 					suggestion.save();
