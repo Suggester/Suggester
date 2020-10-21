@@ -35,7 +35,6 @@ module.exports = {
 		for await (let suggestion of approvedSuggestions) {
 			if (time && new Date(suggestion.submitted).getTime()+time < Date.now()) continue;
 			if (!suggestion.votes.up && !suggestion.votes.down && !suggestion.votes.cached) {
-				console.log(`Fetching ${suggestion.suggestionId}`);
 				await client.channels.cache.get(suggestion.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
 					let votes = checkVotes(locale, suggestion, f);
 					if (votes[2]) {

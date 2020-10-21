@@ -21,8 +21,6 @@ module.exports = {
 		cooldown: 60
 	},
 	do: async (locale, message, client, args, Discord) => {
-		let fetched = 0;
-		let cache = 0;
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
 		if (returned) return message.channel.send(returned);
 
@@ -38,8 +36,6 @@ module.exports = {
 		for await (let suggestion of approvedSuggestions) {
 			if (time && new Date(suggestion.submitted).getTime()+time < Date.now()) continue;
 			if (!suggestion.votes.up && !suggestion.votes.down && !suggestion.votes.cached) {
-				fetched++;
-				console.log(`Attempting to fetch ${suggestion.suggestionId}, let's hope it works!`)
 				await client.channels.cache.get(suggestion.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
 					let votes = checkVotes(locale, suggestion, f);
 					if (votes[2]) {
@@ -48,7 +44,6 @@ module.exports = {
 							opinion: votes[2]
 						});
 					}
-					console.log(`Fetched ${suggestion.suggestionId} from Discord - Votes ${votes[0]}, ${votes[1]} - Cached: ${suggestion.votes.cached}`)
 					if (votes[0]) suggestion.votes.up = votes[0];
 					if (votes[1]) suggestion.votes.down = votes[1];
 					if ((votes[0] || votes[0] === 0) || (votes[1] || votes[1] === 0)) {
@@ -58,8 +53,6 @@ module.exports = {
 				}).catch(() => {});
 				await timeout(750);
 			} else {
-				cache++;
-				console.log(`Fetched ${suggestion.suggestionId} from cache`);
 				if (!suggestion.votes.cached) {
 					suggestion.votes.cached = true;
 					suggestion.save();
@@ -111,7 +104,6 @@ module.exports = {
 			}
 			message.channel.stopTyping(true);
 			m.delete();
-			message.reply(`${fetched} fetched, ${cache} cached`)
 			return pages(locale, message, embeds);
 		}
 	}
