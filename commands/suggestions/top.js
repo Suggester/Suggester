@@ -8,6 +8,9 @@ function timeout(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let fetched = 0;
+let cache = 0;
+
 module.exports = {
 	controls: {
 		name: "topvoted",
@@ -36,7 +39,7 @@ module.exports = {
 		for await (let suggestion of approvedSuggestions) {
 			if (time && new Date(suggestion.submitted).getTime()+time < Date.now()) continue;
 			if (!suggestion.votes.up && !suggestion.votes.down && !suggestion.votes.cached) {
-				console.log(`Fetching ${suggestion.suggestionId}`);
+				fetched++;
 				await client.channels.cache.get(suggestion.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(suggestion.messageId).then(f => {
 					let votes = checkVotes(locale, suggestion, f);
 					if (votes[2]) {
@@ -54,6 +57,7 @@ module.exports = {
 				}).catch(() => {});
 				await timeout(750);
 			} else {
+				cache++;
 				if (!suggestion.votes.cached) {
 					suggestion.votes.cached = true;
 					suggestion.save();
@@ -105,6 +109,7 @@ module.exports = {
 			}
 			message.channel.stopTyping(true);
 			pages(locale, message, embeds);
+			message.reply(`${fetched} fetched, ${cache} cached`)
 			return m.delete();
 		}
 	}
