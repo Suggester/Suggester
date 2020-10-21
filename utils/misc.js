@@ -89,7 +89,8 @@ module.exports = {
 			if (suggestion.votes.up !== votes[0] || suggestion.votes.down !== votes[1]) {
 				suggestion.votes = {
 					up: votes[0],
-					down: votes[1]
+					down: votes[1],
+					cached: true
 				};
 				await suggestion.save();
 			}

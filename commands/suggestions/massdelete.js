@@ -87,8 +87,6 @@ module.exports = {
 
 				let deleteMsg = await deleteFeedMessage(locale, qSuggestionDB, qServerDB, client);
 
-				await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
-
 				if (qServerDB.config.channels.denied) {
 					let deniedEmbed = new Discord.MessageEmbed()
 						.setTitle(string(guildLocale, "SUGGESTION_DELETED_TITLE"))
@@ -127,6 +125,8 @@ module.exports = {
 				}
 
 				await denied[s].save();
+
+				await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
 			}
 		}
 	}

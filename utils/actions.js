@@ -17,7 +17,7 @@ module.exports = {
 	},
 	deleteFeedMessage: async function(locale, qSuggestionDB, qServerDB, client) {
 		let messageDeleted;
-		await client.channels.cache.get(qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
+		await client.channels.cache.get(qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
 			f.delete();
 			messageDeleted = f;
 		}).catch(() => messageDeleted = false);
