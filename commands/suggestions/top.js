@@ -108,9 +108,9 @@ module.exports = {
 				embeds.push(embed);
 			}
 			message.channel.stopTyping(true);
-			pages(locale, message, embeds);
+			m.delete();
 			message.reply(`${fetched} fetched, ${cache} cached`)
-			return m.delete();
+			return pages(locale, message, embeds);
 		}
 	}
 };
