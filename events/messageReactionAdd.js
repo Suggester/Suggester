@@ -22,7 +22,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		if (emotes.findIndex(i => i === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) === 0) {
 			let qUserDB = await dbQuery("User", { id: user.id });
 			let locale = qUserDB.locale || db.config.locale || "en";
-			if (qUserDB.auto_subscribe) {
+			if (qUserDB.auto_subscribe && db.config.notify) {
 				if (!qUserDB.notify) {
 					qUserDB.auto_subscribe = false;
 					qUserDB.save();
