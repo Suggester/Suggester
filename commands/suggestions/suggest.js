@@ -67,7 +67,7 @@ module.exports = {
 
 		let suggestion = args.join(" ");
 
-		if (suggestion.length > 1024) return message.channel.send(string(locale, "TOO_LONG_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		if (suggestion.length > 1900) return message.channel.send(string(locale, "TOO_LONG_SUGGESTION_ERROR_NEW", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let id = await Suggestion.countDocuments() + 1;
 

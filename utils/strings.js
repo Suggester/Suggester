@@ -702,8 +702,8 @@ module.exports = {
 			string: "Please provide a suggestion!",
 			context: "Error when a user does not provide a suggestion in the suggest command"
 		},
-		"TOO_LONG_SUGGESTION_ERROR": {
-			string: "Suggestions cannot be longer than 1024 characters.",
+		"TOO_LONG_SUGGESTION_ERROR_NEW": {
+			string: "Suggestions cannot be longer than 1900 characters.",
 			context: "Error when a suggestion is too long"
 		},
 		"NO_REVIEW_CHANNEL_ERROR": {

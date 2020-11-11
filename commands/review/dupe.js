@@ -116,7 +116,7 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, dupeSuggestion, message.author, "DENIED_LOG", "red")
-				.addField(string(guildLocale, "SUGGESTION_HEADER"), dupeSuggestion.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
+				.setDescription(dupeSuggestion.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
 			logs.addField(string(guildLocale, "REASON_GIVEN"), dupeSuggestion.denial_reason);
 			if (dupeSuggestion.attachment) {
