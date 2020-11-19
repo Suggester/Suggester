@@ -32,6 +32,7 @@ module.exports = {
 		const { fetchUser } = module.exports;
 		const { checkVotes } = require("./actions");
 		let suggester = await fetchUser(suggestion.suggester, client);
+		let editor = suggestion.edited_by ? await fetchUser(suggestion.edited_by, client) : null;
 		let embed = new Discord.MessageEmbed();
 		// User information
 		embed.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
@@ -40,7 +41,7 @@ module.exports = {
 		embed.setDescription(suggestion.suggestion)
 			// Footer
 			.setTimestamp(suggestion.submitted)
-			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }));
+			.setFooter(!editor ? string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }) : string(locale, "SUGGESTION_FOOTER_WITH_EDIT", { id: suggestion.suggestionId, editor: editor.tag }));
 		let votes = await client.channels.cache.get(suggestion.channels.suggestions || server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
 			return checkVotes(locale, suggestion, m);
 		}).catch(() => {});
@@ -111,9 +112,9 @@ module.exports = {
 		if (reason) embed.addField(string(locale, reason.header), reason.reason);
 		return embed;
 	},
-	reviewEmbed: function (locale, qSuggestionDB, user, color, change) {
+	reviewEmbed: function (locale, qSuggestionDB, user, color, change, editor) {
 		let embed = new Discord.MessageEmbed()
-			.setTitle(string(locale, "SUGGESTION_REVIEW_EMBED_TITLE", { id: qSuggestionDB.suggestionId.toString() }))
+			.setTitle(string(locale, qSuggestionDB.edit ? "SUGGESTION_REVIEW_EDIT_EMBED_TITLE" : "SUGGESTION_REVIEW_EMBED_TITLE", { id: qSuggestionDB.suggestionId.toString() }))
 			.setAuthor(string(locale, "USER_INFO_HEADER", { user: user.tag, id: user.id }), user.displayAvatarURL({format: "png", dynamic: true}))
 			.setDescription(qSuggestionDB.suggestion)
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
@@ -125,6 +126,8 @@ module.exports = {
 			embed.addField(string(locale, "WITH_ATTACHMENT_HEADER"), qSuggestionDB.attachment);
 			embed.setImage(qSuggestionDB.attachment);
 		}
+
+		if (editor) embed.setFooter(string(locale, "SUGGESTION_FOOTER_WITH_EDIT", { id: qSuggestionDB.suggestionId.toString(), editor: editor.tag }));
 		return embed;
 	},
 	logEmbed: function (locale, qSuggestionDB, user, title, color) {

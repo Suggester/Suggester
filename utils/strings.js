@@ -698,6 +698,16 @@ module.exports = {
 				}
 			}
 		},
+		"EDIT_NOT_COMMAND_CHANNEL_ERROR": {
+			string: "Suggestions can only be edited in the following channels: {{channels}}",
+			context: "Error when a user uses edit in a non-command channel",
+			replaced: {
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The mentions of the commands channels"
+				}
+			}
+		},
 		"NO_SUGGESTION_ERROR": {
 			string: "Please provide a suggestion!",
 			context: "Error when a user does not provide a suggestion in the suggest command"
@@ -734,6 +744,20 @@ module.exports = {
 				}
 			}
 		},
+		"SUGGESTION_FOOTER_WITH_EDIT": {
+			string: "Suggestion ID: {{id}} | Edited by {{editor}} | Submitted at",
+			context: "Footer for suggestion embeds",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				},
+				editor: {
+					to_replace: "{{editor}}",
+					description: "The user who edited the suggestion"
+				}
+			}
+		},
 		"SUGGESTION_SUBMITTED_STAFF_REVIEW_SUCCESS": {
 			string: "Your suggestion has been submitted to the server staff for review!",
 			context: "Success message when a suggestion is sent for staff review"
@@ -741,6 +765,16 @@ module.exports = {
 		"SUGGESTION_REVIEW_EMBED_TITLE": {
 			string: "Suggestion Awaiting Review (#{{id}})",
 			context: "Title for the suggestion review embed",
+			replaced: {
+				id: {
+					to_replace: "{{id}}",
+					description: "A suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_REVIEW_EDIT_EMBED_TITLE": {
+			string: "Suggestion Edit Awaiting Review (#{{id}})",
+			context: "Title for the suggestion edit review embed",
 			replaced: {
 				id: {
 					to_replace: "{{id}}",
@@ -835,6 +869,62 @@ module.exports = {
 				user: {
 					to_replace: "{{user}}",
 					description: "A user tag"
+				}
+			}
+		},
+		"LOG_EDIT_SUBMITTED_REVIEW_TITLE": {
+			string: "{{user}} submitted a suggestion edit for review on #{{id}}",
+			context: "Title in the log embed when a suggestion edit is submitted for review",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"LOG_EDIT_SUBMITTED_ON_APPROVED_TITLE": {
+			string: "{{user}} edited #{{id}} (which is currently awaiting review)",
+			context: "Title in the log embed when a suggestion in review is edited",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"LOG_EDIT_TITLE": {
+			string: "{{user}} edited #{{id}}",
+			context: "Title in the log embed when a suggestion is edited",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"LOG_EDIT_APPROVE_TITLE": {
+			string: "{{user}} approved a suggestion edit on #{{id}}",
+			context: "Title in the log embed when a suggestion edit is approved",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
 				}
 			}
 		},
@@ -1544,12 +1634,16 @@ module.exports = {
 			string: "This suggestion has been marked as implemented and moved to the implemented archive channel, so no further actions can be taken on it.",
 			context: "Error shown when a suggestion has already been marked as implemented and an action like comment/mark is used"
 		},
+		"SUGGESTION_DENIED_EDIT_ERROR": {
+			string: "This suggestion has been denied, and therefore cannot be edited.",
+			context: "Error shown when a suggestion has been denied and is attempted to be edited"
+		},
 		"NO_COMMENT_ERROR": {
 			string: "You must provide a comment!",
 			context: "Error shown when no comment is specified for the comment command"
 		},
-		"TOO_MANY_COMMENTS_ERROR": {
-			string: "Due to Discord embed limitations, suggestions can only have up to 23 comments.",
+		"TOO_MANY_COMMENTS_ERROR_NEW": {
+			string: "Due to Discord embed limitations, suggestions can only have up to 15 comments.",
 			context: "Error shown when a suggestion has the maximum number of comments"
 		},
 		"COMMENT_TOO_LONG_ERROR": {
@@ -1679,6 +1773,14 @@ module.exports = {
 		"SUGGESTION_APPROVED_TITLE": {
 			string: "Suggestion Approved",
 			context: "Title for the suggestion approved embed"
+		},
+		"SUGGESTION_EDIT_APPROVED_TITLE": {
+			string: "Suggestion Edit Approved",
+			context: "Title for the suggestion edit approved embed"
+		},
+		"SUGGESTION_EDIT_DENIED_TITLE": {
+			string: "Suggestion Edit Denied",
+			context: "Title for the suggestion edit denied embed"
 		},
 		"APPROVED_BY": {
 			string: "Approved by {{user}}",
@@ -4887,9 +4989,131 @@ module.exports = {
 			string: "This user has already been exempted from the suggestion cooldown",
 			context: "Error shown when a user has already been exempted from the suggestion cooldown"
 		},
-		"PROTIP_SPOOKY": {
-			string: ":ghost: :jack_o_lantern: :bat:",
-			context: "_Spooooooooky_\n(you don't need to translate this)"
-		}
+		"EDIT_NOT_AUTHOR_ERROR": {
+			string: "You can only edit your own suggestions",
+			context: "Error shown when a user attempts to edit a suggestion that is not their's"
+		},
+		"NO_PENDING_EDIT_ERROR": {
+			string: "This suggestion has no pending edit.",
+			context: "Error shown when no suggestion edit is pending review"
+		},
+		"EDIT_APPROVE_DM_TITLE": {
+			string: "Your suggestion edit was approved in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion edit being approved",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"EDIT_APPROVE_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was edited in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being edited on a suggestion followed",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"EDIT_DENY_DM_TITLE": {
+			string: "Your suggestion edit was denied in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion edit being denied",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"LOG_EDIT_DENY_TITLE": {
+			string: "{{user}} denied a suggestion edit on #{{id}}",
+			context: "Title in the log embed when a suggestion edit is denied",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SUGGESTION_EDIT_DM_TITLE": {
+			string: "Your suggestion was edited in **{{server}}**!",
+			context: "Title for the DM notification of a suggestion being admin-edited",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"SUGGESTION_EDIT_DM_TITLE_FOLLOW": {
+			string: "A suggestion you follow was edited in **{{server}}**!",
+			context: "Title for the DM notification of a followed suggestion being admin-edited",
+			replaced: {
+				server: {
+					to_replace: "{{server}}",
+					description: "The name of the server the command was run in"
+				}
+			}
+		},
+		"SUGGESTION_UPDATED_SELF": {
+			string: "Your suggestion has been updated!",
+			context: "Response when the user who edits is the suggester"
+		},
+		"SUGGESTION_UPDATED_NOT_SELF": {
+			string: "The suggestion has been updated!",
+			context: "Response when the user who edits is not the suggester"
+		},
+		"SUGGESTION_UPDATED_REVIEW": {
+			string: "Your suggestion edit has been submitted for review!",
+			context: "Response when the suggestion has already been approved and the user edits it"
+		},
+		"COMMAND_DESC:EDIT": {
+			string: "Edits a suggestion",
+			context: "Description for the edit command"
+		},
+		"COMMAND_USAGE:EDIT": {
+			string: "edit [suggestion id] [new content]",
+			context: "Description for the edit command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EDIT": {
+			string: "`{{p}}edit 1234 This is an edit suggestion`\nEdits suggestion #1234 to have the content of \"This is an edit suggestion\"",
+			context: "Examples for the edit command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:APPROVEEDIT": {
+			string: "Approves a pending suggestion edit",
+			context: "Description for the approveedit command"
+		},
+		"COMMAND_USAGE:APPROVEEDIT": {
+			string: "approveedit [suggestion id]",
+			context: "Description for the approveedit command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:APPROVEEDIT": {
+			string: "`{{p}}approveedit 123`\nApproves a pending edit on suggestion #123",
+			context: "Examples for the approveedit command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:DENYEDIT": {
+			string: "Denies a pending suggestion edit",
+			context: "Description for the denyedit command"
+		},
+		"COMMAND_USAGE:DENYEDIT": {
+			string: "denyedit [suggestion id]",
+			context: "Description for the denyedit command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:DENYEDIT": {
+			string: "`{{p}}denyedit 123`\nDenies a pending edit on suggestion #123",
+			context: "Examples for the denyedit command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
 	}
 };

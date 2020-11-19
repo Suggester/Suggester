@@ -93,7 +93,18 @@ const suggestion = new Schema({
 		up: { type: Number, default: 0 },
 		down: { type: Number, default: 0 },
 		cached: { type: Boolean, default: false }
-	}
+	},
+	pending_edit: {
+		content: String,
+		channelid: String,
+		messageid: String,
+		reviewEmojis: {
+			approve: String,
+			deny: String
+		},
+		submitted: Date
+	},
+	edited_by: String
 });
 
 const user = new Schema({

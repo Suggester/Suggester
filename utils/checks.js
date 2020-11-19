@@ -147,9 +147,9 @@ module.exports = {
 			if (perms) return perms;
 		} else return string(locale, "NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
 	},
-	checkReview: function (locale, guild, db, suggestion) {
+	checkReview: function (locale, guild, db, suggestion, edit) {
 		const { channelPermissions } = require("./checks");
-		if (guild.channels.cache.get((suggestion ? suggestion.channels.staff : null) || db.config.channels.staff)) {
+		if (guild.channels.cache.get(edit ? (suggestion.pending_edit.channelid || db.config.channels.staff) : ((suggestion ? suggestion.channels.staff : null) || db.config.channels.staff))) {
 			let perms = channelPermissions(locale,  "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
 			if (perms) return perms;
 		} else return string(locale, "NO_REVIEW_CHANNEL_ERROR", {}, "error");
