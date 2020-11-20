@@ -630,6 +630,14 @@ module.exports = {
 			string: "Automatic following is already disabled.",
 			context: "Shown when automatic following is disabled and a user tries to disable them"
 		},
+		"GUILD_AUTOFOLLOW_ENABLED": {
+			string: "Automatic following is **enabled**. Users will automatically follow suggestions when they upvote them, and will be notified when they are updated.",
+			context: "Shown when a guild has enabled automatic following"
+		},
+		"GUILD_AUTOFOLLOW_DISABLED": {
+			string: "Automatic following is **disabled**. Users will not automatically follow suggestions when they upvote them, and not will be notified when they are updated even if they have followed them previously.",
+			context: "Shown when a guild has disabled automatic following"
+		},
 		"PROTIPS_ENABLED": {
 			string: "Protips are **enabled**.",
 			context: "Shown when a user has enabled protips"
@@ -5163,6 +5171,19 @@ module.exports = {
 			string: "`{{p}}config implementedrole Implemented Suggester`\nSets the \"Implemented Suggester\" as the role given when a member has their suggestion marked as implemented\n\n`{{p}}config implementedrole none`\nResets the role given when a member has their suggestion marked as implemented, meaning no role will be given",
 			context: "Examples for the Implemented Suggestion Role config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `implementedrole`"
+		},
+		"CONFIG_NAME:AUTOFOLLOW": {
+			string: "Automatic Following",
+			context: "Name of the Automatic Following config element"
+		},
+		"CONFIG_DESC:AUTOFOLLOW": {
+			string: "This setting controls whether or not users will follow suggestions upon upvoting them, meaning they will receive a DM when the suggestion is updated",
+			context: "Description of the Automatic Following config element"
+		},
+		"CONFIG_EXAMPLES:AUTOFOLLOW": {
+			string: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
+			context: "Examples for the Automatic Following config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
 		}
 	}
 };

@@ -186,7 +186,7 @@ module.exports = {
 			if (efn) uEmbed = efn(uEmbed, u.locale || db.config.locale);
 			if (u && u.id !== "0") u.send(uEmbed).catch(() => {});
 		}
-		if (!sendOps.follow) return;
+		if (!sendOps.follow || !db.config.auto_subscribe) return;
 		let followers = await dbQueryAll("User", { subscribed: {$elemMatch: { id: suggestion.suggestionId, guild: suggestion.id } } });
 		title.string += "_FOLLOW";
 		for await (let fid of followers) {

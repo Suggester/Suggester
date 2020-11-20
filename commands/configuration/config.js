@@ -592,6 +592,39 @@ module.exports = {
 			}
 		},
 		{
+			names: ["autofollow", "autosubscribe"],
+			name: "Automatic Following",
+			description: "This setting controls whether or not users will follow suggestions upon upvoting them, meaning they will receive a DM when the suggestion is updated",
+			examples: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.auto_subscribe ? "GUILD_AUTOFOLLOW_ENABLED" : "GUILD_AUTOFOLLOW_DISABLED"));
+				switch (args[1].toLowerCase()) {
+				case "enable":
+				case "on": {
+					if (!qServerDB.config.auto_subscribe) {
+						qServerDB.config.auto_subscribe = true;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "GUILD_AUTOFOLLOW_ENABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_ENABLED", {}, "error"));
+				}
+				case "disable":
+				case "off": {
+					if (qServerDB.config.auto_subscribe) {
+						qServerDB.config.auto_subscribe = false;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "GUILD_AUTOFOLLOW_DISABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "AUTOFOLLOW_ALREADY_DISABLED", {}, "error"));
+				}
+				case "toggle":
+					qServerDB.config.auto_subscribe = !qServerDB.config.auto_subscribe;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, qServerDB.config.auto_subscribe ? "GUILD_AUTOFOLLOW_ENABLED" : "GUILD_AUTOFOLLOW_DISABLED", {}, "success"));
+				default:
+					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+				}
+			}
+		},
+		{
 			names: ["clearcommands", "cleancommand", "clear", "clean", "cleancommands", "clearcommand"],
 			name: "Clean Commands",
 			description: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
@@ -858,6 +891,8 @@ module.exports = {
 			cfgRolesArr.push((await listRoles(qServerDB.config.blocked_roles, server, "CONFIG_NAME:BLOCKED", false))[0]);
 			// Approved suggestion role
 			cfgRolesArr.push((await listRoles(qServerDB.config.approved_role, server, "CONFIG_NAME:APPROVEROLE", false)));
+			// Implemented suggestion role
+			cfgRolesArr.push((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
 			// Submitted suggestion mention role
 			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:PINGROLE", false)));
 			// Suggestions channel
@@ -929,6 +964,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:PREFIX", {}, "success")}:** ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 			// Notify
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:NOTIFY", {}, "success")}:** ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
+			// Automatic following
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:AUTOFOLLOW", {}, "success")}:** ${string(locale, qServerDB.config.auto_subscribe ? "ENABLED" : "DISABLED")}`);
 			//Clean Suggestion Command
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEARCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
 			//In-Channel Suggestions

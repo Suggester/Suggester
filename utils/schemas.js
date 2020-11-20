@@ -34,6 +34,7 @@ const settings = new Schema({
 			color: { type: String, default: "#FFD700" }
 		},
 		notify: { type: Boolean, default: true },
+		auto_subscribe: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
 		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
