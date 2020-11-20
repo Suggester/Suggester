@@ -44,6 +44,7 @@ module.exports = {
 		if (permission > 3 && qSuggestionDB.suggester !== message.author.id) return message.channel.send(string(locale, "EDIT_NOT_AUTHOR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let newSuggestion = args.splice(1).join(" ");
+		if (!newSuggestion) return message.channel.send(string(locale, "EDIT_NO_CONTENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		if (newSuggestion.length > 1900) return message.channel.send(string(locale, "TOO_LONG_SUGGESTION_ERROR_NEW", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);

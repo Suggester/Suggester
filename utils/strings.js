@@ -712,6 +712,10 @@ module.exports = {
 			string: "Please provide a suggestion!",
 			context: "Error when a user does not provide a suggestion in the suggest command"
 		},
+		"EDIT_NO_CONTENT_ERROR": {
+			string: "Please provide new content for the suggestion!",
+			context: "Error when the user does not provide a suggestion content in the edit command"
+		},
 		"TOO_LONG_SUGGESTION_ERROR_NEW": {
 			string: "Suggestions cannot be longer than 1900 characters.",
 			context: "Error when a suggestion is too long"
