@@ -1,7 +1,6 @@
 const { dbQueryNoNew, dbQuery } = require("../utils/db");
 const { editFeedMessage } = require("../utils/actions");
 const { checkPermissions, channelPermissions } = require("../utils/checks");
-const { reviewEmbed, fetchUser } = require("../utils/misc");
 const { string } = require("../utils/strings");
 const { prefix } = require("../config.json");
 const { errorLog } = require("../utils/logs");
@@ -145,50 +144,6 @@ module.exports = async (Discord, client, messageReaction, user) => {
 
 					console.log(err);
 				}
-				/*let suggester = await fetchUser(edit.suggester, client);
-				switch (action) {
-				case "approve":
-					// eslint-disable-next-line no-case-declarations
-					let embedReview = reviewEmbed(db.config.locale, {
-						suggestionId: edit.suggestionId,
-						suggestion: edit.pending_edit.content,
-						submitted: edit.submitted,
-						attachment: edit.attachment,
-						edit: true
-					}, suggester, "green", string(db.config.locale, "APPROVED_BY", { user: user.tag }));
-					client.channels.cache.get(edit.pending_edit.channelid || db.config.channels.staff).messages.fetch(edit.pending_edit.messageid).then(fetched => {
-						fetched.edit(embedReview);
-						fetched.reactions.removeAll();
-					}).catch(() => {});
-
-					edit.edited_by = null;
-					edit.suggestion = edit.pending_edit.content;
-					edit.pending_edit = {};
-					edit.save();
-
-					// eslint-disable-next-line no-case-declarations
-					let editFeed = await editFeedMessage({ guild: db.config.locale, user: locale }, edit, db, client);
-					if (editFeed) return messageReaction.message.channel.send(editFeed);
-					break;
-				case "deny":
-					// eslint-disable-next-line no-case-declarations
-					let embedReviewDeny = reviewEmbed(db.config.locale, {
-						suggestionId: edit.suggestionId,
-						suggestion: edit.pending_edit.content,
-						submitted: edit.submitted,
-						attachment: edit.attachment,
-						edit: true
-					}, suggester, "red", string(db.config.locale, "DENIED_BY", { user: user.tag }));
-					client.channels.cache.get(edit.pending_edit.channelid || db.config.channels.staff).messages.fetch(edit.pending_edit.messageid).then(fetched => {
-						fetched.edit(embedReviewDeny);
-						fetched.reactions.removeAll();
-					}).catch(() => {});
-					edit.edited_by = null;
-					edit.suggestion = edit.pending_edit.content;
-					edit.pending_edit = {};
-					edit.save();
-					break;
-				}*/
 			}
 		}
 	}

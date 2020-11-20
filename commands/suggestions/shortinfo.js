@@ -21,8 +21,6 @@ module.exports = {
 		let [err, qSuggestionDB] = await checkSuggestion(locale, message.guild, args[0]);
 		if (err) return message.channel.send(err);
 
-		let id = qSuggestionDB.suggestionId;
-
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
