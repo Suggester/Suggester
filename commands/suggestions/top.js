@@ -12,7 +12,7 @@ module.exports = {
 	controls: {
 		name: "topvoted",
 		permission: 3,
-		aliases: ["top"],
+		aliases: ["top", "best", "upvoted", "upvotes"],
 		usage: "top (time)",
 		description: "Shows the top 10 most highly voted suggestions",
 		examples: "`{{p}}top`\nShows the top 10 suggestions\n\n`{{p}}top 1w`\nShows the top 10 suggestions from the last week",
