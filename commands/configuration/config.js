@@ -330,7 +330,7 @@ module.exports = {
 				let role = await findRole(input, server.roles.cache);
 				if (!role) return message.channel.send(string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error"));
 				if (qServerDB.config.approved_role === role.id) return message.channel.send(string(locale, "CFG_ALREADY_APPROVED_ROLE_ERROR", {}, "error"));
-				if (!role.editable || role.managed) return message.channel.send(string(locale, "CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
+				if (!role.editable || role.managed || message.guild.id === role.id) return message.channel.send(string(locale, "CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
 				qServerDB.config.approved_role = role.id;
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string(locale, "CFG_APPROVED_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
@@ -353,7 +353,7 @@ module.exports = {
 				let role = await findRole(input, server.roles.cache);
 				if (!role) return message.channel.send(string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error"));
 				if (qServerDB.config.implemented_role === role.id) return message.channel.send(string(locale, "CFG_ALREADY_IMPLEMENTED_ROLE_ERROR", {}, "error"));
-				if (!role.editable || role.managed) return message.channel.send(string(locale, "CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
+				if (!role.editable || role.managed || message.guild.id === role.id) return message.channel.send(string(locale, "CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
 				qServerDB.config.implemented_role = role.id;
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string(locale, "CFG_IMPLEMENTED_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
