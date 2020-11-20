@@ -337,6 +337,29 @@ module.exports = {
 			}
 		},
 		{
+			names: ["implementedrole", "implementrole"],
+			name: "Implemented Suggestion Role",
+			description: "The role that is given to members that have a suggestion marked as implemented.",
+			examples: "`{{p}}config implementedrole Implemented Suggester`\nSets the \"Implemented Suggester\" as the role given when a member has their suggestion marked as implemented\n\n`{{p}}config implementedrole none`\nResets the role given when a member has their suggestion marked as implemented, meaning no role will be given",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
+				let input = args.splice(1).join(" ");
+				if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+					qServerDB.config.implemented_role = "";
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, "CFG_RESET_IMPLEMENTED_ROLE_SUCCESS", {}, "success"));
+				}
+				if (!server.me.permissions.has("MANAGE_ROLES")) return message.channel.send(string(locale, "CFG_NO_MANAGE_ROLES_ERROR", { bot: `<@${client.user.id}>` }, "error"));
+				let role = await findRole(input, server.roles.cache);
+				if (!role) return message.channel.send(string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error"));
+				if (qServerDB.config.implemented_role === role.id) return message.channel.send(string(locale, "CFG_ALREADY_IMPLEMENTED_ROLE_ERROR", {}, "error"));
+				if (!role.editable || role.managed) return message.channel.send(string(locale, "CFG_UNMANAGEABLE_ROLE_ERROR", { role: role.name }, "error"), {disableMentions: "everyone"});
+				qServerDB.config.implemented_role = role.id;
+				await dbModify("Server", {id: server.id}, qServerDB);
+				return message.channel.send(string(locale, "CFG_IMPLEMENTED_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
+			}
+		},
+		{
 			names: ["pingrole", "ping"],
 			name: "Suggestion Submitted Mention Role",
 			description: "The role that is mentioned when a new suggestion is submitted for review.",

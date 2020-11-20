@@ -1304,6 +1304,24 @@ module.exports = {
 				}
 			}
 		},
+		"CFG_RESET_IMPLEMENTED_ROLE_SUCCESS": {
+			string: "Successfully reset the implemented suggestion role.",
+			context: "Success message when the implemented suggestion role is reset"
+		},
+		"CFG_ALREADY_IMPLEMENTED_ROLE_ERROR": {
+			string: "This role is already set to be given when a member's suggestion is marked as implemented!",
+			context: "Error when the specified implemented suggestion role is already set"
+		},
+		"CFG_IMPLEMENTED_ROLE_SUCCESS": {
+			string: "Members who have their suggestion marked as implemented will now receive the **{{role}}** role.",
+			context: "Success message when the implemented suggestion role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
 		"CFG_NO_CHANNEL_SPECIFIED_ERROR": {
 			string: "You must specify a channel #mention, channel ID, or channel name.",
 			context: "Error when no channel is specified for configuration"
@@ -5132,6 +5150,19 @@ module.exports = {
 			string: "`{{p}}shortinfo 1`\nShows information about suggestion #1",
 			context: "Examples for the shortinfo command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"CONFIG_NAME:IMPLEMENTEDROLE": {
+			string: "Implemented Suggestion Role",
+			context: "Name of the Implemented Suggestion Role config element"
+		},
+		"CONFIG_DESC:IMPLEMENTEDROLE": {
+			string: "The role that is given to members that have a suggestion marked as implemented.",
+			context: "Description of the Implemented Suggestion Role config element"
+		},
+		"CONFIG_EXAMPLES:IMPLEMENTEDROLE": {
+			string: "`{{p}}config implementedrole Implemented Suggester`\nSets the \"Implemented Suggester\" as the role given when a member has their suggestion marked as implemented\n\n`{{p}}config implementedrole none`\nResets the role given when a member has their suggestion marked as implemented, meaning no role will be given",
+			context: "Examples for the Implemented Suggestion Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `implementedrole`"
 		}
 	}
 };

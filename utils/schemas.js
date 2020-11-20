@@ -17,6 +17,7 @@ const settings = new Schema({
 		blocked_roles: [String],
 		ping_role: String,
 		approved_role: { type: String },
+		implemented_role: { type: String },
 		channels: {
 			suggestions: { type: String },
 			staff: { type: String },
