@@ -592,7 +592,7 @@ module.exports = {
 			}
 		},
 		{
-			names: ["autofollow", "autosubscribe"],
+			names: ["autofollow", "autosubscribe", "autofollowing"],
 			name: "Automatic Following",
 			description: "This setting controls whether or not users will follow suggestions upon upvoting them, meaning they will receive a DM when the suggestion is updated",
 			examples: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",

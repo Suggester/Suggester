@@ -3112,8 +3112,8 @@ module.exports = {
 			string: "Useful Links",
 			context: "Header for the useful links section of the help embed"
 		},
-		"HELP_USEFUL_LINKS_DESC": {
-			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://suggester.js.org/#/supporting/info)\n[Privacy Policy](https://suggester.js.org/#/legal)",
+		"HELP_USEFUL_LINKS_DESC_NEW": {
+			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Documentation](https://suggester.js.org/)\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://suggester.js.org/#/supporting/info)\n[Privacy Policy](https://suggester.js.org/#/legal)",
 			context: "Shows useful links on the help command",
 			replaced: {
 				support_invite: {

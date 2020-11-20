@@ -61,7 +61,7 @@ module.exports = {
 					.setColor(client.colors.default)
 					.setDescription((string(locale, `MODULE_DESC:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).description) + "\n\n" + moduleCommands.map(c => `\`${serverPrefix}${string(locale, `COMMAND_USAGE:${c.controls.name.toUpperCase()}`) || c.controls.usage}\` - ${string(locale, `COMMAND_DESC:${c.controls.name.toUpperCase()}`) || c.controls.description}`).join("\n"))
 					.addField(string(locale, "HELP_ADDITIONAL_INFO"), string(locale, "HELP_UNDERSTANDING", { prefix: serverPrefix }))
-					.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC", { support_invite, bot_invite: url.replace("[ID]", client.user.id) })));
+					.addField(string(locale, "HELP_USEFUL_LINKS"), string(locale, "HELP_USEFUL_LINKS_DESC_NEW", { support_invite, bot_invite: url.replace("[ID]", client.user.id) })));
 			}
 			return message.channel.send(string(locale, "UNKNOWN_COMMAND_ERROR", {}, "error"));
 		}
