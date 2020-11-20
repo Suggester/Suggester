@@ -22,7 +22,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		if (emotes.findIndex(i => i === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) === 0) {
 			let qUserDB = await dbQuery("User", { id: user.id });
 			let locale = qUserDB.locale || db.config.locale || "en";
-			if (qUserDB.auto_subscribe) {
+			if (qUserDB.auto_subscribe && db.config.notify && db.config.auto_subscribe) {
 				if (!qUserDB.notify) {
 					qUserDB.auto_subscribe = false;
 					qUserDB.save();
@@ -54,31 +54,88 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		await editFeedMessage({guild: db.config.locale}, suggestion, db, client);
 	} else {
 		let awaiting = await dbQueryNoNew("Suggestion", { id: messageReaction.message.guild.id, reviewMessage: messageReaction.message.id, status: "awaiting_review" });
-		if (!awaiting) return;
-		let emotes = [{
-			emoji: awaiting.reviewEmojis.approve.match(/a?:?.+:(\d+)/) ? awaiting.reviewEmojis.approve.match(/a?:?.+:(\d+)/)[1] : awaiting.reviewEmojis.approve,
-			cmd: "approve"
-		}, {
-			emoji: awaiting.reviewEmojis.deny.match(/a?:?.+:(\d+)/) ? awaiting.reviewEmojis.deny.match(/a?:?.+:(\d+)/)[1] : awaiting.reviewEmojis.deny,
-			cmd: "deny"
-		}];
-		if (!emotes.map(e => e.emoji).includes(nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) return;
-		let commandName = emotes.find(e => e.emoji === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)).cmd;
-		let command = require(`../commands/review/${commandName}`);
-		let permission = await checkPermissions(messageReaction.message.guild.members.cache.get(user.id), client);
-		if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
-		let qUserDB = await dbQuery("User", { id: user.id });
-		let locale = qUserDB.locale || db.config.locale || "en";
-		if (command.controls.permissions) {
-			let checkPerms = channelPermissions(locale, command.controls.permissions, messageReaction.message.channel, client);
-			if (checkPerms) {
-				return messageReaction.message.channel.send(checkPerms).catch(() => {});
+		if (awaiting) {
+			let emotes = [{
+				emoji: awaiting.reviewEmojis.approve.match(/a?:?.+:(\d+)/) ? awaiting.reviewEmojis.approve.match(/a?:?.+:(\d+)/)[1] : awaiting.reviewEmojis.approve,
+				cmd: "approve"
+			}, {
+				emoji: awaiting.reviewEmojis.deny.match(/a?:?.+:(\d+)/) ? awaiting.reviewEmojis.deny.match(/a?:?.+:(\d+)/)[1] : awaiting.reviewEmojis.deny,
+				cmd: "deny"
+			}];
+			if (!emotes.map(e => e.emoji).includes(nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) return;
+			let commandName = emotes.find(e => e.emoji === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)).cmd;
+			let command = require(`../commands/review/${commandName}`);
+			let permission = await checkPermissions(messageReaction.message.guild.members.cache.get(user.id), client);
+			if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
+			let qUserDB = await dbQuery("User", {id: user.id});
+			let locale = qUserDB.locale || db.config.locale || "en";
+			if (command.controls.permissions) {
+				let checkPerms = channelPermissions(locale, command.controls.permissions, messageReaction.message.channel, client);
+				if (checkPerms) {
+					return messageReaction.message.channel.send(checkPerms).catch(() => {
+					});
+				}
 			}
-		}
-		messageReaction.message.author = user;
-		try {
-			command.do(locale, messageReaction.message, client, [awaiting.suggestionId], Discord, true)
-				.catch((err) => {
+			messageReaction.message.author = user;
+			try {
+				command.do(locale, messageReaction.message, client, [awaiting.suggestionId], Discord, true)
+					.catch((err) => {
+						let errorText;
+						if (err.stack) errorText = err.stack;
+						else if (err.error) errorText = err.error;
+						messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+						errorLog(err, "Command Handler", "On queue reaction");
+
+						console.log(err);
+					});
+
+			} catch (err) {
+				let errorText;
+				if (err.stack) errorText = err.stack;
+				else if (err.error) errorText = err.error;
+				messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+				errorLog(err, "Command Handler", "On queue reaction");
+
+				console.log(err);
+			}
+		} else {
+			let edit = await dbQueryNoNew("Suggestion", { id: messageReaction.message.guild.id, "pending_edit.messageid": messageReaction.message.id });
+			if (edit) {
+				let emotes = [{
+					emoji: edit.pending_edit.reviewEmojis.approve.match(/a?:?.+:(\d+)/) ? edit.pending_edit.reviewEmojis.approve.match(/a?:?.+:(\d+)/)[1] : edit.pending_edit.reviewEmojis.approve,
+					cmd: "approveedit"
+				}, {
+					emoji: edit.pending_edit.reviewEmojis.deny.match(/a?:?.+:(\d+)/) ? edit.pending_edit.reviewEmojis.deny.match(/a?:?.+:(\d+)/)[1] : edit.pending_edit.reviewEmojis.deny,
+					cmd: "denyedit"
+				}];
+				if (!emotes.map(e => e.emoji).includes(nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) return;
+				let permission = await checkPermissions(messageReaction.message.guild.members.cache.get(user.id), client);
+				let commandName = emotes.find(e => e.emoji === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)).cmd;
+				let command = require(`../commands/review/${commandName}`);
+				if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
+				let qUserDB = await dbQuery("User", {id: user.id});
+				let locale = qUserDB.locale || db.config.locale || "en";
+				if (command.controls.permissions) {
+					let checkPerms = channelPermissions(locale, command.controls.permissions, messageReaction.message.channel, client);
+					if (checkPerms) {
+						return messageReaction.message.channel.send(checkPerms).catch(() => {
+						});
+					}
+				}
+				messageReaction.message.author = user;
+				try {
+					command.do(locale, messageReaction.message, client, [edit.suggestionId], Discord, true)
+						.catch((err) => {
+							let errorText;
+							if (err.stack) errorText = err.stack;
+							else if (err.error) errorText = err.error;
+							messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+							errorLog(err, "Command Handler", "On queue reaction");
+
+							console.log(err);
+						});
+
+				} catch (err) {
 					let errorText;
 					if (err.stack) errorText = err.stack;
 					else if (err.error) errorText = err.error;
@@ -86,16 +143,8 @@ module.exports = async (Discord, client, messageReaction, user) => {
 					errorLog(err, "Command Handler", "On queue reaction");
 
 					console.log(err);
-				});
-
-		} catch (err) {
-			let errorText;
-			if (err.stack) errorText = err.stack;
-			else if (err.error) errorText = err.error;
-			messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-			errorLog(err, "Command Handler", "On queue reaction");
-
-			console.log(err);
+				}
+			}
 		}
 	}
 };

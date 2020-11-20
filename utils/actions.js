@@ -177,15 +177,16 @@ module.exports = {
 		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
 		return [upCount, downCount, upCount-downCount];
 	},
-	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn) {
+	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn, sendOps={follow: true, author: true}) {
 		if (!db.config.notify) return;
 		let suggester = await dbQuery("User", { id: suggestion.suggester });
-		if (suggester.notify) {
+		if (sendOps.author && suggester.notify) {
 			let u = await fetchUser(suggestion.suggester, client);
 			let uEmbed = dmEmbed(u.locale || db.config.locale, client, suggestion, color, title, attachment, suggestions, reason);
 			if (efn) uEmbed = efn(uEmbed, u.locale || db.config.locale);
 			if (u && u.id !== "0") u.send(uEmbed).catch(() => {});
 		}
+		if (!sendOps.follow || !db.config.auto_subscribe) return;
 		let followers = await dbQueryAll("User", { subscribed: {$elemMatch: { id: suggestion.suggestionId, guild: suggestion.id } } });
 		title.string += "_FOLLOW";
 		for await (let fid of followers) {

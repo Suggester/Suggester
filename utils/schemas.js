@@ -17,6 +17,7 @@ const settings = new Schema({
 		blocked_roles: [String],
 		ping_role: String,
 		approved_role: { type: String },
+		implemented_role: { type: String },
 		channels: {
 			suggestions: { type: String },
 			staff: { type: String },
@@ -33,6 +34,7 @@ const settings = new Schema({
 			color: { type: String, default: "#FFD700" }
 		},
 		notify: { type: Boolean, default: true },
+		auto_subscribe: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
 		clean_suggestion_command: { type: Boolean, default: false },
 		mode: { type: String, default: "review" },
@@ -93,7 +95,18 @@ const suggestion = new Schema({
 		up: { type: Number, default: 0 },
 		down: { type: Number, default: 0 },
 		cached: { type: Boolean, default: false }
-	}
+	},
+	pending_edit: {
+		content: String,
+		channelid: String,
+		messageid: String,
+		reviewEmojis: {
+			approve: String,
+			deny: String
+		},
+		submitted: Date
+	},
+	edited_by: String
 });
 
 const user = new Schema({

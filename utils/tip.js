@@ -131,10 +131,6 @@ module.exports = {
 			rickroll: {
 				string: "PROTIP_RICKROLL",
 				command: ["rickroll"]
-			},
-			spooky: {
-				string: "PROTIP_SPOOKY",
-				command: ["rickroll"]
 			}
 		};
 		let qUserDB = await message.author.db;

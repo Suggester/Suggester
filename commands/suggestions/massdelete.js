@@ -26,8 +26,10 @@ module.exports = {
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
-		let checkStaff = checkReview(locale, message.guild, qServerDB);
-		if (checkStaff) return message.channel.send(checkStaff);
+		if (qServerDB.config.mode === "review") {
+			let checkStaff = checkReview(locale, message.guild, qServerDB);
+			if (checkStaff) return message.channel.send(checkStaff);
+		}
 
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return message.channel.send(deniedCheck);
@@ -105,7 +107,7 @@ module.exports = {
 
 				if (qServerDB.config.channels.log) {
 					let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")
-						.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
+						.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
 					reason ? logs.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 					if (qSuggestionDB.attachment) {

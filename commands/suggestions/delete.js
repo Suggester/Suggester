@@ -78,7 +78,7 @@ module.exports = {
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")
-				.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
+				.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 
 			reason ? logs.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			if (qSuggestionDB.attachment) {

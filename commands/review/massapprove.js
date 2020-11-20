@@ -138,7 +138,7 @@ module.exports = {
 
 					if (qServerDB.config.channels.log) {
 						let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "APPROVED_LOG", "green")
-							.addField(string(guildLocale, "SUGGESTION_HEADER"), qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
+							.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
 						reason ? embedLog.addField(string(guildLocale, "COMMENT_TITLE", {
 							user: message.author.tag,
 							id: `${qSuggestionDB.suggestionId.toString()}_1`

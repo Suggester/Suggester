@@ -42,7 +42,7 @@ module.exports = {
 			embed.addField(string(locale, "DB_EMBED_TITLE_MODIFIED"), string(locale, "DB_EMBED_MODIFY_INFO", { field: modifyField, oldValue: oldValue, newValue: modifyValue }));
 		}
 
-		embed.addField(string(locale, "RESULT_FIELD_TITLE"), result ? `\`\`\`${result.toString().substr(0, 1020)}\`\`\`` : string(locale, "DB_NO_RESULT_FOUND"))
+		embed.addField(string(locale, "RESULT_FIELD_TITLE"), result ? `\`\`\`${result.toString().substr(0, 1005)}\`\`\`` : string(locale, "DB_NO_RESULT_FOUND"))
 			.setColor(result ? client.colors.default : "#ff0000");
 		return message.channel.send(embed);
 	}
