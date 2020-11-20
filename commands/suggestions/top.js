@@ -63,11 +63,13 @@ module.exports = {
 				});
 			}
 		}
+		let index = 1;
 		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 10)) {
 			embedArray.push({
-				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
+				"fieldTitle": `${index}: ${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
 				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`
 			});
+			index++;
 		}
 		if (!embedArray[0]) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
 
