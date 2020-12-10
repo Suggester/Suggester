@@ -2296,6 +2296,18 @@ module.exports = {
 			string: "This comment has already been deleted!",
 			context: "Error shown when a user attempts to delete a previously deleted comment"
 		},
+		"COMMENT_ALREADY_DELETED_ERROR_EDIT": {
+			string: "This comment has been deleted!",
+			context: "Error shown when a user attempts to edit a previously deleted comment"
+		},
+		"COMMENT_NOT_AUTHOR_ERROR": {
+			string: "You are not the author of this comment, so you cannot edit it!",
+			context: "Error shown when a user attempts to edit a comment they did not create (or is not anonymous)"
+		},
+		"COMMENT_NO_EDIT_CONTENT_ERROR": {
+			string: "You must specify new content for the comment!",
+			context: "Error when no new content is specified for editing a comment"
+		},
 		"DELETED_COMMENT_LOG": {
 			string: "{{user}} deleted comment {{comment}} from #{{id}}",
 			context: "Title for the log embed when a comment is deleted",
@@ -2314,9 +2326,31 @@ module.exports = {
 				}
 			}
 		},
+		"EDITED_COMMENT_LOG": {
+			string: "{{user}} edited comment {{comment}} on #{{id}}",
+			context: "Title for the log embed when a comment is edited",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				},
+				comment: {
+					to_replace: "{{comment}}",
+					description: "The comment ID"
+				}
+			}
+		},
 		"COMMENT_DELETED_TITLE": {
 			string: "Comment Deleted",
 			context: "Title when a comment is deleted"
+		},
+		"COMMENT_EDITED_TITLE": {
+			string: "Comment Edited",
+			context: "Title when a comment is edited"
 		},
 		"SUGGESTION_DENIED_TITLE": {
 			string: "Suggestion Denied",
@@ -5184,6 +5218,20 @@ module.exports = {
 			string: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
 			context: "Examples for the Automatic Following config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"COMMAND_DESC:EDITCOMMENT": {
+			string: "Edits a comment on a suggestion",
+			context: "Description for the editcomment command"
+		},
+		"COMMAND_USAGE:EDITCOMMENT": {
+			string: "editcomment [comment id] [new content]",
+			context: "Usage for the editcomment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EDITCOMMENT": {
+			string: "`{{p}}editcomment 27_1 This is new content`\nEdits a comment with the ID `27_1` to read \"This is new content\"",
+			context: "Examples for the editcomment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		}
 	}
 };
