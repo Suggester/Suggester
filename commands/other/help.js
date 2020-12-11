@@ -17,7 +17,7 @@ module.exports = {
 		examples: "`{{p}}help`\nShows the list of commands\n\n`{{p}}help suggest`\nShows information about the \"suggest\" command",
 		image: "images/Help.gif",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY", "ADD_REACTIONS"],
 		cooldown: 5,
 		dmAvailable: true
 	},
