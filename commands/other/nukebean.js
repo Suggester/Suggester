@@ -4,7 +4,7 @@ const { dbQuery } = require("../../utils/db");
 module.exports = {
 	controls: {
 		name: "nukebean",
-		permission: 1,
+		permission: 0,
 		usage: "nukebean [user]",
 		description: "Nukebeans a user",
 		enabled: true,

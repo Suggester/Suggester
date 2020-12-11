@@ -4,7 +4,7 @@ const { dbQuery } = require("../../utils/db");
 module.exports = {
 	controls: {
 		name: "hypernukebean",
-		permission: 1,
+		permission: 0,
 		usage: "hypernukebean [user]",
 		description: "Hypernukebeans a user",
 		enabled: true,
