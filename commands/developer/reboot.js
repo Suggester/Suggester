@@ -9,7 +9,7 @@ module.exports = {
 		description: "Reboots the bot by exiting the process",
 		examples: "`{{p}}reboot`\nReboots all shards of the bot\n\n`{{p}}reboot 2`\nReboots shard 2",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY"]
 	},
 	do: async (locale, message, client, args) => {
 		if (!client.admins.has(message.author.id)) return;

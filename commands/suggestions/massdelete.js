@@ -26,11 +26,6 @@ module.exports = {
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB);
 		if (suggestionsCheck) return message.channel.send(suggestionsCheck);
 
-		if (qServerDB.config.mode === "review") {
-			let checkStaff = checkReview(locale, message.guild, qServerDB);
-			if (checkStaff) return message.channel.send(checkStaff);
-		}
-
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return message.channel.send(deniedCheck);
 

@@ -316,6 +316,10 @@ module.exports = {
 			string: "You must specify a valid user!",
 			context: "String used when no/an invalid user is specified in a command"
 		},
+		"INVALID_MEMBER_ERROR": {
+			string: "You must specify a valid member!",
+			context: "String used when an invalid member is specified in a command"
+		},
 		"INVALID_GLOBALBAN_NEW_PARAMS_ERROR": {
 			string: "Invalid block setting. Use `true` to block and `false` to unblock.",
 			context: "Error produced when globalban is run with an invalid block setting"
@@ -2128,6 +2132,10 @@ module.exports = {
 			string: "Block reasons are limited to a length of 1024 characters.",
 			context: "Error shown when a block reason is too long"
 		},
+		"BEAN_REASON_TOO_LONG_ERROR": {
+			string: "Bean reasons are limited to a length of 1024 characters.",
+			context: "Error shown when a bean reason is too long"
+		},
 		"BLOCK_GLOBAL_STAFF_ERROR": {
 			string: "Global Suggester staff members cannot be blocked.",
 			context: "Error shown when a user attempts to block a global staff member"
@@ -2296,6 +2304,18 @@ module.exports = {
 			string: "This comment has already been deleted!",
 			context: "Error shown when a user attempts to delete a previously deleted comment"
 		},
+		"COMMENT_ALREADY_DELETED_ERROR_EDIT": {
+			string: "This comment has been deleted!",
+			context: "Error shown when a user attempts to edit a previously deleted comment"
+		},
+		"COMMENT_NOT_AUTHOR_ERROR": {
+			string: "You are not the author of this comment, so you cannot edit it!",
+			context: "Error shown when a user attempts to edit a comment they did not create (or is not anonymous)"
+		},
+		"COMMENT_NO_EDIT_CONTENT_ERROR": {
+			string: "You must specify new content for the comment!",
+			context: "Error when no new content is specified for editing a comment"
+		},
 		"DELETED_COMMENT_LOG": {
 			string: "{{user}} deleted comment {{comment}} from #{{id}}",
 			context: "Title for the log embed when a comment is deleted",
@@ -2314,9 +2334,31 @@ module.exports = {
 				}
 			}
 		},
+		"EDITED_COMMENT_LOG": {
+			string: "{{user}} edited comment {{comment}} on #{{id}}",
+			context: "Title for the log embed when a comment is edited",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The staff member's tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				},
+				comment: {
+					to_replace: "{{comment}}",
+					description: "The comment ID"
+				}
+			}
+		},
 		"COMMENT_DELETED_TITLE": {
 			string: "Comment Deleted",
 			context: "Title when a comment is deleted"
+		},
+		"COMMENT_EDITED_TITLE": {
+			string: "Comment Edited",
+			context: "Title when a comment is edited"
 		},
 		"SUGGESTION_DENIED_TITLE": {
 			string: "Suggestion Denied",
@@ -5184,6 +5226,156 @@ module.exports = {
 			string: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
 			context: "Examples for the Automatic Following config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"COMMAND_DESC:EDITCOMMENT": {
+			string: "Edits a comment on a suggestion",
+			context: "Description for the editcomment command"
+		},
+		"COMMAND_USAGE:EDITCOMMENT": {
+			string: "editcomment [comment id] [new content]",
+			context: "Usage for the editcomment command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:EDITCOMMENT": {
+			string: "`{{p}}editcomment 27_1 This is new content`\nEdits a comment with the ID `27_1` to read \"This is new content\"",
+			context: "Examples for the editcomment command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"NO_REASON": {
+			string: "No reason provided",
+			context: "String when no reason is provided"
+		},
+		"BEAN_SUCCESS": {
+			string: "Beaned **{{user}}** (`{{id}}`)",
+			context: "Success message when a user is beaned",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"BEAN_DM": {
+			string: "**You have been beaned from {{guild}}**",
+			context: "DM message for a bean",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The guild name"
+				}
+			}
+		},
+		"MEGABEAN_SUCCESS": {
+			string: "Megabeaned **{{user}}** (`{{id}}`)",
+			context: "Success message when a user is megabeaned",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"MEGABEAN_DM": {
+			string: "**You have been megabeaned from {{guild}}**",
+			context: "DM message for a megabean",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The guild name"
+				}
+			}
+		},
+		"NUKEBEAN_SUCCESS": {
+			string: "Nukebeaned **{{user}}** (`{{id}}`)",
+			context: "Success message when a user is nukebeaned",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"NUKEBEAN_DM": {
+			string: "**You have been nukebeaned from {{guild}}**",
+			context: "DM message for a nukebean",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The guild name"
+				}
+			}
+		},
+		"HYPERNUKEBEAN_SUCCESS": {
+			string: "Hypernukebeaned **{{user}}** (`{{id}}`)",
+			context: "Success message when a user is hypernukebeaned",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "The user tag"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The user ID"
+				}
+			}
+		},
+		"HYPERNUKEBEAN_DM": {
+			string: "**You have been hypernukebeaned from {{guild}}**",
+			context: "DM message for a hypernukebean",
+			replaced: {
+				guild: {
+					to_replace: "{{guild}}",
+					description: "The guild name"
+				}
+			}
+		},
+		"COMMAND_DESC:BEAN": {
+			string: "Beans a user",
+			context: "Description for the bean command"
+		},
+		"COMMAND_USAGE:BEAN": {
+			string: "bean [user]",
+			context: "Usage for the bean command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:MEGABEAN": {
+			string: "Megabeans a user",
+			context: "Description for the megabean command"
+		},
+		"COMMAND_USAGE:MEGABEAN": {
+			string: "megabean [user]",
+			context: "Usage for the megabean command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:NUKEBEAN": {
+			string: "Nukebeans a user",
+			context: "Description for the nukebean command"
+		},
+		"COMMAND_USAGE:NUKEBEAN": {
+			string: "nukebean [user]",
+			context: "Usage for the nukebean command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_DESC:HYPERNUKEBEAN": {
+			string: "Hypernukebeans a user",
+			context: "Description for the hypernukebean command"
+		},
+		"COMMAND_USAGE:HYPERNUKEBEAN": {
+			string: "hypernukebean [user]",
+			context: "Usage for the hypernukebean command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		}
 	}
 };

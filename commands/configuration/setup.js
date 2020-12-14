@@ -14,7 +14,7 @@ module.exports = {
 		image: "images/Setup.gif",
 		examples: "The bot will send a prompt, and you send your response in the channel. The bot will then send another prompt, and the cycle continues until your server is configured.",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "READ_MESSAGE_HISTORY"],
 		cooldown: 45
 	},
 	do: async (locale, message, client, args, Discord) => {

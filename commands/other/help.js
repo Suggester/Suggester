@@ -17,7 +17,7 @@ module.exports = {
 		examples: "`{{p}}help`\nShows the list of commands\n\n`{{p}}help suggest`\nShows information about the \"suggest\" command",
 		image: "images/Help.gif",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY", "ADD_REACTIONS"],
 		cooldown: 5,
 		dmAvailable: true
 	},
@@ -34,7 +34,7 @@ module.exports = {
 		if (!args[0]) {
 			let embeds = [];
 			for await (let module of new Set(client.commands.map(c => c.controls.module).sort((a, b) => (require(`../${a}/module`)).position - (require(`../${b}/module`)).position))) {
-				let moduleCommands = client.commands.filter(c => c.controls.module === module && c.controls.permission >= permission);
+				let moduleCommands = client.commands.filter(c => c.controls.module === module && c.controls.permission >= permission && !c.controls.hidden);
 				if (moduleCommands.size > 0) embeds.push(new Discord.MessageEmbed()
 					.setAuthor(`${string(locale, "HELP_AUTHOR", { name: client.user.username })} • ${string(locale, "PAGINATION_PAGE_COUNT")}`, client.user.displayAvatarURL({ format: "png", dynamic: true }))
 					.setTitle(string(locale, "HELP_MODULE_TITLE", { module: string(locale, `MODULE_NAME:${(require(`../${module}/module`)).name.toUpperCase()}`) || (require(`../${module}/module`)).name }))

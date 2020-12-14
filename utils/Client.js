@@ -26,7 +26,8 @@ module.exports = class extends Client {
 			"yellow": "#f1c40f",
 			"gold": "#FFD700",
 			"teal": "#53d0e1",
-			"protip": "#1abc9c"
+			"protip": "#1abc9c",
+			"bean": "#aad136"
 		};
 		for (let c of Object.keys(baseColors)) {
 			if (config.colors && config.colors[c]) baseColors[c] = config.colors[c];

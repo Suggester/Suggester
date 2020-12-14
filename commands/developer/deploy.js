@@ -11,7 +11,7 @@ module.exports = {
 		description: "Pulls an update from git and reboots with changes",
 		examples: "`{{p}}deploy`\nDeploys an update from the `production` branch\n\n`{{p}}deploy staging`\nDeploys an update from the `staging` branch",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "READ_MESSAGE_HISTORY"]
 	},
 	do: async (locale, message, client, args, Discord) => {
 		if (!client.admins.has(message.author.id)) return;

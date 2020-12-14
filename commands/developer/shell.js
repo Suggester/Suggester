@@ -17,7 +17,7 @@ module.exports = {
 		aliases: ["exec"],
 		description: "Runs shell code",
 		enabled: true,
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"]
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY"]
 	},
 	do: async (locale, message, client, args) => {
 		if (!client.admins.has(message.author.id)) return;
