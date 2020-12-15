@@ -9,6 +9,7 @@ const { cleanCommand } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const lngDetector = new (require("languagedetect"));
 const humanizeDuration = require("humanize-duration");
+const { initTrello } = require("../../utils/trello");
 
 module.exports = {
 	controls: {
@@ -208,6 +209,9 @@ module.exports = {
 				qServerDB.config.cooldown_exempt.splice(qServerDB.config.cooldown_exempt.findIndex(u => u === message.author.id), 1);
 				await qServerDB.save();
 			}
+
+			const t = initTrello();
+			t.addCard(suggestion.suggestion, )
 
 			lngDetector.setLanguageType("iso2");
 			let detected = lngDetector.detect(suggestion)[0];

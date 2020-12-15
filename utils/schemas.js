@@ -52,7 +52,7 @@ const settings = new Schema({
 		suggestion_cooldown: { type: Number, default: 0 },
 		cooldown_exempt: [String],
 		trello: {
-			board_id: String,
+			board: String,
 			actions: [{
 				action: { type: String, enum: ["suggest", "deny", "approve", "nothappening", "progress", "consideration", "implemented", "delete"] },
 				part: { type: String, enum: ["label", "board", "archive"] },

@@ -8,7 +8,7 @@ const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
-const { initTrello } = require("../../utils/trello");
+const { initTrello, findList } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "config",
@@ -859,6 +859,35 @@ module.exports = {
 					}
 					break;
 				case "actions":
+					if (!qServerDB.config.trello.board) return message.channel.send(string(locale, "NO_TRELLO_BOARD_SET_ERROR", {}, "error"));
+					// eslint-disable-next-line no-case-declarations
+					let lists = await t.getListsOnBoard(qServerDB.config.trello.board).catch(() => null);
+					if (!args[2]) return; //TODO: Show current
+					switch (args[2].toLowerCase() || "") {
+					case "suggest":
+						if (!args[3]) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+						if (["none", "reset", "delete"].includes(args[3].toLowerCase())) {
+							qServerDB.config.trello.actions.splice(qServerDB.config.trello.actions.findIndex(a => a.ation === "suggest"), 1);
+							qServerDB.save();
+							return message.channel.send(string(locale, "SUGGEST_LIST_RESET_SUCCESS", {}, "success"));
+						}
+						// eslint-disable-next-line no-case-declarations
+						let foundList = findList(lists, args.splice(3).join(" "));
+						if (!foundList) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+						// eslint-disable-next-line no-case-declarations
+						let suggestAction = qServerDB.config.trello.actions.find(a => a.action === "suggest");
+						suggestAction ? suggestAction = {
+							part: "list",
+							id: foundList.id
+						} : qServerDB.config.trello.actions.push({
+							action: "suggest",
+							part: "list",
+							id: foundList.id
+						});
+						qServerDB.save();
+						message.channel.send(string(locale, "SUGGEST_LIST_SET_SUCCESS", { list: foundList.name }, "success"), { disableMentions: "everyone" });
+						break;
+					}
 					break;
 				}
 			}

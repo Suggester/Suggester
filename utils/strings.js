@@ -5398,6 +5398,37 @@ module.exports = {
 					context: "The trello board code"
 				}
 			}
+		},
+		"NO_TRELLO_BOARD_SET_ERROR": {
+			string: "You must have a Trello board configured to configure actions",
+			context: "Error when there is no Trello board set and a user tries to configure actions"
+		},
+		"NO_LIST_NAME_ERROR": {
+			string: "You must provide the name of a list on the Trello board <https://trello.com/b/{{code}}>",
+			context: "Error shown when a user does not provide a valid list name for configuring Trello",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
+		},
+		"SUGGEST_LIST_RESET_SUCCESS": {
+			string: "Submitted suggestions will no longer be posted to the Trello board",
+			context: "Success message when the submitted suggestions list is reset"
+		},
+		"SUGGEST_LIST_SET_SUCCESS": {
+			string: "All submitted suggestions will be sent to the **{{list}}** list on Trello",
+			context: "Success message shown when a user configures a list for submitted suggestions on Trello",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The trello board list name"
+				}
+			}
+		},
+		"SUGGESTION_TRELLO_INFO": {
+			string: "Submitted by {{user}} ({{id}})\nSuggestion ID: {{sid}}\n[Link]()"
 		}
 	}
 };
