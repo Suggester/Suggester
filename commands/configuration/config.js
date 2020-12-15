@@ -8,6 +8,7 @@ const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "config",
@@ -828,6 +829,38 @@ module.exports = {
 				qServerDB.config.suggestion_cooldown = newValue;
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
+			}
+		}, {
+			names: ["trello"],
+			name: "Trello",
+			description: "Settings for the Suggester Trello integration",
+			examples: "_ _",
+			cfg: async function() {
+				const t = initTrello();
+				if (!args[1]) return; //TODO: Show config
+				switch (args[1].toLowerCase()) {
+				case "board":
+					if (!args[2]) return message.channel.send(string(locale, "NO_BOARD_SPECIFIED_ERROR", {}, "error"));
+					if (["none", "reset", "delete"].includes(args[2].toLowerCase())) {
+						qServerDB.config.trello.board = "";
+						qServerDB.save();
+						return message.channel.send(string(locale, "TRELLO_BOARD_RESET_SUCCESS", {}, "success"));
+					} else {
+						let linkMatch = args[2].match(/trello.com\/b\/([a-zA-Z0-9]+)/);
+						if (!linkMatch) return message.channel.send(string(locale, "NO_BOARD_SPECIFIED_ERROR", {}, "error"));
+						t.getBoardMembers(linkMatch[1]).then(members => {
+							if (!members.find(m => m.username === "suggester_bot")) return message.channel.send(string(locale, "INVALID_BOARD_SPECIFIED_ERROR", {}, "error"));
+							qServerDB.config.trello.board = linkMatch[1];
+							qServerDB.save();
+							return message.channel.send(string(locale, "TRELLO_BOARD_SET_SUCCESS", {code: linkMatch[1]}, "success"));
+						}).catch(() => {
+							return message.channel.send(string(locale, "INVALID_BOARD_SPECIFIED_ERROR", {}, "error"));
+						});
+					}
+					break;
+				case "actions":
+					break;
+				}
 			}
 		}];
 

@@ -27,6 +27,7 @@
     "node-fetch": "^2.6.1",
     "prettysize": "^2.0.0",
     "string-similarity": "^4.0.2",
+    "trello": "^0.10.0",
     "valid-url": "1.0.9"
   },
   "devDependencies": {

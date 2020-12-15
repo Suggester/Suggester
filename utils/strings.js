@@ -5376,6 +5376,28 @@ module.exports = {
 			string: "hypernukebean [user]",
 			context: "Usage for the hypernukebean command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"NO_BOARD_SPECIFIED_ERROR": {
+			string: "You must specify a valid link to a Trello board",
+			context: "Error shown when a user has not specified a valid Trello board link"
+		},
+		"INVALID_BOARD_SPECIFIED_ERROR": {
+			string: "The board you specified could not be found. Make sure `@suggester_bot` has been added as a board member.",
+			context: "Error shown when a user has not specified a Trello board link the bot can access"
+		},
+		"TRELLO_BOARD_RESET_SUCCESS": {
+			string: "Successfully reset the configured Trello board",
+			context: "Success message when the trello board is reset"
+		},
+		"TRELLO_BOARD_SET_SUCCESS": {
+			string: "Successfully set the Trello board to https://trello.com/b/{{code}}",
+			context: "Success message when the Trello board is set",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
 		}
 	}
 };
