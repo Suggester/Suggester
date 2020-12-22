@@ -132,6 +132,20 @@ module.exports = {
 
 				serverLog(embedLog, qServerDB, client);
 			}
+
+			if (qServerDB.config.trello.board && qServerDB.config.trello.actions.find(a => a.action === "suggest")) {
+				const t = initTrello();
+				let c = await t.addCard(qSuggestionDB.suggestion, string(guildLocale, "SUGGESTION_TRELLO_INFO", {
+					user: message.author.tag,
+					id: message.author.id,
+					sid: qSuggestionDB.suggestionId
+				}), qServerDB.config.trello.actions.find(a => a.action === "suggest").id).catch(() => null);
+				if (c) {
+					qSuggestionDB.trello_card = c.id;
+					qSuggestionDB.save();
+					if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).catch(() => null);
+				}
+			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
 				let perms = channelPermissions(locale,  "suggestions", client.channels.cache.get(qServerDB.config.channels.suggestions), client);
@@ -180,6 +194,21 @@ module.exports = {
 							down: reactEmojiDown
 						};
 					}
+
+					if (qServerDB.config.trello.board && qServerDB.config.trello.actions.find(a => a.action === "suggest")) {
+						const t = initTrello();
+						let c = await t.addCard(qSuggestionDB.suggestion, string(guildLocale, "SUGGESTION_TRELLO_INFO", {
+							user: message.author.tag,
+							id: message.author.id,
+							sid: qSuggestionDB.suggestionId
+						}), qServerDB.config.trello.actions.find(a => a.action === "suggest").id).catch(() => null);
+						if (c) {
+							qSuggestionDB.trello_card = c.id;
+							if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).catch(() => null);
+							t.addAttachmentToCard(c.id, `https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId}`).catch(() => null);
+						}
+					}
+
 					await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 					client.reactInProgress = false;
 				});
@@ -209,9 +238,6 @@ module.exports = {
 				qServerDB.config.cooldown_exempt.splice(qServerDB.config.cooldown_exempt.findIndex(u => u === message.author.id), 1);
 				await qServerDB.save();
 			}
-
-			const t = initTrello();
-			t.addCard(suggestion.suggestion, )
 
 			lngDetector.setLanguageType("iso2");
 			let detected = lngDetector.detect(suggestion)[0];

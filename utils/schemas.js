@@ -54,8 +54,8 @@ const settings = new Schema({
 		trello: {
 			board: String,
 			actions: [{
-				action: { type: String, enum: ["suggest", "deny", "approve", "nothappening", "progress", "consideration", "implemented", "delete"] },
-				part: { type: String, enum: ["label", "board", "archive"] },
+				action: String, //"suggest", "deny", "approve", "nothappening", "progress", "consideration", "implemented", "delete"
+				part: String,
 				id: String
 			}]
 		}
@@ -114,7 +114,8 @@ const suggestion = new Schema({
 		},
 		submitted: Date
 	},
-	edited_by: String
+	edited_by: String,
+	trello_card: String
 });
 
 const user = new Schema({

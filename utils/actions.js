@@ -132,7 +132,7 @@ module.exports = {
 		const filter = (reaction, user) => (Object.values(emojis).includes(reaction.emoji.name) || Object.values(emojis).includes(reaction.emoji.id)) && !user.bot && user.id === message.author.id;
 
 		let page = options.startPage;
-		content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
+		if (content[page] instanceof Discord.MessageEmbed) content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
 		const msg = await message.channel.send(content[page] instanceof Discord.MessageEmbed ? { embed: content[page] } : content[page]);
 
 		for (const emoji in emojis) await msg.react(emojis[emoji]);
@@ -153,8 +153,10 @@ module.exports = {
 				return;
 			}
 			if (msg) {
-				content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
-				if (content[page] instanceof Discord.MessageEmbed) msg.edit({ embed: content[page] });
+				if (content[page] instanceof Discord.MessageEmbed) {
+					content[page].author.name = content[page].author.name.replace("{{current}}", page+1).replace("{{total}}", content.length.toString());
+					msg.edit({ embed: content[page] });
+				}
 				else msg.edit(content[page]);
 			}
 		});

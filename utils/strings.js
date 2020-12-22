@@ -454,6 +454,10 @@ module.exports = {
 			string: "Other Configuration",
 			context: "Title for the Other Configuration field of the configuration list"
 		},
+		"TRELLO_CONFIGURATION_TITLE": {
+			string: "Trello Configuration",
+			context: "Title for the Trello Configuration field of the configuration list"
+		},
 		"CFG_STATUS_TITLE": {
 			string: "Config Status",
 			context: "Title for the Config Status field of the configuration list"
@@ -5413,6 +5417,16 @@ module.exports = {
 				}
 			}
 		},
+		"NO_LABEL_NAME_ERROR": {
+			string: "You must provide the name of a label on the Trello board <https://trello.com/b/{{code}}>",
+			context: "Error shown when a user does not provide a valid label name for configuring Trello",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
+		},
 		"SUGGEST_LIST_RESET_SUCCESS": {
 			string: "Submitted suggestions will no longer be posted to the Trello board",
 			context: "Success message when the submitted suggestions list is reset"
@@ -5428,7 +5442,324 @@ module.exports = {
 			}
 		},
 		"SUGGESTION_TRELLO_INFO": {
-			string: "Submitted by {{user}} ({{id}})\nSuggestion ID: {{sid}}\n[Link]()"
+			string: "Submitted by {{user}} ({{id}})\nSuggestion ID: {{sid}}",
+			context: "Information for the Trello card description",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					context: "The user who submitted the suggestion"
+				},
+				id: {
+					to_replace: "{{id}}",
+					context: "The ID of the user who submitted the suggestion"
+				},
+				sid: {
+					to_replace: "{{sid}}",
+					context: "The ID of the suggestion"
+				}
+			}
+		},
+		"TRELLO_CONFIG_SUGGEST": {
+			string: "All submitted suggestions are added to list **{{list}}**",
+			context: "Shows where submitted suggestions are added on trello",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The list name"
+				}
+			}
+		},
+		"TRELLO_CONFIG_SUGGEST_NONE": {
+			string: "Submitted suggestions are not added to Trello",
+			context: "Shows where submitted suggestions are added on trello if not configured"
+		},
+		"TRELLO_INVALID_ACTION_ERROR": {
+			string: "That is an inavlid action. You can configure the following actions: {{list}}",
+			context: "Shown when an action specified is invalid",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The list of available actions"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_DELETE": {
+			string: "Suggestions that are approved will be deleted from the Trello board",
+			context: "Shows that suggestions approved will be deleted"
+		},
+		"TRELLO_ACTION_APPROVE_ARCHIVE": {
+			string: "Suggestions that are approved will be archived on the Trello board",
+			context: "Shows that suggestions approved will be archived"
+		},
+		"TRELLO_ACTION_APPROVE_LIST": {
+			string: "Suggestions that are approved will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions approved will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_LABEL": {
+			string: "Suggestions that are approved will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions approved will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DENY_DELETE": {
+			string: "Suggestions that are denied will be deleted from the Trello board",
+			context: "Shows that suggestions denied will be deleted"
+		},
+		"TRELLO_ACTION_DENY_ARCHIVE": {
+			string: "Suggestions that are denied will be archived on the Trello board",
+			context: "Shows that suggestions denied will be archived"
+		},
+		"TRELLO_ACTION_DENY_LIST": {
+			string: "Suggestions that are denied will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions denied will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DENY_LABEL": {
+			string: "Suggestions that are denied will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions denied will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DELETE_DELETE": {
+			string: "Suggestions that are deleted will be deleted from the Trello board",
+			context: "Shows that suggestions deleted will be deleted"
+		},
+		"TRELLO_ACTION_DELETE_ARCHIVE": {
+			string: "Suggestions that are deleted will be archived on the Trello board",
+			context: "Shows that suggestions deleted will be archived"
+		},
+		"TRELLO_ACTION_DELETE_LIST": {
+			string: "Suggestions that are deleted will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions deleted will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DELETE_LABEL": {
+			string: "Suggestions that are deleted will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions deleted will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_IMPLEMENTED_DELETE": {
+			string: "Suggestions that are marked as implemented will be deleted from the Trello board",
+			context: "Shows that suggestions marked as implemented will be deleted"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_ARCHIVE": {
+			string: "Suggestions that are marked as implemented will be archived on the Trello board",
+			context: "Shows that suggestions marked as implemented will be archived"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_LIST": {
+			string: "Suggestions that are marked as implemented will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as implemented will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_IMPLEMENTED_LABEL": {
+			string: "Suggestions that are marked as implemented will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as implemented will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_CONSIDER_DELETE": {
+			string: "Suggestions that are marked as in consideration will be deleted from the Trello board",
+			context: "Shows that suggestions marked as in consideration will be deleted"
+		},
+		"TRELLO_ACTION_CONSIDER_ARCHIVE": {
+			string: "Suggestions that are marked as in consideration will be archived on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be archived"
+		},
+		"TRELLO_ACTION_CONSIDER_LIST": {
+			string: "Suggestions that are marked as in consideration will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_CONSIDER_LABEL": {
+			string: "Suggestions that are marked as in consideration will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_PROGRESS_DELETE": {
+			string: "Suggestions that are marked as in progress will be deleted from the Trello board",
+			context: "Shows that suggestions marked as in progress will be deleted"
+		},
+		"TRELLO_ACTION_PROGRESS_ARCHIVE": {
+			string: "Suggestions that are marked as in progress will be archived on the Trello board",
+			context: "Shows that suggestions marked as in progress will be archived"
+		},
+		"TRELLO_ACTION_PROGRESS_LIST": {
+			string: "Suggestions that are marked as in progress will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as in progress will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_PROGRESS_LABEL": {
+			string: "Suggestions that are marked as in progress will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as in progress will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_NOTHAPPENING_DELETE": {
+			string: "Suggestions that are marked as not happening will be deleted from the Trello board",
+			context: "Shows that suggestions marked as not happening will be deleted"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_ARCHIVE": {
+			string: "Suggestions that are marked as not happening will be archived on the Trello board",
+			context: "Shows that suggestions marked as not happening will be archived"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_LIST": {
+			string: "Suggestions that are marked as not happening will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as not happening will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_NOTHAPPENING_LABEL": {
+			string: "Suggestions that are marked as not happening will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as not happening will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_COLORCHANGE_DELETE": {
+			string: "Suggestions that are upvoted past the color change threshold will be deleted from the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be deleted"
+		},
+		"TRELLO_ACTION_COLORCHANGE_ARCHIVE": {
+			string: "Suggestions that are upvoted past the color change threshold will be archived on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be archived"
+		},
+		"TRELLO_ACTION_COLORCHANGE_LIST": {
+			string: "Suggestions that are upvoted past the color change threshold will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_COLORCHANGE_LABEL": {
+			string: "Suggestions that are upvoted past the color change threshold will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_NONE": {
+			string: "No Trello action will be taken on suggestions that are approved",
+			context: "Shows that suggestions approved will not be taken action on"
+		},
+		"TRELLO_ACTION_DENY_NONE": {
+			string: "No Trello action will be taken on suggestions that are denied",
+			context: "Shows that suggestions denied will not be taken action on"
+		},
+		"TRELLO_ACTION_DELETE_NONE": {
+			string: "No Trello action will be taken on suggestions that are deleted",
+			context: "Shows that suggestions deleted will not be taken action on"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as implemented",
+			context: "Shows that suggestions marked as implemented will not be taken action on"
+		},
+		"TRELLO_ACTION_CONSIDER_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as in consideration",
+			context: "Shows that suggestions marked as in consideration will not be taken action on"
+		},
+		"TRELLO_ACTION_PROGRESS_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as in progress",
+			context: "Shows that suggestions marked as in progress will not be taken action on"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as not happening",
+			context: "Shows that suggestions marked as not happening will not be taken action on"
+		},
+		"TRELLO_ACTION_COLORCHANGE_NONE": {
+			string: "No Trello action will be taken on suggestions that are upvoted past the color change threshold",
+			context: "Shows that suggestions upvoted past the color change threshold will not be taken action on"
+		},
+		"TRELLO_NO_ACTIONS_CONFIGURED": {
+			string: "No Trello actions are configured",
+			content: "Shows when no Trello actions are set"
+		},
+		"TRELLO_BASE_CONFIG": {
+			string: "**Linked Trello Board:** {{code}}\nUse `{{p}}config trello actions` to view configured actions",
+			context: "Shows the linked trello board, **do not translate `config trello actions` as that is a bot command**",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				},
+				p: {
+					to_replace: "{{p}}",
+					context: "The server prefix"
+				}
+			}
+		},
+		"CFG_TRELLO_INVALID_PARAM": {
+			string: "You must specify `board` or `action`",
+			context: "Error when a user specifies none or an invalid parameter for Trello config"
 		}
 	}
 };

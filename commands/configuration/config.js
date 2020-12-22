@@ -8,7 +8,7 @@ const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
-const { initTrello, findList } = require("../../utils/trello");
+const { initTrello, findList, findLabel } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "config",
@@ -837,7 +837,7 @@ module.exports = {
 			examples: "_ _",
 			cfg: async function() {
 				const t = initTrello();
-				if (!args[1]) return; //TODO: Show config
+				if (!args[1]) return message.channel.send(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"));
 				switch (args[1].toLowerCase()) {
 				case "board":
 					if (!args[2]) return message.channel.send(string(locale, "NO_BOARD_SPECIFIED_ERROR", {}, "error"));
@@ -859,15 +859,52 @@ module.exports = {
 					}
 					break;
 				case "actions":
+				case "action":
 					if (!qServerDB.config.trello.board) return message.channel.send(string(locale, "NO_TRELLO_BOARD_SET_ERROR", {}, "error"));
 					// eslint-disable-next-line no-case-declarations
 					let lists = await t.getListsOnBoard(qServerDB.config.trello.board).catch(() => null);
-					if (!args[2]) return; //TODO: Show current
-					switch (args[2].toLowerCase() || "") {
+					// eslint-disable-next-line no-case-declarations
+					let labels = await t.getLabelsForBoard(qServerDB.config.trello.board).catch(() => null);
+					// eslint-disable-next-line no-case-declarations
+					let actionPrepend = {
+						approve: "<:suggester_check:704665656573952040>",
+						deny: "<:suggester_x:704665482828972113>",
+						delete: "<:strash:790937745560305674>",
+						consider: "<:sconsider:740935462067372112>",
+						implemented: "<:simplemented:740935015109492758>",
+						progress: "<:sprogress:740935462163841137>",
+						nothappening: "<:sno:740935462079954996>",
+						colorchange: "⭐",
+						suggest: "📣"
+					};
+					if (!args[2]) {
+						if (!qServerDB.config.trello.actions.length) return message.channel.send(string(locale, "TRELLO_NO_ACTIONS_CONFIGURED", {}, "error"));
+						let actionArr = [];
+						for (let a of qServerDB.config.trello.actions) {
+							if (a.action === "suggest") {
+								let ls = lists.find(li => li.id === a.id);
+								if (!ls) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, "TRELLO_CONFIG_SUGGEST", { list: ls.name })}`);
+							} else if (a.part === "list") {
+								let l = lists.find(li => li.id === a.id);
+								if (!l) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_LIST`, { list: l.name })}`);
+							} else if (a.part === "label") {
+								let la = labels.find(l => l.id === a.id);
+								if (!la) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_LABEL`, { label: la.name })}`);
+							} else actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_${a.part.toUpperCase()}`)}`);
+						}
+						return pages(locale, message, actionArr.chunk(6).map(c => c.join("\n")));
+					}
+					switch (args[2].toLowerCase()) {
 					case "suggest":
-						if (!args[3]) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+					case "submit":
+						// eslint-disable-next-line no-case-declarations
+						let suggestAction = qServerDB.config.trello.actions.find(a => a.action === "suggest");
+						if (!args[3]) return message.channel.send(`${actionPrepend["suggest"]} ${string(locale, suggestAction ? "TRELLO_CONFIG_SUGGEST" : "TRELLO_CONFIG_SUGGEST_NONE", suggestAction ? { list: lists.find(l => l.id === suggestAction.id) ? lists.find(l => l.id === suggestAction.id).name : string(locale, "NONE") } : {})}`);
 						if (["none", "reset", "delete"].includes(args[3].toLowerCase())) {
-							qServerDB.config.trello.actions.splice(qServerDB.config.trello.actions.findIndex(a => a.ation === "suggest"), 1);
+							qServerDB.config.trello.actions.splice(qServerDB.config.trello.actions.findIndex(a => a.action === "suggest"), 1);
 							qServerDB.save();
 							return message.channel.send(string(locale, "SUGGEST_LIST_RESET_SUCCESS", {}, "success"));
 						}
@@ -875,8 +912,8 @@ module.exports = {
 						let foundList = findList(lists, args.splice(3).join(" "));
 						if (!foundList) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
 						// eslint-disable-next-line no-case-declarations
-						let suggestAction = qServerDB.config.trello.actions.find(a => a.action === "suggest");
 						suggestAction ? suggestAction = {
+							action: "suggest",
 							part: "list",
 							id: foundList.id
 						} : qServerDB.config.trello.actions.push({
@@ -887,8 +924,96 @@ module.exports = {
 						qServerDB.save();
 						message.channel.send(string(locale, "SUGGEST_LIST_SET_SUCCESS", { list: foundList.name }, "success"), { disableMentions: "everyone" });
 						break;
+					default:
+						// eslint-disable-next-line no-case-declarations
+						let allowed = [["approve", "accept"], ["deny", "reject", "refuse"], ["delete", "remove"], ["implemented", "implement", "done"], ["consider", "considered", "consideration"], ["progress", "working"], ["nothappening", "no"], ["colorchange", "color"]];
+						// eslint-disable-next-line no-case-declarations
+						let foundAction = allowed.find(a => a.includes(args[2].toLowerCase()));
+						if (!foundAction) return message.channel.send(string(locale, "TRELLO_INVALID_ACTION_ERROR", { list: `\`${allowed.push(["suggest"]).map(a => a[0]).join("`, `")}\`` }, "error"));
+
+						if (!args[3]) {
+							let actionList = qServerDB.config.trello.actions.filter(a => a.action === foundAction[0]);
+							if (!actionList.length) return message.channel.send(`${actionPrepend[foundAction[0]]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_NONE`)}`);
+							let actionArr = [];
+							for (let a of actionList) {
+								if (a.part === "list") {
+									let l = lists.find(li => li.id === a.id);
+									if (!l) continue;
+									actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LIST`, { list: l.name })}`);
+								} else if (a.part === "label") {
+									let la = labels.find(l => l.id === a.id);
+									if (!la) continue;
+									actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LABEL`, { label: la.name })}`);
+								} else actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_${a.part.toUpperCase()}`)}`);
+							}
+							return message.channel.send(actionArr.join("\n"));
+						}
+						//Action is foundAction[0]
+						switch(args[3].toLowerCase()) {
+						case "delete":
+							// eslint-disable-next-line no-case-declarations
+							let filteredActionsDel = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							filteredActionsDel.push({
+								action: foundAction[0],
+								part: "delete"
+							});
+							qServerDB.config.trello.actions = filteredActionsDel;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_DELETE`, {}, "success"));
+						case "archive":
+							// eslint-disable-next-line no-case-declarations
+							let filteredActionsArc = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							filteredActionsArc.push({
+								action: foundAction[0],
+								part: "archive"
+							});
+							qServerDB.config.trello.actions = filteredActionsArc;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_ARCHIVE`, {}, "success"));
+						case "label":
+							// eslint-disable-next-line no-case-declarations
+							let foundLabel = findLabel(labels, args.splice(4).join(" "));
+							if (!foundLabel) return message.channel.send(string(locale, "NO_LABEL_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+							// eslint-disable-next-line no-case-declarations
+							let newLList = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0] || !["delete", "archive"].includes(a.part));
+							// eslint-disable-next-line no-case-declarations
+							let labelAction = newLList.find(a => a.action === foundAction[0] && a.part === "label");
+							labelAction ? labelAction = {
+								action: foundAction[0],
+								part: "label",
+								id: foundLabel.id
+							} : newLList.push({
+								action: foundAction[0],
+								part: "label",
+								id: foundLabel.id
+							});
+							qServerDB.config.trello.actions = newLList;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LABEL`, { label: foundLabel.name }, "success"));
+						case "list":
+							// eslint-disable-next-line no-case-declarations
+							let foundList = findList(lists, args.splice(4).join(" "));
+							if (!foundList) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+							// eslint-disable-next-line no-case-declarations
+							let newList = qServerDB.config.trello.actions.filter(a => (a.action !== foundAction[0] || !["delete", "archive"].includes(a.part)) && !(a.action === foundAction[0] && a.part === "list"));
+							// eslint-disable-next-line no-case-declarations
+							newList.push({
+								action: foundAction[0],
+								part: "list",
+								id: foundList.id
+							});
+							qServerDB.config.trello.actions = newList;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LIST`, { list: foundList.name }, "success"));
+						case "none":
+							qServerDB.config.trello.actions = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_NONE`, {}, "success"));
+						}
 					}
 					break;
+				default:
+					return message.channel.send(string(locale, "CFG_TRELLO_INVALID_PARAM", {}, "error"));
 				}
 			}
 		}];
@@ -1039,7 +1164,8 @@ module.exports = {
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
-				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n"))];
+				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "TRELLO_CONFIGURATION_TITLE")).setDescription(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"))];
 
 			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
 				const permissions = require("../../utils/permissions");
