@@ -834,7 +834,29 @@ module.exports = {
 			names: ["trello"],
 			name: "Trello",
 			description: "Settings for the Suggester Trello integration",
-			examples: "_ _",
+			examples: "`{{p}}config trello board https://trello.com/b/oCArLTyk/test`\n" +
+				"Connects a Trello board to the bot (`@suggester_bot` must be a board member on Trello)\n" +
+				"\n" +
+				"`{{p}}config trello board none`\n" +
+				"Removes the connected Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions suggest List 1` \n" +
+				"Configures that submitted suggestions should be added to list **List 1**\n" +
+				"\n" +
+				"`{{p}}config trello actions approve list List 2`\n" +
+				"Configures that approved suggestions (review mode only) are added to list **List 2**\n" +
+				"\n" +
+				"`{{p}}config trello actions implemented label Finished`\n" +
+				"Configures that suggestions marked as implemented are given label **Finished**\n" +
+				"\n" +
+				"`{{p}}config trello actions deny delete`\n" +
+				"Configures that denied suggestions are removed from the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions delete archive`\n" +
+				"Configures that deleted suggestions are archived on the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions working none`\n" +
+				"Removes any configured actions for suggestions marked as in progress",
 			cfg: async function() {
 				const t = initTrello();
 				if (!args[1]) return message.channel.send(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"));
@@ -926,7 +948,7 @@ module.exports = {
 						break;
 					default:
 						// eslint-disable-next-line no-case-declarations
-						let allowed = [["approve", "accept"], ["deny", "reject", "refuse"], ["delete", "remove"], ["implemented", "implement", "done"], ["consider", "considered", "consideration"], ["progress", "working"], ["nothappening", "no"], ["colorchange", "color"]];
+						let allowed = [["approve", "accept", "approved"], ["deny", "reject", "refuse", "denied"], ["delete", "remove", "deleted"], ["implemented", "implement", "done"], ["consider", "considered", "consideration"], ["progress", "working"], ["nothappening", "no"], ["colorchange", "color"]];
 						// eslint-disable-next-line no-case-declarations
 						let foundAction = allowed.find(a => a.includes(args[2].toLowerCase()));
 						if (!foundAction) return message.channel.send(string(locale, "TRELLO_INVALID_ACTION_ERROR", { list: `\`${allowed.push(["suggest"]).map(a => a[0]).join("`, `")}\`` }, "error"));
@@ -1006,6 +1028,7 @@ module.exports = {
 							qServerDB.save();
 							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LIST`, { list: foundList.name }, "success"));
 						case "none":
+						case "reset":
 							qServerDB.config.trello.actions = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
 							qServerDB.save();
 							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_NONE`, {}, "success"));

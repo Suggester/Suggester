@@ -4773,6 +4773,41 @@ module.exports = {
 			context: "Examples for the Suggestion Cooldown config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `admin`"
 		},
+		"CONFIG_NAME:TRELLO": {
+			string: "Trello",
+			context: "Name of the Trello config element"
+		},
+		"CONFIG_DESC:TRELLO": {
+			string: "Settings for the Suggester Trello integration",
+			context: "Description of the Trello config element"
+		},
+		"CONFIG_EXAMPLES:TRELLO": {
+			string: "`{{p}}config trello board https://trello.com/b/oCArLTyk/test`\n" +
+				"Connects a Trello board to the bot (`@suggester_bot` must be a board member on Trello)\n" +
+				"\n" +
+				"`{{p}}config trello board none`\n" +
+				"Removes the connected Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions suggest List 1` \n" +
+				"Configures that submitted suggestions should be added to list **List 1**\n" +
+				"\n" +
+				"`{{p}}config trello actions approve list List 2`\n" +
+				"Configures that approved suggestions (review mode only) are added to list **List 2**\n" +
+				"\n" +
+				"`{{p}}config trello actions implemented label Finished`\n" +
+				"Configures that suggestions marked as implemented are given label **Finished**\n" +
+				"\n" +
+				"`{{p}}config trello actions deny delete`\n" +
+				"Configures that denied suggestions are removed from the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions delete archive`\n" +
+				"Configures that deleted suggestions are archived on the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions working none`\n" +
+				"Removes any configured actions for suggestions marked as in progress",
+			context: "Examples for the Trello config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `trello`"
+		},
 		"AUTOFOLLOW_FIRST_NOTIF": {
 			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
 			context: "Notification when a user upvotes a suggestion and automatically follows it (only for the first follow)",
