@@ -94,9 +94,11 @@ const suggestion = new Schema({
 			id: { type: String, min: 1, max: 23 },
 			created: { type: Date },
 			deleted: Boolean,
+			trello_comment: String
 		}
 	],
 	attachment: String,
+	trello_attach_id: String,
 	implemented: { type: Boolean, default: false },
 	imported: String,
 	votes: {
@@ -115,7 +117,8 @@ const suggestion = new Schema({
 		submitted: Date
 	},
 	edited_by: String,
-	trello_card: String
+	trello_card: String,
+	color_change_trello_action: { type: Boolean, default: false }
 });
 
 const user = new Schema({

@@ -951,7 +951,8 @@ module.exports = {
 						let allowed = [["approve", "accept", "approved"], ["deny", "reject", "refuse", "denied"], ["delete", "remove", "deleted"], ["implemented", "implement", "done"], ["consider", "considered", "consideration"], ["progress", "working"], ["nothappening", "no"], ["colorchange", "color"]];
 						// eslint-disable-next-line no-case-declarations
 						let foundAction = allowed.find(a => a.includes(args[2].toLowerCase()));
-						if (!foundAction) return message.channel.send(string(locale, "TRELLO_INVALID_ACTION_ERROR", { list: `\`${allowed.push(["suggest"]).map(a => a[0]).join("`, `")}\`` }, "error"));
+						allowed.push(["suggest"]);
+						if (!foundAction) return message.channel.send(string(locale, "TRELLO_INVALID_ACTION_ERROR", { list: `\`${allowed.map(a => a[0]).join("`, `")}\`` }, "error"));
 
 						if (!args[3]) {
 							let actionList = qServerDB.config.trello.actions.filter(a => a.action === foundAction[0]);

@@ -5,6 +5,7 @@ const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/check
 const { string } = require("../../utils/strings");
 const { deleteFeedMessage } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "silentdelete",
@@ -71,5 +72,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("delete", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DELETED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 	}
 };

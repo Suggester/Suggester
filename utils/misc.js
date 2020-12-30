@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const { promises } = require("fs");
 const { resolve } = require("path");
 const { string } = require("./strings");
+const { actCard } = require("./trello");
 
 module.exports = {
 	permLevelToRole: (locale, permLevel) => {
@@ -70,7 +71,14 @@ module.exports = {
 		default: {
 			embed.setColor(client.colors.default);
 			// Check for Color Change Threshold, Modify Color if Met
-			if (votes[2] >= server.config.reactionOptions.color_threshold) embed.setColor(server.config.reactionOptions.color);
+			if (votes[2] >= server.config.reactionOptions.color_threshold) {
+				if (!suggestion.color_change_trello_action) {
+					await actCard("colorchange", server, suggestion, suggester);
+					suggestion.color_change_trello_action = true;
+					await suggestion.save();
+				}
+				embed.setColor(server.config.reactionOptions.color);
+			}
 		}
 		}
 		// Comments

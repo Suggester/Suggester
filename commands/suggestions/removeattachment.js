@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "removeattachment",
@@ -45,6 +46,14 @@ module.exports = {
 				.setImage(oldAttachment);
 
 			serverLog(embedLog, qServerDB, client);
+		}
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && qSuggestionDB.trello_attach_id) {
+			const t = initTrello();
+			t.makeRequest("delete", `/1/cards/${qSuggestionDB.trello_card}/attachments/${qSuggestionDB.trello_attach_id}`).then(() => {
+				qSuggestionDB.trello_attach_id = "";
+				qSuggestionDB.save();
+			}).catch(() => null);
 		}
 	}
 };

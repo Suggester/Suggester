@@ -4,6 +4,7 @@ const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
 const { string } = require("../../utils/strings");
 const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "silentdeny",
@@ -87,5 +88,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("deny", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DENIED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 	}
 };

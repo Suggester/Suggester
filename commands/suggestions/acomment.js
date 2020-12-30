@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "acomment",
@@ -30,11 +31,13 @@ module.exports = {
 
 		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
+		let trello_comment = await trelloComment(qServerDB, {}, qSuggestionDB, comment);
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: 0,
 			id: qSuggestionDB.comments.length+1,
-			created: new Date()
+			created: new Date(),
+			trello_comment
 		});
 
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);

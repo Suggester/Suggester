@@ -5,6 +5,7 @@ const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
 const { fetchUser, logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "editcomment",
@@ -26,6 +27,7 @@ module.exports = {
 		let idsections = args[0].split("_");
 		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
+		console.log(qSuggestionDB)
 		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
@@ -58,6 +60,11 @@ module.exports = {
 			.setColor(client.colors.blue)
 			.setTimestamp();
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && comment.trello_comment) {
+			const t = initTrello();
+			t.makeRequest("put", `/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`, { text: `**${string(qServerDB.config.locale, author ? "COMMENT_TITLE" : "COMMENT_TITLE_ANONYMOUS", { user: author.tag, id: author.id })}**\n${newContent}` }).catch(() => null);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "EDITED_COMMENT_LOG", "blue")

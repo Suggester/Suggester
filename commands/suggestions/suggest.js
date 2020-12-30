@@ -143,7 +143,10 @@ module.exports = {
 				if (c) {
 					qSuggestionDB.trello_card = c.id;
 					qSuggestionDB.save();
-					if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).catch(() => null);
+					if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).then(a => {
+						qSuggestionDB.trello_attach_id = a.id;
+						qSuggestionDB.save();
+					}).catch(() => null);
 				}
 			}
 		} else if (qServerDB.config.mode === "autoapprove") {
@@ -204,7 +207,10 @@ module.exports = {
 						}), qServerDB.config.trello.actions.find(a => a.action === "suggest").id).catch(() => null);
 						if (c) {
 							qSuggestionDB.trello_card = c.id;
-							if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).catch(() => null);
+							if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).then(a => {
+								qSuggestionDB.trello_attach_id = a.id;
+								qSuggestionDB.save();
+							}).catch(() => null);
 							t.addAttachmentToCard(c.id, `https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId}`).catch(() => null);
 						}
 					}

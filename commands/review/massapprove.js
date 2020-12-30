@@ -5,6 +5,7 @@ const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { Suggestion } = require("../../utils/schemas");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard, trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "massapprove",
@@ -58,12 +59,6 @@ module.exports = {
 			status: "approved",
 			staff_member: message.author.id
 		};
-		if (reason) newSet["comments"] = [{
-			comment: reason,
-			author: message.author.id,
-			id: 1,
-			created: new Date()
-		}];
 
 		let { nModified } = await Suggestion.update({
 			suggestionId: { $in: su },
@@ -136,6 +131,17 @@ module.exports = {
 
 					if (qServerDB.config.approved_role && message.guild.roles.cache.get(qServerDB.config.approved_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.approved_role, string(locale, "SUGGESTION_APPROVED_TITLE"));
 
+					if (reason) {
+						let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, reason);
+						qSuggestionDB.comments.push({
+							comment: reason,
+							author: message.author.id,
+							id: 1,
+							created: new Date(),
+							trello_comment
+						});
+					}
+
 					if (qServerDB.config.channels.log) {
 						let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "APPROVED_LOG", "green")
 							.setDescription(qSuggestionDB.suggestion || string(guildLocale, "NO_SUGGESTION_CONTENT"));
@@ -150,6 +156,8 @@ module.exports = {
 
 						serverLog(embedLog, qServerDB, client);
 					}
+
+					await actCard("approve", qServerDB, qSuggestionDB, suggester, string(guildLocale, "APPROVED_BY", { user: message.author.tag }));
 
 					if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
 						let doReview = true;

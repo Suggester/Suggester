@@ -5,6 +5,7 @@ const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard, trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "approve",
@@ -139,6 +140,8 @@ module.exports = {
 
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		await actCard("approve", qServerDB, qSuggestionDB, suggester, string(guildLocale, "APPROVED_BY", { user: message.author.tag }));
 
 		return { protip: { command: "approve", not: [comment ? "approve_reason" : null] } };
 	}

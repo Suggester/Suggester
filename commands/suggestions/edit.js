@@ -5,7 +5,7 @@ const { checkPermissions, checkSuggestions, checkConfig, checkReview, checkSugge
 const { serverLog, } = require("../../utils/logs");
 const { cleanCommand, editFeedMessage, notifyFollowers } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
-
+const { initTrello } = require("../../utils/trello");
 
 module.exports = {
 	controls: {
@@ -67,6 +67,11 @@ module.exports = {
 				serverLog(embedLog, qServerDB, client);
 			}
 
+			if (qServerDB.config.trello.board && qSuggestionDB.trello_card) {
+				const t = initTrello();
+				t.updateCardName(qSuggestionDB.trello_card, newSuggestion).catch(() => {});
+			}
+
 			return message.channel.send(string(locale, message.author.id === suggester.id ? "SUGGESTION_UPDATED_SELF" : "SUGGESTION_UPDATED_NOT_SELF"), new Discord.MessageEmbed().setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({dynamic: true, format: "png"})).setColor(client.colors.yellow).setDescription(newSuggestion).setFooter(string(locale, "SUGGESTION_FOOTER", { id: qSuggestionDB.suggestionId.toString() })).setTimestamp(qSuggestionDB.submitted)).then(sent => cleanCommand(message, sent, qServerDB));
 		} else {
 			//Suggestion has been approved
@@ -115,6 +120,11 @@ module.exports = {
 						.setDescription(newSuggestion);
 
 					serverLog(embedLog, qServerDB, client);
+				}
+
+				if (qServerDB.config.trello.board && qSuggestionDB.trello_card) {
+					const t = initTrello();
+					t.updateCardName(qSuggestionDB.trello_card, newSuggestion).catch(() => {});
 				}
 				return message.channel.send(string(locale, message.author.id === suggester.id ? "SUGGESTION_UPDATED_SELF" : "SUGGESTION_UPDATED_NOT_SELF"), new Discord.MessageEmbed().setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({dynamic: true, format: "png"})).setColor(client.colors.blue).setDescription(newSuggestion).setFooter(string(locale, "SUGGESTION_FOOTER", { id: qSuggestionDB.suggestionId.toString() })).setTimestamp(qSuggestionDB.submitted)).then(sent => cleanCommand(message, sent, qServerDB));
 			}

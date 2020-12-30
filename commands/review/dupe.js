@@ -5,6 +5,7 @@ const { notifyFollowers } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "dupe",
@@ -125,5 +126,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("deny", qServerDB, dupeSuggestion, suggester, `${string(guildLocale, "DENIED_BY", { user: message.author.tag })}${dupeSuggestion.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${dupeSuggestion.denial_reason}` : ""}`);
 	}
 };

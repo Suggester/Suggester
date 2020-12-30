@@ -5,6 +5,7 @@ const { Suggestion } = require("../../utils/schemas");
 const { checkDenied, baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "massdelete",
@@ -111,6 +112,8 @@ module.exports = {
 					}
 					serverLog(logs, qServerDB, client);
 				}
+
+				await actCard("delete", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DELETED_BY", { user: message.author.tag })}${reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${reason}` : ""}`);
 
 				if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
 					let doReview = true;

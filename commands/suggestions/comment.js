@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "comment",
@@ -30,17 +31,18 @@ module.exports = {
 
 		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let commentId = qSuggestionDB.comments.length+1;
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
+		let commentId = qSuggestionDB.comments.length+1;
+		let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, comment);
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: message.author.id,
 			id: commentId,
-			created: new Date()
+			created: new Date(),
+			trello_comment
 		});
-
-		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
@@ -66,7 +68,6 @@ module.exports = {
 			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
 			return e;
 		});
-
 		return { protip: { command: "comment" } };
 	}
 };

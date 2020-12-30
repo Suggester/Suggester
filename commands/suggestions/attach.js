@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "attach",
@@ -57,6 +58,14 @@ module.exports = {
 				.addField(string(guildLocale, "ATTACHMENT_ADDED_HEADER"), attachment)
 				.setImage(attachment);
 			serverLog(embedLog, qServerDB, client);
+		}
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card) {
+			const t = initTrello();
+			await t.addAttachmentToCard(qSuggestionDB.trello_card, attachment).then(a => {
+				qSuggestionDB.trello_attach_id = a.id;
+				qSuggestionDB.save();
+			}).catch(() => null);
 		}
 	}
 };

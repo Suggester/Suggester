@@ -5,6 +5,7 @@ const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
 const { fetchUser, logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "deletecomment",
@@ -55,6 +56,13 @@ module.exports = {
 			.setColor(client.colors.red)
 			.setTimestamp();
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
+
+		console.log(comment);
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && comment.trello_comment) {
+			const t = initTrello();
+			console.log(`/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`)
+			t.makeRequest("delete", `/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`).catch(() => null);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")

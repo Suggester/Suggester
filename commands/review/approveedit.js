@@ -5,6 +5,7 @@ const { dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers, editFeedMessage } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "approveedit",
@@ -67,6 +68,11 @@ module.exports = {
 		qSuggestionDB.suggestion = qSuggestionDB.pending_edit.content;
 		qSuggestionDB.pending_edit = {};
 		await qSuggestionDB.save();
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card) {
+			const t = initTrello();
+			t.updateCardName(qSuggestionDB.trello_card, qSuggestionDB.suggestion).catch(() => {});
+		}
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
