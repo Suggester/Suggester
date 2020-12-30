@@ -60,7 +60,7 @@ module.exports = {
 		console.log(comment);
 		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && comment.trello_comment) {
 			const t = initTrello();
-			console.log(`/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`)
+			console.log(`/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`);
 			t.makeRequest("delete", `/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`).catch(() => null);
 		}
 

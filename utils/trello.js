@@ -59,7 +59,7 @@ module.exports = {
 		}
 		if (suggestion.trello_card && comment) t.addCommentToCard(suggestion.trello_card, comment).catch(() => {});
 	},
-	trelloComment: async function (db, user, suggestion, comment, id) {
+	trelloComment: async function (db, user, suggestion, comment) {
 		if (!db.config.trello.board || !suggestion.trello_card) return;
 		const t = module.exports.initTrello();
 		return t.addCommentToCard(suggestion.trello_card, `**${string(db.config.locale, user.id ? "COMMENT_TITLE" : "COMMENT_TITLE_ANONYMOUS", { user: user.tag, id: user.id })}**\n${comment}`).then(c => {

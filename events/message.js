@@ -4,6 +4,7 @@ const { commandLog, errorLog, commandExecuted } = require("../utils/logs");
 const { protip } = require("../utils/tip");
 const { prefix, log_hooks, support_invite, staff_alert_role } = require("../config.json");
 const { string } = require("../utils/strings");
+const { cleanCommand } = require("../utils/actions");
 const { Collection } = require("discord.js");
 function escapeRegExp(string) {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -124,14 +125,7 @@ module.exports = async (Discord, client, message) => {
 
 			if (expires > now) {
 				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`).then(m => {
-					if (noCommand) {
-						setTimeout(function() {
-							message.delete();
-							m.delete();
-						}, 7500);
-					}
-				});
+				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 			}
 		}
 

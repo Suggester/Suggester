@@ -27,7 +27,6 @@ module.exports = {
 		let idsections = args[0].split("_");
 		if (idsections.length < 2) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		let qSuggestionDB = await dbQueryNoNew("Suggestion", {suggestionId: idsections[0], id: message.guild.id});
-		console.log(qSuggestionDB)
 		if (!qSuggestionDB) return message.channel.send(string(locale, "NO_COMMENT_ID_SPECIFIED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);

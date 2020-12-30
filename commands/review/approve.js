@@ -49,11 +49,13 @@ module.exports = {
 		if (isComment) {
 			comment = args.splice(1).join(" ");
 			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+			let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, comment);
 			qSuggestionDB.comments = [{
 				comment: comment,
 				author: message.author.id,
 				id: 1,
-				created: new Date()
+				created: new Date(),
+				trello_comment
 			}];
 		}
 
