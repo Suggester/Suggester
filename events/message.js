@@ -117,7 +117,7 @@ module.exports = async (Discord, client, message) => {
 					}
 				});
 
-				commandLog(`--- Cooldown Breach Lookup ${message.author.id} ---`);
+				commandLog(`--- Cooldown Breach Lookup ${message.author.id} ---`, message);
 				let hook = new Discord.WebhookClient(log_hooks.staff_alert.id, log_hooks.staff_alert.token);
 				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\nCommand logs can be found by searching \`Cooldown Breach Lookup ${message.author.id}\`\n(${staff_alert_role ? `<@&${staff_alert_role}>` : "@everyone"})`, {disableMentions: "none"});
 			}
