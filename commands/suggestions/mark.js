@@ -32,11 +32,12 @@ module.exports = {
 				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), string(guildLocale, "STATUS_IMPLEMENTED"), client.colors.green];
 			case "working":
 			case "progress":
-			case "in":
+			case "inprogress":
 				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), client.colors.orange];
 			case "consideration":
 			case "consider":
 			case "considered":
+			case "inconsideration":
 				return [["consideration"], string(locale, "STATUS_CONSIDERATION"), string(guildLocale, "STATUS_CONSIDERATION"), client.colors.teal];
 			case "no":
 			case "not":
