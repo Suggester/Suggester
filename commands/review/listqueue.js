@@ -22,11 +22,14 @@ module.exports = {
 
 		let listarray = [];
 		let queuedSuggestions = await dbQueryAll("Suggestion", { status: "awaiting_review", id: message.guild.id });
+		let num = 1;
 		queuedSuggestions.forEach(suggestion => {
 			listarray.push({
 				"fieldTitle": `${string(locale, "SUGGESTION_HEADER")} #${suggestion.suggestionId.toString()}`,
-				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${suggestion.id}/${suggestion.channels.staff || qServerDB.config.channels.staff}/${suggestion.reviewMessage})`
+				"fieldDescription": `[${string(locale, "QUEUE_POST_LINK")}](https://discord.com/channels/${suggestion.id}/${suggestion.channels.staff || qServerDB.config.channels.staff}/${suggestion.reviewMessage})`,
+				num
 			});
+			num++;
 		});
 		if (!listarray[0]) return message.channel.send(string(locale, "NONE_AWAITING_REVIEW", {}, "success"));
 
@@ -35,7 +38,7 @@ module.exports = {
 		for await (let chunk of chunks) {
 			let embed = new Discord.MessageEmbed()
 				.setColor(client.colors.yellow)
-				.setTitle(string(locale, "PENDING_REVIEW_HEADER"));
+				.setTitle(string(locale, "PENDING_REVIEW_HEADER_NUM", { min: chunk[0].num, max: chunk[chunk.length-1].num, total: listarray.length }));
 			chunk.forEach(smallchunk => {
 				embed.addField(smallchunk.fieldTitle, smallchunk.fieldDescription);
 			});

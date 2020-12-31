@@ -2464,9 +2464,23 @@ module.exports = {
 			string: "There are no suggestions awaiting review!",
 			context: "Shown when the queue is empty in the listqueue command"
 		},
-		"PENDING_REVIEW_HEADER": {
-			string: "Suggestions Pending Review",
-			context: "Header for the listqueue embed"
+		"PENDING_REVIEW_HEADER_NUM": {
+			string: "Suggestions Pending Review (showing {{min}}-{{max}} of {{total}})",
+			context: "Header for the listqueue embed",
+			replaced: {
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				},
+				total: {
+					to_replace: "{{total}}",
+					context: "The total number of suggestions awaiting review"
+				},
+			}
 		},
 		"STATUS_ALREADY_SET_ERROR": {
 			string: "This suggestion already has a status of **{{status}}**",
