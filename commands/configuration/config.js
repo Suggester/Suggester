@@ -1213,7 +1213,7 @@ module.exports = {
 				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "TRELLO_CONFIGURATION_TITLE")).setDescription(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"))];
 
-			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
+			if (["--flags", "-flags"].some(e => e === args[args.length-1].toLowerCase()) && permission <= 1) {
 				const permissions = require("../../utils/permissions");
 				let hasPermissionList = [];
 				Object.keys(permissions).forEach(perm => {
