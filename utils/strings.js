@@ -5240,17 +5240,17 @@ module.exports = {
 			context: "Examples for the denyedit command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:SHORTINFO": {
+		"COMMAND_DESC:SINFO": {
 			string: "Shows information about a suggestion in a concise manner",
 			context: "Description for the shortinfo command"
 		},
-		"COMMAND_USAGE:SHORTINFO": {
+		"COMMAND_USAGE:SINFO": {
 			string: "shortinfo [suggestion id]",
 			context: "Usage for the shortinfo command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:SHORTINFO": {
-			string: "`{{p}}shortinfo 1`\nShows information about suggestion #1",
+		"COMMAND_EXAMPLES:SINFO": {
+			string: "`{{p}}shortinfo 1`\nShows information about suggestion #1\n\n`{{p}}shortinfo 1 -trim-suggest`\nShows information about suggestion #1 limiting the suggestion content to 250 characters\n\n`{{p}}shortinfo 1 -no-attach`\nShows information about suggestion #1 without showing the added attachment",
 			context: "Examples for the shortinfo command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
