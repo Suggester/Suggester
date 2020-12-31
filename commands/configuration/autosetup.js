@@ -11,7 +11,8 @@ module.exports = {
 		description: "Automatically sets up channels and configures the bot",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "MANAGE_CHANNELS"],
-		cooldown: 60
+		cooldown: 60,
+		docs: "admin/autosetup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		if ((

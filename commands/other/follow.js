@@ -14,7 +14,8 @@ module.exports = {
 		examples: "`{{p}}follow 123`\nFollows suggestion #123\n\n`{{p}}follow list`\nLists the suggestions you are following\n\n`{{p}}follow auto on`\nEnables following suggestions when you upvote them\n\n`{{p}}follow auto off`\nDisables following suggestions when you upvote them\n\n`{{p}}follow auto toggle`\nToggles following suggestions when you upvote them",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "following/follow"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		const qServerDB = message.guild ? await message.guild.db : null;

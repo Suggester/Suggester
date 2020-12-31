@@ -15,7 +15,8 @@ module.exports = {
 		examples: "`{{p}}denyedit 1`\nDenies a pending edit on suggestion #123",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "editing/denyedit"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

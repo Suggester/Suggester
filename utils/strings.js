@@ -574,6 +574,10 @@ module.exports = {
 			string: "Aliases",
 			context: "Aliases field name in help command"
 		},
+		"HELP_DOCS": {
+			string: "Documenation",
+			context: "Documenation field name in help command"
+		},
 		"COMMAND_DISABLED": {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"

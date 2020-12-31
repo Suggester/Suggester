@@ -16,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}removeattachment 1`\nRemoves the attachment from suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/removeattachment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);

@@ -17,7 +17,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}massdeny 1 2 3`\nDenies suggestions 1, 2, and 3\n\n`{{p}}massdeny 1 2 3 -r This isn't something we're interested in doing`\nDenies suggestions 1, 2, and 3 with a reason of \"This isn't something we're interested in doing\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "staff/massdeny"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

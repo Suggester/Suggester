@@ -15,7 +15,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}silentdeny 1`\nSilently denies suggestion #1\n\n`{{p}}silentdeny 1 This isn't something we're interested in`\nSilently denies suggestion #1 with the reason \"This isn't something we're interested in\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/silentdeny"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

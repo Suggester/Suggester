@@ -12,7 +12,8 @@ module.exports = {
 		examples: "`{{p}}notify`\nShows your DM notification setting\n\n`{{p}}notify on`\nEnables DM notifications for suggestion changes\n\n`{{p}}notify off`\nDisables DM notifications for suggestion changes\n\n`{{p}}notify toggle`\nToggles DM notifications for suggestion changes",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args) => {
 		const qServerDB = message.guild ? await message.guild.db : null;

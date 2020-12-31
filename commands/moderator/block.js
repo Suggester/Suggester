@@ -16,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}block @Brightness™`\nBlocks Brightness™ from using the bot in this server\n\n`{{p}}block 255834596766253057 Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for \"Spamming suggestions\"\n\n`{{p}}block @Brightness™ 1h`\nBlocks Brightness™ from using the bot in this server for 1 hour\n\n`{{p}}block 255834596766253057 2h Spamming suggestions`\nBlocks a user with ID 255834596766253057 from using the bot in this server for 2 hours with reason \"Spamming suggestions\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS", "ADD_REACTIONS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/block"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

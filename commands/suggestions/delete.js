@@ -16,7 +16,8 @@ module.exports = {
 		examples: "`{{p}}delete 1`\nDeletes suggestion #1\n\n`{{p}}delete 1 This has already been suggested`\nDeletes suggestion #1 with the reason \"This has already been suggested\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!"
+		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!",
+		docs: "staff/delete"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);

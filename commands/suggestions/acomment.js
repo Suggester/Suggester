@@ -16,7 +16,8 @@ module.exports = {
 		examples: "`{{p}}acomment 1 This is a comment`\nAnonymously comments on suggestion #1 with \"This is a comment\"",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/acomment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);

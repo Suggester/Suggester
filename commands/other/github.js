@@ -9,7 +9,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: (locale, message) => {
 		return message.channel.send(string(locale, "GITHUB_REPO", { link: "https://github.com/Suggester/Suggester" }));

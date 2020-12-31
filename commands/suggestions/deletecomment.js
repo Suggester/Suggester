@@ -16,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}deletecomment 27_1`\nDeletes a comment with the ID `27_1`",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/deletecomment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

@@ -22,7 +22,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}suggest This is a suggestion`\nSubmits a suggestion\n\nYou can also attach images to your suggestion by uploading an image when you send the command",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });

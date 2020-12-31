@@ -18,7 +18,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
+		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!",
+		docs: "staff/approve"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

@@ -17,7 +17,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}edit 1234 This is an edit suggestion`\nEdits suggestion #1234 to have the content of \"This is an edit suggestion\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "editing/suggestion-editing"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });

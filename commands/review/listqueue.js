@@ -12,7 +12,8 @@ module.exports = {
 		image: "images/Listqueue.gif",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
-		cooldown: 25
+		cooldown: 25,
+		docs: "staff/listqueue"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

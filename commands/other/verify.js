@@ -12,7 +12,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		examples: "`{{p}}verify`\nShows information about you\n\n`{{p}}verify @Brightness™`\nShows Brightness™'s information",
-		cooldown: 10
+		cooldown: 10,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let user = await fetchUser(args[0] ? args[0] : message.author.id, client);

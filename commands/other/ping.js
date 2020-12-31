@@ -13,7 +13,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let developerArray = [];

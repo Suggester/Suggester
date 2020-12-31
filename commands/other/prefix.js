@@ -10,7 +10,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let serverPrefix = prefix;

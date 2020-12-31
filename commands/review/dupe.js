@@ -16,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}dupe 1 2`\nDenies suggestion #1 as a duplicate of suggestion #2",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/dupe"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

@@ -17,7 +17,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}massdelete 1 2 3`\nDeletes suggestions 1, 2, and 3\n\n`{{p}}massdelete 1 2 3 -r Cleaning up suggestions`\nDeletes suggestions 1, 2, and 3 with a reason of \"Cleaning up suggestions\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "staff/massdelete"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

@@ -9,7 +9,8 @@ module.exports = {
 		description: "Shows information about setting up the bot and using it",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let qServerDB = await message.guild.db;

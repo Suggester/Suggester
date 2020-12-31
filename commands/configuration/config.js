@@ -20,7 +20,8 @@ module.exports = {
 		enabled: true,
 		examples: "Use `{{p}}config help` to view detailed instructions",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "READ_MESSAGE_HISTORY"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "admin/config"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let server;

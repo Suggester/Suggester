@@ -16,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}attach 1 https://i.imgur.com/zmntNve.png`\nAttaches https://i.imgur.com/zmntNve.png to suggestion #1\n\n`{{p}}attach 1`\nIf you attach an image via Discord's native uploader, it will be added to suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ATTACH_FILES"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/attach"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
