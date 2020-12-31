@@ -8,6 +8,7 @@ module.exports = {
 	},
 	findList: function(lists, name) {
 		if (!name) return null;
+		if (!lists.length) return null;
 		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(name.toLowerCase(), lists.map(l => l.name.toLowerCase()));
 
 		if (rating < .3) return null;
@@ -16,6 +17,7 @@ module.exports = {
 	findLabel: function(labels, name) {
 		if (!name) return null;
 		labels = labels.filter(l => l.name);
+		if (!labels.length) return null;
 		let { bestMatchIndex, bestMatch: { rating } } = findBestMatch(name.toLowerCase(), labels.filter(l => l.name).map(l => l.name.toLowerCase()));
 		if (rating < .3) return null;
 		return labels[bestMatchIndex];
