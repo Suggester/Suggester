@@ -155,6 +155,7 @@ module.exports = {
 			name: "Admin Roles",
 			description: "Roles that are allowed to edit server configuration, as well as use all staff commands. (Members with the **Manage Server** permission also have access to these commands)",
 			examples: "`{{p}}config admin add Owner`\nAdds the \"Owner\" role as an admin role\n\n`{{p}}config admin add @Management`\nAdds the mentioned \"Management\" role as an admin role\n\n`{{p}}config admin add 658753146910408724`\nAdds a role with ID 658753146910408724 as an admin role\n\n`{{p}}config admin remove Owner`\nRemoves the \"Owner\" role from the list of admin roles",
+			docs: "adminroles",
 			cfg: async function() {
 
 				switch (args[1]) {
@@ -196,6 +197,7 @@ module.exports = {
 			name: "Staff Roles",
 			description: "Roles that have access to suggestion management commands like `approve`, `deny`, `comment`, and `mark`.",
 			examples: "`{{p}}config staff add Staff`\nAdds the \"Staff\" role as a staff role\n\n`{{p}}config staff add @Moderator`\nAdds the mentioned \"Moderator\" role as a staff role\n\n`{{p}}config staff add 658753146910408724`\nAdds a role with ID 658753146910408724 as a staff role\n\n`{{p}}config staff remove Moderator`\nRemoves the \"Moderator\" role from the list of staff roles",
+			docs: "staffroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -239,6 +241,7 @@ module.exports = {
 			name: "Allowed Suggesting Roles",
 			description: "Roles that are allowed to submit suggestions. If no roles are configured, all users can submit suggestions.",
 			examples: "`{{p}}config allowed add Trusted`\nAdds the \"Trusted\" role to the list of allowed roles\n\n`{{p}}config allowed add @Cool Person`\nAdds the mentioned \"Cool Person\" role as an allowed role\n\n`{{p}}config allowed add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of allowed roles\n\n`{{p}}config allowed remove Trusted`\nRemoves the \"Trusted\" role from the list of allowed roles",
+			docs: "allowedroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -266,6 +269,7 @@ module.exports = {
 			name: "Voting Roles",
 			description: "Roles that are allowed to vote on suggestions in the approved suggestion feed. If no roles are configured, all users can vote on suggestions.",
 			examples: "`{{p}}config voting add Trusted`\nAdds the \"Trusted\" role to the list of allowed voting roles\n\n`{{p}}config voting add @Cool Person`\nAdds the mentioned \"Cool Person\" role as an allowed voting role\n\n`{{p}}config voting add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of allowed voting roles\n\n`{{p}}config voting remove Trusted`\nRemoves the \"Trusted\" role from the list of allowed voting roles",
+			docs: "voting",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -293,6 +297,7 @@ module.exports = {
 			name: "Blocked Roles",
 			description: "Roles that are blocked from using the bot on this server. If you want to block one specific user, use the `block` command.",
 			examples: "`{{p}}config blocked add Restricted`\nAdds the \"Restricted\" role to the list of blocked roles\n\n`{{p}}config blocked add @Bad Person`\nAdds the mentioned \"Bad Person\" role as a blocked role\n\n`{{p}}config blocked add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of blocked roles\n\n`{{p}}config blocked remove Annoying`\nRemoves the \"Annoying\" role from the list of blocked roles, allowing members with that role to use the bot again",
+			docs: "blockedroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -320,6 +325,7 @@ module.exports = {
 			name: "Approved Suggestion Role",
 			description: "The role that is given to members that have a suggestion approved.",
 			examples: "`{{p}}config approverole Suggestion Submitter`\nSets the \"Suggestion Submitter\" as the role given when a member has their suggestion approved\n\n`{{p}}config approverole none`\nResets the role given when a member has their suggestion approved, meaning no role will be given",
+			docs: "approverole",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.approved_role, server, "CONFIG_NAME:APPROVEROLE", false)));
 				let input = args.splice(1).join(" ");
@@ -343,6 +349,7 @@ module.exports = {
 			name: "Implemented Suggestion Role",
 			description: "The role that is given to members that have a suggestion marked as implemented.",
 			examples: "`{{p}}config implementedrole Implemented Suggester`\nSets the \"Implemented Suggester\" as the role given when a member has their suggestion marked as implemented\n\n`{{p}}config implementedrole none`\nResets the role given when a member has their suggestion marked as implemented, meaning no role will be given",
+			docs: "implementedrole",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
 				let input = args.splice(1).join(" ");
@@ -366,6 +373,7 @@ module.exports = {
 			name: "Suggestion Submitted Mention Role",
 			description: "The role that is mentioned when a new suggestion is submitted for review.",
 			examples: "`{{p}}config reviewping Staff`\nSets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config reviewping none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			docs: "pingrole",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
 				let input = args.splice(1).join(" ");
@@ -410,6 +418,7 @@ module.exports = {
 			name: "Suggestion Review Channel",
 			description: "The channel where suggestions are sent once they are submitted for review.",
 			examples: "`{{p}}config review #suggestions-review`\nSets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			docs: "review",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, server, "CONFIG_NAME:REVIEW", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string(locale, "CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
@@ -420,6 +429,7 @@ module.exports = {
 			name: "Approved Suggestions Channel",
 			description: "The channel where suggestions are sent once they are approved (or submitted when the mode is set to `autoapprove`).",
 			examples: "`{{p}}config suggestions #suggestions`\nSets the #suggestions channel as the channel where approved suggestions are sent",
+			docs: "suggestions",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.suggestions, server, "CONFIG_NAME:SUGGESTIONS", true))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
@@ -430,6 +440,7 @@ module.exports = {
 			name: "Denied Suggestions Channel",
 			description: "The channel where suggestions are sent when they are denied or deleted.",
 			examples: "`{{p}}config denied #denied-suggestions`\nSets the #denied-suggestions channel as the channel where denied or deleted suggestions are sent\n\n`{{p}}config denied none`\nResets the denied suggestions channel, making there be none set",
+			docs: "denied",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.denied, server, "CONFIG_NAME:DENIED", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "denied", "denied", "CFG_DENIED_SET_SUCCESS", "CFG_DENIED_RESET_SUCCESS")));
@@ -440,6 +451,7 @@ module.exports = {
 			name: "Log Channel",
 			description: "The channel where suggestions submitted and actions taken on them are logged.",
 			examples: "`{{p}}config log #suggestion-log`\nSets the #suggestion-log channel as log channel for suggestions and actions taken on them\n\n`{{p}}config log none`\nResets the log channel, making there be none set",
+			docs: "logs",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.log, server, "CONFIG_NAME:LOG", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "log", "log", "CFG_LOG_SET_SUCCESS", "CFG_LOG_RESET_SUCCESS")));
@@ -450,6 +462,7 @@ module.exports = {
 			name: "Suggestion Commands Channels",
 			description: "This setting locks using the `suggest` command to only the configured channels. Configuring no channels will allow the command to be used in any channel.",
 			examples: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels",
+			docs: "commands",
 			cfg: async function() {
 				switch (args[1] || "") {
 				case "add":
@@ -477,6 +490,7 @@ module.exports = {
 			name: "Implemented Suggestions Archive Channel",
 			description: "The channel where suggestions marked as \"Implemented\" via the `mark` command are sent. If no channel is configured, implemented suggestions will remain in the suggestions feed",
 			examples: "`{{p}}config implemented #implemented-suggestions`\nSets the #implemented-suggestions channel as the channel where implemented suggestions are sent\n\n`{{p}}config implemented none`\nResets the implemented suggestions archive channel, making there be none set",
+			docs: "implemented",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.archive, server, "CONFIG_NAME:IMPLEMENTED", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
@@ -487,6 +501,7 @@ module.exports = {
 			name: "Prefix",
 			description: "The string of characters (usually a symbol) used to invoke a bot command. For example, in `.vote` the prefix is `.`",
 			examples: "`{{p}}config prefix ?`\nSets the bot prefix to `?`",
+			docs: "prefix",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:PREFIX", {}, "success")} ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 				let prefix = args[1];
@@ -503,6 +518,7 @@ module.exports = {
 			name: "Mode",
 			description: "The mode of handling suggestions. This can be `review` (all suggestions are held for manual review by staff) or `autoapprove` (all suggestions are automatically posted to the suggestions feed)",
 			examples: "`{{p}}config mode review`\nSets the mode to `review`\n\n`{{p}}config mode autoapprove`\nSets the mode to `autoapprove`",
+			docs: "mode",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:MODE", {}, "success")} ${qServerDB.config.mode}`);
 				switch (args[1].toLowerCase()) {
@@ -529,6 +545,7 @@ module.exports = {
 			name: "Suggestion Feed Reactions",
 			description: "Settings for managing the emojis that are added to suggestions posted to the suggestions feed",
 			examples: "`{{p}}config emojis up 👍`\nSets the upvote emoji to 👍\n\n`{{p}}config emojis mid 🤷`\nSets the shrug/no opinion emoji to 🤷\n\n`{{p}}config emojis down 👎`\nSets the downvote emoji to 👎\n\n`{{p}}config emojis up disable`\nDisables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n\n`{{p}}config emojis disable`\nDisables all suggestion feed reactions\n\n`{{p}}config emojis enable`\nEnables suggestion feed reactions if they are disabled",
+			docs: "emojis",
 			cfg: async function() {
 				if (!args[1]) {
 					let reactEmbed = new Discord.MessageEmbed()
@@ -587,6 +604,7 @@ module.exports = {
 			name: "DM Notifications",
 			description: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
 			examples: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
+			docs: "notify",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -620,6 +638,7 @@ module.exports = {
 			name: "Automatic Following",
 			description: "This setting controls whether or not users will follow suggestions upon upvoting them, meaning they will receive a DM when the suggestion is updated",
 			examples: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
+			docs: "autofollowing",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.auto_subscribe ? "GUILD_AUTOFOLLOW_ENABLED" : "GUILD_AUTOFOLLOW_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -653,6 +672,7 @@ module.exports = {
 			name: "Clean Commands",
 			description: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
 			examples: "`{{p}}config cleancommands on`\nEnables cleaning of commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of commands",
+			docs: "cleancommands",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAR_COMMANDS_ENABLED" : "CFG_CLEAR_COMMANDS_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -688,6 +708,7 @@ module.exports = {
 			name: "Voting on Own Suggestions",
 			description: "This setting controls whether or not the user who made a suggestion can vote on their own suggestion when it has been approved.",
 			examples: "`{{p}}config selfvote on`\nAllows suggestion authors to vote on their own suggestions\n\n`{{p}}config selfvote off`\nPrevents suggestion authors from voting on their own suggestions",
+			docs: "selfvote",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -721,6 +742,7 @@ module.exports = {
 			name: "Multiple Reaction Voting",
 			description: "This setting controls whether or not users can choose multiple voting options on a suggestion (For example, both upvote and downvote).",
 			examples: "`{{p}}config onevote on`\nAllows users to choose only one option when voting\n\n`{{p}}config onevote off`\nAllows users to choose multiple options when voting",
+			docs: "onevote",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -754,6 +776,7 @@ module.exports = {
 			name: "In-Suggestions Channel Suggestion Submission",
 			description: "This setting controls whether or not users can submit suggestions via sending a message in the suggestions feed channel.",
 			examples: "`{{p}}config inchannelsuggestions on`\nAllows users to submit suggestions via any message in the suggestions feed channel\n\n`{{p}}config inchannelsuggestions off`\nPrevents users from submitting suggestions via any message in the suggestions feed channel",
+			docs: "inchannelsuggestions",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -787,6 +810,7 @@ module.exports = {
 			name: "Color Change",
 			description: "This setting controls the color of the suggestion embed changing based on the number of net upvotes. You can customize the color, and the number of net upvotes necessary to change the color!",
 			examples: "`{{p}}config colorchange color gold`\nSets the color to change the embed to `gold`. This element supports hex colors, CSS colors, and more!\n\n`{{p}}config colorchange number 5`\nSets the number of net upvotes to change the embed color to `5`.",
+			docs: "colorchange",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })));
 				switch (args[1].toLowerCase()) {
@@ -820,6 +844,7 @@ module.exports = {
 			name: "Locale",
 			description: "The language the bot will respond in. If a user has a locale configured via the `locale` command, the bot will respond to them in their preferred language. If they don't, the bot will respond in the language configured here.",
 			examples: "`{{p}}config locale en`\nSets the server language to English.",
+			docs: "locale",
 			cfg: async function() {
 				if (!args[1]) {
 					let totalStrings = Object.keys(list).length;
@@ -1100,6 +1125,7 @@ module.exports = {
 					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				return message.channel.send(elementEmbed);
 			}
 			let embeds = [new Discord.MessageEmbed()
@@ -1119,6 +1145,7 @@ module.exports = {
 					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				embeds.push(elementEmbed);
 			}
 			return pages(locale, message, embeds);
