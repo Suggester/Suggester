@@ -3404,6 +3404,16 @@ module.exports = {
 				}
 			}
 		},
+		"PROTIP_LARGE_SERVER": {
+			string: "This server may be eligible for Suggester's **large server program**. Read more about the program [here](https://suggester.js.org/#/community-programs) and apply in the [support server]({{support_invite}}) for info!",
+			context: "Protip for the large server program",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
 		"PROTIP_RICKROLL": {
 			string: "We're no strangers to love\n" +
 				"You know the rules and so do I\n" +
