@@ -5891,6 +5891,26 @@ module.exports = {
 					description: "The configured cap"
 				}
 			}
-		}
+		},
+		"AUTOSETUP_CATEGORY": {
+			string: "Suggester",
+			context: "The name of the category created for suggestions channels in autosetup"
+		},
+		"AUTOSETUP_SUGGESTIONS": {
+			string: "suggestions",
+			context: "The name of the channel created for approved suggestions in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_DENIED": {
+			string: "denied-suggestions",
+			context: "The name of the channel created for denied suggestions in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_REVIEW": {
+			string: "suggestion-review",
+			context: "The name of the channel created for suggestion review in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_LOG": {
+			string: "suggestion-log",
+			context: "The name of the channel created for suggestion logs in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
 	}
 };
