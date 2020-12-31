@@ -16,6 +16,7 @@ const settings = new Schema({
 		voting_roles: [String],
 		blocked_roles: [String],
 		ping_role: String,
+		feed_ping_role: String,
 		approved_role: { type: String },
 		implemented_role: { type: String },
 		channels: {

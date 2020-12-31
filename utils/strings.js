@@ -3024,6 +3024,10 @@ module.exports = {
 			string: "Successfully reset the suggestion submitted mention role.",
 			context: "Success message when the mention on submitted suggestion role is reset"
 		},
+		"CFG_RESET_FEED_PING_ROLE_SUCCESS": {
+			string: "Successfully reset the suggestion approved mention role.",
+			context: "Success message when the mention on submitted approved role is reset"
+		},
 		"CFG_NO_MENTION_EVERYONE_ERROR": {
 			string: "Please give {{bot}} the **Mention Everyone** permission in order for the bot to be able to mention this role when a suggestion is submitted.",
 			context: "Error when an suggestion ping role is configured but the bot does not have the Mention Everyone permission",
@@ -3041,6 +3045,20 @@ module.exports = {
 		"CFG_PING_ROLE_SUCCESS": {
 			string: "The **{{role}}** role will now be mentioned when suggestions are submitted for review.",
 			context: "Success message when the suggestion ping role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_FEED_PING_ROLE_ERROR": {
+			string: "This role is already set to be mentioned when a suggestion is approved!",
+			context: "Error when the specified suggestio  approved ping role is already set"
+		},
+		"CFG_FEED_PING_ROLE_SUCCESS": {
+			string: "The **{{role}}** role will now be mentioned when suggestions are approved.",
+			context: "Success message when the suggestion approved ping role is configured",
 			replaced: {
 				role: {
 					to_replace: "{{role}}",
@@ -4508,21 +4526,34 @@ module.exports = {
 			context: "Examples for the Approved Suggestion Role config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `approverole`"
 		},
-		"CONFIG_NAME:PINGROLE": {
+		"CONFIG_NAME:REVIEWPING": {
 			string: "Suggestion Submitted Mention Role",
 			context: "Name of the Suggestion Submitted Mention Role config element"
 		},
-		"CONFIG_DESC:PINGROLE": {
+		"CONFIG_DESC:REVIEWPING": {
 			string: "The role that is mentioned when a new suggestion is submitted for review.",
 			context: "Description of the Suggestion Submitted Mention Role config element"
 		},
-		"CONFIG_EXAMPLES:PINGROLE": {
-			string: "`{{p}}config pingrole Staff`\n" +
-				"Sets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n" +
+		"CONFIG_EXAMPLES:REVIEWPING": {
+			string: "`{{p}}config reviewping Staff`\n" +
+				"Sets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n" +
 				"\n" +
-				"`{{p}}config pingrole none`\n" +
+				"`{{p}}config reviewping none`\n" +
 				"Resets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
 			context: "Examples for the Suggestion Submitted Mention Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
+		},
+		"CONFIG_NAME:APPROVEPING": {
+			string: "Suggestion Approved Mention Role",
+			context: "Name of the Suggestion Approved Mention Role config element"
+		},
+		"CONFIG_DESC:APPROVEPING": {
+			string: "The role that is mentioned when a new suggestion is approved and sent to the suggestions feed.",
+			context: "Description of the Suggestion Approved Mention Role config element"
+		},
+		"CONFIG_EXAMPLES:APPROVEPING": {
+			string: "`{{p}}config approveping Voting Squad`\nSets the \"Voting Squad\" role as the role mentioned when a suggestion is sent to the suggestions feed\n\n`{{p}}config approveping none`\nResets the role mentioned when a suggestion is sent to the suggestions feed, meaning no role will be mentioned",
+			context: "Examples for the Suggestion Approved Mention Role config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
 		},
 		"CONFIG_NAME:REVIEW": {

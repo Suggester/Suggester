@@ -361,12 +361,12 @@ module.exports = {
 			}
 		},
 		{
-			names: ["pingrole", "ping"],
+			names: ["reviewping", "submitping", "reviewpingrole", "submitpingrole"],
 			name: "Suggestion Submitted Mention Role",
 			description: "The role that is mentioned when a new suggestion is submitted for review.",
-			examples: "`{{p}}config pingrole Staff`\nSets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config pingrole none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			examples: "`{{p}}config reviewping Staff`\nSets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config reviewping none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:PINGROLE", false)));
+				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
 				let input = args.splice(1).join(" ");
 				if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
 					qServerDB.config.ping_role = "";
@@ -380,6 +380,28 @@ module.exports = {
 				qServerDB.config.ping_role = role.id;
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return message.channel.send(string(locale, "CFG_PING_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
+			}
+		},
+		{
+			names: ["approveping", "feedping", "approvepingrole", "feedpingrole"],
+			name: "Suggestion Approved Mention Role",
+			description: "The role that is mentioned when a new suggestion is approved and sent to the suggestions feed.",
+			examples: "`{{p}}config approveping Voting Squad`\nSets the \"Voting Squad\" role as the role mentioned when a suggestion is sent to the suggestions feed\n\n`{{p}}config approveping none`\nResets the role mentioned when a suggestion is sent to the suggestions feed, meaning no role will be mentioned",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.feed_ping_role, server, "CONFIG_NAME:APPROVEPING", false)));
+				let input = args.splice(1).join(" ");
+				if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+					qServerDB.config.feed_ping_role = "";
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_RESET_FEED_PING_ROLE_SUCCESS", {}, "success"));
+				}
+				if (!server.me.permissions.has("MENTION_EVERYONE")) return message.channel.send(string(locale, "CFG_NO_MENTION_EVERYONE_ERROR", { bot: `<@${client.user.id}>` }, "error"));
+				let role = await findRole(input, server.roles.cache);
+				if (!role) return message.channel.send(string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error"));
+				if (qServerDB.config.feed_ping_role === role.id) return message.channel.send(string(locale, "CFG_FEED_ALREADY_PING_ROLE_ERROR", {}, "error"));
+				qServerDB.config.feed_ping_role = role.id;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_FEED_PING_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
 			}
 		},
 		{
@@ -1125,7 +1147,9 @@ module.exports = {
 			// Implemented suggestion role
 			cfgRolesArr.push((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
 			// Submitted suggestion mention role
-			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:PINGROLE", false)));
+			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
+			// Approved suggestion mention role
+			cfgRolesArr.push((await listRoles(qServerDB.config.feed_ping_role, server, "CONFIG_NAME:APPROVEPING", false)));
 			// Suggestions channel
 			let suggestionChannel = await showChannel(qServerDB.config.channels.suggestions, server, "CONFIG_NAME:SUGGESTIONS", true);
 			if (suggestionChannel[1]) {
@@ -1197,15 +1221,15 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:NOTIFY", {}, "success")}:** ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
 			// Automatic following
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:AUTOFOLLOW", {}, "success")}:** ${string(locale, qServerDB.config.auto_subscribe ? "ENABLED" : "DISABLED")}`);
-			//Clean Suggestion Command
+			// Clean Suggestion Command
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEARCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
-			//In-Channel Suggestions
+			// In-Channel Suggestions
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:INCHANNELSUGGESTIONS", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
-			//Locale
+			// Locale
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
-			//Cooldown
+			// Cooldown
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
-			//Cap
+			// Cap
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
