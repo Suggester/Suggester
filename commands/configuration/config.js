@@ -704,7 +704,7 @@ module.exports = {
 			}
 		},
 		{
-			names: ["selfvote", "suggestervote", "self"],
+			names: ["selfvote", "suggestervote", "self", "ownvote"],
 			name: "Voting on Own Suggestions",
 			description: "This setting controls whether or not the user who made a suggestion can vote on their own suggestion when it has been approved.",
 			examples: "`{{p}}config selfvote on`\nAllows suggestion authors to vote on their own suggestions\n\n`{{p}}config selfvote off`\nPrevents suggestion authors from voting on their own suggestions",

@@ -144,7 +144,8 @@ module.exports = {
 		let qUserDB = await message.author.db;
 		const randomChance = Math.floor(Math.random() * 5);
 		if (!qUserDB.protips || randomChance !== 2) return;
-		let filteredList = Object.keys(list).filter(k => !qUserDB.displayed_protips.includes(k) && (command ? (list[k].command && list[k].command.includes(command)) : !list[k].command) && !not.includes(k) && (!admin ? !list[k].admin : true) && (list[k].members && message.guild ? message.guild.memberCount >= message.guild.memberCount : true));
+		let filteredList = Object.keys(list).filter(k => !qUserDB.displayed_protips.includes(k) && (command ? (list[k].command && list[k].command.includes(command)) : !list[k].command) && !not.includes(k) && (!admin ? !list[k].admin : true) && (list[k].members ? (message.guild ? message.guild.memberCount >= list[k].members : false) : true));
+		console.log(filteredList)
 		if (force && qUserDB.displayed_protips.includes(force)) return;
 		let key = force || filteredList[Math.floor(Math.random()*filteredList.length)];
 		if (Math.floor(Math.random() * 100) < 5) key = "spooky";
