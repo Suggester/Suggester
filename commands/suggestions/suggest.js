@@ -62,6 +62,10 @@ module.exports = {
 			if (foundCooldown) return message.channel.send(string(locale, "CUSTOM_COOLDOWN_FLAG", { time: humanizeDuration(qServerDB.config.suggestion_cooldown+(new Date(foundCooldown.submitted).getTime())-Date.now(), { language: locale, fallbacks: ["en"] }) }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		}
 
+		if (qServerDB.config.suggestion_cap && permission > 3) {
+			if ((await dbQueryAll("Suggestion", { id: message.guild.id, status: "approved", implemented: false } )).length >= qServerDB.config.suggestion_cap) return message.channel.send(string(locale, "CAP_REACHED_ERROR", { cap: qServerDB.config.suggestion_cap }, "error"));
+		}
+
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
 		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		if (attachment && !(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));

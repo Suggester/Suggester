@@ -58,7 +58,8 @@ const settings = new Schema({
 				part: String,
 				id: String
 			}]
-		}
+		},
+		suggestion_cap: { type: Number, default: 0 }
 	}
 });
 

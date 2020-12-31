@@ -5798,17 +5798,64 @@ module.exports = {
 			replaced: {
 				code: {
 					to_replace: "{{code}}",
-					context: "The trello board code"
+					description: "The trello board code"
 				},
 				p: {
 					to_replace: "{{p}}",
-					context: "The server prefix"
+					description: "The server prefix"
 				}
 			}
 		},
 		"CFG_TRELLO_INVALID_PARAM": {
 			string: "You must specify `board` or `action`",
 			context: "Error when a user specifies none or an invalid parameter for Trello config"
+		},
+		"CFG_CAP_INFO": {
+			string: "The suggestion cap is currently set to **{{cap}}** suggestions",
+			context: "Shows the suggestion cap in the config command",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The configured cap"
+				}
+			}
+		},
+		"CFG_CAP_NONE": {
+			string: "There is no suggestion cap set.",
+			context: "Shows the suggestion cap in the config command when none is set"
+		},
+		"CFG_CAP_SET": {
+			string: "The suggestion cap is now **{{cap}}** suggestions",
+			context: "Success message when the suggestion cap is set",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The time the cap is set to"
+				}
+			}
+		},
+		"CONFIG_NAME:CAP": {
+			string: "Suggestion Cap",
+			context: "Name of the Suggestion Cap config element"
+		},
+		"CONFIG_DESC:CAP": {
+			string: "The maximum number of approved (not denied or implemented) suggestions there can be at any given time. When the cap is reached, no new suggestions can be submitted",
+			context: "Description of the Suggestion Cap config element"
+		},
+		"CONFIG_EXAMPLES:CAP": {
+			string: "`{{p}}config cap 50`\nSets the suggestion cap to 50\n\n`{{p}}config cap none`\nRemoves the suggestion cap",
+			context: "Examples for the Suggestion Cap config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"CAP_REACHED_ERROR": {
+			string: "This server has reached the configured cap of {{cap}} approved suggestions. New suggestions cannot be submitted until some existing suggestions are cleared.",
+			context: "Error shown when a server's cap limit has been reached",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The configured cap"
+				}
+			}
 		}
 	}
 };

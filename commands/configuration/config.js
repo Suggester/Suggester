@@ -830,7 +830,8 @@ module.exports = {
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
 			}
-		}, {
+		},
+		{
 			names: ["trello"],
 			name: "Trello",
 			description: "Settings for the Suggester Trello integration",
@@ -1040,7 +1041,26 @@ module.exports = {
 					return message.channel.send(string(locale, "CFG_TRELLO_INVALID_PARAM", {}, "error"));
 				}
 			}
-		}];
+		},
+		{
+			names: ["cap", "maxsuggestions", "suggestioncap", "maxsuggest", "suggestcap", "suggestmax"],
+			name: "Suggestion Cap",
+			description: "The maximum number of approved (not denied or implemented) suggestions there can be at any given time. When the cap is reached, no new suggestions can be submitted",
+			examples: "`{{p}}config cap 50`\nSets the suggestion cap to 50\n\n`{{p}}config cap none`\nRemoves the suggestion cap",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cap ? "CFG_CAP_INFO" : "CFG_CAP_NONE", { cap: qServerDB.config.suggestion_cap }));
+				if (["none", "delete", "reset", "remove", "0"].includes(args[1].toLowerCase())) {
+					qServerDB.config.suggestion_cap = 0;
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_CAP_NONE", {}, "success"));
+				}
+				let newValue = parseInt(args[1]);
+				if (!newValue) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
+				qServerDB.config.suggestion_cap = newValue;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_CAP_SET", { cap: newValue }, "success"));
+			}
+		},];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
 		case "help": {
@@ -1185,6 +1205,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
 			//Cooldown
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
+			//Cap
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
