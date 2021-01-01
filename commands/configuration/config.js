@@ -21,7 +21,7 @@ module.exports = {
 		examples: "Use `{{p}}config help` to view detailed instructions",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "READ_MESSAGE_HISTORY"],
 		cooldown: 5,
-		docs: "admin/config"
+		docs: "config/configuration"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let server;
@@ -373,7 +373,7 @@ module.exports = {
 			name: "Suggestion Submitted Mention Role",
 			description: "The role that is mentioned when a new suggestion is submitted for review.",
 			examples: "`{{p}}config reviewping Staff`\nSets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config reviewping none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
-			docs: "pingrole",
+			docs: "reviewping",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
 				let input = args.splice(1).join(" ");
@@ -396,6 +396,7 @@ module.exports = {
 			name: "Suggestion Approved Mention Role",
 			description: "The role that is mentioned when a new suggestion is approved and sent to the suggestions feed.",
 			examples: "`{{p}}config approveping Voting Squad`\nSets the \"Voting Squad\" role as the role mentioned when a suggestion is sent to the suggestions feed\n\n`{{p}}config approveping none`\nResets the role mentioned when a suggestion is sent to the suggestions feed, meaning no role will be mentioned",
+			docs: "feedping",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.feed_ping_role, server, "CONFIG_NAME:APPROVEPING", false)));
 				let input = args.splice(1).join(" ");
@@ -417,7 +418,7 @@ module.exports = {
 			names: ["review", "reviewchannel"],
 			name: "Suggestion Review Channel",
 			description: "The channel where suggestions are sent once they are submitted for review.",
-			examples: "`{{p}}config review #suggestions-review`\nSets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			examples: "`{{p}}config review #suggestion-review`\nSets the #suggestion-review channel as the channel where suggestions awaiting review are sent",
 			docs: "review",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, server, "CONFIG_NAME:REVIEW", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string(locale, "CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
