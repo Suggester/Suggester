@@ -4579,8 +4579,8 @@ module.exports = {
 			context: "Description of the Suggestion Review Channel config element"
 		},
 		"CONFIG_EXAMPLES:REVIEW": {
-			string: "`{{p}}config review #suggestions-review`\n" +
-				"Sets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			string: "`{{p}}config review #suggestion-review`\n" +
+				"Sets the #suggestion-review channel as the channel where suggestions awaiting review are sent",
 			context: "Examples for the Suggestion Review Channel config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `review`"
 		},
@@ -5568,7 +5568,7 @@ module.exports = {
 			context: "Shows where submitted suggestions are added on trello if not configured"
 		},
 		"TRELLO_INVALID_ACTION_ERROR": {
-			string: "That is an inavlid action. You can configure the following actions: {{list}}",
+			string: "That is an invalid action. You can configure the following actions: {{list}}",
 			context: "Shown when an action specified is invalid",
 			replaced: {
 				list: {
