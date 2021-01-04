@@ -83,7 +83,7 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let isComment = args[2];
+		let isComment = args.slice().join(" ").trim();
 
 		let comment;
 		if (isComment) {

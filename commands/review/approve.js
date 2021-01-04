@@ -44,7 +44,7 @@ module.exports = {
 			}
 		}
 
-		let isComment = args[1];
+		let isComment = args.slice().join(" ").trim();
 
 		let comment;
 		if (isComment) {

@@ -36,7 +36,7 @@ module.exports = {
 		qSuggestionDB.staff_member = message.author.id;
 
 		let reason;
-		if (args[1]) {
+		if (args.slice().join(" ").trim()) {
 			reason = args.splice(1).join(" ");
 			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.denial_reason = reason;

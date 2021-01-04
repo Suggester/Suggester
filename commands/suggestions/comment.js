@@ -24,7 +24,7 @@ module.exports = {
 		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
-		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (!args.slice().join(" ").trim()) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 15) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR_NEW", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 

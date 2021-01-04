@@ -68,7 +68,7 @@ module.exports = {
 		}
 
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
-		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		if (!args.join(" ").trim() && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		if (attachment && !(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let suggestion = args.join(" ");
