@@ -47,9 +47,7 @@ module.exports = {
 
 		const img = await fetch(link).then((res) => res.buffer());
 
-		if (img.length >= 8e6) {
-			return { code: 40005 };
-		}
+		if (img.length >= 8e6) return { code: 40005 };
 
 		const body = new FormData();
 		body.append("image", img, { filename });
