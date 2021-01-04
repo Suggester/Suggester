@@ -88,7 +88,7 @@ module.exports = {
 					let user = await fetchUser(comment.author, client);
 					let title;
 					!user || user.id === "0" ? title = `${string(locale, "COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `${string(locale, "COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created ? " • " + comment.created.toUTCString(locale, ) : ""}`;
-					embed.addField(title, comment.comment);
+					embed.addField(title, comment.comment || string(locale, "ERROR", {}, "error"));
 				}
 			}
 		}
