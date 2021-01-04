@@ -56,6 +56,7 @@ module.exports = {
 		if (origSuggestion.implemented) reasonInfo.name = "DUPE_REASON_IMPLEMENTED";
 		else if (origSuggestion.status === "awaiting_review") reasonInfo.name = "DUPE_REASON_REVIEW";
 		else if (origSuggestion.status === "denied") {
+			reasonInfo.name = "DUPE_REASON_DENIED";
 			if (origSuggestion.denial_reason) {
 				reasonInfo.name = "DUPE_REASON_DENIED_WITH_REASON";
 				reasonInfo.replaced.reason = origSuggestion.denial_reason;
