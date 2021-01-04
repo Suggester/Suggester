@@ -44,8 +44,7 @@ module.exports = {
 			}
 		}
 
-		let isComment = args.slice().join(" ").trim();
-
+		let isComment = args.slice(1).join(" ").trim();
 		let comment;
 		if (isComment) {
 			comment = args.splice(1).join(" ");
@@ -125,7 +124,7 @@ module.exports = {
 			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 			client.reactInProgress = false;
 			await notifyFollowers(client, qServerDB, qSuggestionDB, "green", { string: "APPROVED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, qServerDB.config.channels.suggestions, null, function(e, l) {
-				if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment);
+				if (comment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_1` }), comment);
 				return e;
 			});
 		});
