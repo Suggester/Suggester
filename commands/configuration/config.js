@@ -1104,7 +1104,7 @@ module.exports = {
 					return message.channel.send(string(locale, "CFG_CAP_NONE", {}, "success"));
 				}
 				let newValue = parseInt(args[1]);
-				if (!newValue) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
+				if (!newValue || newValue < 1) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
 				qServerDB.config.suggestion_cap = newValue;
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_CAP_SET", { cap: newValue }, "success"));
