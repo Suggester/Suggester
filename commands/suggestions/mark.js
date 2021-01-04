@@ -83,8 +83,7 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let isComment = args.slice().join(" ").trim();
-
+		let isComment = args.slice(2).join(" ").trim();
 		let comment;
 		if (isComment) {
 			comment = args.splice(shifted ? 1 : 2).join(" ");
@@ -124,7 +123,7 @@ module.exports = {
 					.setTimestamp(qSuggestionDB.submitted)
 					.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str);
 
-				if (isComment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+				if (comment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 				message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 				if (qServerDB.config.channels.log) {
@@ -132,14 +131,14 @@ module.exports = {
 						.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), guildstr)
 						.addField(string(guildLocale, "IMPLEMENTED_LINK"), `[${string(guildLocale, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 
-					if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+					if (comment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					serverLog(logs, qServerDB, client);
 				}
 
 				if (qServerDB.config.implemented_role && message.guild.roles.cache.get(qServerDB.config.implemented_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.implemented_role, string(locale, "STATUS_IMPLEMENTED"));
 
 				await notifyFollowers(client, qServerDB, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, null, { header: "INFO_PUBLIC_STATUS_HEADER", reason: str }, function(e, l) {
-					if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+					if (comment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 					e.addField(string(l, "IMPLEMENTED_LINK"), `[${string(l, "IMPLEMENTED_LINK")}](https://discord.com/channels/${sent.guild.id}/${sent.channel.id}/${sent.id})`);
 					return e;
 				});
@@ -163,14 +162,14 @@ module.exports = {
 			.setTimestamp(qSuggestionDB.submitted)
 			.addField(string(locale, "INFO_PUBLIC_STATUS_HEADER"), str);
 
-		if (isComment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+		if (comment) replyEmbed.addField(string(locale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "STATUS_MARK_LOG", color)
 				.addField(string(guildLocale, "INFO_PUBLIC_STATUS_HEADER"), guildstr);
 
-			if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+			if (comment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
 		}
 
@@ -179,9 +178,9 @@ module.exports = {
 		if (qSuggestionDB.displayStatus === "implemented" && qServerDB.config.implemented_role && message.guild.roles.cache.get(qServerDB.config.implemented_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.implemented_role, string(locale, "STATUS_IMPLEMENTED"));
 
 		if (![null, "default"].includes(qSuggestionDB.displayStatus)) await notifyFollowers(client, qServerDB, qSuggestionDB, color, { string: "STATUS_MARK_DM_TITLE", guild: message.guild.name }, null, qServerDB.config.channels.suggestions, { header: "INFO_PUBLIC_STATUS_HEADER", reason: str }, function(e, l) {
-			if (isComment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
+			if (comment) e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			return e;
 		});
-		return { protip: { command: "mark", not: [isComment ? "markcomment" : null] } };
+		return { protip: { command: "mark", not: [comment ? "markcomment" : null] } };
 	}
 };
