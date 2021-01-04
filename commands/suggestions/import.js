@@ -19,7 +19,8 @@ module.exports = {
 		description: "Imports suggestions from a channel",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
-		cooldown: 60
+		cooldown: 60,
+		docs: "admin/import"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		function ziraReason (e) {

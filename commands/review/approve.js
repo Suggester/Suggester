@@ -5,6 +5,7 @@ const { dbModify, dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard, trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "approve",
@@ -17,7 +18,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!"
+		cooldownMessage: "Need to approve multiple suggestions? Try the `mapprove` command!",
+		docs: "staff/approve"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -42,17 +44,19 @@ module.exports = {
 			}
 		}
 
-		let isComment = args[1];
+		let isComment = args.slice().join(" ").trim();
 
 		let comment;
 		if (isComment) {
 			comment = args.splice(1).join(" ");
 			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+			let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, comment);
 			qSuggestionDB.comments = [{
 				comment: comment,
 				author: message.author.id,
 				id: 1,
-				created: new Date()
+				created: new Date(),
+				trello_comment
 			}];
 		}
 
@@ -92,7 +96,7 @@ module.exports = {
 		}
 
 		let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
-		client.channels.cache.get(qServerDB.config.channels.suggestions).send(embedSuggest).then(async posted => {
+		client.channels.cache.get(qServerDB.config.channels.suggestions).send(qServerDB.config.feed_ping_role ? `<@&${qServerDB.config.feed_ping_role}>` : embedSuggest, qServerDB.config.feed_ping_role ? embedSuggest : null).then(async posted => {
 			qSuggestionDB.messageId = posted.id;
 			qSuggestionDB.channels.suggestions = posted.channel.id;
 			if (qServerDB.config.react) {
@@ -139,6 +143,8 @@ module.exports = {
 
 			serverLog(embedLog, qServerDB, client);
 		}
+
+		await actCard("approve", qServerDB, qSuggestionDB, suggester, string(guildLocale, "APPROVED_BY", { user: message.author.tag }));
 
 		return { protip: { command: "approve", not: [comment ? "approve_reason" : null] } };
 	}

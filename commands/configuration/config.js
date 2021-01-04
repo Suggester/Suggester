@@ -8,6 +8,7 @@ const ms = require("ms");
 const humanizeDuration = require("humanize-duration");
 const { string, list } = require("../../utils/strings");
 const colorstring = require("color-string");
+const { initTrello, findList, findLabel } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "config",
@@ -19,7 +20,8 @@ module.exports = {
 		enabled: true,
 		examples: "Use `{{p}}config help` to view detailed instructions",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "READ_MESSAGE_HISTORY"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "config/configuration"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let server;
@@ -153,6 +155,7 @@ module.exports = {
 			name: "Admin Roles",
 			description: "Roles that are allowed to edit server configuration, as well as use all staff commands. (Members with the **Manage Server** permission also have access to these commands)",
 			examples: "`{{p}}config admin add Owner`\nAdds the \"Owner\" role as an admin role\n\n`{{p}}config admin add @Management`\nAdds the mentioned \"Management\" role as an admin role\n\n`{{p}}config admin add 658753146910408724`\nAdds a role with ID 658753146910408724 as an admin role\n\n`{{p}}config admin remove Owner`\nRemoves the \"Owner\" role from the list of admin roles",
+			docs: "adminroles",
 			cfg: async function() {
 
 				switch (args[1]) {
@@ -194,6 +197,7 @@ module.exports = {
 			name: "Staff Roles",
 			description: "Roles that have access to suggestion management commands like `approve`, `deny`, `comment`, and `mark`.",
 			examples: "`{{p}}config staff add Staff`\nAdds the \"Staff\" role as a staff role\n\n`{{p}}config staff add @Moderator`\nAdds the mentioned \"Moderator\" role as a staff role\n\n`{{p}}config staff add 658753146910408724`\nAdds a role with ID 658753146910408724 as a staff role\n\n`{{p}}config staff remove Moderator`\nRemoves the \"Moderator\" role from the list of staff roles",
+			docs: "staffroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -237,6 +241,7 @@ module.exports = {
 			name: "Allowed Suggesting Roles",
 			description: "Roles that are allowed to submit suggestions. If no roles are configured, all users can submit suggestions.",
 			examples: "`{{p}}config allowed add Trusted`\nAdds the \"Trusted\" role to the list of allowed roles\n\n`{{p}}config allowed add @Cool Person`\nAdds the mentioned \"Cool Person\" role as an allowed role\n\n`{{p}}config allowed add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of allowed roles\n\n`{{p}}config allowed remove Trusted`\nRemoves the \"Trusted\" role from the list of allowed roles",
+			docs: "allowedroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -264,6 +269,7 @@ module.exports = {
 			name: "Voting Roles",
 			description: "Roles that are allowed to vote on suggestions in the approved suggestion feed. If no roles are configured, all users can vote on suggestions.",
 			examples: "`{{p}}config voting add Trusted`\nAdds the \"Trusted\" role to the list of allowed voting roles\n\n`{{p}}config voting add @Cool Person`\nAdds the mentioned \"Cool Person\" role as an allowed voting role\n\n`{{p}}config voting add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of allowed voting roles\n\n`{{p}}config voting remove Trusted`\nRemoves the \"Trusted\" role from the list of allowed voting roles",
+			docs: "voting",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -291,6 +297,7 @@ module.exports = {
 			name: "Blocked Roles",
 			description: "Roles that are blocked from using the bot on this server. If you want to block one specific user, use the `block` command.",
 			examples: "`{{p}}config blocked add Restricted`\nAdds the \"Restricted\" role to the list of blocked roles\n\n`{{p}}config blocked add @Bad Person`\nAdds the mentioned \"Bad Person\" role as a blocked role\n\n`{{p}}config blocked add 658753146910408724`\nAdds a role with ID 658753146910408724 to the list of blocked roles\n\n`{{p}}config blocked remove Annoying`\nRemoves the \"Annoying\" role from the list of blocked roles, allowing members with that role to use the bot again",
+			docs: "blockedroles",
 			cfg: async function() {
 				switch (args[1]) {
 				case "add":
@@ -318,6 +325,7 @@ module.exports = {
 			name: "Approved Suggestion Role",
 			description: "The role that is given to members that have a suggestion approved.",
 			examples: "`{{p}}config approverole Suggestion Submitter`\nSets the \"Suggestion Submitter\" as the role given when a member has their suggestion approved\n\n`{{p}}config approverole none`\nResets the role given when a member has their suggestion approved, meaning no role will be given",
+			docs: "approverole",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.approved_role, server, "CONFIG_NAME:APPROVEROLE", false)));
 				let input = args.splice(1).join(" ");
@@ -341,6 +349,7 @@ module.exports = {
 			name: "Implemented Suggestion Role",
 			description: "The role that is given to members that have a suggestion marked as implemented.",
 			examples: "`{{p}}config implementedrole Implemented Suggester`\nSets the \"Implemented Suggester\" as the role given when a member has their suggestion marked as implemented\n\n`{{p}}config implementedrole none`\nResets the role given when a member has their suggestion marked as implemented, meaning no role will be given",
+			docs: "implementedrole",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
 				let input = args.splice(1).join(" ");
@@ -360,12 +369,13 @@ module.exports = {
 			}
 		},
 		{
-			names: ["pingrole", "ping"],
+			names: ["reviewping", "submitping", "reviewpingrole", "submitpingrole"],
 			name: "Suggestion Submitted Mention Role",
 			description: "The role that is mentioned when a new suggestion is submitted for review.",
-			examples: "`{{p}}config pingrole Staff`\nSets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config pingrole none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			examples: "`{{p}}config reviewping Staff`\nSets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n\n`{{p}}config reviewping none`\nResets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
+			docs: "reviewping",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:PINGROLE", false)));
+				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
 				let input = args.splice(1).join(" ");
 				if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
 					qServerDB.config.ping_role = "";
@@ -382,10 +392,34 @@ module.exports = {
 			}
 		},
 		{
+			names: ["approveping", "feedping", "approvepingrole", "feedpingrole"],
+			name: "Suggestion Approved Mention Role",
+			description: "The role that is mentioned when a new suggestion is approved and sent to the suggestions feed.",
+			examples: "`{{p}}config approveping Voting Squad`\nSets the \"Voting Squad\" role as the role mentioned when a suggestion is sent to the suggestions feed\n\n`{{p}}config approveping none`\nResets the role mentioned when a suggestion is sent to the suggestions feed, meaning no role will be mentioned",
+			docs: "feedping",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send((await listRoles(qServerDB.config.feed_ping_role, server, "CONFIG_NAME:APPROVEPING", false)));
+				let input = args.splice(1).join(" ");
+				if (input.toLowerCase() === "none" || input.toLowerCase() === "reset") {
+					qServerDB.config.feed_ping_role = "";
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_RESET_FEED_PING_ROLE_SUCCESS", {}, "success"));
+				}
+				if (!server.me.permissions.has("MENTION_EVERYONE")) return message.channel.send(string(locale, "CFG_NO_MENTION_EVERYONE_ERROR", { bot: `<@${client.user.id}>` }, "error"));
+				let role = await findRole(input, server.roles.cache);
+				if (!role) return message.channel.send(string(locale, "CFG_INVALID_ROLE_ERROR", {}, "error"));
+				if (qServerDB.config.feed_ping_role === role.id) return message.channel.send(string(locale, "CFG_FEED_ALREADY_PING_ROLE_ERROR", {}, "error"));
+				qServerDB.config.feed_ping_role = role.id;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_FEED_PING_ROLE_SUCCESS", { role: role.name }, "success"), {disableMentions: "everyone"});
+			}
+		},
+		{
 			names: ["review", "reviewchannel"],
 			name: "Suggestion Review Channel",
 			description: "The channel where suggestions are sent once they are submitted for review.",
-			examples: "`{{p}}config review #suggestions-review`\nSets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			examples: "`{{p}}config review #suggestion-review`\nSets the #suggestion-review channel as the channel where suggestions awaiting review are sent",
+			docs: "review",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.staff, server, "CONFIG_NAME:REVIEW", qServerDB.config.mode === "review", qServerDB.config.mode === "autoapprove" ? string(locale, "CFG_REVIEW_NOT_NECESSARY_APPEND") : ""))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "staff", "staff", "CFG_REVIEW_SET_SUCCESS")));
@@ -396,6 +430,7 @@ module.exports = {
 			name: "Approved Suggestions Channel",
 			description: "The channel where suggestions are sent once they are approved (or submitted when the mode is set to `autoapprove`).",
 			examples: "`{{p}}config suggestions #suggestions`\nSets the #suggestions channel as the channel where approved suggestions are sent",
+			docs: "suggestions",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.suggestions, server, "CONFIG_NAME:SUGGESTIONS", true))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "suggestions", "suggestions", "CFG_SUGGESTIONS_SET_SUCCESS")));
@@ -406,6 +441,7 @@ module.exports = {
 			name: "Denied Suggestions Channel",
 			description: "The channel where suggestions are sent when they are denied or deleted.",
 			examples: "`{{p}}config denied #denied-suggestions`\nSets the #denied-suggestions channel as the channel where denied or deleted suggestions are sent\n\n`{{p}}config denied none`\nResets the denied suggestions channel, making there be none set",
+			docs: "denied",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.denied, server, "CONFIG_NAME:DENIED", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "denied", "denied", "CFG_DENIED_SET_SUCCESS", "CFG_DENIED_RESET_SUCCESS")));
@@ -416,6 +452,7 @@ module.exports = {
 			name: "Log Channel",
 			description: "The channel where suggestions submitted and actions taken on them are logged.",
 			examples: "`{{p}}config log #suggestion-log`\nSets the #suggestion-log channel as log channel for suggestions and actions taken on them\n\n`{{p}}config log none`\nResets the log channel, making there be none set",
+			docs: "logs",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.log, server, "CONFIG_NAME:LOG", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "log", "log", "CFG_LOG_SET_SUCCESS", "CFG_LOG_RESET_SUCCESS")));
@@ -426,6 +463,7 @@ module.exports = {
 			name: "Suggestion Commands Channels",
 			description: "This setting locks using the `suggest` command to only the configured channels. Configuring no channels will allow the command to be used in any channel.",
 			examples: "`{{p}}config commands add #bot-commands`\nLimits using the `suggest` command to the #bot-commands channel\n\n`{{p}}config commands remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of commands channels\n\n`{{p}}config commands list`\nLists the configured commands channels",
+			docs: "commands",
 			cfg: async function() {
 				switch (args[1] || "") {
 				case "add":
@@ -453,6 +491,7 @@ module.exports = {
 			name: "Implemented Suggestions Archive Channel",
 			description: "The channel where suggestions marked as \"Implemented\" via the `mark` command are sent. If no channel is configured, implemented suggestions will remain in the suggestions feed",
 			examples: "`{{p}}config implemented #implemented-suggestions`\nSets the #implemented-suggestions channel as the channel where implemented suggestions are sent\n\n`{{p}}config implemented none`\nResets the implemented suggestions archive channel, making there be none set",
+			docs: "implemented",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send((await showChannel(qServerDB.config.channels.archive, server, "CONFIG_NAME:IMPLEMENTED", false))[0]);
 				return message.channel.send((await handleChannelInput(locale, args.splice(1).join(" ").toLowerCase(), server, "archive", "denied", "CFG_ARCHIVE_SET_SUCCESS", "CFG_ARCHIVE_RESET_SUCCESS")));
@@ -463,6 +502,7 @@ module.exports = {
 			name: "Prefix",
 			description: "The string of characters (usually a symbol) used to invoke a bot command. For example, in `.vote` the prefix is `.`",
 			examples: "`{{p}}config prefix ?`\nSets the bot prefix to `?`",
+			docs: "prefix",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:PREFIX", {}, "success")} ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 				let prefix = args[1];
@@ -479,6 +519,7 @@ module.exports = {
 			name: "Mode",
 			description: "The mode of handling suggestions. This can be `review` (all suggestions are held for manual review by staff) or `autoapprove` (all suggestions are automatically posted to the suggestions feed)",
 			examples: "`{{p}}config mode review`\nSets the mode to `review`\n\n`{{p}}config mode autoapprove`\nSets the mode to `autoapprove`",
+			docs: "mode",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:MODE", {}, "success")} ${qServerDB.config.mode}`);
 				switch (args[1].toLowerCase()) {
@@ -505,6 +546,7 @@ module.exports = {
 			name: "Suggestion Feed Reactions",
 			description: "Settings for managing the emojis that are added to suggestions posted to the suggestions feed",
 			examples: "`{{p}}config emojis up 👍`\nSets the upvote emoji to 👍\n\n`{{p}}config emojis mid 🤷`\nSets the shrug/no opinion emoji to 🤷\n\n`{{p}}config emojis down 👎`\nSets the downvote emoji to 👎\n\n`{{p}}config emojis up disable`\nDisables the upvote reaction (this can be done for any reaction, just change `up` to any of the other types)\n\n`{{p}}config emojis disable`\nDisables all suggestion feed reactions\n\n`{{p}}config emojis enable`\nEnables suggestion feed reactions if they are disabled",
+			docs: "emojis",
 			cfg: async function() {
 				if (!args[1]) {
 					let reactEmbed = new Discord.MessageEmbed()
@@ -563,6 +605,7 @@ module.exports = {
 			name: "DM Notifications",
 			description: "Settings for server notifications, whether or not users are sent a DM when an action is taken on one of their suggestions",
 			examples: "`{{p}}config notify on`\nEnables DM notifications for suggestions in this server\n\n`{{p}}config notify off`\nDisables DM notifications for suggestions in this server",
+			docs: "notify",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.notify ? "GUILD_NOTIFICATIONS_ENABLED" : "GUILD_NOTIFICATIONS_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -596,6 +639,7 @@ module.exports = {
 			name: "Automatic Following",
 			description: "This setting controls whether or not users will follow suggestions upon upvoting them, meaning they will receive a DM when the suggestion is updated",
 			examples: "`{{p}}config autofollow on`\nEnables auto-following for suggestions in this server\n\n`{{p}}config autofollow off`\nDisables auto-following for suggestions in this server",
+			docs: "autofollowing",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.auto_subscribe ? "GUILD_AUTOFOLLOW_ENABLED" : "GUILD_AUTOFOLLOW_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -629,6 +673,7 @@ module.exports = {
 			name: "Clean Commands",
 			description: "This setting controls whether or not some commands and the response are removed after a few seconds. This is useful for keeping your channels clean!",
 			examples: "`{{p}}config cleancommands on`\nEnables cleaning of commands\n\n`{{p}}config cleancommands off`\nDisables cleaning of commands",
+			docs: "cleancommands",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.clean_suggestion_command ? "CFG_CLEAR_COMMANDS_ENABLED" : "CFG_CLEAR_COMMANDS_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -660,10 +705,11 @@ module.exports = {
 			}
 		},
 		{
-			names: ["selfvote", "suggestervote", "self"],
+			names: ["selfvote", "suggestervote", "self", "ownvote"],
 			name: "Voting on Own Suggestions",
 			description: "This setting controls whether or not the user who made a suggestion can vote on their own suggestion when it has been approved.",
 			examples: "`{{p}}config selfvote on`\nAllows suggestion authors to vote on their own suggestions\n\n`{{p}}config selfvote off`\nPrevents suggestion authors from voting on their own suggestions",
+			docs: "selfvote",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.suggester ? "CFG_SELF_VOTE_ENABLED" : "CFG_SELF_VOTE_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -697,6 +743,7 @@ module.exports = {
 			name: "Multiple Reaction Voting",
 			description: "This setting controls whether or not users can choose multiple voting options on a suggestion (For example, both upvote and downvote).",
 			examples: "`{{p}}config onevote on`\nAllows users to choose only one option when voting\n\n`{{p}}config onevote off`\nAllows users to choose multiple options when voting",
+			docs: "onevote",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.reactionOptions.one ? "CFG_ONE_VOTE_ENABLED" : "CFG_ONE_VOTE_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -730,6 +777,7 @@ module.exports = {
 			name: "In-Suggestions Channel Suggestion Submission",
 			description: "This setting controls whether or not users can submit suggestions via sending a message in the suggestions feed channel.",
 			examples: "`{{p}}config inchannelsuggestions on`\nAllows users to submit suggestions via any message in the suggestions feed channel\n\n`{{p}}config inchannelsuggestions off`\nPrevents users from submitting suggestions via any message in the suggestions feed channel",
+			docs: "inchannelsuggestions",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -763,6 +811,7 @@ module.exports = {
 			name: "Color Change",
 			description: "This setting controls the color of the suggestion embed changing based on the number of net upvotes. You can customize the color, and the number of net upvotes necessary to change the color!",
 			examples: "`{{p}}config colorchange color gold`\nSets the color to change the embed to `gold`. This element supports hex colors, CSS colors, and more!\n\n`{{p}}config colorchange number 5`\nSets the number of net upvotes to change the embed color to `5`.",
+			docs: "colorchange",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(new Discord.MessageEmbed().setColor(qServerDB.config.reactionOptions.color).setDescription(string(locale, "CFG_COLOR_CHANGE_INFO", { number: qServerDB.config.reactionOptions.color_threshold, color: qServerDB.config.reactionOptions.color })));
 				switch (args[1].toLowerCase()) {
@@ -796,6 +845,7 @@ module.exports = {
 			name: "Locale",
 			description: "The language the bot will respond in. If a user has a locale configured via the `locale` command, the bot will respond to them in their preferred language. If they don't, the bot will respond in the language configured here.",
 			examples: "`{{p}}config locale en`\nSets the server language to English.",
+			docs: "locale",
 			cfg: async function() {
 				if (!args[1]) {
 					let totalStrings = Object.keys(list).length;
@@ -829,7 +879,237 @@ module.exports = {
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
 			}
-		}];
+		},
+		{
+			names: ["trello"],
+			name: "Trello",
+			description: "Settings for the Suggester Trello integration",
+			examples: "`{{p}}config trello board https://trello.com/b/oCArLTyk/test`\n" +
+				"Connects a Trello board to the bot (`@suggester_bot` must be a board member on Trello)\n" +
+				"\n" +
+				"`{{p}}config trello board none`\n" +
+				"Removes the connected Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions suggest List 1` \n" +
+				"Configures that submitted suggestions should be added to list **List 1**\n" +
+				"\n" +
+				"`{{p}}config trello actions approve list List 2`\n" +
+				"Configures that approved suggestions (review mode only) are added to list **List 2**\n" +
+				"\n" +
+				"`{{p}}config trello actions implemented label Finished`\n" +
+				"Configures that suggestions marked as implemented are given label **Finished**\n" +
+				"\n" +
+				"`{{p}}config trello actions deny delete`\n" +
+				"Configures that denied suggestions are removed from the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions delete archive`\n" +
+				"Configures that deleted suggestions are archived on the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions working none`\n" +
+				"Removes any configured actions for suggestions marked as in progress",
+			cfg: async function() {
+				const t = initTrello();
+				if (!args[1]) return message.channel.send(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"));
+				switch (args[1].toLowerCase()) {
+				case "board":
+					if (!args[2]) return message.channel.send(string(locale, "NO_BOARD_SPECIFIED_ERROR", {}, "error"));
+					if (["none", "reset", "delete"].includes(args[2].toLowerCase())) {
+						qServerDB.config.trello.board = "";
+						qServerDB.save();
+						return message.channel.send(string(locale, "TRELLO_BOARD_RESET_SUCCESS", {}, "success"));
+					} else {
+						let linkMatch = args[2].match(/trello.com\/b\/([a-zA-Z0-9]+)/);
+						if (!linkMatch) return message.channel.send(string(locale, "NO_BOARD_SPECIFIED_ERROR", {}, "error"));
+						t.getBoardMembers(linkMatch[1]).then(members => {
+							if (!members.find(m => m.username === "suggester_bot")) return message.channel.send(string(locale, "INVALID_BOARD_SPECIFIED_ERROR", {}, "error"));
+							qServerDB.config.trello.board = linkMatch[1];
+							qServerDB.save();
+							return message.channel.send(string(locale, "TRELLO_BOARD_SET_SUCCESS", {code: linkMatch[1]}, "success"));
+						}).catch(() => {
+							return message.channel.send(string(locale, "INVALID_BOARD_SPECIFIED_ERROR", {}, "error"));
+						});
+					}
+					break;
+				case "actions":
+				case "action":
+					if (!qServerDB.config.trello.board) return message.channel.send(string(locale, "NO_TRELLO_BOARD_SET_ERROR", {}, "error"));
+					// eslint-disable-next-line no-case-declarations
+					let lists = await t.getListsOnBoard(qServerDB.config.trello.board).catch(() => null);
+					// eslint-disable-next-line no-case-declarations
+					let labels = await t.getLabelsForBoard(qServerDB.config.trello.board).catch(() => null);
+					// eslint-disable-next-line no-case-declarations
+					let actionPrepend = {
+						approve: "<:suggester_check:704665656573952040>",
+						deny: "<:suggester_x:704665482828972113>",
+						delete: "<:strash:790937745560305674>",
+						consider: "<:sconsider:740935462067372112>",
+						implemented: "<:simplemented:740935015109492758>",
+						progress: "<:sprogress:740935462163841137>",
+						nothappening: "<:sno:740935462079954996>",
+						colorchange: "⭐",
+						suggest: "📣"
+					};
+					if (!args[2]) {
+						if (!qServerDB.config.trello.actions.length) return message.channel.send(string(locale, "TRELLO_NO_ACTIONS_CONFIGURED", {}, "error"));
+						let actionArr = [];
+						for (let a of qServerDB.config.trello.actions) {
+							if (a.action === "suggest") {
+								let ls = lists.find(li => li.id === a.id);
+								if (!ls) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, "TRELLO_CONFIG_SUGGEST", { list: ls.name })}`);
+							} else if (a.part === "list") {
+								let l = lists.find(li => li.id === a.id);
+								if (!l) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_LIST`, { list: l.name })}`);
+							} else if (a.part === "label") {
+								let la = labels.find(l => l.id === a.id);
+								if (!la) continue;
+								actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_LABEL`, { label: la.name })}`);
+							} else actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${a.action.toUpperCase()}_${a.part.toUpperCase()}`)}`);
+						}
+						return pages(locale, message, actionArr.chunk(6).map(c => c.join("\n")));
+					}
+					switch (args[2].toLowerCase()) {
+					case "suggest":
+					case "submit":
+						// eslint-disable-next-line no-case-declarations
+						let suggestAction = qServerDB.config.trello.actions.find(a => a.action === "suggest");
+						if (!args[3]) return message.channel.send(`${actionPrepend["suggest"]} ${string(locale, suggestAction ? "TRELLO_CONFIG_SUGGEST" : "TRELLO_CONFIG_SUGGEST_NONE", suggestAction ? { list: lists.find(l => l.id === suggestAction.id) ? lists.find(l => l.id === suggestAction.id).name : string(locale, "NONE") } : {})}`);
+						if (["none", "reset", "delete"].includes(args[3].toLowerCase())) {
+							qServerDB.config.trello.actions.splice(qServerDB.config.trello.actions.findIndex(a => a.action === "suggest"), 1);
+							qServerDB.save();
+							return message.channel.send(string(locale, "SUGGEST_LIST_RESET_SUCCESS", {}, "success"));
+						}
+						// eslint-disable-next-line no-case-declarations
+						let foundList = findList(lists, args.splice(3).join(" "));
+						if (!foundList) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+						// eslint-disable-next-line no-case-declarations
+						suggestAction ? suggestAction = {
+							action: "suggest",
+							part: "list",
+							id: foundList.id
+						} : qServerDB.config.trello.actions.push({
+							action: "suggest",
+							part: "list",
+							id: foundList.id
+						});
+						qServerDB.save();
+						message.channel.send(string(locale, "SUGGEST_LIST_SET_SUCCESS", { list: foundList.name }, "success"), { disableMentions: "everyone" });
+						break;
+					default:
+						// eslint-disable-next-line no-case-declarations
+						let allowed = [["approve", "accept", "approved"], ["deny", "reject", "refuse", "denied"], ["delete", "remove", "deleted"], ["implemented", "implement", "done"], ["consider", "considered", "consideration"], ["progress", "working"], ["nothappening", "no"], ["colorchange", "color"]];
+						// eslint-disable-next-line no-case-declarations
+						let foundAction = allowed.find(a => a.includes(args[2].toLowerCase()));
+						allowed.push(["suggest"]);
+						if (!foundAction) return message.channel.send(string(locale, "TRELLO_INVALID_ACTION_ERROR", { list: `\`${allowed.map(a => a[0]).join("`, `")}\`` }, "error"));
+
+						if (!args[3]) {
+							let actionList = qServerDB.config.trello.actions.filter(a => a.action === foundAction[0]);
+							if (!actionList.length) return message.channel.send(`${actionPrepend[foundAction[0]]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_NONE`)}`);
+							let actionArr = [];
+							for (let a of actionList) {
+								if (a.part === "list") {
+									let l = lists.find(li => li.id === a.id);
+									if (!l) continue;
+									actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LIST`, { list: l.name })}`);
+								} else if (a.part === "label") {
+									let la = labels.find(l => l.id === a.id);
+									if (!la) continue;
+									actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LABEL`, { label: la.name })}`);
+								} else actionArr.push(`${actionPrepend[a.action]} ${string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_${a.part.toUpperCase()}`)}`);
+							}
+							return message.channel.send(actionArr.join("\n"));
+						}
+						//Action is foundAction[0]
+						switch(args[3].toLowerCase()) {
+						case "delete":
+							// eslint-disable-next-line no-case-declarations
+							let filteredActionsDel = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							filteredActionsDel.push({
+								action: foundAction[0],
+								part: "delete"
+							});
+							qServerDB.config.trello.actions = filteredActionsDel;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_DELETE`, {}, "success"));
+						case "archive":
+							// eslint-disable-next-line no-case-declarations
+							let filteredActionsArc = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							filteredActionsArc.push({
+								action: foundAction[0],
+								part: "archive"
+							});
+							qServerDB.config.trello.actions = filteredActionsArc;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_ARCHIVE`, {}, "success"));
+						case "label":
+							// eslint-disable-next-line no-case-declarations
+							let foundLabel = findLabel(labels, args.splice(4).join(" "));
+							if (!foundLabel) return message.channel.send(string(locale, "NO_LABEL_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+							// eslint-disable-next-line no-case-declarations
+							let newLList = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0] || !["delete", "archive"].includes(a.part));
+							// eslint-disable-next-line no-case-declarations
+							let labelAction = newLList.find(a => a.action === foundAction[0] && a.part === "label");
+							labelAction ? labelAction = {
+								action: foundAction[0],
+								part: "label",
+								id: foundLabel.id
+							} : newLList.push({
+								action: foundAction[0],
+								part: "label",
+								id: foundLabel.id
+							});
+							qServerDB.config.trello.actions = newLList;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LABEL`, { label: foundLabel.name }, "success"));
+						case "list":
+							// eslint-disable-next-line no-case-declarations
+							let foundList = findList(lists, args.splice(4).join(" "));
+							if (!foundList) return message.channel.send(string(locale, "NO_LIST_NAME_ERROR", { code: qServerDB.config.trello.board }, "error"));
+							// eslint-disable-next-line no-case-declarations
+							let newList = qServerDB.config.trello.actions.filter(a => (a.action !== foundAction[0] || !["delete", "archive"].includes(a.part)) && !(a.action === foundAction[0] && a.part === "list"));
+							// eslint-disable-next-line no-case-declarations
+							newList.push({
+								action: foundAction[0],
+								part: "list",
+								id: foundList.id
+							});
+							qServerDB.config.trello.actions = newList;
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_LIST`, { list: foundList.name }, "success"));
+						case "none":
+						case "reset":
+							qServerDB.config.trello.actions = qServerDB.config.trello.actions.filter(a => a.action !== foundAction[0]);
+							qServerDB.save();
+							return message.channel.send(string(locale, `TRELLO_ACTION_${foundAction[0].toUpperCase()}_NONE`, {}, "success"));
+						}
+					}
+					break;
+				default:
+					return message.channel.send(string(locale, "CFG_TRELLO_INVALID_PARAM", {}, "error"));
+				}
+			}
+		},
+		{
+			names: ["cap", "maxsuggestions", "suggestioncap", "maxsuggest", "suggestcap", "suggestmax"],
+			name: "Suggestion Cap",
+			description: "The maximum number of approved (not denied or implemented) suggestions there can be at any given time. When the cap is reached, no new suggestions can be submitted",
+			examples: "`{{p}}config cap 50`\nSets the suggestion cap to 50\n\n`{{p}}config cap none`\nRemoves the suggestion cap",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cap ? "CFG_CAP_INFO" : "CFG_CAP_NONE", { cap: qServerDB.config.suggestion_cap }));
+				if (["none", "delete", "reset", "remove", "0"].includes(args[1].toLowerCase())) {
+					qServerDB.config.suggestion_cap = 0;
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_CAP_NONE", {}, "success"));
+				}
+				let newValue = parseInt(args[1]);
+				if (!newValue || newValue < 1) return message.channel.send(string(locale, "CFG_COLOR_CHANGE_INVALID_NUMBER", {}, "error"));
+				qServerDB.config.suggestion_cap = newValue;
+				await qServerDB.save();
+				return message.channel.send(string(locale, "CFG_CAP_SET", { cap: newValue }, "success"));
+			}
+		},];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
 		case "help": {
@@ -846,6 +1126,7 @@ module.exports = {
 					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				return message.channel.send(elementEmbed);
 			}
 			let embeds = [new Discord.MessageEmbed()
@@ -865,6 +1146,7 @@ module.exports = {
 					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				embeds.push(elementEmbed);
 			}
 			return pages(locale, message, embeds);
@@ -894,7 +1176,9 @@ module.exports = {
 			// Implemented suggestion role
 			cfgRolesArr.push((await listRoles(qServerDB.config.implemented_role, server, "CONFIG_NAME:IMPLEMENTEDROLE", false)));
 			// Submitted suggestion mention role
-			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:PINGROLE", false)));
+			cfgRolesArr.push((await listRoles(qServerDB.config.ping_role, server, "CONFIG_NAME:REVIEWPING", false)));
+			// Approved suggestion mention role
+			cfgRolesArr.push((await listRoles(qServerDB.config.feed_ping_role, server, "CONFIG_NAME:APPROVEPING", false)));
 			// Suggestions channel
 			let suggestionChannel = await showChannel(qServerDB.config.channels.suggestions, server, "CONFIG_NAME:SUGGESTIONS", true);
 			if (suggestionChannel[1]) {
@@ -966,20 +1250,23 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:NOTIFY", {}, "success")}:** ${string(locale, qServerDB.config.notify ? "ENABLED" : "DISABLED")}`);
 			// Automatic following
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:AUTOFOLLOW", {}, "success")}:** ${string(locale, qServerDB.config.auto_subscribe ? "ENABLED" : "DISABLED")}`);
-			//Clean Suggestion Command
+			// Clean Suggestion Command
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CLEARCOMMANDS", {}, "success")}:** ${string(locale, qServerDB.config.clean_suggestion_command ? "ENABLED" : "DISABLED")}`);
-			//In-Channel Suggestions
+			// In-Channel Suggestions
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:INCHANNELSUGGESTIONS", {}, "success")}:** ${string(locale, qServerDB.config.in_channel_suggestions ? "ENABLED" : "DISABLED")}`);
-			//Locale
+			// Locale
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:LOCALE", {}, "success")}:** ${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.native} (${client.locales.find(l => l.settings.code === qServerDB.config.locale).settings.english})`);
-			//Cooldown
+			// Cooldown
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
+			// Cap
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
-				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n"))];
+				new Discord.MessageEmbed().setTitle(string(locale, "OTHER_CONFIGURATION_TITLE")).setDescription(cfgOtherArr.join("\n")),
+				new Discord.MessageEmbed().setTitle(string(locale, "TRELLO_CONFIGURATION_TITLE")).setDescription(string(locale, "TRELLO_BASE_CONFIG", { code: qServerDB.config.trello.board ? `https://trello.com/b/${qServerDB.config.trello.board}` : string(locale, "NONE_CONFIGURED"), p: qServerDB.config.prefix }, qServerDB.config.trello.board ? "success" : "error"))];
 
-			if (args[args.length-1].toLowerCase() === "--flags" && permission <= 1) {
+			if (["--flags", "-flags"].some(e => e === args[args.length-1].toLowerCase()) && permission <= 1) {
 				const permissions = require("../../utils/permissions");
 				let hasPermissionList = [];
 				Object.keys(permissions).forEach(perm => {

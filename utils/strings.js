@@ -454,6 +454,10 @@ module.exports = {
 			string: "Other Configuration",
 			context: "Title for the Other Configuration field of the configuration list"
 		},
+		"TRELLO_CONFIGURATION_TITLE": {
+			string: "Trello Configuration",
+			context: "Title for the Trello Configuration field of the configuration list"
+		},
 		"CFG_STATUS_TITLE": {
 			string: "Config Status",
 			context: "Title for the Config Status field of the configuration list"
@@ -569,6 +573,10 @@ module.exports = {
 		"HELP_ALIAS_PLURAL": {
 			string: "Aliases",
 			context: "Aliases field name in help command"
+		},
+		"HELP_DOCS": {
+			string: "Documenation",
+			context: "Documenation field name in help command"
 		},
 		"COMMAND_DISABLED": {
 			string: "This command is currently disabled globally.",
@@ -2460,9 +2468,23 @@ module.exports = {
 			string: "There are no suggestions awaiting review!",
 			context: "Shown when the queue is empty in the listqueue command"
 		},
-		"PENDING_REVIEW_HEADER": {
-			string: "Suggestions Pending Review",
-			context: "Header for the listqueue embed"
+		"PENDING_REVIEW_HEADER_NUM": {
+			string: "Suggestions Pending Review (showing {{min}}-{{max}} of {{total}})",
+			context: "Header for the listqueue embed",
+			replaced: {
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				},
+				total: {
+					to_replace: "{{total}}",
+					context: "The total number of suggestions awaiting review"
+				},
+			}
 		},
 		"STATUS_ALREADY_SET_ERROR": {
 			string: "This suggestion already has a status of **{{status}}**",
@@ -3006,6 +3028,10 @@ module.exports = {
 			string: "Successfully reset the suggestion submitted mention role.",
 			context: "Success message when the mention on submitted suggestion role is reset"
 		},
+		"CFG_RESET_FEED_PING_ROLE_SUCCESS": {
+			string: "Successfully reset the suggestion approved mention role.",
+			context: "Success message when the mention on submitted approved role is reset"
+		},
 		"CFG_NO_MENTION_EVERYONE_ERROR": {
 			string: "Please give {{bot}} the **Mention Everyone** permission in order for the bot to be able to mention this role when a suggestion is submitted.",
 			context: "Error when an suggestion ping role is configured but the bot does not have the Mention Everyone permission",
@@ -3023,6 +3049,20 @@ module.exports = {
 		"CFG_PING_ROLE_SUCCESS": {
 			string: "The **{{role}}** role will now be mentioned when suggestions are submitted for review.",
 			context: "Success message when the suggestion ping role is configured",
+			replaced: {
+				role: {
+					to_replace: "{{role}}",
+					description: "A role name"
+				}
+			}
+		},
+		"CFG_ALREADY_FEED_PING_ROLE_ERROR": {
+			string: "This role is already set to be mentioned when a suggestion is approved!",
+			context: "Error when the specified suggestio  approved ping role is already set"
+		},
+		"CFG_FEED_PING_ROLE_SUCCESS": {
+			string: "The **{{role}}** role will now be mentioned when suggestions are approved.",
+			context: "Success message when the suggestion approved ping role is configured",
 			replaced: {
 				role: {
 					to_replace: "{{role}}",
@@ -3357,6 +3397,16 @@ module.exports = {
 		"PROTIP_CANARY": {
 			string: "You can join the Suggester Canary program to help test new bot features before they are released to the main bot. Join the [Support Server]({{support_invite}}) for info!",
 			context: "Protip for Canary",
+			replaced: {
+				support_invite: {
+					to_replace: "{{support_invite}}",
+					description: "The link to the support server"
+				}
+			}
+		},
+		"PROTIP_LARGE_SERVER": {
+			string: "This server may be eligible for Suggester's **large server program**. Read more about the program [here](https://suggester.js.org/#/community-programs) and apply in the [support server]({{support_invite}}) for info!",
+			context: "Protip for the large server program",
 			replaced: {
 				support_invite: {
 					to_replace: "{{support_invite}}",
@@ -4490,21 +4540,34 @@ module.exports = {
 			context: "Examples for the Approved Suggestion Role config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `approverole`"
 		},
-		"CONFIG_NAME:PINGROLE": {
+		"CONFIG_NAME:REVIEWPING": {
 			string: "Suggestion Submitted Mention Role",
 			context: "Name of the Suggestion Submitted Mention Role config element"
 		},
-		"CONFIG_DESC:PINGROLE": {
+		"CONFIG_DESC:REVIEWPING": {
 			string: "The role that is mentioned when a new suggestion is submitted for review.",
 			context: "Description of the Suggestion Submitted Mention Role config element"
 		},
-		"CONFIG_EXAMPLES:PINGROLE": {
-			string: "`{{p}}config pingrole Staff`\n" +
-				"Sets the \"Staff\" as the role mentioned when a suggestion is submitted for review\n" +
+		"CONFIG_EXAMPLES:REVIEWPING": {
+			string: "`{{p}}config reviewping Staff`\n" +
+				"Sets the \"Staff\" role as the role mentioned when a suggestion is submitted for review\n" +
 				"\n" +
-				"`{{p}}config pingrole none`\n" +
+				"`{{p}}config reviewping none`\n" +
 				"Resets the role mentioned when a suggestion is submitted for review, meaning no role will be mentioned",
 			context: "Examples for the Suggestion Submitted Mention Role config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
+		},
+		"CONFIG_NAME:APPROVEPING": {
+			string: "Suggestion Approved Mention Role",
+			context: "Name of the Suggestion Approved Mention Role config element"
+		},
+		"CONFIG_DESC:APPROVEPING": {
+			string: "The role that is mentioned when a new suggestion is approved and sent to the suggestions feed.",
+			context: "Description of the Suggestion Approved Mention Role config element"
+		},
+		"CONFIG_EXAMPLES:APPROVEPING": {
+			string: "`{{p}}config approveping Voting Squad`\nSets the \"Voting Squad\" role as the role mentioned when a suggestion is sent to the suggestions feed\n\n`{{p}}config approveping none`\nResets the role mentioned when a suggestion is sent to the suggestions feed, meaning no role will be mentioned",
+			context: "Examples for the Suggestion Approved Mention Role config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `pingrole`"
 		},
 		"CONFIG_NAME:REVIEW": {
@@ -4516,8 +4579,8 @@ module.exports = {
 			context: "Description of the Suggestion Review Channel config element"
 		},
 		"CONFIG_EXAMPLES:REVIEW": {
-			string: "`{{p}}config review #suggestions-review`\n" +
-				"Sets the #suggestions-review channel as the channel where suggestions awaiting review are sent",
+			string: "`{{p}}config review #suggestion-review`\n" +
+				"Sets the #suggestion-review channel as the channel where suggestions awaiting review are sent",
 			context: "Examples for the Suggestion Review Channel config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `review`"
 		},
@@ -4768,6 +4831,41 @@ module.exports = {
 			string: "`{{p}}config cooldown 5m`\nSets the suggestion cooldown time to 5 minutes.\n\n`{{p}}config cooldown 1 hour`\nSets the suggestion cooldown time to 1 hour.\n\n`{{p}}config cooldown 0`\nRemoves the suggestion cooldown time",
 			context: "Examples for the Suggestion Cooldown config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `admin`"
+		},
+		"CONFIG_NAME:TRELLO": {
+			string: "Trello",
+			context: "Name of the Trello config element"
+		},
+		"CONFIG_DESC:TRELLO": {
+			string: "Settings for the Suggester Trello integration",
+			context: "Description of the Trello config element"
+		},
+		"CONFIG_EXAMPLES:TRELLO": {
+			string: "`{{p}}config trello board https://trello.com/b/oCArLTyk/test`\n" +
+				"Connects a Trello board to the bot (`@suggester_bot` must be a board member on Trello)\n" +
+				"\n" +
+				"`{{p}}config trello board none`\n" +
+				"Removes the connected Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions suggest List 1` \n" +
+				"Configures that submitted suggestions should be added to list **List 1**\n" +
+				"\n" +
+				"`{{p}}config trello actions approve list List 2`\n" +
+				"Configures that approved suggestions (review mode only) are added to list **List 2**\n" +
+				"\n" +
+				"`{{p}}config trello actions implemented label Finished`\n" +
+				"Configures that suggestions marked as implemented are given label **Finished**\n" +
+				"\n" +
+				"`{{p}}config trello actions deny delete`\n" +
+				"Configures that denied suggestions are removed from the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions delete archive`\n" +
+				"Configures that deleted suggestions are archived on the Trello board\n" +
+				"\n" +
+				"`{{p}}config trello actions working none`\n" +
+				"Removes any configured actions for suggestions marked as in progress",
+			context: "Examples for the Trello config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `trello`"
 		},
 		"AUTOFOLLOW_FIRST_NOTIF": {
 			string: "You just upvoted suggestion #{{suggestion}} in **{{server}}**. By default, you're now following this suggestion. This means that if an update is made to the suggestion you will receive a DM. Use `{{prefix}}unfollow {{suggestion}}` in {{server}} to unfollow the suggestion, and `{{prefix}}unfollow auto` to disable automatic following.\n_You will only receive this message once_",
@@ -5187,17 +5285,17 @@ module.exports = {
 			context: "Examples for the denyedit command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
-		"COMMAND_DESC:SHORTINFO": {
+		"COMMAND_DESC:SINFO": {
 			string: "Shows information about a suggestion in a concise manner",
 			context: "Description for the shortinfo command"
 		},
-		"COMMAND_USAGE:SHORTINFO": {
+		"COMMAND_USAGE:SINFO": {
 			string: "shortinfo [suggestion id]",
 			context: "Usage for the shortinfo command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:SHORTINFO": {
-			string: "`{{p}}shortinfo 1`\nShows information about suggestion #1",
+		"COMMAND_EXAMPLES:SINFO": {
+			string: "`{{p}}shortinfo 1`\nShows information about suggestion #1\n\n`{{p}}shortinfo 1 -trim-suggest`\nShows information about suggestion #1 limiting the suggestion content to 250 characters\n\n`{{p}}shortinfo 1 -no-attach`\nShows information about suggestion #1 without showing the added attachment",
 			context: "Examples for the shortinfo command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
@@ -5376,6 +5474,453 @@ module.exports = {
 			string: "hypernukebean [user]",
 			context: "Usage for the hypernukebean command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
-		}
+		},
+		"NO_BOARD_SPECIFIED_ERROR": {
+			string: "You must specify a valid link to a Trello board",
+			context: "Error shown when a user has not specified a valid Trello board link"
+		},
+		"INVALID_BOARD_SPECIFIED_ERROR": {
+			string: "The board you specified could not be found. Make sure `@suggester_bot` has been added as a board member.",
+			context: "Error shown when a user has not specified a Trello board link the bot can access"
+		},
+		"TRELLO_BOARD_RESET_SUCCESS": {
+			string: "Successfully reset the configured Trello board",
+			context: "Success message when the trello board is reset"
+		},
+		"TRELLO_BOARD_SET_SUCCESS": {
+			string: "Successfully set the Trello board to https://trello.com/b/{{code}}",
+			context: "Success message when the Trello board is set",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
+		},
+		"NO_TRELLO_BOARD_SET_ERROR": {
+			string: "You must have a Trello board configured to configure actions",
+			context: "Error when there is no Trello board set and a user tries to configure actions"
+		},
+		"NO_LIST_NAME_ERROR": {
+			string: "You must provide the name of a list on the Trello board <https://trello.com/b/{{code}}>",
+			context: "Error shown when a user does not provide a valid list name for configuring Trello",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
+		},
+		"NO_LABEL_NAME_ERROR": {
+			string: "You must provide the name of a label on the Trello board <https://trello.com/b/{{code}}>",
+			context: "Error shown when a user does not provide a valid label name for configuring Trello",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					context: "The trello board code"
+				}
+			}
+		},
+		"SUGGEST_LIST_RESET_SUCCESS": {
+			string: "Submitted suggestions will no longer be posted to the Trello board",
+			context: "Success message when the submitted suggestions list is reset"
+		},
+		"SUGGEST_LIST_SET_SUCCESS": {
+			string: "All submitted suggestions will be sent to the **{{list}}** list on Trello",
+			context: "Success message shown when a user configures a list for submitted suggestions on Trello",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The trello board list name"
+				}
+			}
+		},
+		"SUGGESTION_TRELLO_INFO": {
+			string: "Submitted by {{user}} ({{id}})\nSuggestion ID: {{sid}}",
+			context: "Information for the Trello card description",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					context: "The user who submitted the suggestion"
+				},
+				id: {
+					to_replace: "{{id}}",
+					context: "The ID of the user who submitted the suggestion"
+				},
+				sid: {
+					to_replace: "{{sid}}",
+					context: "The ID of the suggestion"
+				}
+			}
+		},
+		"TRELLO_CONFIG_SUGGEST": {
+			string: "All submitted suggestions are added to list **{{list}}**",
+			context: "Shows where submitted suggestions are added on trello",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The list name"
+				}
+			}
+		},
+		"TRELLO_CONFIG_SUGGEST_NONE": {
+			string: "Submitted suggestions are not added to Trello",
+			context: "Shows where submitted suggestions are added on trello if not configured"
+		},
+		"TRELLO_INVALID_ACTION_ERROR": {
+			string: "That is an invalid action. You can configure the following actions: {{list}}",
+			context: "Shown when an action specified is invalid",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					context: "The list of available actions"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_DELETE": {
+			string: "Suggestions that are approved will be deleted from the Trello board",
+			context: "Shows that suggestions approved will be deleted"
+		},
+		"TRELLO_ACTION_APPROVE_ARCHIVE": {
+			string: "Suggestions that are approved will be archived on the Trello board",
+			context: "Shows that suggestions approved will be archived"
+		},
+		"TRELLO_ACTION_APPROVE_LIST": {
+			string: "Suggestions that are approved will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions approved will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_LABEL": {
+			string: "Suggestions that are approved will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions approved will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DENY_DELETE": {
+			string: "Suggestions that are denied will be deleted from the Trello board",
+			context: "Shows that suggestions denied will be deleted"
+		},
+		"TRELLO_ACTION_DENY_ARCHIVE": {
+			string: "Suggestions that are denied will be archived on the Trello board",
+			context: "Shows that suggestions denied will be archived"
+		},
+		"TRELLO_ACTION_DENY_LIST": {
+			string: "Suggestions that are denied will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions denied will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DENY_LABEL": {
+			string: "Suggestions that are denied will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions denied will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DELETE_DELETE": {
+			string: "Suggestions that are deleted will be deleted from the Trello board",
+			context: "Shows that suggestions deleted will be deleted"
+		},
+		"TRELLO_ACTION_DELETE_ARCHIVE": {
+			string: "Suggestions that are deleted will be archived on the Trello board",
+			context: "Shows that suggestions deleted will be archived"
+		},
+		"TRELLO_ACTION_DELETE_LIST": {
+			string: "Suggestions that are deleted will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions deleted will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_DELETE_LABEL": {
+			string: "Suggestions that are deleted will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions deleted will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_IMPLEMENTED_DELETE": {
+			string: "Suggestions that are marked as implemented will be deleted from the Trello board",
+			context: "Shows that suggestions marked as implemented will be deleted"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_ARCHIVE": {
+			string: "Suggestions that are marked as implemented will be archived on the Trello board",
+			context: "Shows that suggestions marked as implemented will be archived"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_LIST": {
+			string: "Suggestions that are marked as implemented will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as implemented will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_IMPLEMENTED_LABEL": {
+			string: "Suggestions that are marked as implemented will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as implemented will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_CONSIDER_DELETE": {
+			string: "Suggestions that are marked as in consideration will be deleted from the Trello board",
+			context: "Shows that suggestions marked as in consideration will be deleted"
+		},
+		"TRELLO_ACTION_CONSIDER_ARCHIVE": {
+			string: "Suggestions that are marked as in consideration will be archived on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be archived"
+		},
+		"TRELLO_ACTION_CONSIDER_LIST": {
+			string: "Suggestions that are marked as in consideration will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_CONSIDER_LABEL": {
+			string: "Suggestions that are marked as in consideration will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as in consideration will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_PROGRESS_DELETE": {
+			string: "Suggestions that are marked as in progress will be deleted from the Trello board",
+			context: "Shows that suggestions marked as in progress will be deleted"
+		},
+		"TRELLO_ACTION_PROGRESS_ARCHIVE": {
+			string: "Suggestions that are marked as in progress will be archived on the Trello board",
+			context: "Shows that suggestions marked as in progress will be archived"
+		},
+		"TRELLO_ACTION_PROGRESS_LIST": {
+			string: "Suggestions that are marked as in progress will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as in progress will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_PROGRESS_LABEL": {
+			string: "Suggestions that are marked as in progress will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as in progress will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_NOTHAPPENING_DELETE": {
+			string: "Suggestions that are marked as not happening will be deleted from the Trello board",
+			context: "Shows that suggestions marked as not happening will be deleted"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_ARCHIVE": {
+			string: "Suggestions that are marked as not happening will be archived on the Trello board",
+			context: "Shows that suggestions marked as not happening will be archived"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_LIST": {
+			string: "Suggestions that are marked as not happening will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions marked as not happening will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_NOTHAPPENING_LABEL": {
+			string: "Suggestions that are marked as not happening will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions marked as not happening will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_COLORCHANGE_DELETE": {
+			string: "Suggestions that are upvoted past the color change threshold will be deleted from the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be deleted"
+		},
+		"TRELLO_ACTION_COLORCHANGE_ARCHIVE": {
+			string: "Suggestions that are upvoted past the color change threshold will be archived on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be archived"
+		},
+		"TRELLO_ACTION_COLORCHANGE_LIST": {
+			string: "Suggestions that are upvoted past the color change threshold will be moved to the **{{list}}** list on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be moved to a list",
+			replaced: {
+				list: {
+					to_replace: "{{list}}",
+					description: "The list name"
+				}
+			}
+		},
+		"TRELLO_ACTION_COLORCHANGE_LABEL": {
+			string: "Suggestions that are upvoted past the color change threshold will be given the **{{label}}** label on the Trello board",
+			context: "Shows that suggestions upvoted past the color change threshold will be moved to a list",
+			replaced: {
+				label: {
+					to_replace: "{{label}}",
+					description: "The label name"
+				}
+			}
+		},
+		"TRELLO_ACTION_APPROVE_NONE": {
+			string: "No Trello action will be taken on suggestions that are approved",
+			context: "Shows that suggestions approved will not be taken action on"
+		},
+		"TRELLO_ACTION_DENY_NONE": {
+			string: "No Trello action will be taken on suggestions that are denied",
+			context: "Shows that suggestions denied will not be taken action on"
+		},
+		"TRELLO_ACTION_DELETE_NONE": {
+			string: "No Trello action will be taken on suggestions that are deleted",
+			context: "Shows that suggestions deleted will not be taken action on"
+		},
+		"TRELLO_ACTION_IMPLEMENTED_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as implemented",
+			context: "Shows that suggestions marked as implemented will not be taken action on"
+		},
+		"TRELLO_ACTION_CONSIDER_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as in consideration",
+			context: "Shows that suggestions marked as in consideration will not be taken action on"
+		},
+		"TRELLO_ACTION_PROGRESS_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as in progress",
+			context: "Shows that suggestions marked as in progress will not be taken action on"
+		},
+		"TRELLO_ACTION_NOTHAPPENING_NONE": {
+			string: "No Trello action will be taken on suggestions that are marked as not happening",
+			context: "Shows that suggestions marked as not happening will not be taken action on"
+		},
+		"TRELLO_ACTION_COLORCHANGE_NONE": {
+			string: "No Trello action will be taken on suggestions that are upvoted past the color change threshold",
+			context: "Shows that suggestions upvoted past the color change threshold will not be taken action on"
+		},
+		"TRELLO_NO_ACTIONS_CONFIGURED": {
+			string: "No Trello actions are configured",
+			content: "Shows when no Trello actions are set"
+		},
+		"TRELLO_BASE_CONFIG": {
+			string: "**Linked Trello Board:** {{code}}\nUse `{{p}}config trello actions` to view configured actions",
+			context: "Shows the linked trello board, **do not translate `config trello actions` as that is a bot command**",
+			replaced: {
+				code: {
+					to_replace: "{{code}}",
+					description: "The trello board code"
+				},
+				p: {
+					to_replace: "{{p}}",
+					description: "The server prefix"
+				}
+			}
+		},
+		"CFG_TRELLO_INVALID_PARAM": {
+			string: "You must specify `board` or `action`",
+			context: "Error when a user specifies none or an invalid parameter for Trello config"
+		},
+		"CFG_CAP_INFO": {
+			string: "The suggestion cap is currently set to **{{cap}}** suggestions",
+			context: "Shows the suggestion cap in the config command",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The configured cap"
+				}
+			}
+		},
+		"CFG_CAP_NONE": {
+			string: "There is no suggestion cap set.",
+			context: "Shows the suggestion cap in the config command when none is set"
+		},
+		"CFG_CAP_SET": {
+			string: "The suggestion cap is now **{{cap}}** suggestions",
+			context: "Success message when the suggestion cap is set",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The time the cap is set to"
+				}
+			}
+		},
+		"CONFIG_NAME:CAP": {
+			string: "Suggestion Cap",
+			context: "Name of the Suggestion Cap config element"
+		},
+		"CONFIG_DESC:CAP": {
+			string: "The maximum number of approved (not denied or implemented) suggestions there can be at any given time. When the cap is reached, no new suggestions can be submitted",
+			context: "Description of the Suggestion Cap config element"
+		},
+		"CONFIG_EXAMPLES:CAP": {
+			string: "`{{p}}config cap 50`\nSets the suggestion cap to 50\n\n`{{p}}config cap none`\nRemoves the suggestion cap",
+			context: "Examples for the Suggestion Cap config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"CAP_REACHED_ERROR": {
+			string: "This server has reached the configured cap of {{cap}} approved suggestions. New suggestions cannot be submitted until some existing suggestions are cleared.",
+			context: "Error shown when a server's cap limit has been reached",
+			replaced: {
+				cap: {
+					to_replace: "{{cap}}",
+					description: "The configured cap"
+				}
+			}
+		},
+		"AUTOSETUP_CATEGORY": {
+			string: "Suggester",
+			context: "The name of the category created for suggestions channels in autosetup"
+		},
+		"AUTOSETUP_SUGGESTIONS": {
+			string: "suggestions",
+			context: "The name of the channel created for approved suggestions in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_DENIED": {
+			string: "denied-suggestions",
+			context: "The name of the channel created for denied suggestions in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_REVIEW": {
+			string: "suggestion-review",
+			context: "The name of the channel created for suggestion review in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
+		"AUTOSETUP_LOG": {
+			string: "suggestion-log",
+			context: "The name of the channel created for suggestion logs in autosetup\n**As this is a channel name, make sure there are no spaces**"
+		},
 	}
 };

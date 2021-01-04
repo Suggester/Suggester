@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "removeattachment",
@@ -15,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}removeattachment 1`\nRemoves the attachment from suggestion #1",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/removeattachment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
@@ -45,6 +47,14 @@ module.exports = {
 				.setImage(oldAttachment);
 
 			serverLog(embedLog, qServerDB, client);
+		}
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && qSuggestionDB.trello_attach_id) {
+			const t = initTrello();
+			t.makeRequest("delete", `/1/cards/${qSuggestionDB.trello_card}/attachments/${qSuggestionDB.trello_attach_id}`).then(() => {
+				qSuggestionDB.trello_attach_id = "";
+				qSuggestionDB.save();
+			}).catch(() => null);
 		}
 	}
 };

@@ -5,6 +5,7 @@ const { dbQueryNoNew } = require("../../utils/db");
 const { notifyFollowers, editFeedMessage } = require("../../utils/actions");
 const { baseConfig, checkSuggestions, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "approveedit",
@@ -15,7 +16,8 @@ module.exports = {
 		examples: "`{{p}}approveedit 123`\nApproves a pending edit on suggestion #123",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "editing/approveedit"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -67,6 +69,11 @@ module.exports = {
 		qSuggestionDB.suggestion = qSuggestionDB.pending_edit.content;
 		qSuggestionDB.pending_edit = {};
 		await qSuggestionDB.save();
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card) {
+			const t = initTrello();
+			t.updateCardName(qSuggestionDB.trello_card, qSuggestionDB.suggestion).catch(() => {});
+		}
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));

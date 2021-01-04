@@ -6,6 +6,7 @@ const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/
 const { emoji } = require("../../config.json");
 const { deleteFeedMessage, editFeedMessage, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard, trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "mark",
@@ -17,7 +18,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplemented:740935015109492758> Implemented (`implemented`)\n<:sprogress:740935462163841137> In Progress (`working`)\n<:sconsider:740935462067372112> In Consideration (`considered`)\n<:sdefault:740935462117703831> Default (`default`)\n<:sno:740935462079954996> Not Happening (`no`)",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/mark"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
@@ -31,11 +33,12 @@ module.exports = {
 				return [["implemented"], string(locale, "STATUS_IMPLEMENTED"), string(guildLocale, "STATUS_IMPLEMENTED"), client.colors.green];
 			case "working":
 			case "progress":
-			case "in":
+			case "inprogress":
 				return [["working"], string(locale, "STATUS_PROGRESS"), string(guildLocale, "STATUS_PROGRESS"), client.colors.orange];
 			case "consideration":
 			case "consider":
 			case "considered":
+			case "inconsideration":
 				return [["consideration"], string(locale, "STATUS_CONSIDERATION"), string(guildLocale, "STATUS_CONSIDERATION"), client.colors.teal];
 			case "no":
 			case "not":
@@ -77,7 +80,10 @@ module.exports = {
 		if (!checkFor) return message.channel.send(string(locale, "NO_STATUS_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		if (checkFor.includes(qSuggestionDB.displayStatus)) return message.channel.send(string(locale, "STATUS_ALREADY_SET_ERROR", { status: str }, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let isComment = args[2];
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+
+		let isComment = args.slice().join(" ").trim();
 
 		let comment;
 		if (isComment) {
@@ -85,18 +91,17 @@ module.exports = {
 			if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			let commentId = qSuggestionDB.comments.length+1;
 			isComment = commentId;
+			let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, comment);
 			qSuggestionDB.comments.push({
 				comment: comment,
 				author: message.author.id,
 				id: commentId,
-				created: new Date()
+				created: new Date(),
+				trello_comment
 			});
 		}
 
 		qSuggestionDB.displayStatus = checkFor[0];
-
-		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qSuggestionDB.displayStatus === "implemented" && qServerDB.config.channels.archive) {
 			if (message.guild.channels.cache.get(qServerDB.config.channels.archive)) {
@@ -139,6 +144,8 @@ module.exports = {
 					return e;
 				});
 			});
+
+			await actCard("implemented", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "INFO_PUBLIC_STATUS_HEADER")}: ${guildstr}`);
 			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 			return;
 		}
@@ -166,6 +173,8 @@ module.exports = {
 			if (isComment) logs.addField(string(guildLocale, "COMMENT_TITLE", { user: message.author.tag, id: `${id.toString()}_${isComment}` }), comment);
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard({ working: "progress", consideration: "consider", no: "nothappening" }[qSuggestionDB.displayStatus] || qSuggestionDB.displayStatus, qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "INFO_PUBLIC_STATUS_HEADER")}: ${guildstr}`);
 
 		if (qSuggestionDB.displayStatus === "implemented" && qServerDB.config.implemented_role && message.guild.roles.cache.get(qServerDB.config.implemented_role) && message.guild.members.cache.get(suggester.id) && message.guild.me.permissions.has("MANAGE_ROLES")) await message.guild.members.cache.get(suggester.id).roles.add(qServerDB.config.implemented_role, string(locale, "STATUS_IMPLEMENTED"));
 

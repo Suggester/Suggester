@@ -5,6 +5,7 @@ const { notifyFollowers } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "dupe",
@@ -15,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}dupe 1 2`\nDenies suggestion #1 as a duplicate of suggestion #2",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/dupe"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -54,8 +56,11 @@ module.exports = {
 		if (origSuggestion.implemented) reasonInfo.name = "DUPE_REASON_IMPLEMENTED";
 		else if (origSuggestion.status === "awaiting_review") reasonInfo.name = "DUPE_REASON_REVIEW";
 		else if (origSuggestion.status === "denied") {
-			reasonInfo.name = "DUPE_REASON_DENIED_WITH_REASON";
-			reasonInfo.replaced.reason = origSuggestion.denial_reason;
+			reasonInfo.name = "DUPE_REASON_DENIED";
+			if (origSuggestion.denial_reason) {
+				reasonInfo.name = "DUPE_REASON_DENIED_WITH_REASON";
+				reasonInfo.replaced.reason = origSuggestion.denial_reason;
+			}
 			if (string(guildLocale, reasonInfo.name, reasonInfo.replaced).length > 1024) {
 				reasonInfo.name = "DUPE_REASON_DENIED";
 				reasonInfo.replaced.reason = "";
@@ -125,5 +130,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("deny", qServerDB, dupeSuggestion, suggester, `${string(guildLocale, "DENIED_BY", { user: message.author.tag })}${dupeSuggestion.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${dupeSuggestion.denial_reason}` : ""}`);
 	}
 };

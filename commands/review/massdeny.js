@@ -5,6 +5,7 @@ const { notifyFollowers } = require("../../utils/actions");
 const { Suggestion } = require("../../utils/schemas");
 const { checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "massdeny",
@@ -16,7 +17,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}massdeny 1 2 3`\nDenies suggestions 1, 2, and 3\n\n`{{p}}massdeny 1 2 3 -r This isn't something we're interested in doing`\nDenies suggestions 1, 2, and 3 with a reason of \"This isn't something we're interested in doing\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "staff/massdeny"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -111,6 +113,8 @@ module.exports = {
 					}
 					serverLog(logs, qServerDB, client);
 				}
+
+				await actCard("deny", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DENIED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 
 				if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
 					let doReview = true;

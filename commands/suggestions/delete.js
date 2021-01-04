@@ -5,6 +5,7 @@ const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/check
 const { string } = require("../../utils/strings");
 const { deleteFeedMessage, checkVotes, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "delete",
@@ -15,7 +16,8 @@ module.exports = {
 		examples: "`{{p}}delete 1`\nDeletes suggestion #1\n\n`{{p}}delete 1 This has already been suggested`\nDeletes suggestion #1 with the reason \"This has already been suggested\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!"
+		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!",
+		docs: "staff/delete"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);
@@ -29,7 +31,7 @@ module.exports = {
 		qSuggestionDB.staff_member = message.author.id;
 
 		let reason;
-		if (args[1]) {
+		if (args.slice().join(" ").trim()) {
 			reason = args.splice(1).join(" ");
 			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.denial_reason = reason;
@@ -53,7 +55,7 @@ module.exports = {
 		}
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
+		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff) && client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
 			let reviewCheck = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 			if (!reviewCheck) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
 		}
@@ -85,6 +87,8 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("delete", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DELETED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 
 		await notifyFollowers(client, qServerDB, qSuggestionDB, "red", { string: "DELETED_DM_TITLE", guild: message.guild.name }, qSuggestionDB.attachment, null, reason ? { header: "REASON_GIVEN", reason: reason } : null);
 	}

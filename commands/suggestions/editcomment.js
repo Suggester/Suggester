@@ -5,6 +5,7 @@ const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
 const { fetchUser, logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "editcomment",
@@ -15,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}editcomment 27_1 This is new content`\nEdits a comment with the ID `27_1` to read \"This is new content\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "editing/comment-editing"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -58,6 +60,11 @@ module.exports = {
 			.setColor(client.colors.blue)
 			.setTimestamp();
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
+
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && comment.trello_comment) {
+			const t = initTrello();
+			t.makeRequest("put", `/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`, { text: `**${string(qServerDB.config.locale, author ? "COMMENT_TITLE" : "COMMENT_TITLE_ANONYMOUS", { user: author.tag, id: author.id })}**\n${newContent}` }).catch(() => null);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "EDITED_COMMENT_LOG", "blue")

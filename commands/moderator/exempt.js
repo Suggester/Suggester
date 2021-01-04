@@ -12,7 +12,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}exempt @Brightness™`\nExempts Brightness™ from the configured suggestion cooldown\n\n`{{p}}exempt 255834596766253057`\nExempts a user with ID 255834596766253057 from the configured suggestion cooldown",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS", "ADD_REACTIONS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/exempt"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

@@ -16,6 +16,7 @@ const settings = new Schema({
 		voting_roles: [String],
 		blocked_roles: [String],
 		ping_role: String,
+		feed_ping_role: String,
 		approved_role: { type: String },
 		implemented_role: { type: String },
 		channels: {
@@ -50,7 +51,16 @@ const settings = new Schema({
 			token: String
 		},
 		suggestion_cooldown: { type: Number, default: 0 },
-		cooldown_exempt: [String]
+		cooldown_exempt: [String],
+		trello: {
+			board: String,
+			actions: [{
+				action: String, //"suggest", "deny", "approve", "nothappening", "progress", "consideration", "implemented", "delete"
+				part: String,
+				id: String
+			}]
+		},
+		suggestion_cap: { type: Number, default: 0 }
 	}
 });
 
@@ -86,9 +96,11 @@ const suggestion = new Schema({
 			id: { type: String, min: 1, max: 23 },
 			created: { type: Date },
 			deleted: Boolean,
+			trello_comment: String
 		}
 	],
 	attachment: String,
+	trello_attach_id: String,
 	implemented: { type: Boolean, default: false },
 	imported: String,
 	votes: {
@@ -106,7 +118,9 @@ const suggestion = new Schema({
 		},
 		submitted: Date
 	},
-	edited_by: String
+	edited_by: String,
+	trello_card: String,
+	color_change_trello_action: { type: Boolean, default: false }
 });
 
 const user = new Schema({

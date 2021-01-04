@@ -4,13 +4,13 @@ const { string } = require("../../utils/strings");
 const { checkVotes } = require("../../utils/actions");
 module.exports = {
 	controls: {
-		name: "shortinfo",
+		name: "sinfo",
 		permission: 10,
 		usage: "shortinfo [suggestion id]",
-		aliases: ["sinfo", "sdetails", "si"],
+		aliases: ["shortinfo", "sdetails", "si"],
 		description: "Shows information about a suggestion in a concise manner",
 		enabled: true,
-		examples: "`{{p}}shortinfo 1`\nShows information about suggestion #1",
+		examples: "`{{p}}shortinfo 1`\nShows information about suggestion #1\n\n`{{p}}shortinfo 1 -trim-suggest`\nShows information about suggestion #1 limiting the suggestion content to 250 characters\n\n`{{p}}shortinfo 1 -no-attach`\nShows information about suggestion #1 without showing the added attachment",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5
 	},
@@ -27,10 +27,10 @@ module.exports = {
 		let embed = new Discord.MessageEmbed()
 			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({dynamic: true, format: "png"}))
 			.setColor(client.colors.blue)
-			.setDescription(qSuggestionDB.suggestion || string(locale, "NO_SUGGESTION_CONTENT"))
+			.setDescription(qSuggestionDB.suggestion ? (["--trimsuggest", "--ts", "--shortsuggest", "--ss", "--trimsuggestion", "--shortsuggestion", "--trim-suggest", "--trim-suggestion", "--short-suggest", "--short-suggestion", "-trimsuggest", "-ts", "-shortsuggest", "-ss", "-trimsuggestion", "-shortsuggestion", "-trim-suggest", "-trim-suggestion", "-short-suggest", "-short-suggestion"].some(e => message.content.toLowerCase().includes(e)) ? `${qSuggestionDB.suggestion.substr(0, 250)}${qSuggestionDB.suggestion.length > 250 ? "..." : ""}` : qSuggestionDB.suggestion) : string(locale, "NO_SUGGESTION_CONTENT"))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: qSuggestionDB.suggestionId.toString() })).setTimestamp(qSuggestionDB.submitted);
 
-		if (qSuggestionDB.attachment) embed.setImage(qSuggestionDB.attachment);
+		if (qSuggestionDB.attachment && !["--noattach", "--na", "--no-attach", "--no-attachment", "-noattachment", "-noattach", "-na", "-no-attach", "-no-attachment", "--noattachment"].some(e => message.content.toLowerCase().includes(e))) embed.setImage(qSuggestionDB.attachment);
 
 		switch (qSuggestionDB.status) {
 		case "awaiting_review":

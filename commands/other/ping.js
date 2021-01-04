@@ -13,7 +13,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let developerArray = [];
@@ -39,7 +40,7 @@ module.exports = {
 			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`, true)
 			.addField(string(locale, "PING_MEMORY_HEADER"), pretty(shardInfo.reduce((t, c) => t + parseFloat(c[0].memory), 0)))
 			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${shardInfo.map(s => string(locale, "PING_SHARD_STATS_NEW", { num: s[0].id.toString(), guilds: s[0].guilds.toString(), channels: s[0].channels.toString(), members: s[0].members.toString(), ping: Math.round(s[0].ping), uptime: humanizeDuration(s[0].uptime, { language: locale, fallbacks: ["en"] }), memory: pretty(s[0].memory)})).join("\n")}`)
-			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v4.6.1`, client.user.displayAvatarURL({format: "png"}))
+			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v4.7`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(client.colors.default);
 

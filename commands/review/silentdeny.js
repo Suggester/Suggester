@@ -4,6 +4,7 @@ const { reviewEmbed, logEmbed, fetchUser } = require("../../utils/misc");
 const { string } = require("../../utils/strings");
 const { checkSuggestion, checkDenied, baseConfig, checkReview } = require("../../utils/checks");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "silentdeny",
@@ -14,7 +15,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}silentdeny 1`\nSilently denies suggestion #1\n\n`{{p}}silentdeny 1 This isn't something we're interested in`\nSilently denies suggestion #1 with the reason \"This isn't something we're interested in\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "staff/silentdeny"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -45,7 +47,7 @@ module.exports = {
 		qSuggestionDB.staff_member = message.author.id;
 
 		let reason;
-		if (args[1]) {
+		if (args.slice().join(" ").trim()) {
 			reason = args.splice(1).join(" ");
 			if (reason.length > 1024) return message.channel.send(string(locale, "DENIAL_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.denial_reason = reason;
@@ -87,5 +89,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("deny", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DENIED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 	}
 };

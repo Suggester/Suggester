@@ -5,6 +5,7 @@ const { string } = require("../../utils/strings");
 const { baseConfig, checkSuggestions } = require("../../utils/checks");
 const { fetchUser, logEmbed } = require("../../utils/misc");
 const { cleanCommand } = require("../../utils/actions");
+const { initTrello } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "deletecomment",
@@ -15,7 +16,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}deletecomment 27_1`\nDeletes a comment with the ID `27_1`",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/deletecomment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -55,6 +57,13 @@ module.exports = {
 			.setColor(client.colors.red)
 			.setTimestamp();
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
+
+		console.log(comment);
+		if (qServerDB.config.trello.board && qSuggestionDB.trello_card && comment.trello_comment) {
+			const t = initTrello();
+			console.log(`/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`);
+			t.makeRequest("delete", `/1/cards/${qSuggestionDB.trello_card}/actions/${comment.trello_comment}/comments`).catch(() => null);
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_COMMENT_LOG", "red")

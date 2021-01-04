@@ -17,7 +17,8 @@ module.exports = {
 		examples: "`{{p}}down`\nShows the top 10 lowest voted suggestions\n\n`{{p}}down 1w`\nShows the top 10 lowest voted suggestions from the last week",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 60
+		cooldown: 60,
+		docs: "staff/top-n-down"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

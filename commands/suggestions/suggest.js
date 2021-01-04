@@ -9,6 +9,7 @@ const { cleanCommand } = require("../../utils/actions");
 const { string } = require("../../utils/strings");
 const lngDetector = new (require("languagedetect"));
 const humanizeDuration = require("humanize-duration");
+const { initTrello } = require("../../utils/trello");
 
 module.exports = {
 	controls: {
@@ -21,7 +22,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}suggest This is a suggestion`\nSubmits a suggestion\n\nYou can also attach images to your suggestion by uploading an image when you send the command",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 20
+		cooldown: 20,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let qServerDB = await dbQuery("Server", { id: message.guild.id });
@@ -61,8 +63,12 @@ module.exports = {
 			if (foundCooldown) return message.channel.send(string(locale, "CUSTOM_COOLDOWN_FLAG", { time: humanizeDuration(qServerDB.config.suggestion_cooldown+(new Date(foundCooldown.submitted).getTime())-Date.now(), { language: locale, fallbacks: ["en"] }) }, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		}
 
+		if (qServerDB.config.suggestion_cap && permission > 3) {
+			if ((await dbQueryAll("Suggestion", { id: message.guild.id, status: "approved", implemented: false } )).length >= qServerDB.config.suggestion_cap) return message.channel.send(string(locale, "CAP_REACHED_ERROR", { cap: qServerDB.config.suggestion_cap }, "error"));
+		}
+
 		let attachment = message.attachments.first() ? message.attachments.first().url : "";
-		if (args.length === 0 && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
+		if (!args.join(" ").trim() && !attachment) return message.channel.send(string(locale, "NO_SUGGESTION_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 		if (attachment && !(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 
 		let suggestion = args.join(" ");
@@ -131,6 +137,23 @@ module.exports = {
 
 				serverLog(embedLog, qServerDB, client);
 			}
+
+			if (qServerDB.config.trello.board && qServerDB.config.trello.actions.find(a => a.action === "suggest")) {
+				const t = initTrello();
+				let c = await t.addCard(qSuggestionDB.suggestion, string(guildLocale, "SUGGESTION_TRELLO_INFO", {
+					user: message.author.tag,
+					id: message.author.id,
+					sid: qSuggestionDB.suggestionId
+				}), qServerDB.config.trello.actions.find(a => a.action === "suggest").id).catch(() => null);
+				if (c) {
+					qSuggestionDB.trello_card = c.id;
+					qSuggestionDB.save();
+					if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).then(a => {
+						qSuggestionDB.trello_attach_id = a.id;
+						qSuggestionDB.save();
+					}).catch(() => null);
+				}
+			}
 		} else if (qServerDB.config.mode === "autoapprove") {
 			if (client.channels.cache.get(qServerDB.config.channels.suggestions)) {
 				let perms = channelPermissions(locale,  "suggestions", client.channels.cache.get(qServerDB.config.channels.suggestions), client);
@@ -151,7 +174,7 @@ module.exports = {
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
 			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
-				.send(embedSuggest)
+				.send(qServerDB.config.feed_ping_role ? `<@&${qServerDB.config.feed_ping_role}>` : embedSuggest, qServerDB.config.feed_ping_role ? embedSuggest : null)
 				.then(async (posted) => {
 					qSuggestionDB.messageId = posted.id;
 					qSuggestionDB.channels.suggestions = posted.channel.id;
@@ -179,6 +202,24 @@ module.exports = {
 							down: reactEmojiDown
 						};
 					}
+
+					if (qServerDB.config.trello.board && qServerDB.config.trello.actions.find(a => a.action === "suggest")) {
+						const t = initTrello();
+						let c = await t.addCard(qSuggestionDB.suggestion, string(guildLocale, "SUGGESTION_TRELLO_INFO", {
+							user: message.author.tag,
+							id: message.author.id,
+							sid: qSuggestionDB.suggestionId
+						}), qServerDB.config.trello.actions.find(a => a.action === "suggest").id).catch(() => null);
+						if (c) {
+							qSuggestionDB.trello_card = c.id;
+							if (qSuggestionDB.attachment) await t.addAttachmentToCard(c.id, qSuggestionDB.attachment).then(a => {
+								qSuggestionDB.trello_attach_id = a.id;
+								qSuggestionDB.save();
+							}).catch(() => null);
+							t.addAttachmentToCard(c.id, `https://discord.com/channels/${qSuggestionDB.id}/${qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions}/${qSuggestionDB.messageId}`).catch(() => null);
+						}
+					}
+
 					await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
 					client.reactInProgress = false;
 				});

@@ -8,7 +8,8 @@ module.exports = {
 		description: "Help support the bot!",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message) => {
 		return message.channel.send(string(locale, "VOTE_INFO", { link: `<https://discord.gg/${support_invite}>`, links: `<${Object.values(module.exports.lists).join(">\n<")}>` }));

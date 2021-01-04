@@ -11,7 +11,8 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "ADD_REACTIONS"],
 		cooldown: 25,
-		dmAvailable: true
+		dmAvailable: true,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		get("https://api.github.com/repos/Suggester/Suggester/releases/latest").then(({ data }) => {

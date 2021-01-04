@@ -17,7 +17,8 @@ module.exports = {
 		examples: "`{{p}}locale`\nShows the list of available languages\n\n`{{p}}locale fr`\nSets your language to French",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "sumup"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let qUserDB = await dbQuery("User", { id: message.author.id });

@@ -5,6 +5,7 @@ const { suggestionDeleteCommandCheck, checkReview } = require("../../utils/check
 const { string } = require("../../utils/strings");
 const { deleteFeedMessage } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { actCard } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "silentdelete",
@@ -15,7 +16,8 @@ module.exports = {
 		examples: "`{{p}}silentdelete 1`\nSilently deletes suggestion #1\n\n`{{p}}silentdelete 1 This has already been suggested`\nSilently deletes suggestion #1 with the reason \"This has already been suggested\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!"
+		cooldownMessage: "Need to delete multiple suggestions? Try the `mdelete` command!",
+		docs: "staff/silentdelete"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionDeleteCommandCheck(locale, message, args);
@@ -34,7 +36,7 @@ module.exports = {
 		qSuggestionDB.staff_member = message.author.id;
 
 		let reason;
-		if (args[1]) {
+		if (args.slice().join(" ").trim()) {
 			reason = args.splice(1).join(" ");
 			if (reason.length > 1024) return message.channel.send(string(locale, "DELETION_REASON_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 			qSuggestionDB.denial_reason = reason;
@@ -71,5 +73,7 @@ module.exports = {
 			}
 			serverLog(logs, qServerDB, client);
 		}
+
+		await actCard("delete", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "DELETED_BY", { user: message.author.tag })}${qSuggestionDB.denial_reason ? `\n${string(guildLocale, "BLOCK_REASON_HEADER")} ${qSuggestionDB.denial_reason}` : ""}`);
 	}
 };

@@ -4,6 +4,7 @@ const { commandLog, errorLog, commandExecuted } = require("../utils/logs");
 const { protip } = require("../utils/tip");
 const { prefix, log_hooks, support_invite, staff_alert_role } = require("../config.json");
 const { string } = require("../utils/strings");
+const { cleanCommand } = require("../utils/actions");
 const { Collection } = require("discord.js");
 function escapeRegExp(string) {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -62,6 +63,7 @@ module.exports = async (Discord, client, message) => {
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but did not have permission to do so.`, message);
+		if (noCommand) message.delete();
 		return;
 	}
 
@@ -117,21 +119,14 @@ module.exports = async (Discord, client, message) => {
 					}
 				});
 
-				commandLog(`--- Cooldown Breach Lookup ${message.author.id} ---`);
+				commandLog(`--- Cooldown Breach Lookup ${message.author.id} ---`, message);
 				let hook = new Discord.WebhookClient(log_hooks.staff_alert.id, log_hooks.staff_alert.token);
 				return hook.send(`🚨 **EXCESSIVE COOLDOWN BREACHING**\n${message.author.tag} (\`${message.author.id}\`) has breached the cooldown limit of ${cooldownLimit.toString()}\nThey were automatically blocked from using the bot globally\nCommand logs can be found by searching \`Cooldown Breach Lookup ${message.author.id}\`\n(${staff_alert_role ? `<@&${staff_alert_role}>` : "@everyone"})`, {disableMentions: "none"});
 			}
 
 			if (expires > now) {
 				await commandExecuted(command, message, { pre, post: new Date(), success: false });
-				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`).then(m => {
-					if (noCommand) {
-						setTimeout(function() {
-							message.delete();
-							m.delete();
-						}, 7500);
-					}
-				});
+				return message.channel.send(`${string(locale, "COMMAND_COOLDOWN", { time: ((expires - now) / 1000).toFixed(0) })} ${command.controls.cooldownMessage ? command.controls.cooldownMessage : ""}`).then(sent => cleanCommand(message, sent, qServerDB, noCommand));
 			}
 		}
 

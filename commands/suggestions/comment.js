@@ -5,6 +5,7 @@ const { dbModify } = require("../../utils/db");
 const { suggestionEditCommandCheck } = require("../../utils/checks");
 const { editFeedMessage, notifyFollowers } = require("../../utils/actions");
 const { cleanCommand } = require("../../utils/actions");
+const { trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
 		name: "comment",
@@ -15,14 +16,15 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}comment 1 This is a comment`\nComments on suggestion #1 with \"This is a comment\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 10
+		cooldown: 10,
+		docs: "staff/comment"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB, qSuggestionDB, id] = await suggestionEditCommandCheck(locale, message, args);
 		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		let guildLocale = qServerDB.config.locale;
 
-		if (!args[1]) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (!args.slice().join(" ").trim()) return message.channel.send(string(locale, "NO_COMMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		if (qSuggestionDB.comments && qSuggestionDB.comments.filter(c => !c.deleted).length + 1 > 15) return message.channel.send(string(locale, "TOO_MANY_COMMENTS_ERROR_NEW", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
@@ -30,17 +32,18 @@ module.exports = {
 
 		if (comment.length > 1024) return message.channel.send(string(locale, "COMMENT_TOO_LONG_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let commentId = qSuggestionDB.comments.length+1;
+		let suggester = await fetchUser(qSuggestionDB.suggester, client);
+		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
+		let commentId = qSuggestionDB.comments.length+1;
+		let trello_comment = await trelloComment(qServerDB, message.author, qSuggestionDB, comment);
 		qSuggestionDB.comments.push({
 			comment: comment,
 			author: message.author.id,
 			id: commentId,
-			created: new Date()
+			created: new Date(),
+			trello_comment
 		});
-
-		let suggester = await fetchUser(qSuggestionDB.suggester, client);
-		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
@@ -66,7 +69,6 @@ module.exports = {
 			e.addField(string(l, "COMMENT_TITLE", { user: message.author.tag, id: `${id}_${commentId}` }), comment);
 			return e;
 		});
-
 		return { protip: { command: "comment" } };
 	}
 };
