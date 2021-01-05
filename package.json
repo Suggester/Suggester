@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@sentry/node": "^5.29.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "blapi": "^1.4.0",
     "chalk": "^4.1.0",
     "color-string": "^1.5.4",
