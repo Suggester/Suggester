@@ -62,7 +62,9 @@ module.exports = {
 			"567033485882163200",
 			"597776518441336862",
 			"668116464351576085",
-			"699677631372853248"
+			"699677631372853248",
+			"245675252821000193",
+			"356878329602768897"
 		];
 		let botArr = [];
 		for await (let b of bots) {
@@ -578,6 +580,22 @@ module.exports = {
 						});
 						break;
 					}
+					break;
+				case "245675252821000193": //Gaius Cicereius
+				case "356878329602768897": //Gaius Cicereius+
+					if (!embed || !embed.description || !embed.footer) {
+						errorCount++;
+						continue;
+					}
+					suggestionInfo.status = "approved";
+					suggestionInfo.suggestion = embed.description;
+					// eslint-disable-next-line no-case-declarations
+					let gUserFooterMatch = embed.footer.text.match(/ID: (\d+)/);
+					if (!gUserFooterMatch) {
+						errorCount++;
+						continue;
+					}
+					suggestionInfo.suggester = gUserFooterMatch[1];
 					break;
 				default:
 					if (m.author.bot) {
