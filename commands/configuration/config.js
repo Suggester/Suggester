@@ -1220,7 +1220,7 @@ module.exports = {
 			let commandsChannel = await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND"));
 			cfgChannelsArr.push(commandsChannel[0]);
 			// Emojis
-			if (server.emojis) {
+			if (server.emojis && server.id === message.guild.id) {
 				let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string(locale, "CFG_UPVOTE_REACTION_DISABLED") : "👍");
 				let midEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.mid), server.emojis.cache))[1] || (qServerDB.config.emojis.mid === "none" ? string(locale, "CFG_MID_REACTION_DISABLED") : "🤷");
 				let downEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.down), server.emojis.cache))[1] || (qServerDB.config.emojis.down === "none" ? string(locale, "CFG_DOWNVOTE_REACTION_DISABLED") : "👎");
