@@ -1109,7 +1109,41 @@ module.exports = {
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_CAP_SET", { cap: newValue }, "success"));
 			}
-		},];
+		},
+		{
+			names: ["commenttime", "commentime", "commenttimestamp", "commenttimestamps", "commentimestamp", "commentimestamps", "ctime"],
+			name: "Comment Timestamps",
+			description: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
+			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+			docs: "onevote",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.comment_timestamps ? "CFG_COMMENT_TIME_ENABLED" : "CFG_COMMENT_TIME_DISABLED"));
+				switch (args[1].toLowerCase()) {
+				case "enable":
+				case "on": {
+					if (!qServerDB.config.comment_timestamps) {
+						qServerDB.config.comment_timestamps = true;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "CFG_COMMENT_TIME_ENABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_COMMENT_TIME_ALREADY_ENABLED", {}, "error"));
+				}
+				case "disable":
+				case "off": {
+					if (qServerDB.config.comment_timestamps) {
+						qServerDB.config.comment_timestamps = false;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "CFG_COMMENT_TIME_DISABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_COMMENT_TIME_ALREADY_DISABLED", {}, "error"));
+				}
+				case "toggle":
+					qServerDB.config.comment_timestamps = !qServerDB.config.comment_timestamps;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, qServerDB.config.comment_timestamps ? "CFG_COMMENT_TIME_ENABLED" : "CFG_COMMENT_TIME_DISABLED", {}, "success"));
+				default:
+					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+				}
+			}
+		}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
 		case "help": {

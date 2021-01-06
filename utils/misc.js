@@ -84,10 +84,10 @@ module.exports = {
 		// Comments
 		if (suggestion.comments) {
 			for (const comment of suggestion.comments) {
-				if (!comment.deleted || comment.deleted !== true) {
+				if (!comment.deleted && comment.comment) {
 					let user = await fetchUser(comment.author, client);
 					let title;
-					!user || user.id === "0" ? title = `${string(locale, "COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created ? " • " + comment.created.toUTCString() : ""}` : title = `${string(locale, "COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created ? " • " + comment.created.toUTCString(locale, ) : ""}`;
+					!user || user.id === "0" ? title = `${string(locale, "COMMENT_TITLE_ANONYMOUS")} (ID ${suggestion.suggestionId}_${comment.id})${comment.created && server.config.comment_timestamps ? " • " + comment.created.toUTCString() : ""}` : title = `${string(locale, "COMMENT_TITLE", { user: user.tag, id: `${suggestion.suggestionId}_${comment.id}` })} ${comment.created && server.config.comment_timestamps ? " • " + comment.created.toUTCString(locale, ) : ""}`;
 					embed.addField(title, comment.comment || string(locale, "ERROR", {}, "error"));
 				}
 			}

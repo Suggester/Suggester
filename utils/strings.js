@@ -1614,6 +1614,22 @@ module.exports = {
 			string: "Members can already choose multiple reaction options when voting on a suggestion.",
 			context: "Shown when choosing one vote reaction is disabled and a guild tries to disable it"
 		},
+		"CFG_COMMENT_TIME_ENABLED": {
+			string: "Comment timestamps will be shown on suggestion embeds",
+			context: "Shown when a guild has enabled comment timestamps"
+		},
+		"CFG_COMMENT_TIME_DISABLED": {
+			string: "Comment timestamps will not be shown on suggestion embeds",
+			context: "Shown when a guild has disabled comment timestamps"
+		},
+		"CFG_COMMENT_TIME_ALREADY_ENABLED": {
+			string: "Comment timestamps are already shown on suggestion embeds",
+			context: "Shown when comment timestamps are enabled and a guild tries to enable it"
+		},
+		"CFG_COMMENT_TIME_ALREADY_DISABLED": {
+			string: "Comment timestamps are already not shown on suggestion embeds",
+			context: "Shown when comment timestamps are disabled and a guild tries to disable it"
+		},
 		"CFG_INCHANNEL_ENABLED": {
 			string: "Suggestions can be submitted via any message the suggestions feed channel",
 			context: "Shown when a guild has enabled in-channel suggestions"
@@ -5922,5 +5938,18 @@ module.exports = {
 			string: "suggestion-log",
 			context: "The name of the channel created for suggestion logs in autosetup\n**As this is a channel name, make sure there are no spaces**"
 		},
+		"CONFIG_NAME:COMMENTTIME": {
+			string: "Comment Timestamps",
+			context: "Name of the Comment Timestamps config element"
+		},
+		"CONFIG_DESC:COMMENTTIME": {
+			string: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
+			context: "Description of the Comment Timestamps config element"
+		},
+		"CONFIG_EXAMPLES:COMMENTTIME": {
+			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+			context: "Examples for the Comment Timestamps config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		}
 	}
 };

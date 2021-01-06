@@ -60,7 +60,8 @@ const settings = new Schema({
 				id: String
 			}]
 		},
-		suggestion_cap: { type: Number, default: 0 }
+		suggestion_cap: { type: Number, default: 0 },
+		comment_timestamps: { type: Boolean, default: true }
 	}
 });
 
