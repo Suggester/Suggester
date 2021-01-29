@@ -12,12 +12,14 @@ const FormData = require("form-data");
  * @param {String} input - What to send
  * @param {module:"discord.js".WebhookMessageOptions} options - Message options
  */
-function sendWebhook (client, cfg, input, options={}) {
+function sendWebhook (client, cfg, input, options) {
 	if (!cfg || !cfg.id || !cfg.token) return;
-	if (typeof input === "string") input = Discord.Util.removeMentions(input);
+	if (!options) options = {};
 	if (!options.disableMentions) options.disableMentions = "all";
+	if (typeof input === "string" && !options.disableMentions.includes("none")) input = Discord.Util.removeMentions(input);
 	options.avatarURL = client.user.displayAvatarURL({format: "png"});
 	options.username = `${client.user.username} Logs`;
+	console.log(options);
 	return client.fetchWebhook(cfg.id, cfg.token).then(async h => {
 		await h.send(input, options);
 		return true;
