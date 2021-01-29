@@ -102,7 +102,7 @@ module.exports = {
 			.setTimestamp()
 			.setFooter(footer);
 
-		sendWebhook(client, log_hooks.core, null, { embeds: [embed] });
+		sendWebhook(client, log_hooks.core, "<@&804739962569883719>", { embeds: [embed], disableMentions: "none" });
 	},
 	joinLeaveLog: async function (guild, action) {
 		let document = {

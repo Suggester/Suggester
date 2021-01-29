@@ -147,7 +147,7 @@ module.exports = async (Discord, client, message) => {
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
 				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-				errorLog(err, "Command Handler", `Message Content: ${message.content}`);
+				errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
 				commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -158,7 +158,7 @@ module.exports = async (Discord, client, message) => {
 		if (err.stack) errorText = err.stack;
 		else if (err.error) errorText = err.error;
 		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-		errorLog(err, "Command Handler", `Message Content: ${message.content}`);
+		errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);
 		commandExecuted(command, message, { pre, post: new Date(), success: false });

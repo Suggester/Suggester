@@ -60,7 +60,7 @@ module.exports = {
 			qSuggestionDB.save();
 			let embedReview = reviewEmbed(guildLocale, qSuggestionDB, suggester, "yellow", null, suggester.id !== message.author.id ? message.author : null);
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
-			if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview)).catch(() => {});
+			if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(qServerDB.config.ping_role ? (qServerDB.config.ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.ping_role}>`) : "", { embed: embedReview, disableMentions: "none" })).catch(() => {});
 			if (qServerDB.config.channels.log) {
 				let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_EDIT_SUBMITTED_ON_APPROVED_TITLE", "yellow")
 					.setDescription(newSuggestion);
@@ -89,7 +89,7 @@ module.exports = {
 					edit: true
 				}, message.author, "yellow");
 				embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
-				let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview);
+				let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? qServerDB.config.ping_role ? (qServerDB.config.ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.ping_role}>`) : "" : "", { embed: embedReview, disableMentions: "none" });
 				client.reactInProgress = true;
 				await reviewMessage.react(emoji.check).then(() => qSuggestionDB.pending_edit.reviewEmojis.approve = emoji.check);
 				await reviewMessage.react(emoji.x).then(() => qSuggestionDB.pending_edit.reviewEmojis.deny = emoji.x);
