@@ -174,7 +174,7 @@ module.exports = {
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
 			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
-				.send(qServerDB.config.feed_ping_role ? (qServerDB.config.feed_ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.feed_ping_role}>`) : embedSuggest, qServerDB.config.feed_ping_role ? { embed: embedSuggest, disableMentions: "none" } : { disableMentions: "none" })
+				.send(qServerDB.config.feed_ping_role ? (qServerDB.config.feed_ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.feed_ping_role}>`) : "", { embed: embedSuggest, disableMentions: "none" })
 				.then(async (posted) => {
 					qSuggestionDB.messageId = posted.id;
 					qSuggestionDB.channels.suggestions = posted.channel.id;
