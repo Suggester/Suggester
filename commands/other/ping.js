@@ -26,10 +26,7 @@ module.exports = {
 		const shardInfo = await client.shard.broadcastEval(`[{
 			id: this.shard.ids[0],
 			guilds: this.guilds.cache.size,
-			channels: this.channels.cache.size,
-			members: this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0),
 			memory: (process.memoryUsage().heapUsed).toFixed(2),
-			ping: this.ws.ping,
 			uptime: this.uptime
 		  }]`).catch(() => false);
 
