@@ -175,8 +175,8 @@ module.exports = {
 		let downCount;
 		let upReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.up));
 		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
-		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;
-		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
+		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me || upReaction.users.resolve(msg.client.user.id) ? upReaction.count-1 : upReaction.count;
+		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me || downReaction.users.resolve(msg.client.user.id) ? downReaction.count-1 : downReaction.count;
 		return [upCount, downCount, upCount-downCount];
 	},
 	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn, sendOps={follow: true, author: true}) {

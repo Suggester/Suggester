@@ -17,7 +17,7 @@ module.exports = {
 		image: "images/Mark.gif",
 		enabled: true,
 		examples: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplemented:740935015109492758> Implemented (`implemented`)\n<:sprogress:740935462163841137> In Progress (`working`)\n<:sconsider:740935462067372112> In Consideration (`considered`)\n<:sdefault:740935462117703831> Default (`default`)\n<:sno:740935462079954996> Not Happening (`no`)",
-		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS"],
+		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "MANAGE_MESSAGES"],
 		cooldown: 10,
 		docs: "staff/mark"
 	},
