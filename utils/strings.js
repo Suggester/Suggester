@@ -2088,41 +2088,13 @@ module.exports = {
 				}
 			}
 		},
-		"PING_SHARD_STATS_HEADER": {
-			string: "Shard Statistics",
-			context: "Header for the shard statistics section of the ping embed"
-		},
-		"PING_SHARD_STATS_NEW": {
-			string: "**Shard {{num}}:** {{guilds}} servers with {{channels}} channels and {{members}} members combined, {{ping}} ms ping, up for {{uptime}}, using {{memory}} of memory",
-			context: "Statistics for a shard",
+		"PING_COUNT_CONTENT_SHARD": {
+			string: "{{guilds}} servers on this shard",
+			context: "Shows total number of guilds on a shard",
 			replaced: {
-				num: {
-					to_replace: "{{num}}",
-					description: "The shard number"
-				},
 				guilds: {
 					to_replace: "{{guilds}}",
-					description: "The number of guilds on the shard"
-				},
-				channels: {
-					to_replace: "{{channels}}",
-					description: "The number of channels on the shard"
-				},
-				members: {
-					to_replace: "{{members}}",
-					description: "The number of members on the shard"
-				},
-				ping: {
-					to_replace: "{{ping}}",
-					description: "The shard's ping"
-				},
-				uptime: {
-					to_replace: "{{uptime}}",
-					description: "How long the shard has been up"
-				},
-				memory: {
-					to_replace: "{{memory}}",
-					description: "The memory used by the shard"
+					description: "Total server count of the shard"
 				}
 			}
 		},

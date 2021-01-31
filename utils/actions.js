@@ -8,7 +8,7 @@ module.exports = {
 		let suggestionEditEmbed = await suggestionEmbed(guild, qSuggestionDB, qServerDB, client);
 		let messageEdited;
 		await client.channels.cache.get(qSuggestionDB.channels.suggestions || qServerDB.config.channels.suggestions).messages.fetch(qSuggestionDB.messageId).then(f => {
-			qServerDB.config.feed_ping_role ? f.edit(`<@&${qServerDB.config.feed_ping_role}>`, suggestionEditEmbed) : f.edit(suggestionEditEmbed);
+			qServerDB.config.feed_ping_role ? f.edit(qServerDB.config.feed_ping_role === qServerDB.id ? "@everyone" : `<@&${qServerDB.config.feed_ping_role}>`, { embed: suggestionEditEmbed, disableMentions: "none" }) : f.edit(suggestionEditEmbed);
 			if (removereactions) f.reactions.removeAll();
 			messageEdited = true;
 		}).catch(() => messageEdited = false);
@@ -175,8 +175,8 @@ module.exports = {
 		let downCount;
 		let upReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.up));
 		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
-		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me ? upReaction.count-1 : upReaction.count;
-		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me ? downReaction.count-1 : downReaction.count;
+		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me || upReaction.users.resolve(msg.client.user.id) ? upReaction.count-1 : upReaction.count;
+		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me || downReaction.users.resolve(msg.client.user.id) ? downReaction.count-1 : downReaction.count;
 		return [upCount, downCount, upCount-downCount];
 	},
 	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn, sendOps={follow: true, author: true}) {

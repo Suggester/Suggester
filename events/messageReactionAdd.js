@@ -84,7 +84,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 						if (err.stack) errorText = err.stack;
 						else if (err.error) errorText = err.error;
 						messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-						errorLog(err, "Command Handler", "On queue reaction");
+						errorLog(client, err, "Command Handler", "On queue reaction");
 
 						console.log(err);
 					});
@@ -94,7 +94,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
 				messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-				errorLog(err, "Command Handler", "On queue reaction");
+				errorLog(client, err, "Command Handler", "On queue reaction");
 
 				console.log(err);
 			}
@@ -130,7 +130,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 							if (err.stack) errorText = err.stack;
 							else if (err.error) errorText = err.error;
 							messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-							errorLog(err, "Command Handler", "On queue reaction");
+							errorLog(client, err, "Command Handler", "On queue reaction");
 
 							console.log(err);
 						});
@@ -140,7 +140,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 					if (err.stack) errorText = err.stack;
 					else if (err.error) errorText = err.error;
 					messageReaction.message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(user.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
-					errorLog(err, "Command Handler", "On queue reaction");
+					errorLog(client, err, "Command Handler", "On queue reaction");
 
 					console.log(err);
 				}

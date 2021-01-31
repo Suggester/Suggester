@@ -26,27 +26,31 @@ module.exports = {
 		const shardInfo = await client.shard.broadcastEval(`[{
 			id: this.shard.ids[0],
 			guilds: this.guilds.cache.size,
-			channels: this.channels.cache.size,
-			members: this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0),
 			memory: (process.memoryUsage().heapUsed).toFixed(2),
-			ping: this.ws.ping,
 			uptime: this.uptime
-		  }]`);
+		  }]`).catch(() => false);
 
-		let embed = new Discord.MessageEmbed()
+		let version = "4.7.2";
+		let embed = shardInfo ? new Discord.MessageEmbed()
 			.addField(string(locale, "PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
 			.addField(`${string(locale, "PING_GUILD_COUNT_HEADER")}`, string(locale, "PING_COUNT_CONTENT", { guilds: shardInfo.reduce((t, c) => t + c[0].guilds, 0), shards: shardInfo.length }), true)
 			.addField(string(locale, "PING_UPTIME_HEADER"), `${humanizeDuration(client.uptime, { language: locale, fallbacks: ["en"] })}\nAvg: ${humanizeDuration(shardInfo.reduce((t, c) => t + parseFloat(c[0].uptime), 0)/shardInfo.length, { language: locale, fallbacks: ["en"] })}`, true)
 			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`, true)
-			.addField(string(locale, "PING_MEMORY_HEADER"), pretty(shardInfo.reduce((t, c) => t + parseFloat(c[0].memory), 0)))
-			.addField(string(locale, "PING_SHARD_STATS_HEADER"), `${shardInfo.map(s => string(locale, "PING_SHARD_STATS_NEW", { num: s[0].id.toString(), guilds: s[0].guilds.toString(), channels: s[0].channels.toString(), members: s[0].members.toString(), ping: Math.round(s[0].ping), uptime: humanizeDuration(s[0].uptime, { language: locale, fallbacks: ["en"] }), memory: pretty(s[0].memory)})).join("\n")}`)
-			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v4.7.1`, client.user.displayAvatarURL({format: "png"}))
+			.addField(string(locale, "PING_MEMORY_HEADER"), pretty(shardInfo.reduce((t, c) => t + parseFloat(c[0].memory), 0)), true)
+			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v${version}`, client.user.displayAvatarURL({format: "png"}))
+			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
+			.setColor(client.colors.default) : new Discord.MessageEmbed()
+			.addField(string(locale, "PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
+			.addField(`${string(locale, "PING_GUILD_COUNT_HEADER")}`, string(locale, "PING_COUNT_CONTENT_SHARD", { guilds: client.guilds.cache.size }), true)
+			.addField(string(locale, "PING_UPTIME_HEADER"), humanizeDuration(client.uptime, { language: locale, fallbacks: ["en"] }), true)
+			.addField(string(locale, "PING_SHARD_PING_HEADER"), `${Math.round(client.ws.ping)} ms`, true)
+			.setFooter(`${string(locale, "PING_SHARD_FOOTER", { shard: client.shard.ids[0].toString() })} • ${client.user.tag} v${version}`, client.user.displayAvatarURL({format: "png"}))
 			.setThumbnail(client.user.displayAvatarURL({format: "png"}))
 			.setColor(client.colors.default);
 
 		const before = Date.now();
 		message.channel.send(embed).then((sent) => {
-			embed.addField(string(locale, "PING_BOT_LATENCY_HEADER"), ms(Date.now() - before));
+			embed.addField(string(locale, "PING_BOT_LATENCY_HEADER"), ms(Date.now() - before), true);
 			sent.edit(embed);
 		});
 	}

@@ -118,7 +118,7 @@ module.exports = {
 			let embedReview = reviewEmbed(guildLocale, qSuggestionDB, message.author, "yellow");
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
 
-			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? `<@&${qServerDB.config.ping_role}>` : "", embedReview);
+			let reviewMessage = await client.channels.cache.get(qServerDB.config.channels.staff).send(qServerDB.config.ping_role ? (qServerDB.config.ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.ping_role}>`) : "", { embed: embedReview, disableMentions: "none" });
 			client.reactInProgress = true;
 			await reviewMessage.react(emoji.check).then(() => newSuggestion.reviewEmojis.approve = emoji.check);
 			await reviewMessage.react(emoji.x).then(() => newSuggestion.reviewEmojis.deny = emoji.x);
@@ -174,7 +174,7 @@ module.exports = {
 			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
 			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
-				.send(qServerDB.config.feed_ping_role ? `<@&${qServerDB.config.feed_ping_role}>` : embedSuggest, qServerDB.config.feed_ping_role ? embedSuggest : null)
+				.send(qServerDB.config.feed_ping_role ? (qServerDB.config.feed_ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.feed_ping_role}>`) : "", { embed: embedSuggest, disableMentions: "none" })
 				.then(async (posted) => {
 					qSuggestionDB.messageId = posted.id;
 					qSuggestionDB.channels.suggestions = posted.channel.id;

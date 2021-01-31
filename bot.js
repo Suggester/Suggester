@@ -66,7 +66,7 @@ connection.on("error", (err) => {
 				event(Discord, client, ...args);
 			}
 			catch (err) {
-				errorLog(err, "Event Handler", `Event: ${eventName}`);
+				errorLog(client, err, "Event Handler", `Event: ${eventName}`);
 			}
 		});
 		events.push(eventName);
@@ -106,13 +106,13 @@ client.login(process.env.TOKEN)
 	.catch((err) => console.log(chalk`{cyan [{bold DISCORD}] Error logging in: ${err.stack}}`));
 
 client.on("error", (err) => {
-	errorLog(err, "error", "something happened and idk what");
+	errorLog(client, err, "error", "something happened and idk what");
 });
 client.on("warn", (warning) => {
 	console.warn(warning);
 });
 process.on("unhandledRejection", (err) => { // this catches unhandledPromiserejectionWarning and other unhandled rejections
-	errorLog(err, "unhandledRejection", "oof something is broken x.x");
+	errorLog(client, err, "unhandledRejection", "oof something is broken x.x");
 });
 
 /**
