@@ -5865,7 +5865,7 @@ module.exports = {
 		},
 		"TRELLO_NO_ACTIONS_CONFIGURED": {
 			string: "No Trello actions are configured",
-			content: "Shows when no Trello actions are set"
+			context: "Shows when no Trello actions are set"
 		},
 		"TRELLO_BASE_CONFIG": {
 			string: "**Linked Trello Board:** {{code}}\nUse `{{p}}config trello actions` to view configured actions",
