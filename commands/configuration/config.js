@@ -1157,7 +1157,7 @@ module.exports = {
 					if (!qServerDB.config.anon) {
 						qServerDB.config.anon = true;
 						await dbModify("Server", {id: server.id}, qServerDB);
-						return message.channel.send(string(locale, "CFG_ANONYMOUS_ENABLED", { invite: slash_url.replace("[ID]", client.user.id) }, "success"));
+						return message.channel.send(string(locale, "CFG_ANONYMOUS_ENABLED", { invite: `${slash_url.replace("[ID]", client.user.id)}&guild_id=${message.guild.id}` }, "success"));
 					} else return message.channel.send(string(locale, "CFG_ANONYMOUS_ALREADY_ENABLED", {}, "error"));
 				}
 				case "disable":
@@ -1171,7 +1171,7 @@ module.exports = {
 				case "toggle":
 					qServerDB.config.anon = !qServerDB.config.anon;
 					await dbModify("Server", {id: server.id}, qServerDB);
-					return message.channel.send(string(locale, qServerDB.config.anon ? "CFG_ANONYMOUS_ENABLED" : "CFG_ANONYMOUS_DISABLED", { invite: slash_url.replace("[ID]", client.user.id) }, "success"));
+					return message.channel.send(string(locale, qServerDB.config.anon ? "CFG_ANONYMOUS_ENABLED" : "CFG_ANONYMOUS_DISABLED", { invite: `${slash_url.replace("[ID]", client.user.id)}&guild_id=${message.guild.id}` }, "success"));
 				default:
 					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 				}

@@ -1661,7 +1661,7 @@ module.exports = {
 			}
 		},
 		"CFG_ANONYMOUS_DISABLED": {
-			string: "Anonymous suggestions cannot be submitted",
+			string: "Anonymous suggestions cannot be submitted on this server",
 			context: "Shown when a guild has disabled anonymous suggestions"
 		},
 		"CFG_ANONYMOUS_ALREADY_ENABLED": {

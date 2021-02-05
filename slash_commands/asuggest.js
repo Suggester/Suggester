@@ -25,6 +25,8 @@ module.exports = async function (interaction, client) {
 	if (!qServerDB) return respond(string(locale, "UNCONFIGURED_ERROR", {}, "error"));
 	const guildLocale = qServerDB.config.locale;
 
+	if (!qServerDB.config.anon) return respond(string(locale, "CFG_ANONYMOUS_DISABLED", {}, "error"));
+
 	let missingConfig = await checkConfig(locale, qServerDB, client);
 	if (missingConfig) return respond(`${missingConfig.description}\n\n**${missingConfig.fields[0].name}**\n${missingConfig.fields[0].value}`);
 
