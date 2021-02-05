@@ -3,7 +3,7 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const Client = require("./utils/Client");
 const chalk = require("chalk");
-const { errorLog } = require("./utils/logs");
+const { errorLog, commandLog } = require("./utils/logs");
 const { fileLoader } = require("./utils/misc.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
@@ -114,7 +114,10 @@ connection.on("error", (err) => {
 
 client.ws.on("INTERACTION_CREATE", async interaction => {
 	try {
-		if (client.slashcommands.get(interaction.data.name)) await client.slashcommands.get(interaction.data.name)(interaction, client, Discord);
+		if (client.slashcommands.get(interaction.data.name)) {
+			commandLog(`<:slashcommands:785919558376488990> ${interaction.member.user.username}#${interaction.member.user.discriminator} (\`${interaction.member.user.id}\`) ran slash command \`${interaction.data.name}\` in the \`${interaction.channel_id}\` channel of \`${interaction.guild_id}\``, { client, content: "" });
+			await client.slashcommands.get(interaction.data.name)(interaction, client, Discord);
+		}
 	} catch (e) {
 		console.log(e);
 	}

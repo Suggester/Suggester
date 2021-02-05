@@ -9,7 +9,6 @@ const { string } = require("../utils/strings");
 const humanizeDuration = require("humanize-duration");
 const { initTrello } = require("../utils/trello");
 module.exports = async function (interaction, client) {
-	console.log(interaction);
 	function respond(data) {
 		client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 			type: 3,

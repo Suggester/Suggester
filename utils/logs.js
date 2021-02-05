@@ -67,9 +67,9 @@ module.exports = {
 		if (!sendWebhook(client, log_hooks.core, input)) console.log(chalk`{red {bold Core} log webhook not found}`);
 	},
 	commandLog: (input, message) => {
-		let embed = new Discord.MessageEmbed()
-			.setDescription(message.content);
-		if (!sendWebhook(message.client, log_hooks.commands, input, { embeds: [embed] })) console.log(chalk`{red {bold Command} log webhook not found}`);
+		let embed = message.content ? new Discord.MessageEmbed()
+			.setDescription(message.content) : null;
+		if (!sendWebhook(message.client, log_hooks.commands, input, embed ? { embeds: [embed] } : {})) console.log(chalk`{red {bold Command} log webhook not found}`);
 	},
 	/**
 	 * Logs an input to the specified server's log channel
