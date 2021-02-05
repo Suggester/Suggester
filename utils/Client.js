@@ -12,6 +12,7 @@ module.exports = class extends Client {
 
 		this.admins = new Set();
 		this.commands = new Collection();
+		this.slashcommands = new Collection();
 		this.locales = new Collection();
 		this.cooldowns = new Collection();
 		this.config = config;

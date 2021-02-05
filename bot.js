@@ -100,7 +100,25 @@ connection.on("error", (err) => {
 			});
 		}
 	});
+
+	let slashCommandFiles = await fileLoader("slash_commands");
+	for await (let file of slashCommandFiles) {
+		if (!file.endsWith(".js")) continue;
+		let command = require(file);
+		let commandName = basename(file).split(".")[0];
+		client.slashcommands.set(commandName, command);
+		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
+	}
+	console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${client.slashcommands.size} slash commands}}`);
 })();
+
+client.ws.on("INTERACTION_CREATE", async interaction => {
+	try {
+		if (client.slashcommands.get(interaction.data.name)) await client.slashcommands.get(interaction.data.name)(interaction, client, Discord);
+	} catch (e) {
+		console.log(e);
+	}
+});
 
 client.login(process.env.TOKEN)
 	.catch((err) => console.log(chalk`{cyan [{bold DISCORD}] Error logging in: ${err.stack}}`));

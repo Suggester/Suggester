@@ -37,8 +37,9 @@ module.exports = {
 		let editor = suggestion.edited_by ? await fetchUser(suggestion.edited_by, client) : null;
 		let embed = new Discord.MessageEmbed();
 		// User information
-		embed.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
+		if (!suggestion.anon) embed.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({format: "png", dynamic: true}))
 			.setThumbnail(suggester.displayAvatarURL({format: "png", dynamic: true}));
+		else embed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" }));
 		// Suggestion
 		embed.setDescription(suggestion.suggestion)
 			// Footer
@@ -129,6 +130,8 @@ module.exports = {
 			.setFooter(string(locale, "SUGGESTION_FOOTER", {id: qSuggestionDB.suggestionId.toString()}))
 			.setTimestamp(qSuggestionDB.submitted)
 			.setColor(user.client.colors[color] || color);
+
+		if (qSuggestionDB.anon) embed.addField("_ _", string(locale, "ANON_SUGGESTION_STAFF_NOTICE"));
 
 		if (change) embed.addField(string(locale, "SUGGESTION_CHANGE_REVIEW_EMBED"), change);
 		if (qSuggestionDB.attachment) {

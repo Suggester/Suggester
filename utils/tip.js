@@ -1,4 +1,4 @@
-const { url } = require("../commands/other/invite");
+const { slash_url } = require("../commands/other/invite");
 const { lists } = require("../commands/other/vote");
 const { string } = require("./strings");
 const { dbModify } = require("./db");
@@ -9,7 +9,7 @@ module.exports = {
 			invite: {
 				string: "PROTIP_INVITE",
 				use: {
-					bot_invite: url.replace("[ID]", client.user.id)
+					bot_invite: slash_url.replace("[ID]", client.user.id)
 				}
 			},
 			support: {
