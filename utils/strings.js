@@ -5989,6 +5989,10 @@ module.exports = {
 		"ANON_SUGGESTION_STAFF_NOTICE": {
 			string: ":warning: This suggestion is anonymous",
 			context: "Notice for staff that the suggestion is anonymous"
+		},
+		"ANON_SUGGEST_SLASH_NOTICE": {
+			string: "Anonymous suggestions are handled through **slash commands**. To use anonymous suggestions, head to the server you'd like to submit a suggestion on and type `/`. You should see a menu open that contains `/asuggest`, and selecting that will allow you to submit an anonymous suggestion.\nIf you don't see the commands listed: Ask a server administrator to re-invite the bot with the link below to grant it permission to show slash commands",
+			context: "Notice shown when a user runs the regular asuggest command"
 		}
 	}
 };
