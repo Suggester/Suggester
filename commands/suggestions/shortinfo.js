@@ -25,10 +25,11 @@ module.exports = {
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error"));
 
 		let embed = new Discord.MessageEmbed()
-			.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({dynamic: true, format: "png"}))
 			.setColor(client.colors.blue)
 			.setDescription(qSuggestionDB.suggestion ? (["--trimsuggest", "--ts", "--shortsuggest", "--ss", "--trimsuggestion", "--shortsuggestion", "--trim-suggest", "--trim-suggestion", "--short-suggest", "--short-suggestion", "-trimsuggest", "-ts", "-shortsuggest", "-ss", "-trimsuggestion", "-shortsuggestion", "-trim-suggest", "-trim-suggestion", "-short-suggest", "-short-suggestion"].some(e => message.content.toLowerCase().includes(e)) ? `${qSuggestionDB.suggestion.substr(0, 250)}${qSuggestionDB.suggestion.length > 250 ? "..." : ""}` : qSuggestionDB.suggestion) : string(locale, "NO_SUGGESTION_CONTENT"))
 			.setFooter(string(locale, "SUGGESTION_FOOTER", { id: qSuggestionDB.suggestionId.toString() })).setTimestamp(qSuggestionDB.submitted);
+
+		qSuggestionDB.anon ? embed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({format: "png"})) : embed.setAuthor(string(locale, "SUGGESTION_FROM_TITLE", { user: suggester.tag }), suggester.displayAvatarURL({dynamic: true, format: "png"}));
 
 		if (qSuggestionDB.attachment && !["--noattach", "--na", "--no-attach", "--no-attachment", "-noattachment", "-noattach", "-na", "-no-attach", "-no-attachment", "--noattachment"].some(e => message.content.toLowerCase().includes(e))) embed.setImage(qSuggestionDB.attachment);
 

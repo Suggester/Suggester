@@ -19,7 +19,6 @@ function sendWebhook (client, cfg, input, options) {
 	if (typeof input === "string" && !options.disableMentions.includes("none")) input = Discord.Util.removeMentions(input);
 	options.avatarURL = client.user.displayAvatarURL({format: "png"});
 	options.username = `${client.user.username} Logs`;
-	console.log(options);
 	return client.fetchWebhook(cfg.id, cfg.token).then(async h => {
 		await h.send(input, options);
 		return true;
@@ -67,9 +66,9 @@ module.exports = {
 		if (!sendWebhook(client, log_hooks.core, input)) console.log(chalk`{red {bold Core} log webhook not found}`);
 	},
 	commandLog: (input, message) => {
-		let embed = new Discord.MessageEmbed()
-			.setDescription(message.content);
-		if (!sendWebhook(message.client, log_hooks.commands, input, { embeds: [embed] })) console.log(chalk`{red {bold Command} log webhook not found}`);
+		let embed = message.content ? new Discord.MessageEmbed()
+			.setDescription(message.content) : null;
+		if (!sendWebhook(message.client, log_hooks.commands, input, embed ? { embeds: [embed] } : {})) console.log(chalk`{red {bold Command} log webhook not found}`);
 	},
 	/**
 	 * Logs an input to the specified server's log channel

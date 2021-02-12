@@ -96,6 +96,8 @@ module.exports = {
 		}
 		}
 
+		if (qSuggestionDB.anon) embed.addField("_ _", string(locale, "ANON_SUGGESTION_STAFF_NOTICE"));
+
 		message.channel.send(embed);
 	}
 };

@@ -896,6 +896,16 @@ module.exports = {
 				}
 			}
 		},
+		"LOG_SUGGESTION_SUBMITTED_REVIEW_TITLE_ANON": {
+			string: "{{user}} submitted an anonymous suggestion for review",
+			context: "Title in the log embed when an anonymous suggestion is submitted for review",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
 		"LOG_EDIT_SUBMITTED_REVIEW_TITLE": {
 			string: "{{user}} submitted a suggestion edit for review on #{{id}}",
 			context: "Title in the log embed when a suggestion edit is submitted for review",
@@ -955,6 +965,16 @@ module.exports = {
 		"LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE": {
 			string: "{{user}} submitted a suggestion",
 			context: "Title in the log embed when a suggestion is submitted in autoapprove mode",
+			replaced: {
+				user: {
+					to_replace: "{{user}}",
+					description: "A user tag"
+				}
+			}
+		},
+		"LOG_SUGGESTION_SUBMITTED_AUTOAPPROVE_TITLE_ANON": {
+			string: "{{user}} submitted an anonymous suggestion",
+			context: "Title in the log embed when an anonymous suggestion is submitted in autoapprove mode",
 			replaced: {
 				user: {
 					to_replace: "{{user}}",
@@ -1629,6 +1649,28 @@ module.exports = {
 		"CFG_COMMENT_TIME_ALREADY_DISABLED": {
 			string: "Comment timestamps are already not shown on suggestion embeds",
 			context: "Shown when comment timestamps are disabled and a guild tries to disable it"
+		},
+		"CFG_ANONYMOUS_ENABLED": {
+			string: "Anonymous suggestions can be submitted via `/asuggest`. The identity of the submitting user will be visible to staff but not in the public suggestions feed.\n> If the command does not appear, the bot may need re-invited to allow use of slash commands using this link: {{invite}}",
+			context: "Shown when a guild has enabled anonymous suggestions",
+			replaced: {
+				invite: {
+					to_replace: "{{invite}}",
+					description: "The bot invite link"
+				}
+			}
+		},
+		"CFG_ANONYMOUS_DISABLED": {
+			string: "Anonymous suggestions cannot be submitted on this server",
+			context: "Shown when a guild has disabled anonymous suggestions"
+		},
+		"CFG_ANONYMOUS_ALREADY_ENABLED": {
+			string: "Anonymous suggestions can already be submitted on this server",
+			context: "Shown when anonymous suggestions are enabled and a guild tries to enable it"
+		},
+		"CFG_ANONYMOUS_ALREADY_DISABLED": {
+			string: "Anonymous suggestions are already disabled on this server",
+			context: "Shown when anonymous suggestions are disabled and a guild tries to disable it"
 		},
 		"CFG_INCHANNEL_ENABLED": {
 			string: "Suggestions can be submitted via any message the suggestions feed channel",
@@ -5823,7 +5865,7 @@ module.exports = {
 		},
 		"TRELLO_NO_ACTIONS_CONFIGURED": {
 			string: "No Trello actions are configured",
-			content: "Shows when no Trello actions are set"
+			context: "Shows when no Trello actions are set"
 		},
 		"TRELLO_BASE_CONFIG": {
 			string: "**Linked Trello Board:** {{code}}\nUse `{{p}}config trello actions` to view configured actions",
@@ -5922,6 +5964,35 @@ module.exports = {
 			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
 			context: "Examples for the Comment Timestamps config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"CONFIG_NAME:ANONYMOUS": {
+			string: "Anonymous Suggestions",
+			context: "Name of the Anonymous Suggestions config element"
+		},
+		"CONFIG_DESC:ANONYMOUS": {
+			string: "This setting controls whether or not users can submit anonymous suggestions.",
+			context: "Description of the Anonymous Suggestions config element"
+		},
+		"CONFIG_EXAMPLES:ANONYMOUS": {
+			string: "`{{p}}config anonymous on`\nEnables the ability to submit anonymous suggestions\n\n`{{p}}config anonymous off`\nDisables the ability to submit anonymous suggestion",
+			context: "Examples for the Anonymous Suggestions config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"ANON_SUGGESTION": {
+			string: "Anonymous Suggestion",
+			context: "Title for anonymous suggestions"
+		},
+		"ANON_SUGGESTION_DISCLAIMER_SUBMIT": {
+			string: "_This suggestion will be publicly shown as anonymous, but server staff will still be able to view your identity for moderation purposes._",
+			context: "Disclaimer for anonymous suggestions upon submission"
+		},
+		"ANON_SUGGESTION_STAFF_NOTICE": {
+			string: ":warning: This suggestion is anonymous",
+			context: "Notice for staff that the suggestion is anonymous"
+		},
+		"ANON_SUGGEST_SLASH_NOTICE": {
+			string: "Anonymous suggestions are handled through **slash commands**. To use anonymous suggestions, head to the server you'd like to submit a suggestion on and type `/`. You should see a menu open that contains `/asuggest`, and selecting that will allow you to submit an anonymous suggestion.\nIf you don't see the commands listed: Ask a server administrator to re-invite the bot with the link below to grant it permission to show slash commands",
+			context: "Notice shown when a user runs the regular asuggest command"
 		}
 	}
 };

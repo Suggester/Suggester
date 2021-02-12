@@ -3,7 +3,7 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const Client = require("./utils/Client");
 const chalk = require("chalk");
-const { errorLog } = require("./utils/logs");
+const { errorLog, commandLog } = require("./utils/logs");
 const { fileLoader } = require("./utils/misc.js");
 const { connect, connection } = require("mongoose");
 const autoIncrement = require("mongoose-sequence");
@@ -100,7 +100,28 @@ connection.on("error", (err) => {
 			});
 		}
 	});
+
+	let slashCommandFiles = await fileLoader("slash_commands");
+	for await (let file of slashCommandFiles) {
+		if (!file.endsWith(".js")) continue;
+		let command = require(file);
+		let commandName = basename(file).split(".")[0];
+		client.slashcommands.set(commandName, command);
+		//console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${command.controls.name}} ${file}}`);
+	}
+	console.log(chalk`{magenta [{bold COMMAND}] Loaded {bold ${client.slashcommands.size} slash commands}}`);
 })();
+
+client.ws.on("INTERACTION_CREATE", async interaction => {
+	try {
+		if (client.slashcommands.get(interaction.data.name)) {
+			commandLog(`<:slashcommands:785919558376488990> ${interaction.member.user.username}#${interaction.member.user.discriminator} (\`${interaction.member.user.id}\`) ran slash command \`${interaction.data.name}\` in the \`${interaction.channel_id}\` channel of \`${interaction.guild_id}\``, { client, content: "" });
+			await client.slashcommands.get(interaction.data.name)(interaction, client, Discord);
+		}
+	} catch (e) {
+		console.log(e);
+	}
+});
 
 client.login(process.env.TOKEN)
 	.catch((err) => console.log(chalk`{cyan [{bold DISCORD}] Error logging in: ${err.stack}}`));

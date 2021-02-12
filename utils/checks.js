@@ -27,11 +27,11 @@ module.exports = {
 		if (!member.guild) return 10;
 		let qServerDB = await dbQueryNoNew("Server", { id: member.guild.id });
 		if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) return 2;
-		if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) return 3;
-		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocklist.find(b => b.id === member.id && b.expires > Date.now()) || qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r))) return 11;
+		if (qServerDB.config.staff_roles.some(r => member.roles[0] ? member.roles.find(m => m === r) : member.roles.cache.has(r))) return 3;
+		if (qServerDB.config.blocklist.includes(member.id) || qServerDB.config.blocklist.find(b => b.id === member.id && b.expires > Date.now()) || qServerDB.config.blocked_roles.some(r => member.roles[0] ? member.roles.find(m => m === r) : member.roles.cache.has(r))) return 11;
 		return 10;
 	},
-	channelPermissions: (locale, permissionCheckFor, channel, client) => {
+	channelPermissions: (locale, permissionCheckFor, channel, client, noEmbedOverride) => {
 		let permissionCheckArr = [];
 		switch (permissionCheckFor) {
 		case "suggestions":
@@ -57,7 +57,7 @@ module.exports = {
 		if (missing.length < 1) return null;
 
 		let returned;
-		if (channelPermissions.has("EMBED_LINKS")) {
+		if (channelPermissions.has("EMBED_LINKS") && !noEmbedOverride) {
 			returned = new Discord.MessageEmbed()
 				.setDescription(string(locale, "PERMISSIONS_MISSING_HEADER", { name: client.user.username, channel: `<#${channel.id}>` }))
 				.addField(string(locale, "MISSING_ELEMENTS_HEADER"), `${channelPermissions.has("USE_EXTERNAL_EMOJIS") ? `<:${emoji.x}>` : "❌"} ${missing.join(`\n${channelPermissions.has("USE_EXTERNAL_EMOJIS") ? `<:${emoji.x}>` : "❌"} `)}`)
@@ -147,10 +147,10 @@ module.exports = {
 			if (perms) return perms;
 		} else return string(locale, "NO_SUGGESTION_CHANNEL_ERROR", {}, "error");
 	},
-	checkReview: function (locale, guild, db, suggestion, edit) {
+	checkReview: function (locale, guild, db, suggestion, edit, noEmbedOverride) {
 		const { channelPermissions } = require("./checks");
 		if (guild.channels.cache.get(edit ? (suggestion.pending_edit.channelid || db.config.channels.staff) : ((suggestion ? suggestion.channels.staff : null) || db.config.channels.staff))) {
-			let perms = channelPermissions(locale,  "staff", guild.channels.cache.get(db.config.channels.staff), guild.client);
+			let perms = channelPermissions(locale,  "staff", guild.channels.cache.get(db.config.channels.staff), guild.client, noEmbedOverride);
 			if (perms) return perms;
 		} else return string(locale, "NO_REVIEW_CHANNEL_ERROR", {}, "error");
 	},
