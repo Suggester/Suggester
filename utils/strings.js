@@ -5993,6 +5993,36 @@ module.exports = {
 		"ANON_SUGGEST_SLASH_NOTICE": {
 			string: "Anonymous suggestions are handled through **slash commands**. To use anonymous suggestions, head to the server you'd like to submit a suggestion on and type `/`. You should see a menu open that contains `/asuggest`, and selecting that will allow you to submit an anonymous suggestion.\nIf you don't see the commands listed: Ask a server administrator to re-invite the bot with the link below to grant it permission to show slash commands",
 			context: "Notice shown when a user runs the regular asuggest command"
+		},
+		"SHARDS_NOT_SPAWNED": {
+			string: "Shards are still being spawned",
+			context: "Error shown when shards are still being spawned"
+		},
+		"SHARDS_DETAIL": {
+			string: "Servers: {{servers}}\nChannels: {{channels}}\nUsers: {{users}}\nMemory: {{memory}} MB\nAPI: {{api}} ms",
+			context: "Detailed shard information for the shard command",
+			replaced: {
+				servers: {
+					to_replace: "{{servers}}",
+					description: "The shard's server count"
+				},
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The shard's channel count"
+				},
+				users: {
+					to_replace: "{{users}}",
+					description: "The shard's user count"
+				},
+				memory: {
+					to_replace: "{{memory}}",
+					description: "The shard's memory usage"
+				},
+				api: {
+					to_replace: "{{api}}",
+					description: "The shard's API ping"
+				}
+			}
 		}
 	}
 };
