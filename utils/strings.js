@@ -5961,7 +5961,7 @@ module.exports = {
 			context: "Description of the Comment Timestamps config element"
 		},
 		"CONFIG_EXAMPLES:COMMENTTIME": {
-			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
 			context: "Examples for the Comment Timestamps config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
 		},
