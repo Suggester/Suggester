@@ -44,7 +44,7 @@ module.exports = {
 	list: {
 		"NO_ACK_SET": {
 			string: "No Acknowledgement Set",
-			context: "Shown in the acknowledgement command when no acknowledgement is set for user"
+			context: "Shown in the acknowledgement command when no acknowledgement is set for a user"
 		},
 		"ACK_FILLER_TEXT": {
 			string: "{{user}}'s acknowledgement is: `{{acknowledgement}}`",
@@ -90,7 +90,7 @@ module.exports = {
 		},
 		"NONE_OR_INVALID_STATUS_ERROR": {
 			string: "You provided none or an invalid status. Please choose a reaction below to select a status, or {{x}} to cancel.\n\n>>> **Status List:**\n{{list}}",
-			context: "Error that shows the mark command is run without any status parameter",
+			context: "Error that shows when the mark command is run without any status parameter",
 			replaced: {
 				x: {
 					to_replace: "{{x}}",
@@ -1685,7 +1685,7 @@ module.exports = {
 			context: "Shown when in-channel suggestions are enabled and a guild tries to enable them"
 		},
 		"CFG_INCHANNEL_ALREADY_DISABLED": {
-			string: "Suggestions already cannot be submitted via any message the suggestions feed channel",
+			string: "Suggestions already cannot be submitted via any message in the suggestions feed channel",
 			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
 		},
 		"CFG_CLEAR_COMMANDS_ENABLED": {
