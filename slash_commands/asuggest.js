@@ -35,11 +35,10 @@ module.exports = async function (interaction, client) {
 	let user = await fetchUser(interaction.member.user.id, client);
 	let member = guild.members.cache.get(interaction.member.user.id);
 	if (!member) return respond(string(locale, "ERROR", {}, "error"));
-
 	let permission = await checkPermissions(member, client);
 
 	if (qServerDB.config.allowed_roles && qServerDB.config.allowed_roles.length > 0 && permission > 3) {
-		if (!qServerDB.config.allowed_roles.some(r => member.roles.find(m => m === r))) {
+		if (!qServerDB.config.allowed_roles.some(r => member.roles.cache.find(m => m === r))) {
 			let roleIds = [...new Set(qServerDB.config.allowed_roles.concat(qServerDB.config.staff_roles), qServerDB.config.admin_roles)];
 			let roles = roleIds.map(roleId => {
 				if (guild.roles.cache.get(roleId)) {
