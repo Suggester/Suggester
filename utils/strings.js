@@ -6027,6 +6027,10 @@ module.exports = {
 		"SUGGESTION_DENIED_ERROR": {
 			string: "This action cannot be taken on denied suggestions.",
 			context: "Error shown when a user attempts to take action on a denied suggestion"
+		},
+		"CFG_EMOJIS_RESET_ALL_SUCCESS": {
+			string: "All reaction emojis have been reset to their default settings",
+			context: "Success message when all emojis are reset"
 		}
 	}
 };

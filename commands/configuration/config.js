@@ -114,7 +114,7 @@ module.exports = {
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return string(locale, disabled_str, {}, "success");
 			}
-			let emote = await findEmoji(input, server.emojis.cache);
+			let emote = ["default", "reset"].includes(input.toLowerCase()) ? { up: ["👍", "👍"], mid: ["🤷", "🤷"], down: ["👎", "👎"] }[current_name] : await findEmoji(input, server.emojis.cache);
 			if (emote[0]) {
 				if (Object.values(qServerDB.config.emojis).includes(emote[0])) return string(locale, "CFG_EMOJI_ALREADY_SET_ERROR", {}, "error");
 				qServerDB.config.emojis[current_name] = emote[0];
@@ -591,6 +591,13 @@ module.exports = {
 						await dbModify("Server", {id: server.id}, qServerDB);
 						return message.channel.send(string(locale, "CFG_FEED_REACTIONS_DISABLED", {}, "success"));
 					} else return message.channel.send(string(locale, "CFG_FEED_REACTIONS_ALREADY_DISABLED", {}, "error"));
+				}
+				case "reset":
+				case "default": {
+					qServerDB.config.emojis = {up: "👍", mid: "🤷", down: "👎"};
+					qServerDB.config.react = true;
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_EMOJIS_RESET_ALL_SUCCESS", {}, "success"));
 				}
 				case "toggle":
 					qServerDB.config.react = !qServerDB.config.react;
