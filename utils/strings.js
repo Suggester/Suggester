@@ -6023,6 +6023,10 @@ module.exports = {
 					description: "The shard's API ping"
 				}
 			}
+		},
+		"SUGGESTION_DENIED_ERROR": {
+			string: "This action cannot be taken on denied suggestions.",
+			context: "Error shown when a user attempts to take action on a denied suggestion"
 		}
 	}
 };
