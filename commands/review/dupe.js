@@ -76,7 +76,9 @@ module.exports = {
 			let checkStaff = checkReview(locale, message.guild, qServerDB, dupeSuggestion);
 			if (checkStaff) return message.channel.send(checkStaff);
 			let returned = await client.channels.cache.get(dupeSuggestion.channels.staff || qServerDB.config.channels.staff).messages.fetch(dupeSuggestion.reviewMessage).then(fetched => {
-				fetched.edit((reviewEmbed(locale, dupeSuggestion, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))));
+				let re = reviewEmbed(locale, dupeSuggestion, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }));
+				dupeSuggestion.denial_reason ? re.addField(string(locale, "REASON_GIVEN"), dupeSuggestion.denial_reason) : "";
+				fetched.edit(re);
 				fetched.reactions.removeAll();
 			}).catch(() => {});
 			if (returned) return;

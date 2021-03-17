@@ -60,7 +60,11 @@ module.exports = {
 		}
 		message.channel.send(replyEmbed).then(sent => cleanCommand(message, sent, qServerDB));
 
-		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
+		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
+			let re = reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }));
+			reason ? re.addField(string(locale, "REASON_GIVEN"), reason) : "";
+			client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(re)).catch(() => {});
+		}
 
 		if (qServerDB.config.channels.log) {
 			let logs = logEmbed(guildLocale, qSuggestionDB, message.author, "DELETED_LOG", "red")

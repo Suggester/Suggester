@@ -57,7 +57,11 @@ module.exports = {
 
 		if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff) && client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) {
 			let reviewCheck = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
-			if (!reviewCheck) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
+			if (!reviewCheck) {
+				let re = reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }));
+				reason ? re.addField(string(locale, "REASON_GIVEN"), reason) : "";
+				client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(re)).catch(() => {});
+			}
 		}
 
 		if (qServerDB.config.channels.denied) {
