@@ -6031,6 +6031,20 @@ module.exports = {
 		"CFG_EMOJIS_RESET_ALL_SUCCESS": {
 			string: "All reaction emojis have been reset to their default settings",
 			context: "Success message when all emojis are reset"
+		},
+		"CFG_COOLDOWN_VALUE_BELOW_GLOBAL": {
+			string: "The specified cooldown time is smaller than the global cooldown for the `{{p}}suggest` command. You must set a value greater than {{global}}.",
+			context: "Error shown when a user attempts to set a cooldown that is below the global cooldown",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The server's prefix"
+				},
+				global: {
+					to_replace: "{{global}}",
+					description: "The global cooldown"
+				}
+			}
 		}
 	}
 };
