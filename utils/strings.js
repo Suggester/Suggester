@@ -6045,6 +6045,42 @@ module.exports = {
 					description: "The global cooldown"
 				}
 			}
-		}
+		},
+		"SEARCH_BAD_QUERY_ERROR": {
+			string: "Please make sure you specify a valid query",
+			context: "Error shown when an invalid query is provided for the search command"
+		},
+		"NO_LINK_SEARCH": {
+			string: "Use `{{p}}info {{id}}` for info",
+			context: "Shown when a suggestion does not have a message link to show in search directing them to the info comand",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The server's prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SEARCH_TITLE": {
+			string: "Found {{total}} Suggestions (showing {{min}}-{{max}} of {{total}})",
+			context: "Header for the search embed",
+			replaced: {
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				},
+				total: {
+					to_replace: "{{total}}",
+					context: "The total number of suggestions awaiting review"
+				}
+			}
+		},
 	}
 };
