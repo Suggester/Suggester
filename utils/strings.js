@@ -3616,6 +3616,20 @@ module.exports = {
 			context: "Examples for the acknowledgement command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
+		"COMMAND_DESC:SEARCH": {
+			string: "Searches suggestions on this server",
+			context: "Description for the search command"
+		},
+		"COMMAND_USAGE:SEARCH": {
+			string: "search [query]",
+			context: "Usage for the search command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SEARCH": {
+			string: "`{{p}}search status:approved author:327887845270487041`\nSearches for approved suggestions created by user 327887845270487041\n\n`{{p}}search mark:\"in progress\" staff:702180584503508994`\nSearches for suggestions marked as \"In Progress\" that were approved by user 702180584503508994\n\n`{{p}}search votes>10 time>\"1 month\" content!\"test\"`\nSearches for suggestions with more than 10 votes, more than a month old, and with a content not including \"test\"",
+			context: "Examples for the search command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
 		"COMMAND_DESC:EXEMPT": {
 			string: "Allows a user to bypass the server's configured suggestion cooldown",
 			context: "Description for the exempt command"
