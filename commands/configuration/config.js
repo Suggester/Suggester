@@ -1122,8 +1122,8 @@ module.exports = {
 		{
 			names: ["commenttime", "commentime", "commenttimestamp", "commenttimestamps", "commentimestamp", "commentimestamps", "ctime"],
 			name: "Comment Timestamps",
-			description: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
-			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+			description: "This setting controls whether or not timestamps are shown for comments on the suggestion embed",
+			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.comment_timestamps ? "CFG_COMMENT_TIME_ENABLED" : "CFG_COMMENT_TIME_DISABLED"));
 				switch (args[1].toLowerCase()) {
