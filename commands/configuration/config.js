@@ -803,7 +803,7 @@ module.exports = {
 						qServerDB.config.in_channel_suggestions = false;
 						await dbModify("Server", {id: server.id}, qServerDB);
 						return message.channel.send(string(locale, "CFG_INCHANNEL_DISABLED", {}, "success"));
-					} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED", {}, "error"));
+					} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED_NEW", {}, "error"));
 				}
 				case "toggle":
 					qServerDB.config.in_channel_suggestions = !qServerDB.config.in_channel_suggestions;
@@ -1120,7 +1120,7 @@ module.exports = {
 			}
 		},
 		{
-			names: ["commenttime", "commentime", "commenttimestamp", "commenttimestamps", "commentimestamp", "commentimestamps", "ctime"],
+			names: ["commenttimestamps", "commenttime", "commentime", "commenttimestamp", "commentimestamp", "commentimestamps", "ctime"],
 			name: "Comment Timestamps",
 			description: "This setting controls whether or not timestamps are shown for comments on the suggestion embed",
 			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
@@ -1337,6 +1337,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
 			// Cap
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
+			// Comment Timestamps
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COMMENTTIMESTAMPS", {}, "success")}:** ${string(locale, qServerDB.config.comment_timestamps ? "ENABLED" : "DISABLED")}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),

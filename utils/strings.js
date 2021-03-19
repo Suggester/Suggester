@@ -1684,7 +1684,7 @@ module.exports = {
 			string: "Suggestions can already be submitted via any message the suggestions feed channel",
 			context: "Shown when in-channel suggestions are enabled and a guild tries to enable them"
 		},
-		"CFG_INCHANNEL_ALREADY_DISABLED": {
+		"CFG_INCHANNEL_ALREADY_DISABLED_NEW": {
 			string: "Suggestions already cannot be submitted via any message in the suggestions feed channel",
 			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
 		},
@@ -5988,15 +5988,15 @@ module.exports = {
 			string: "suggestion-log",
 			context: "The name of the channel created for suggestion logs in autosetup\n**As this is a channel name, make sure there are no spaces**"
 		},
-		"CONFIG_NAME:COMMENTTIME": {
+		"CONFIG_NAME:COMMENTTIMESTAMPS": {
 			string: "Comment Timestamps",
 			context: "Name of the Comment Timestamps config element"
 		},
-		"CONFIG_DESC:COMMENTTIME": {
+		"CONFIG_DESC:COMMENTTIMESTAMPS": {
 			string: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
 			context: "Description of the Comment Timestamps config element"
 		},
-		"CONFIG_EXAMPLES:COMMENTTIME": {
+		"CONFIG_EXAMPLES:COMMENTTIMESTAMPS": {
 			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
 			context: "Examples for the Comment Timestamps config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
