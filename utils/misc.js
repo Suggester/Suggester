@@ -77,7 +77,6 @@ module.exports = {
 				if (!suggestion.color_change_trello_action) {
 					await actCard("colorchange", server, suggestion, suggester);
 					suggestion.color_change_trello_action = true;
-					await suggestion.save();
 				}
 				embed.setColor(server.config.reactionOptions.color);
 			}
@@ -103,12 +102,11 @@ module.exports = {
 					down: votes[1],
 					cached: true
 				};
-				await suggestion.save();
 			}
 		}
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
-
+		await suggestion.save();
 		return embed;
 	},
 	dmEmbed: function(locale, client, qSuggestionDB, color, title, attachment, suggestions, reason) {
