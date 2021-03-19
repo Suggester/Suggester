@@ -37,7 +37,7 @@ module.exports = {
 		}
 
 		function handleQuoteInput (input) {
-			console.log(input);
+
 			input = input.toLowerCase();
 			return input.match(/['"“”‘’„”«»]?([\s\S]+)['"“”‘’„”«»]/) ? input.match(/['"“”‘’„”«»]?([\s\S]+)['"“”‘’„”«»]/)[1] : input;
 		}
