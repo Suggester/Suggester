@@ -951,10 +951,10 @@ module.exports = {
 						approve: "<:suggester_check:704665656573952040>",
 						deny: "<:suggester_x:704665482828972113>",
 						delete: "<:strash:790937745560305674>",
-						consider: "<:sconsider:740935462067372112>",
-						implemented: "<:simplemented:740935015109492758>",
-						progress: "<:sprogress:740935462163841137>",
-						nothappening: "<:sno:740935462079954996>",
+						consider: "<:sconsider:822458050111340544>",
+						implemented: "<:simplementednum:822458050161147914>",
+						progress: "<:sworkingnum:822458050374795295>",
+						nothappening: "<:snonum:822458049801355315>",
 						colorchange: "⭐",
 						suggest: "📣"
 					};

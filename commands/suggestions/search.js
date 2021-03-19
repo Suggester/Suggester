@@ -68,7 +68,7 @@ module.exports = {
 					status = "awaiting_review";
 					break;
 				}
-				if (status) query["status"] = q[2] !== "!" ? status : { $not: status };
+				if (status) query["status"] = q[2] !== "!" ? status : { $ne: status };
 				break;
 			case "mark":
 				// eslint-disable-next-line no-case-declarations
@@ -102,7 +102,7 @@ module.exports = {
 				case "default":
 					mark = null;
 				}
-				query["displayStatus"] = q[2] !== "!" ? mark : { $not: mark };
+				query["displayStatus"] = q[2] !== "!" ? mark : { $ne: mark };
 				break;
 			case "votes":
 				// eslint-disable-next-line no-case-declarations
@@ -110,21 +110,22 @@ module.exports = {
 				if (votes || votes === 0) voteQuery = [q[2], votes];
 				break;
 			case "author":
-				query["suggester"] = q[2] !== "!" ? handleQuoteInput(q[3]) : { $not: handleQuoteInput(q[3]) };
+				query["suggester"] = q[2] !== "!" ? handleQuoteInput(q[3]) : { $ne: handleQuoteInput(q[3]) };
 				break;
 			case "staff":
-				query["staff_member"] = q[2] !== "!" ? handleQuoteInput(q[3]) : { $not: handleQuoteInput(q[3]) };
+				query["staff_member"] = q[2] !== "!" ? handleQuoteInput(q[3]) : { $ne: handleQuoteInput(q[3]) };
 				break;
 			case "time":
+				// eslint-disable-next-line no-case-declarations
 				let time = (handleQuoteInput(q[3]) ? timestring(handleQuoteInput(q[3]), "ms") : null) || null;
 				if (time) timeQuery = [q[2], time];
-				//time && new Date(suggestion.submitted).getTime()+time < Date.now()
 				break;
 			case "content":
 				query["suggestion"] = q[2] !== "!" ? { "$regex": escapeRegExp(handleQuoteInput(q[3])) } : { $not: { "$regex": escapeRegExp(handleQuoteInput(q[3])) } };
 				break;
 			}
 		}
+		console.log(query);
 		let suggestions = await dbQueryAll("Suggestion", query);
 		if (voteQuery[0]) suggestions = suggestions.filter(s => s.status === "approved" && handleSymbol(s.votes.up - s.votes.down, voteQuery));
 		if (timeQuery[0]) suggestions = suggestions.filter(s => handleSymbol(Date.now()-new Date(s.submitted).getTime(), timeQuery))

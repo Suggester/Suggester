@@ -4243,28 +4243,17 @@ module.exports = {
 			context: "Description for the listqueue command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:MARK": {
+		"COMMAND_DESC:STATUS": {
 			string: "Marks a status on a suggestion",
 			context: "Description for the mark command"
 		},
-		"COMMAND_USAGE:MARK": {
+		"COMMAND_USAGE:STATUS": {
 			string: "mark [suggestion id] [status] (comment)",
 			context: "Description for the mark command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:MARK": {
-			string: "`{{p}}mark 1 implemented`\n" +
-				"Marks suggestion #1 as implemented\n" +
-				"\n" +
-				"`{{p}}mark 1 working This will be released soon!`\n" +
-				"Marks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n" +
-				"\n" +
-				">>> **Status List:**\n" +
-				"<:simplemented:740935015109492758> Implemented (`implemented`)\n" +
-				"<:sprogress:740935462163841137> In Progress (`working`)\n" +
-				"<:sconsider:740935462067372112> In Consideration (`considered`)\n" +
-				"<:sdefault:740935462117703831> Default (`default`)\n" +
-				"<:sno:740935462079954996> Not Happening (`no`)",
+		"COMMAND_EXAMPLES:STATUS": {
+			string: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:822457150507974666> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
 			context: "Examples for the mark command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
