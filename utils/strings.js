@@ -3574,19 +3574,41 @@ module.exports = {
 			string: "No suggestions that matched your query were found",
 			context: "Error shown when no suggestions are found for the top/down command"
 		},
-		"TOP_TITLE_NEW": {
-			string: "Top {{number}} Highest Voted Suggestions",
+		"TOP_TITLE_NEW_AGAIN": {
+			string: "Top {{number}} Highest Voted Suggestions (showing {{min}}-{{max}} of {{number}})",
 			context: "Header for the top suggestions embed",
 			replaced: {
 				number: {
 					to_replace: "{{number}}",
 					description: "The number of suggestions shown"
+				},
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
 				}
 			}
 		},
-		"DOWN_TITLE": {
-			string: "Top 10 Lowest Voted Suggestions",
-			context: "Header for the lowest voted suggestions embed"
+		"DOWN_TITLE_NEW": {
+			string: "Top {{number}} Lowest Voted Suggestions (showing {{min}}-{{max}} of {{number}})",
+			context: "Header for the lowest voted suggestions embed",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The number of suggestions shown"
+				},
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				}
+			}
 		},
 		"SUGGESTION_LOADING": {
 			string: "Collecting suggestion data, this may take a moment...",

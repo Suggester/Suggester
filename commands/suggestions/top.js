@@ -68,7 +68,8 @@ module.exports = {
 		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 10)) {
 			embedArray.push({
 				"fieldTitle": `${index}: ${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
-				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`
+				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`,
+				index
 			});
 			index++;
 		}
@@ -76,7 +77,7 @@ module.exports = {
 
 		if (!qServerDB.flags.includes("LARGE") && !qServerDB.flags.includes("MORE_TOP")) {
 			let embed = new Discord.MessageEmbed()
-				.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
+				.setTitle(string(locale, "TOP_TITLE_NEW_AGAIN", { number: embedArray.length, min: 1, max: embedArray[embedArray.length-1].index }))
 				.setColor(client.colors.green);
 			if (time) embed.setDescription(string(locale, "TOP_TIME_INFO", {
 				time: humanizeDuration(time, {
@@ -92,7 +93,7 @@ module.exports = {
 			let embeds = [];
 			for await (let chunk of chunks) {
 				let embed = new Discord.MessageEmbed()
-					.setTitle(string(locale, "TOP_TITLE_NEW", { number: embedArray.length }))
+					.setTitle(string(locale, "TOP_TITLE_NEW_AGAIN", { number: embedArray.length, min: chunk[0].index, max: chunk[chunk.length-1].index }))
 					.setColor(client.colors.green)
 					.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 					.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : "");
