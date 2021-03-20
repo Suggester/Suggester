@@ -37,7 +37,6 @@ module.exports = {
 		}
 
 		function handleQuoteInput (input) {
-
 			input = input.toLowerCase();
 			return input.match(/['"“”‘’„”«»]?([\s\S]+)['"“”‘’„”«»]/) ? input.match(/['"“”‘’„”«»]?([\s\S]+)['"“”‘’„”«»]/)[1] : input;
 		}
@@ -157,7 +156,7 @@ module.exports = {
 		let embeds = [];
 		for await (let chunk of chunks) {
 			let embed = new Discord.MessageEmbed()
-				.setTitle(string(locale, "PENDING_REVIEW_HEADER_NUM", { min: chunk[0].index, max: chunk[chunk.length-1].index, total: embedArray.length }))
+				.setTitle(string(locale, "SEARCH_TITLE", { min: chunk[0].index, max: chunk[chunk.length-1].index, total: embedArray.length }))
 				.setColor(client.colors.blue)
 				.setAuthor(chunks.length > 1 ? string(locale, "PAGINATION_PAGE_COUNT") : "")
 				.setFooter(chunks.length > 1 ? string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS") : "");
