@@ -883,7 +883,7 @@ module.exports = {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cooldown ? "CFG_COOLDOWN_INFO" : "CFG_COOLDOWN_NONE", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }));
 				let newValue = ms(args.splice(1).join(" "));
 				if ((!newValue && newValue !== 0) || newValue < 0) return message.channel.send(string(locale, "CFG_COOLDOWN_BAD_VALUE", {}, "error"));
-				if (newValue !== 0 && newValue <= (require("../suggestions/suggest")).controls.cooldown*1000) return message.channel.send(string(locale, "CFG_COOLDOWN_VALUE_BELOW_GLOBAL", { p: qServerDB.config.prefix, global: humanizeDuration((require("../suggestions/suggest")).controls.cooldown*1000, { language: locale, fallbacks: ["en"] }) }, "error"))
+				if (newValue !== 0 && newValue <= (require("../suggestions/suggest")).controls.cooldown*1000) return message.channel.send(string(locale, "CFG_COOLDOWN_VALUE_BELOW_GLOBAL", { p: qServerDB.config.prefix, global: humanizeDuration((require("../suggestions/suggest")).controls.cooldown*1000, { language: locale, fallbacks: ["en"] }) }, "error"));
 				qServerDB.config.suggestion_cooldown = newValue;
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));

@@ -127,7 +127,7 @@ module.exports = {
 		console.log(query);
 		let suggestions = await dbQueryAll("Suggestion", query);
 		if (voteQuery[0]) suggestions = suggestions.filter(s => s.status === "approved" && handleSymbol(s.votes.up - s.votes.down, voteQuery));
-		if (timeQuery[0]) suggestions = suggestions.filter(s => handleSymbol(Date.now()-new Date(s.submitted).getTime(), timeQuery))
+		if (timeQuery[0]) suggestions = suggestions.filter(s => handleSymbol(Date.now()-new Date(s.submitted).getTime(), timeQuery));
 		if (!suggestions.length) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
 		let embedArray = [];
 		let index = 1;
