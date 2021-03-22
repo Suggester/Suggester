@@ -99,6 +99,7 @@ module.exports = {
 					let votes = checkVotes(guildLocale, qSuggestionDB, deleteMsg[1]);
 					if (votes[0] || votes[1]) deniedEmbed.addField(string(locale, "VOTES_TITLE"), `${string(locale, "VOTE_COUNT_OPINION")} ${isNaN(votes[2]) ? string(locale, "UNKNOWN") : (votes[2] > 0 ? `+${votes[2]}` : votes[2])}\n${string(locale, "VOTE_COUNT_UP")} ${votes[0]} \`${((votes[0]/(votes[0]+votes[1]))*100).toFixed(2)}%\`\n${string(locale, "VOTE_COUNT_DOWN")} ${votes[1]} \`${((votes[1]/(votes[0]+votes[1]))*100).toFixed(2)}%\``);
 					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
+					if (qSuggestionDB.anon) deniedEmbed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" })).setThumbnail("");
 					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}
 
@@ -122,7 +123,11 @@ module.exports = {
 						let checkStaff = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 						if (checkStaff) doReview = false;
 					}
-					if (doReview) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }))))).catch(() => {});
+					if (doReview) {
+						let re = reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DELETED_BY", { user: message.author.tag }));
+						reason ? re.addField(string(locale, "REASON_GIVEN"), reason) : "";
+						client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(re)).catch(() => {});
+					}
 				}
 
 				await denied[s].save();

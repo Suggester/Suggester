@@ -60,7 +60,9 @@ module.exports = {
 			let checkStaff = checkReview(locale, message.guild, qServerDB, qSuggestionDB);
 			if (checkStaff) return message.channel.send(checkStaff);
 			let returned = await client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
-				fetched.edit((reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))));
+				let re = reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }));
+				reason ? re.addField(string(locale, "REASON_GIVEN"), reason) : "";
+				fetched.edit(re);
 				fetched.reactions.removeAll();
 			}).catch(() => {});
 			if (returned) return;
@@ -102,6 +104,7 @@ module.exports = {
 				.setColor(client.colors.red);
 			reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 			qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
+			if (qSuggestionDB.anon) deniedEmbed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" })).setThumbnail("");
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 

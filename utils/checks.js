@@ -21,6 +21,7 @@ module.exports = {
 		if (!member || !member.id || !client) return 10;
 		let { dbQueryNoNew } = require("./db.js");
 		let qUserDB = await dbQueryNoNew("User", { id: member.id });
+		if (qUserDB && qUserDB.flags.find(f => f.startsWith("PERMISSION_OVERRIDE:")) && (parseInt(qUserDB.flags.find(f => f.startsWith("PERMISSION_OVERRIDE:")).split(":")[1]) || parseInt(qUserDB.flags.find(f => f.startsWith("PERMISSION_OVERRIDE:")).split(":")[1]) === 0)) return parseInt(qUserDB.flags.find(f => f.startsWith("PERMISSION_OVERRIDE:")).split(":")[1]);
 		if (client.admins.has(member.id)) return 0;
 		if (qUserDB && qUserDB.flags.includes("STAFF")) return 1;
 		if (qUserDB && qUserDB.blocked) return 12;

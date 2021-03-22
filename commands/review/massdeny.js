@@ -99,6 +99,7 @@ module.exports = {
 						.setColor(client.colors.red);
 					reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
+					if (qSuggestionDB.anon) deniedEmbed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" })).setThumbnail("");
 					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}
 
@@ -123,7 +124,9 @@ module.exports = {
 						if (checkStaff) doReview = false;
 					}
 					if (doReview) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => {
-						fetched.edit((reviewEmbed(guildLocale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }))));
+						let re = reviewEmbed(locale, qSuggestionDB, suggester, "red", string(locale, "DENIED_BY", { user: message.author.tag }));
+						reason ? re.addField(string(locale, "REASON_GIVEN"), reason) : "";
+						fetched.edit(re);
 						fetched.reactions.removeAll();
 					}).catch(() => {});
 				}

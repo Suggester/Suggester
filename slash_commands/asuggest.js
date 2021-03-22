@@ -9,6 +9,7 @@ const { string } = require("../utils/strings");
 const humanizeDuration = require("humanize-duration");
 const { initTrello } = require("../utils/trello");
 module.exports = async function (interaction, client) {
+	console.log(interaction);
 	function respond(data) {
 		client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 			type: 3,
@@ -35,11 +36,11 @@ module.exports = async function (interaction, client) {
 	let user = await fetchUser(interaction.member.user.id, client);
 	let member = guild.members.cache.get(interaction.member.user.id);
 	if (!member) return respond(string(locale, "ERROR", {}, "error"));
-
 	let permission = await checkPermissions(member, client);
 
 	if (qServerDB.config.allowed_roles && qServerDB.config.allowed_roles.length > 0 && permission > 3) {
-		if (!qServerDB.config.allowed_roles.some(r => member.roles.find(m => m === r))) {
+		console.log(qServerDB.config.allowed_roles, interaction.member.roles);
+		if (!qServerDB.config.allowed_roles.some(r => interaction.member.roles.includes(r))) {
 			let roleIds = [...new Set(qServerDB.config.allowed_roles.concat(qServerDB.config.staff_roles), qServerDB.config.admin_roles)];
 			let roles = roleIds.map(roleId => {
 				if (guild.roles.cache.get(roleId)) {

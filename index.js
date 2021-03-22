@@ -9,6 +9,9 @@ const manager = new ShardingManager("./bot.js", { token: process.env.TOKEN });
 
 manager.on("shardCreate", (shard) => {
 	console.log(chalk`{blue [{bold SHARD}] Spawned shard {bold ${shard.id}}}`);
+	shard.on("message", (message) => {
+		console.log(chalk`{blue [{bold SHARD ${shard.id}}] ${message}}`);
+	});
 });
 
 manager.on("message", (shard, message) => {

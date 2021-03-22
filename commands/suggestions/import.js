@@ -270,7 +270,7 @@ module.exports = {
 						}
 						if (embed.fields[0]) {
 							let carlUser = embed.fields[0].name.match(/Reason from ([\s\S]+)/);
-							suggestionInfo.staff_member = carlUser ? (client.users.cache.find(u => u.tag === carlUser[1]).id || "0") : "0";
+							suggestionInfo.staff_member = carlUser && client.users.cache.find(u => u.tag === carlUser[1]) ? client.users.cache.find(u => u.tag === carlUser[1]).id || "0" : "0";
 							if (embed.fields[0].value !== "No reason given") {
 								if (suggestionInfo.status === "denied") suggestionInfo.denial_reason = embed.fields[0].value;
 								else {

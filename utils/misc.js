@@ -47,7 +47,7 @@ module.exports = {
 			.setFooter(!editor ? string(locale, "SUGGESTION_FOOTER", { id: suggestion.suggestionId }) : string(locale, "SUGGESTION_FOOTER_WITH_EDIT", { id: suggestion.suggestionId, editor: editor.tag }));
 		let votes = await client.channels.cache.get(suggestion.channels.suggestions || server.config.channels.suggestions).messages.fetch(suggestion.messageId).then(m => {
 			return checkVotes(locale, suggestion, m);
-		}).catch(() => {});
+		}).catch((e) => console.log(e));
 		// Embed Color
 		switch (suggestion.displayStatus) {
 		case "implemented": {
@@ -77,7 +77,6 @@ module.exports = {
 				if (!suggestion.color_change_trello_action) {
 					await actCard("colorchange", server, suggestion, suggester);
 					suggestion.color_change_trello_action = true;
-					await suggestion.save();
 				}
 				embed.setColor(server.config.reactionOptions.color);
 			}
@@ -103,12 +102,11 @@ module.exports = {
 					down: votes[1],
 					cached: true
 				};
-				await suggestion.save();
 			}
 		}
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
-
+		await suggestion.save();
 		return embed;
 	},
 	dmEmbed: function(locale, client, qSuggestionDB, color, title, attachment, suggestions, reason) {

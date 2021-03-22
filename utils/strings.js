@@ -44,7 +44,7 @@ module.exports = {
 	list: {
 		"NO_ACK_SET": {
 			string: "No Acknowledgement Set",
-			context: "Shown in the acknowledgement command when no acknowledgement is set for user"
+			context: "Shown in the acknowledgement command when no acknowledgement is set for a user"
 		},
 		"ACK_FILLER_TEXT": {
 			string: "{{user}}'s acknowledgement is: `{{acknowledgement}}`",
@@ -90,7 +90,7 @@ module.exports = {
 		},
 		"NONE_OR_INVALID_STATUS_ERROR": {
 			string: "You provided none or an invalid status. Please choose a reaction below to select a status, or {{x}} to cancel.\n\n>>> **Status List:**\n{{list}}",
-			context: "Error that shows the mark command is run without any status parameter",
+			context: "Error that shows when the mark command is run without any status parameter",
 			replaced: {
 				x: {
 					to_replace: "{{x}}",
@@ -1684,8 +1684,8 @@ module.exports = {
 			string: "Suggestions can already be submitted via any message the suggestions feed channel",
 			context: "Shown when in-channel suggestions are enabled and a guild tries to enable them"
 		},
-		"CFG_INCHANNEL_ALREADY_DISABLED": {
-			string: "Suggestions already cannot be submitted via any message the suggestions feed channel",
+		"CFG_INCHANNEL_ALREADY_DISABLED_NEW": {
+			string: "Suggestions already cannot be submitted via any message in the suggestions feed channel",
 			context: "Shown when in-channel suggestions are disabled and a guild tries to disable them"
 		},
 		"CFG_CLEAR_COMMANDS_ENABLED": {
@@ -3574,19 +3574,41 @@ module.exports = {
 			string: "No suggestions that matched your query were found",
 			context: "Error shown when no suggestions are found for the top/down command"
 		},
-		"TOP_TITLE_NEW": {
-			string: "Top {{number}} Highest Voted Suggestions",
+		"TOP_TITLE_NEW_AGAIN": {
+			string: "Top {{number}} Highest Voted Suggestions (showing {{min}}-{{max}} of {{number}})",
 			context: "Header for the top suggestions embed",
 			replaced: {
 				number: {
 					to_replace: "{{number}}",
 					description: "The number of suggestions shown"
+				},
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
 				}
 			}
 		},
-		"DOWN_TITLE": {
-			string: "Top 10 Lowest Voted Suggestions",
-			context: "Header for the lowest voted suggestions embed"
+		"DOWN_TITLE_NEW": {
+			string: "Top {{number}} Lowest Voted Suggestions (showing {{min}}-{{max}} of {{number}})",
+			context: "Header for the lowest voted suggestions embed",
+			replaced: {
+				number: {
+					to_replace: "{{number}}",
+					description: "The number of suggestions shown"
+				},
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				}
+			}
 		},
 		"SUGGESTION_LOADING": {
 			string: "Collecting suggestion data, this may take a moment...",
@@ -3614,6 +3636,20 @@ module.exports = {
 				"`{{p}}acknowledgement @Brightness™ reset`\n" +
 				"Resets Brightness™'s acknowledgement",
 			context: "Examples for the acknowledgement command\n" +
+				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
+		},
+		"COMMAND_DESC:SEARCH": {
+			string: "Searches suggestions on this server",
+			context: "Description for the search command"
+		},
+		"COMMAND_USAGE:SEARCH": {
+			string: "search [query]",
+			context: "Usage for the search command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
+		},
+		"COMMAND_EXAMPLES:SEARCH": {
+			string: "`{{p}}search status:approved author:327887845270487041`\nSearches for approved suggestions created by user 327887845270487041\n\n`{{p}}search mark:\"in progress\" staff:702180584503508994`\nSearches for suggestions marked as \"In Progress\" that were approved by user 702180584503508994\n\n`{{p}}search votes>10 time>\"1 month\" content!\"test\"`\nSearches for suggestions with more than 10 votes, more than a month old, and with a content not including \"test\"",
+			context: "Examples for the search command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
 		"COMMAND_DESC:EXEMPT": {
@@ -4207,28 +4243,17 @@ module.exports = {
 			context: "Description for the listqueue command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:MARK": {
+		"COMMAND_DESC:STATUS": {
 			string: "Marks a status on a suggestion",
 			context: "Description for the mark command"
 		},
-		"COMMAND_USAGE:MARK": {
+		"COMMAND_USAGE:STATUS": {
 			string: "mark [suggestion id] [status] (comment)",
 			context: "Description for the mark command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:MARK": {
-			string: "`{{p}}mark 1 implemented`\n" +
-				"Marks suggestion #1 as implemented\n" +
-				"\n" +
-				"`{{p}}mark 1 working This will be released soon!`\n" +
-				"Marks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n" +
-				"\n" +
-				">>> **Status List:**\n" +
-				"<:simplemented:740935015109492758> Implemented (`implemented`)\n" +
-				"<:sprogress:740935462163841137> In Progress (`working`)\n" +
-				"<:sconsider:740935462067372112> In Consideration (`considered`)\n" +
-				"<:sdefault:740935462117703831> Default (`default`)\n" +
-				"<:sno:740935462079954996> Not Happening (`no`)",
+		"COMMAND_EXAMPLES:STATUS": {
+			string: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:822457150507974666> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
 			context: "Examples for the mark command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},
@@ -5952,16 +5977,16 @@ module.exports = {
 			string: "suggestion-log",
 			context: "The name of the channel created for suggestion logs in autosetup\n**As this is a channel name, make sure there are no spaces**"
 		},
-		"CONFIG_NAME:COMMENTTIME": {
+		"CONFIG_NAME:COMMENTTIMESTAMPS": {
 			string: "Comment Timestamps",
 			context: "Name of the Comment Timestamps config element"
 		},
-		"CONFIG_DESC:COMMENTTIME": {
+		"CONFIG_DESC:COMMENTTIMESTAMPS": {
 			string: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
 			context: "Description of the Comment Timestamps config element"
 		},
-		"CONFIG_EXAMPLES:COMMENTTIME": {
-			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+		"CONFIG_EXAMPLES:COMMENTTIMESTAMPS": {
+			string: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
 			context: "Examples for the Comment Timestamps config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
 		},
@@ -5993,6 +6018,94 @@ module.exports = {
 		"ANON_SUGGEST_SLASH_NOTICE": {
 			string: "Anonymous suggestions are handled through **slash commands**. To use anonymous suggestions, head to the server you'd like to submit a suggestion on and type `/`. You should see a menu open that contains `/asuggest`, and selecting that will allow you to submit an anonymous suggestion.\nIf you don't see the commands listed: Ask a server administrator to re-invite the bot with the link below to grant it permission to show slash commands",
 			context: "Notice shown when a user runs the regular asuggest command"
-		}
+		},
+		"SHARDS_NOT_SPAWNED": {
+			string: "Shards are still being spawned",
+			context: "Error shown when shards are still being spawned"
+		},
+		"SHARDS_DETAIL": {
+			string: "Servers: {{servers}}\nChannels: {{channels}}\nUsers: {{users}}\nMemory: {{memory}} MB\nAPI: {{api}} ms",
+			context: "Detailed shard information for the shard command",
+			replaced: {
+				servers: {
+					to_replace: "{{servers}}",
+					description: "The shard's server count"
+				},
+				channels: {
+					to_replace: "{{channels}}",
+					description: "The shard's channel count"
+				},
+				users: {
+					to_replace: "{{users}}",
+					description: "The shard's user count"
+				},
+				memory: {
+					to_replace: "{{memory}}",
+					description: "The shard's memory usage"
+				},
+				api: {
+					to_replace: "{{api}}",
+					description: "The shard's API ping"
+				}
+			}
+		},
+		"SUGGESTION_DENIED_ERROR": {
+			string: "This action cannot be taken on denied suggestions.",
+			context: "Error shown when a user attempts to take action on a denied suggestion"
+		},
+		"CFG_EMOJIS_RESET_ALL_SUCCESS": {
+			string: "All reaction emojis have been reset to their default settings",
+			context: "Success message when all emojis are reset"
+		},
+		"CFG_COOLDOWN_VALUE_BELOW_GLOBAL": {
+			string: "The specified cooldown time is smaller than the global cooldown for the `{{p}}suggest` command. You must set a value greater than {{global}}.",
+			context: "Error shown when a user attempts to set a cooldown that is below the global cooldown",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The server's prefix"
+				},
+				global: {
+					to_replace: "{{global}}",
+					description: "The global cooldown"
+				}
+			}
+		},
+		"SEARCH_BAD_QUERY_ERROR": {
+			string: "Please make sure you specify a valid query",
+			context: "Error shown when an invalid query is provided for the search command"
+		},
+		"NO_LINK_SEARCH": {
+			string: "Use `{{p}}info {{id}}` for info",
+			context: "Shown when a suggestion does not have a message link to show in search directing them to the info comand",
+			replaced: {
+				p: {
+					to_replace: "{{p}}",
+					description: "The server's prefix"
+				},
+				id: {
+					to_replace: "{{id}}",
+					description: "The suggestion ID"
+				}
+			}
+		},
+		"SEARCH_TITLE": {
+			string: "Found {{total}} Suggestions (showing {{min}}-{{max}} of {{total}})",
+			context: "Header for the search embed",
+			replaced: {
+				min: {
+					to_replace: "{{min}}",
+					context: "The first number of suggestions being shown"
+				},
+				max: {
+					to_replace: "{{max}}",
+					context: "The last number of suggestions being shown"
+				},
+				total: {
+					to_replace: "{{total}}",
+					context: "The total number of suggestions awaiting review"
+				}
+			}
+		},
 	}
 };

@@ -114,7 +114,7 @@ module.exports = {
 				await dbModify("Server", {id: server.id}, qServerDB);
 				return string(locale, disabled_str, {}, "success");
 			}
-			let emote = await findEmoji(input, server.emojis.cache);
+			let emote = ["default", "reset"].includes(input.toLowerCase()) ? { up: ["👍", "👍"], mid: ["🤷", "🤷"], down: ["👎", "👎"] }[current_name] : await findEmoji(input, server.emojis.cache);
 			if (emote[0]) {
 				if (Object.values(qServerDB.config.emojis).includes(emote[0])) return string(locale, "CFG_EMOJI_ALREADY_SET_ERROR", {}, "error");
 				qServerDB.config.emojis[current_name] = emote[0];
@@ -592,6 +592,13 @@ module.exports = {
 						return message.channel.send(string(locale, "CFG_FEED_REACTIONS_DISABLED", {}, "success"));
 					} else return message.channel.send(string(locale, "CFG_FEED_REACTIONS_ALREADY_DISABLED", {}, "error"));
 				}
+				case "reset":
+				case "default": {
+					qServerDB.config.emojis = {up: "👍", mid: "🤷", down: "👎"};
+					qServerDB.config.react = true;
+					await qServerDB.save();
+					return message.channel.send(string(locale, "CFG_EMOJIS_RESET_ALL_SUCCESS", {}, "success"));
+				}
 				case "toggle":
 					qServerDB.config.react = !qServerDB.config.react;
 					await dbModify("Server", {id: server.id}, qServerDB);
@@ -796,7 +803,7 @@ module.exports = {
 						qServerDB.config.in_channel_suggestions = false;
 						await dbModify("Server", {id: server.id}, qServerDB);
 						return message.channel.send(string(locale, "CFG_INCHANNEL_DISABLED", {}, "success"));
-					} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED", {}, "error"));
+					} else return message.channel.send(string(locale, "CFG_INCHANNEL_ALREADY_DISABLED_NEW", {}, "error"));
 				}
 				case "toggle":
 					qServerDB.config.in_channel_suggestions = !qServerDB.config.in_channel_suggestions;
@@ -876,6 +883,7 @@ module.exports = {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.suggestion_cooldown ? "CFG_COOLDOWN_INFO" : "CFG_COOLDOWN_NONE", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }));
 				let newValue = ms(args.splice(1).join(" "));
 				if ((!newValue && newValue !== 0) || newValue < 0) return message.channel.send(string(locale, "CFG_COOLDOWN_BAD_VALUE", {}, "error"));
+				if (newValue !== 0 && newValue <= (require("../suggestions/suggest")).controls.cooldown*1000) return message.channel.send(string(locale, "CFG_COOLDOWN_VALUE_BELOW_GLOBAL", { p: qServerDB.config.prefix, global: humanizeDuration((require("../suggestions/suggest")).controls.cooldown*1000, { language: locale, fallbacks: ["en"] }) }, "error"));
 				qServerDB.config.suggestion_cooldown = newValue;
 				await qServerDB.save();
 				return message.channel.send(string(locale, "CFG_COOLDOWN_SET", { time: humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] }) }, "success"));
@@ -943,10 +951,10 @@ module.exports = {
 						approve: "<:suggester_check:704665656573952040>",
 						deny: "<:suggester_x:704665482828972113>",
 						delete: "<:strash:790937745560305674>",
-						consider: "<:sconsider:740935462067372112>",
-						implemented: "<:simplemented:740935015109492758>",
-						progress: "<:sprogress:740935462163841137>",
-						nothappening: "<:sno:740935462079954996>",
+						consider: "<:sconsider:822458050111340544>",
+						implemented: "<:simplementednum:822458050161147914>",
+						progress: "<:sworkingnum:822458050374795295>",
+						nothappening: "<:snonum:822458049801355315>",
 						colorchange: "⭐",
 						suggest: "📣"
 					};
@@ -1112,10 +1120,10 @@ module.exports = {
 			}
 		},
 		{
-			names: ["commenttime", "commentime", "commenttimestamp", "commenttimestamps", "commentimestamp", "commentimestamps", "ctime"],
+			names: ["commenttimestamps", "commenttime", "commentime", "commenttimestamp", "commentimestamp", "commentimestamps", "ctime"],
 			name: "Comment Timestamps",
-			description: "This setting controls whether or not timestamps are shown for comments in the suggestion embed",
-			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config onevote off`\nDisables comment timestamps on suggestion embeds",
+			description: "This setting controls whether or not timestamps are shown for comments on the suggestion embed",
+			examples: "`{{p}}config commenttime on`\nEnables comment timestamps on suggestion embeds\n\n`{{p}}config commenttime off`\nDisables comment timestamps on suggestion embeds",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.comment_timestamps ? "CFG_COMMENT_TIME_ENABLED" : "CFG_COMMENT_TIME_DISABLED"));
 				switch (args[1].toLowerCase()) {
@@ -1329,6 +1337,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COOLDOWN", {}, "success")}:** ${humanizeDuration(qServerDB.config.suggestion_cooldown, { language: locale, fallbacks: ["en"] })}`);
 			// Cap
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
+			// Comment Timestamps
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COMMENTTIMESTAMPS", {}, "success")}:** ${string(locale, qServerDB.config.comment_timestamps ? "ENABLED" : "DISABLED")}`);
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),
