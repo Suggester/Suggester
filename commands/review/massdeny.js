@@ -99,6 +99,7 @@ module.exports = {
 						.setColor(client.colors.red);
 					reason ? deniedEmbed.addField(string(guildLocale, "REASON_GIVEN"), reason) : "";
 					qSuggestionDB.attachment ? deniedEmbed.setImage(qSuggestionDB.attachment) : "";
+					if (qSuggestionDB.anon) deniedEmbed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" })).setThumbnail("");
 					client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 				}
 

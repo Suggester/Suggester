@@ -120,6 +120,7 @@ module.exports = {
 				.setColor(client.colors.red)
 				.addField(string(locale, "REASON_GIVEN"), dupeSuggestion.denial_reason);
 			dupeSuggestion.attachment ? deniedEmbed.setImage(dupeSuggestion.attachment) : "";
+			if (dupeSuggestion.anon) deniedEmbed.setAuthor(string(locale, "ANON_SUGGESTION"), client.user.displayAvatarURL({ format: "png" })).setThumbnail("");
 			client.channels.cache.get(qServerDB.config.channels.denied).send(deniedEmbed);
 		}
 
