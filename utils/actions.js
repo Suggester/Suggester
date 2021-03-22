@@ -168,7 +168,8 @@ module.exports = {
 		if (!msg || !msg.reactions || !msg.reactions.cache) return [null, null, null];
 		const nodeEmoji = require("node-emoji");
 		function getEmoji (input) {
-			if (nodeEmoji.find(input)) return input;
+			if (input === "none") return null;
+			else if (nodeEmoji.find(input)) return input;
 			else return input.match(/[a-zA-Z0-9-_]+:([0-9]+)/)[1] || null;
 		}
 		let upCount;
@@ -177,6 +178,8 @@ module.exports = {
 		let downReaction = msg.reactions.cache.get(getEmoji(qSuggestionDB.emojis.down));
 		if (qSuggestionDB.emojis.up !== "none" && upReaction) upCount = upReaction.me || upReaction.users.resolve(msg.client.user.id) ? upReaction.count-1 : upReaction.count;
 		if (qSuggestionDB.emojis.down !== "none" && downReaction) downCount = downReaction.me || downReaction.users.resolve(msg.client.user.id) ? downReaction.count-1 : downReaction.count;
+		if (upCount && !downCount) downCount = 0;
+		if (downCount && !upCount) upCount = 0;
 		return [upCount, downCount, upCount-downCount];
 	},
 	notifyFollowers: async function(client, db, suggestion, color, title, attachment, suggestions, reason, efn, sendOps={follow: true, author: true}) {
