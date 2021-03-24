@@ -9,7 +9,7 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 20,
-                docs: "topics/stats" 
+		docs: "topics/stats" 
 		
 	},
 	do: async (locale, message) => {
