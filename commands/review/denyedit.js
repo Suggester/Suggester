@@ -37,7 +37,7 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let embedReview = reviewEmbed(qServerDB.config.locale, {
+		let embedReview = reviewEmbed(qServerDB.config.locale, { 
 			suggestionId: qSuggestionDB.suggestionId,
 			suggestion: qSuggestionDB.pending_edit.content,
 			submitted: qSuggestionDB.submitted,
