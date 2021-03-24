@@ -16,7 +16,7 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		docs: "editing/denyedit"
+		docs: "s/denyedit"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
