@@ -6136,5 +6136,15 @@ module.exports = {
 				}
 			}
 		},
+		"DENY_AUTOAPPROVE_DELETE_REDIRECT": {
+			string: "If you're trying to remove a suggestion, use the `{{command}}` command",
+			context: "Shown when a user attempts to use deny and the mode is set to autoapprove",
+			replaced: {
+				command: {
+					to_replace: "{{command}}",
+					description: "The command the user should use (delete, silentdelete, or massdelete)"
+				}
+			}
+		}
 	}
 };

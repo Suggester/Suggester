@@ -25,7 +25,7 @@ module.exports = {
 		if (returned) return message.channel.send(returned);
 		let guildLocale = qServerDB.config.locale;
 
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(`${string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")}\n${string(locale, "DENY_AUTOAPPROVE_DELETE_REDIRECT", { command: `${qServerDB.config.prefix}massdelete` })}`).then(sent => cleanCommand(message, sent, qServerDB));
 
 		let checkStaff = checkReview(locale, message.guild, qServerDB);
 		if (checkStaff) return message.channel.send(checkStaff);
