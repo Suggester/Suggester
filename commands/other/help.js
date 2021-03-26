@@ -80,7 +80,7 @@ module.exports = {
 			.setAuthor(`${serverPrefix}${commandName}`, client.user.displayAvatarURL({dynamic: true, format: "png"}));
 
 		commandInfo.aliases ? returnEmbed.addField(string(locale, commandInfo.aliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), commandInfo.aliases.map(c => `\`${serverPrefix}${c}\``).join(", "), true) : "";
-		commandInfo.docs ? returnEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/${commandInfo.docs}`, true) : "";
+		commandInfo.docs ? returnEmbed.addField(string(locale, "HELP_DOCS_NEW"), `https://suggester.js.org/#/${commandInfo.docs}`, true) : "";
 		returnEmbed.addField(string(locale, "HELP_EXAMPLES"), (commandInfo.examples ? (string(locale, `COMMAND_EXAMPLES:${commandInfo.name.toUpperCase()}`) || commandInfo.examples).replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(serverPrefix)) : null) || string(locale, "NONE"));
 
 		if (commandInfo.image) returnEmbed.attachFiles([new MessageAttachment(commandInfo.image, `image.${commandInfo.image.split(".")[1]}`)]).setImage(`attachment://image.${commandInfo.image.split(".")[1]}`);

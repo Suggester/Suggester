@@ -574,7 +574,7 @@ module.exports = {
 			string: "Aliases",
 			context: "Aliases field name in help command"
 		},
-		"HELP_DOCS": {
+		"HELP_DOCS_NEW": {
 			string: "Documentation",
 			context: "Documentation field name in help command"
 		},

@@ -1234,7 +1234,7 @@ module.exports = {
 					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
-				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS_NEW"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				return message.channel.send(elementEmbed);
 			}
 			let embeds = [new Discord.MessageEmbed()
@@ -1254,7 +1254,7 @@ module.exports = {
 					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
-				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS_NEW"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				embeds.push(elementEmbed);
 			}
 			return pages(locale, message, embeds);
