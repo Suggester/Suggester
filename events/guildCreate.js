@@ -26,6 +26,13 @@ module.exports = async (Discord, client, guild) => {
 
 	await guildLog(`📥 New Guild: **${guild.name ? guild.name : "Name Unknown"}** (\`${guild.id ? guild.id : "ID Unknown"}\`)\n>>> **Member Count:** ${guild.memberCount ? guild.memberCount : "Member Count Unknown"}`, {}, client);
 
+	let discordLocale = (await client.api.guilds(guild.id).get()).preferred_locale;
+	let found = client.locales.find(l => l.settings.discord === discordLocale || l.settings.code === discordLocale);
+	if (found) {
+		qServerDB.config.locale = found.settings.code;
+		qServerDB.save();
+	}
+
 	await guild.members.fetch(client.user.id);
 	if (guild.me.joinedTimestamp+60000<Date.now()) return;
 
