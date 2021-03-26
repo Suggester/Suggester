@@ -13,7 +13,7 @@ module.exports = {
 		examples: "`{{p}}unfollow 123`\nUnfollows suggestion #123",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		docs: "following/unfollow"
+		docs: "topics/unfollow"
 	},
 	do: async (locale, message, client, args) => {
 		const qServerDB = message.guild ? await message.guild.db : null;

@@ -13,7 +13,8 @@ module.exports = {
 		enabled: true,
 		examples: "`{{p}}search status:approved author:327887845270487041`\nSearches for approved suggestions created by user 327887845270487041\n\n`{{p}}search mark:\"in progress\" staff:702180584503508994`\nSearches for suggestions marked as \"In Progress\" that were approved by user 702180584503508994\n\n`{{p}}search votes>10 time>\"1 month\" content!\"test\"`\nSearches for suggestions with more than 10 votes, more than a month old, and with a content not including \"test\"",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
-		cooldown: 5
+		cooldown: 5,
+		docs: "topics/search"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);

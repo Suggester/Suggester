@@ -16,7 +16,7 @@ module.exports = {
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 5,
-		docs: "editing/denyedit"
+		docs: "topics/denyedit"
 	},
 	do: async (locale, message, client, args, Discord, noCommand=false) => {
 		let [returned, qServerDB] = await baseConfig(locale, message.guild);
@@ -37,7 +37,7 @@ module.exports = {
 		let suggester = await fetchUser(qSuggestionDB.suggester, client);
 		if (!suggester) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let embedReview = reviewEmbed(qServerDB.config.locale, {
+		let embedReview = reviewEmbed(qServerDB.config.locale, { 
 			suggestionId: qSuggestionDB.suggestionId,
 			suggestion: qSuggestionDB.pending_edit.content,
 			submitted: qSuggestionDB.submitted,
