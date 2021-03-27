@@ -43,7 +43,8 @@ module.exports = async (Discord, client, message) => {
 			args.splice(0, 1);
 
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2].toLowerCase() || c.controls.aliases && c.controls.aliases.includes(match[2].toLowerCase()));
-		} else if (message.content.match(new RegExp(`^<@!?${client.user.id}>[\s]?$`))) command = client.commands.find((c) => c.controls.name.toLowerCase() === "prefix")
+			// eslint-disable-next-line no-useless-escape
+		} else if (message.content.match(new RegExp(`^<@!?${client.user.id}>[\s]?$`))) command = client.commands.find((c) => c.controls.name.toLowerCase() === "prefix");
 	}
 	if (!command) return;
 
