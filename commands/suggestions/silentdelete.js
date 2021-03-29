@@ -11,6 +11,7 @@ module.exports = {
 		name: "silentdelete",
 		permission: 3,
 		usage: "silentdelete [suggestion id] (reason)",
+		aliases: ["sdelete"],
 		description: "Deletes a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
 		examples: "`{{p}}silentdelete 1`\nSilently deletes suggestion #1\n\n`{{p}}silentdelete 1 This has already been suggested`\nSilently deletes suggestion #1 with the reason \"This has already been suggested\"",

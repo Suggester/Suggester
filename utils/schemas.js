@@ -62,6 +62,7 @@ const settings = new Schema({
 		},
 		suggestion_cap: { type: Number, default: 0 },
 		comment_timestamps: { type: Boolean, default: true },
+		live_votes: { type: Boolean, default: true },
 		anon: { type: Boolean, default: false }
 	}
 });

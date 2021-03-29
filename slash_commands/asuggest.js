@@ -12,7 +12,7 @@ module.exports = async function (interaction, client) {
 	console.log(interaction);
 	function respond(data) {
 		client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-			type: 3,
+			type: 4,
 			data: {
 				content: data,
 				flags: 64

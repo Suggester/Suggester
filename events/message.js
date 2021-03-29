@@ -33,18 +33,19 @@ module.exports = async (Discord, client, message) => {
 	if (!command) {
 		let serverPrefix = qServerDB ? qServerDB.config.prefix : prefix;
 		const match = message.content.match(new RegExp(`^(${escapeRegExp(serverPrefix)}|${permission <= 1 ? "suggester:|" : ""}<@!?${client.user.id}> ?${!message.guild ? "|" : ""})(\\S+)`));
-		if (!match) return;
+		if (match) {
 
-		if (match[1].endsWith(" ")) args = args.splice(1);
-		if (args[0].includes("\n")) {
-			args.splice(0, 1, ...args[0].split("\n"));
-		}
+			if (match[1].endsWith(" ")) args = args.splice(1);
+			if (args[0].includes("\n")) {
+				args.splice(0, 1, ...args[0].split("\n"));
+			}
 
-		args.splice(0, 1);
+			args.splice(0, 1);
 
-		command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2].toLowerCase() || c.controls.aliases && c.controls.aliases.includes(match[2].toLowerCase()));
+			command = client.commands.find((c) => c.controls.name.toLowerCase() === match[2].toLowerCase() || c.controls.aliases && c.controls.aliases.includes(match[2].toLowerCase()));
+			// eslint-disable-next-line no-useless-escape
+		} else if (message.content.match(new RegExp(`^<@!?${client.user.id}>[\s]?$`))) command = client.commands.find((c) => c.controls.name.toLowerCase() === "prefix");
 	}
-
 	if (!command) return;
 
 	let qUserDB = await dbQuery("User", { id: message.author.id });

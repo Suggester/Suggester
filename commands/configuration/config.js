@@ -1184,6 +1184,39 @@ module.exports = {
 					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 				}
 			}
+		},
+		{
+			names: ["votecount", "opinion", "liveopinion", "votecounts", "livevotes", "livevote"],
+			name: "Live Vote Count",
+			description: "This setting controls whether or not the live vote count is shown on the suggestion embed",
+			examples: "`{{p}}config votecount on`\nEnables live vote counts on suggestion embeds\n\n`{{p}}config votecount off`\nDisables live vote counts on suggestion embeds",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.live_votes ? "CFG_LIVE_VOTES_ENABLED" : "CFG_LIVE_VOTES_DISABLED"));
+				switch (args[1].toLowerCase()) {
+				case "enable":
+				case "on": {
+					if (!qServerDB.config.live_votes) {
+						qServerDB.config.live_votes = true;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "CFG_LIVE_VOTES_ENABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_LIVE_VOTES_ALREADY_ENABLED", {}, "error"));
+				}
+				case "disable":
+				case "off": {
+					if (qServerDB.config.live_votes) {
+						qServerDB.config.live_votes = false;
+						await dbModify("Server", {id: server.id}, qServerDB);
+						return message.channel.send(string(locale, "CFG_LIVE_VOTES_DISABLED", {}, "success"));
+					} else return message.channel.send(string(locale, "CFG_LIVE_VOTES_ALREADY_DISABLED", {}, "error"));
+				}
+				case "toggle":
+					qServerDB.config.comment_timestamps = !qServerDB.config.live_votes;
+					await dbModify("Server", {id: server.id}, qServerDB);
+					return message.channel.send(string(locale, qServerDB.config.live_votes ? "CFG_LIVE_VOTES_ENABLED" : "CFG_LIVE_VOTES_DISABLED", {}, "success"));
+				default:
+					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
+				}
+			}
 		}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
@@ -1201,7 +1234,7 @@ module.exports = {
 					.addField(string(locale, "HELP_EXAMPLES"), (e.examples ? (string(locale, `CONFIG_EXAMPLES:${nameString}`) || e.examples) : "").replace(new RegExp("{{p}}", "g"), Discord.escapeMarkdown(qServerDB.config.prefix)));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
-				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS_NEW"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				return message.channel.send(elementEmbed);
 			}
 			let embeds = [new Discord.MessageEmbed()
@@ -1221,7 +1254,7 @@ module.exports = {
 					.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
 				let namesAliases = e.names.splice(1);
 				namesAliases && namesAliases.length > 1 ? elementEmbed.addField(string(locale, namesAliases.length > 1 ? "HELP_ALIAS_PLURAL" : "HELP_ALIAS"), namesAliases.map(c => `\`${c}\``).join(", "), true) : "";
-				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS"), `https://suggester.js.org/#/config/${e.docs}`) : "";
+				e.docs ? elementEmbed.addField(string(locale, "HELP_DOCS_NEW"), `https://suggester.js.org/#/config/${e.docs}`) : "";
 				embeds.push(elementEmbed);
 			}
 			return pages(locale, message, embeds);
@@ -1339,6 +1372,9 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:CAP", {}, "success")}:** ${qServerDB.config.suggestion_cap ? qServerDB.config.suggestion_cap : string(locale, "NONE")}`);
 			// Comment Timestamps
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COMMENTTIMESTAMPS", {}, "success")}:** ${string(locale, qServerDB.config.comment_timestamps ? "ENABLED" : "DISABLED")}`);
+			// Live Vote Counts
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:VOTECOUNT", {}, "success")}:** ${string(locale, qServerDB.config.live_votes ? "ENABLED" : "DISABLED")}`);
+
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),
 				new Discord.MessageEmbed().setTitle(string(locale, "CHANNEL_CONFIGURATION_TITLE")).setDescription(cfgChannelsArr.join("\n")),

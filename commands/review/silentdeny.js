@@ -10,7 +10,7 @@ module.exports = {
 		name: "silentdeny",
 		permission: 3,
 		usage: "silentdeny [suggestion id] (reason)",
-		aliases: ["silentrefuse", "silentreject", "silentno"],
+		aliases: ["silentrefuse", "silentreject", "silentno", "sdeny", "srefuse", "sreject", "sno"],
 		description: "Denies a suggestion without posting it to the denied suggestions feed or DMing the suggesting user",
 		enabled: true,
 		examples: "`{{p}}silentdeny 1`\nSilently denies suggestion #1\n\n`{{p}}silentdeny 1 This isn't something we're interested in`\nSilently denies suggestion #1 with the reason \"This isn't something we're interested in\"",
@@ -23,7 +23,7 @@ module.exports = {
 		if (returned) return message.channel.send(returned).then(sent => returned instanceof Discord.MessageEmbed ? null : cleanCommand(message, sent, qServerDB));
 		const guildLocale = qServerDB.config.locale;
 
-		if (qServerDB.config.mode === "autoapprove") return message.channel.send(string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
+		if (qServerDB.config.mode === "autoapprove") return message.channel.send(`${string(locale, "MODE_AUTOAPPROVE_DISABLED_ERROR", {}, "error")}\n${string(locale, "DENY_AUTOAPPROVE_DELETE_REDIRECT", { command: `${qServerDB.config.prefix}silentdelete` })}`).then(sent => cleanCommand(message, sent, qServerDB));
 		let deniedCheck = checkDenied(locale, message.guild, qServerDB);
 		if (deniedCheck) return message.channel.send(deniedCheck);
 

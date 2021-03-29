@@ -15,7 +15,7 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "USE_EXTERNAL_EMOJIS", "EMBED_LINKS"],
 		cooldown: 5,
 		dmAvailable: true,
-		docs: "following/follow"
+		docs: "topics/follow"
 	},
 	do: async (locale, message, client, args, Discord) => {
 		const qServerDB = message.guild ? await message.guild.db : null;

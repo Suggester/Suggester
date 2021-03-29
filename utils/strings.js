@@ -574,9 +574,9 @@ module.exports = {
 			string: "Aliases",
 			context: "Aliases field name in help command"
 		},
-		"HELP_DOCS": {
-			string: "Documenation",
-			context: "Documenation field name in help command"
+		"HELP_DOCS_NEW": {
+			string: "Documentation",
+			context: "Documentation field name in help command"
 		},
 		"COMMAND_DISABLED": {
 			string: "This command is currently disabled globally.",
@@ -1649,6 +1649,22 @@ module.exports = {
 		"CFG_COMMENT_TIME_ALREADY_DISABLED": {
 			string: "Comment timestamps are already not shown on suggestion embeds",
 			context: "Shown when comment timestamps are disabled and a guild tries to disable it"
+		},
+		"CFG_LIVE_VOTES_ENABLED": {
+			string: "Live vote counts will be shown on suggestion embeds",
+			context: "Shown when a guild has enabled live vote counts"
+		},
+		"CFG_LIVE_VOTES_DISABLED": {
+			string: "Live vote counts will not be shown on suggestion embeds",
+			context: "Shown when a guild has disabled live vote counts"
+		},
+		"CFG_LIVE_VOTES_ALREADY_ENABLED": {
+			string: "Live vote counts are already shown on suggestion embeds",
+			context: "Shown when live vote counts are enabled and a guild tries to enable it"
+		},
+		"CFG_LIVE_VOTES_ALREADY_DISABLED": {
+			string: "Live vote counts are already not shown on suggestion embeds",
+			context: "Shown when live vote counts are disabled and a guild tries to disable it"
 		},
 		"CFG_ANONYMOUS_ENABLED": {
 			string: "Anonymous suggestions can be submitted via `/asuggest`. The identity of the submitting user will be visible to staff but not in the public suggestions feed.\n> If the command does not appear, the bot may need re-invited to allow use of slash commands using this link: {{invite}}",
@@ -5990,6 +6006,19 @@ module.exports = {
 			context: "Examples for the Comment Timestamps config element\n" +
 				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
 		},
+		"CONFIG_NAME:VOTECOUNT": {
+			string: "Live Vote Count",
+			context: "Name of the Live Vote Count config element"
+		},
+		"CONFIG_DESC:VOTECOUNT": {
+			string: "This setting controls whether or not the live vote count is shown on the suggestion embed",
+			context: "Description of the Live Vote Count config element"
+		},
+		"CONFIG_EXAMPLES:VOTECOUNT": {
+			string: "`{{p}}config votecount on`\nEnables live vote counts on suggestion embeds\n\n`{{p}}config votecount off`\nDisables live vote counts on suggestion embeds",
+			context: "Examples for the Live Vote Count config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
 		"CONFIG_NAME:ANONYMOUS": {
 			string: "Anonymous Suggestions",
 			context: "Name of the Anonymous Suggestions config element"
@@ -6107,5 +6136,15 @@ module.exports = {
 				}
 			}
 		},
+		"DENY_AUTOAPPROVE_DELETE_REDIRECT": {
+			string: "If you're trying to remove a suggestion, use the `{{command}}` command",
+			context: "Shown when a user attempts to use deny and the mode is set to autoapprove",
+			replaced: {
+				command: {
+					to_replace: "{{command}}",
+					description: "The command the user should use (delete, silentdelete, or massdelete)"
+				}
+			}
+		}
 	}
 };
