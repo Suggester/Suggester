@@ -21,7 +21,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 		if (db.config.reactionOptions.one && emotes.filter(r => messageReaction.message.reactions.cache.get(r) && messageReaction.message.reactions.cache.get(r).users.cache.has(user.id)).length >= 2) return messageReaction.users.remove(user.id);
 		if (emotes.findIndex(i => i === (nodeEmoji.hasEmoji(messageReaction.emoji.name) ? messageReaction.emoji.name : messageReaction.emoji.id)) === 0) {
 			let qUserDB = await dbQuery("User", { id: user.id });
-			let locale = qUserDB.locale || db.config.locale || "en";
+			let locale = qUserDB.locale || db.config.locale || "owo";
 			if (qUserDB.auto_subscribe && db.config.notify && db.config.auto_subscribe) {
 				if (!qUserDB.notify) {
 					qUserDB.auto_subscribe = false;
@@ -68,7 +68,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 			let permission = await checkPermissions(messageReaction.message.guild.members.cache.get(user.id), client);
 			if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
 			let qUserDB = await dbQuery("User", {id: user.id});
-			let locale = qUserDB.locale || db.config.locale || "en";
+			let locale = qUserDB.locale || db.config.locale || "owo";
 			if (command.controls.permissions) {
 				let checkPerms = channelPermissions(locale, command.controls.permissions, messageReaction.message.channel, client);
 				if (checkPerms) {
@@ -114,7 +114,7 @@ module.exports = async (Discord, client, messageReaction, user) => {
 				let command = require(`../commands/review/${commandName}`);
 				if (!command.controls.enabled || command.controls.permission < permission) return messageReaction.users.remove(user.id);
 				let qUserDB = await dbQuery("User", {id: user.id});
-				let locale = qUserDB.locale || db.config.locale || "en";
+				let locale = qUserDB.locale || db.config.locale || "owo";
 				if (command.controls.permissions) {
 					let checkPerms = channelPermissions(locale, command.controls.permissions, messageReaction.message.channel, client);
 					if (checkPerms) {

@@ -28,7 +28,7 @@ module.exports = {
 		)) {
 			//Start auto setup
 			let qServerDB = await dbQuery("Server", {id: message.guild.id});
-			const guildLocale = qServerDB.config.locale || "en";
+			const guildLocale = qServerDB.config.locale || "owo";
 
 			let roles = message.guild.roles.cache.filter(role => role.permissions.has("MANAGE_GUILD") && !role.managed).map(r => r.id);
 			let category = await message.guild.channels.create(string(guildLocale, "AUTOSETUP_CATEGORY") || "Suggester", { type: "category", reason: string(locale, "AUTOMATIC_SETUP") });

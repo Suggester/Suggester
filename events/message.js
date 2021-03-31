@@ -49,7 +49,7 @@ module.exports = async (Discord, client, message) => {
 	if (!command) return;
 
 	let qUserDB = await dbQuery("User", { id: message.author.id });
-	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "en";
+	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "owo";
 
 	if (message.channel.type === "dm" && !command.controls.dmAvailable) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in DMs but the command is only usable in a server.`, message);

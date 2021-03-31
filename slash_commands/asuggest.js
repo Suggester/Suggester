@@ -22,7 +22,7 @@ module.exports = async function (interaction, client) {
 	}
 	let qUserDB = await dbQuery("User", { id: interaction.member.user.id });
 	let qServerDB = await dbQuery("Server", { id: interaction.guild_id });
-	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "en";
+	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "owo";
 	if (!qServerDB) return respond(string(locale, "UNCONFIGURED_ERROR", {}, "error"));
 	const guildLocale = qServerDB.config.locale;
 
