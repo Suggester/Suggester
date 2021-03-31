@@ -9,7 +9,7 @@ const settings = new Schema({
 	flags: [ String ],
 	config: {
 		prefix: { type: String, default: prefix },
-		locale: { type: String, default: "owo" },
+		locale: { type: String, default: "en" },
 		admin_roles: [String],
 		staff_roles: [String],
 		allowed_roles: [String],

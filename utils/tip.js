@@ -139,6 +139,10 @@ module.exports = {
 				},
 				admin: true,
 				members: 5000
+			},
+			owo: {
+				string: "LOCALE_EASTER_EGG_ACTIVATED",
+				special_emotes: "<a:owo:717918218043260969>"
 			}
 		};
 		let qUserDB = await message.author.db;
@@ -152,7 +156,7 @@ module.exports = {
 		let str = list[key];
 		if (!str) return;
 		if (message.guild && !message.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
-			let desc = string(locale, str.string, str.use);
+			let desc = string(locale, str.string, str.use, str.special_emotes, str.special_emotes);
 			let matches = desc.match(/\[([A-Za-z0-9]+)\]\(([A-Za-z:./0-9?=_&-<>]+)\)/g);
 			if (matches) for (let m of matches) {
 				let ma = m.match(/\[([A-Za-z0-9]+)\]\(([A-Za-z:./0-9?=_&-<>]+)\)/);
@@ -163,7 +167,7 @@ module.exports = {
 		} else {
 			let pm = await message.channel.send(new Discord.MessageEmbed()
 				.setColor(client.colors.protip)
-				.setDescription(`${string(locale, "PROTIP_TITLE")} ${string(locale, str.string, str.use)}`));
+				.setDescription(`${string(locale, "PROTIP_TITLE")} ${string(locale, str.string, str.use, str.special_emotes,  str.special_emotes)}`));
 			if (clean) setTimeout(function() {
 				pm.delete(); }, 7500);
 		}
