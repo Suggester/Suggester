@@ -10,7 +10,6 @@ module.exports = {
 	 * @returns {string}
 	 */
 	string: function (locale, string_name, replaced, prefix_with, suffix_with) {
-		if (locale === "en") locale = "owo"; //OwO
 		const { list } = require(`../i18n/${locale}`);
 		const defaultList = module.exports.list;
 		const string = defaultList[string_name];

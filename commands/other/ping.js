@@ -30,7 +30,7 @@ module.exports = {
 			uptime: this.uptime
 		  }]`).catch(() => false);
 
-		let version = "4.1.2021";
+		let version = "4.9.1";
 		let embed = shardInfo ? new Discord.MessageEmbed()
 			.addField(string(locale, "PING_DEVELOPERS_HEADER"), developerArray.join("\n"))
 			.addField(`${string(locale, "PING_GUILD_COUNT_HEADER")}`, string(locale, "PING_COUNT_CONTENT", { guilds: shardInfo.reduce((t, c) => t + c[0].guilds, 0), shards: shardInfo.length }), true)

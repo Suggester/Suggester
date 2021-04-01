@@ -33,7 +33,6 @@ module.exports = {
 		const { fetchUser } = module.exports;
 		const { checkVotes } = require("./actions");
 		let suggester = await fetchUser(suggestion.suggester, client);
-		console.log(suggester);
 		let editor = suggestion.edited_by ? await fetchUser(suggestion.edited_by, client) : null;
 		let embed = new Discord.MessageEmbed();
 		// User information
@@ -106,7 +105,7 @@ module.exports = {
 		}
 		// Attachment
 		if (suggestion.attachment) embed.setImage(suggestion.attachment);
-		await suggestion.save();
+		if (suggestion._id) await suggestion.save();
 		return embed;
 	},
 	dmEmbed: function(locale, client, qSuggestionDB, color, title, attachment, suggestions, reason) {
