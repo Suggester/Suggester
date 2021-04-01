@@ -139,10 +139,6 @@ module.exports = {
 				},
 				admin: true,
 				members: 5000
-			},
-			owo: {
-				string: "LOCALE_EASTER_EGG_ACTIVATED",
-				special_emotes: "<a:owo:717918218043260969>"
 			}
 		};
 		let qUserDB = await message.author.db;
