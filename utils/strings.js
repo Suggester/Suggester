@@ -2142,6 +2142,20 @@ module.exports = {
 				}
 			}
 		},
+		"DISABLE_INCHANNEL_WARNING": {
+			string: "This channel is your suggestions channel, so disabling this channel will also disable the in channel suggestions feature. React with {{check}} if you would like to disable this channel, and {{x}} if you would like to cancel.",
+			context: "Warning about giving the everyone role staff/admin permissions",
+			replaced: {
+				check: {
+					to_replace: "{{check}}",
+					description: "The check emoji"
+				},
+				x: {
+					to_replace: "{{x}}",
+					description: "The X emoji"
+				}
+			}
+		},
 		"PING_COUNT_CONTENT": {
 			string: "{{guilds}} servers across {{shards}} shards",
 			context: "Shows total number of guilds and shards in the ping command",

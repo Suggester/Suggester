@@ -123,12 +123,14 @@ module.exports = {
 			} else return string(locale, "CFG_EMOJI_NOT_FOUND_ERROR", {}, "error");
 		}
 
-		async function handleCommandsChannelInput (locale, input, server, current_name, str_name, check_perms, done_str, action) {
+		async function handleCommandsChannelInput (locale, input, server, current_name, str_name, check_perms, done_str, action, force) {
 			if (!input) return string(locale, "CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
 			let qServerDB = await server.db;
 
 			let channel = await findChannel(input, server.channels.cache);
 			if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+			if (current_name === "disabled" && action === "add" && !force && qServerDB.config.channels.suggestions === channel.id) return "CONFIRM";
+			if (current_name === "disabled" && force) qServerDB.config.in_channel_suggestions = false;
 			let permissions = await channelPermissions(locale, check_perms, channel, server.client);
 			if (permissions) return permissions;
 
@@ -1277,7 +1279,20 @@ module.exports = {
 				switch (args[1] || "") {
 				case "add":
 				case "+": {
-					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add")));
+					let chInput = args.splice(2).join(" ").toLowerCase();
+					let output = await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add");
+					if (output === "CONFIRM") {
+						if ((
+							await confirmation(
+								message,
+								string(locale, "DISABLE_INCHANNEL_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								{
+									deleteAfterReaction: true
+								}
+							)
+						)) return message.channel.send((await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add", true)));
+						else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
+					} else return message.channel.send(output);
 				}
 				case "remove":
 				case "-":
