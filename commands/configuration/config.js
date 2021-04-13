@@ -545,7 +545,7 @@ module.exports = {
 			examples: "`{{p}}config mode review`\nSets the mode to `review`\n\n`{{p}}config mode autoapprove`\nSets the mode to `autoapprove`",
 			docs: "mode",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:MODE", {}, "success")} ${qServerDB.config.mode}`);
+				if (!args[1]) return message.channel.send(`**${string(locale, "CONFIG_NAME:MODE", {}, "success")}** ${qServerDB.config.mode}`);
 				switch (args[1].toLowerCase()) {
 				case "review":
 					qServerDB.config.mode = "review";
