@@ -147,7 +147,7 @@ module.exports = async (Discord, client, message) => {
 				let errorText;
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
-				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${(client.admins.has(message.author.id) || qUserDB.flags.includes("SHOW_ERRORS") || qServerDB.flags.includes("SHOW_ERRORS")) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 				errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
@@ -158,7 +158,7 @@ module.exports = async (Discord, client, message) => {
 		let errorText;
 		if (err.stack) errorText = err.stack;
 		else if (err.error) errorText = err.error;
-		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${(client.admins.has(message.author.id) || qUserDB.flags.includes("SHOW_ERRORS") || qServerDB.flags.includes("SHOW_ERRORS")) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 		errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);
