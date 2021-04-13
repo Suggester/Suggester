@@ -5053,6 +5053,16 @@ module.exports = {
 				}
 			}
 		},
+		"PRIVACY_INFO": {
+			string: "You can find Suggester's privacy policy and security information at {{link}}",
+			context: "Shows the link to Suggester's privacy policy and security information",
+			replaced: {
+				link: {
+					to_replace: "{{link}}",
+					description: "The link to the information"
+				}
+			}
+		},
 		"SERVER_PREFIX": {
 			string: "My prefix is `{{prefix}}`, you can also just mention the bot like \"<@{{id}}> help\"",
 			context: "Shows the configured prefix",
@@ -5294,6 +5304,15 @@ module.exports = {
 		"SUGGESTION_UPDATED_REVIEW": {
 			string: "Your suggestion edit has been submitted for review!",
 			context: "Response when the suggestion has already been approved and the user edits it"
+		},
+		"COMMAND_DESC:PRIVACY": {
+			string: "Shows the link to Suggester's Privacy Policy",
+			context: "Description for the privacy command"
+		},
+		"COMMAND_USAGE:PRIVACY": {
+			string: "privacy",
+			context: "Usage for the privacy command\n" +
+				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_DESC:EDIT": {
 			string: "Edits a suggestion",
