@@ -145,11 +145,11 @@ module.exports = {
 			});
 
 			await actCard("implemented", qServerDB, qSuggestionDB, suggester, `${string(guildLocale, "INFO_PUBLIC_STATUS_HEADER")}: ${guildstr}`);
-			await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
+			await qSuggestionDB.save();
 			return;
 		}
 
-		await dbModify("Suggestion", { suggestionId: id, id: message.guild.id }, qSuggestionDB);
+		await qSuggestionDB.save();
 
 		let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client, qSuggestionDB.displayStatus === "no" && !qServerDB.config.channels.denied);
 		if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));

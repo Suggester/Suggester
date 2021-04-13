@@ -6245,6 +6245,10 @@ module.exports = {
 		"CFG_DISABLED_CMD_ERROR": {
 			string: "This command cannot be disabled",
 			context: "Error shown when a command cannot be disabled"
+		},
+		"USER_BLOCKED_SLASH_RESPONSE": {
+			string: "You are currently blocked from using the bot.",
+			context: "Error shown when a user is blocked and tries to use a slash command"
 		}
 	}
 };
