@@ -26,7 +26,8 @@ const settings = new Schema({
 			denied: { type: String },
 			archive: { type: String },
 			commands: { type: String },
-			commands_new: [ String ]
+			commands_new: [ String ],
+			disabled: [ String ]
 		},
 		reactionOptions: {
 			suggester: { type: Boolean, default: true },
@@ -63,7 +64,8 @@ const settings = new Schema({
 		suggestion_cap: { type: Number, default: 0 },
 		comment_timestamps: { type: Boolean, default: true },
 		live_votes: { type: Boolean, default: true },
-		anon: { type: Boolean, default: false }
+		anon: { type: Boolean, default: false },
+		disabled_commands: [String]
 	}
 });
 

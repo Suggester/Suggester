@@ -582,8 +582,8 @@ module.exports = {
 			string: "This command is currently disabled globally.",
 			context: "Used when a command is disabled globally"
 		},
-		"COMMAND_DISABLED_FLAG": {
-			string: "This command has been disabled on this server by a global administrator",
+		"COMMAND_DISABLED_SERVER": {
+			string: "This command has been disabled on this server",
 			context: "Error shown when a command is disabled for a server"
 		},
 		"INVITE_BOT": {
@@ -1435,6 +1435,26 @@ module.exports = {
 		"CFG_COMMANDS_REMOVED_SUCCESS": {
 			string: "Successfully removed {{channel}} from the list of suggestion commands channels.",
 			context: "Success message when a suggestion commands channel is removed",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_DISABLED_CHNL_ADD_SUCCESS": {
+			string: "The bot will no longer respond in {{channel}}.",
+			context: "Success message when a channel is disabled",
+			replaced: {
+				channel: {
+					to_replace: "{{channel}}",
+					description: "A channel mention"
+				}
+			}
+		},
+		"CFG_DISABLED_CHNL_REMOVED_SUCCESS": {
+			string: "The bot will now respond in {{channel}}.",
+			context: "Success message when a disabled channel is removed",
 			replaced: {
 				channel: {
 					to_replace: "{{channel}}",
@@ -5029,6 +5049,42 @@ module.exports = {
 			string: "This channel has not been added as a commands channel!",
 			context: "Error message shown when a channel is not a commands channel"
 		},
+		"CFG_DISABLED_CHNL_ALREADY_ADDED_ERROR": {
+			string: "This channel has already been disabled!",
+			context: "Error message shown when a channel is already a disabled channel"
+		},
+		"CFG_DISABLED_CHNL_NOT_ADDED_ERROR": {
+			string: "This channel has not been added as a disabled channel!",
+			context: "Error message shown when a channel is not a disabled channel"
+		},
+		"CFG_DISABLED_COMMANDS_ALREADY_ADDED_ERROR": {
+			string: "This command has already been disabled!",
+			context: "Error message shown when a command is already disabled"
+		},
+		"CFG_DISABLED_COMMANDS_NOT_ADDED_ERROR": {
+			string: "This command is not currently disabled!",
+			context: "Error message shown when a command is not disabled"
+		},
+		"CFG_DISABLED_CMD_ADDED": {
+			string: "The `{{command}}` command is now disabled",
+			context: "Success message when a command is disabled",
+			replaced: {
+				command: {
+					to_replace: "{{command}}",
+					description: "The command name"
+				}
+			}
+		},
+		"CFG_DISABLED_CMD_REMOVED": {
+			string: "The `{{command}}` command is no longer disabled",
+			context: "Success message when a command is enabled",
+			replaced: {
+				command: {
+					to_replace: "{{command}}",
+					description: "The command name"
+				}
+			}
+		},
 		"UNAVAILABLE": {
 			string: "Unavailable",
 			context: "Describes something that is not available"
@@ -6145,6 +6201,50 @@ module.exports = {
 					description: "The command the user should use (delete, silentdelete, or massdelete)"
 				}
 			}
+		},
+		"CFG_DISABLED_CMDS_LIST": {
+			string: "{{num}} command(s) are disabled\n**List:** {{commands}}",
+			context: "Shows the list of disabled commands",
+			replaced: {
+				num: {
+					to_replace: "{{num}}",
+					description: "The number of disabled commands"
+				},
+				commands: {
+					to_replace: "{{commands}}",
+					description: "The list of disabled commands"
+				}
+			}
+		},
+		"CONFIG_NAME:DISABLEDCOMMANDS": {
+			string: "Disabled Commands",
+			context: "Name of the Disabled Commands config element"
+		},
+		"CONFIG_DESC:DISABLEDCOMMANDS": {
+			string: "This setting controls what commands are disabled on this server",
+			context: "Description of the Disabled Commands config element"
+		},
+		"CONFIG_EXAMPLES:DISABLEDCOMMANDS": {
+			string: "`{{p}}config disabledcommands add shard`\nDisables the `shard` command on this server\n\n`{{p}}config disabledcommands remove shard`\nEnables the `shard` command on this server\n\n`{{p}}config disabledcommands list`\nLists disabled commands",
+			context: "Examples for the Disabled Commands config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"CONFIG_NAME:DISABLEDCHANNELS": {
+			string: "Disabled Channels",
+			context: "Name of the Disabled Channels config element"
+		},
+		"CONFIG_DESC:DISABLEDCHANNELS": {
+			string: "This setting controls channels where the bot will not respond to any commands",
+			context: "Description of the Disabled Channels config element"
+		},
+		"CONFIG_EXAMPLES:DISABLEDCHANNELS": {
+			string: "`{{p}}config disabledchannels add #chat`\nDisables all commands in the #chat channel\n\n`{{p}}config disabledchannels remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of disabled channels\n\n`{{p}}config disabledchannels list`\nLists the configured disabled channels",
+			context: "Examples for the Disabled Channels config element\n" +
+				"Make sure to keep original formatting and not translate actual inputs like `autofollow`"
+		},
+		"CFG_DISABLED_CMD_ERROR": {
+			string: "This command cannot be disabled",
+			context: "Error shown when a command cannot be disabled"
 		}
 	}
 };
