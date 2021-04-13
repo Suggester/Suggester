@@ -1728,16 +1728,6 @@ module.exports = {
 			string: "Invalid configuration element specified. Please run this command with no parameters to view configuration instructions.",
 			context: "Error if no configuration element is specified"
 		},
-		"STATS_RESPONSE": {
-			string: "You can find statistics about the bot at {{link}}",
-			context: "Provides link to the chart dashboard of bot stats",
-			replaced: {
-				link: {
-					to_replace: "{{link}}",
-					description: "The link to the chart dashboard"
-				}
-			}
-		},
 		"INVALID_SUGGESTION_ID_ERROR": {
 			string: "Please provide a valid suggestion ID.",
 			context: "Error shown when the specified suggestion ID is invalid"
@@ -3973,15 +3963,6 @@ module.exports = {
 		"COMMAND_USAGE:SHARD": {
 			string: "shard",
 			context: "Description for the shard command\n" +
-				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
-		},
-		"COMMAND_DESC:STATS": {
-			string: "Shows the link to bot statistics",
-			context: "Description for the stats command"
-		},
-		"COMMAND_USAGE:STATS": {
-			string: "stats",
-			context: "Description for the stats command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
 		"COMMAND_DESC:SUGGEST": {
