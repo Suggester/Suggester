@@ -19,12 +19,13 @@ module.exports = {
 
 		if (message.guild) {
 			let qServerDB = await dbQuery("Server", { id: message.guild.id });
+			serverPrefix = qServerDB.config.prefix;
 
 			if (args[0]) {
 				let permission = await checkPermissions(message.member || message.author, client);
 				let configCmd = require("../configuration/config");
 				if (permission <= configCmd.controls.permission) return configCmd.do(locale, message, client, ["prefix"].concat(args), Discord);
-			} else serverPrefix = qServerDB.config.prefix;
+			}
 		}
 		return message.channel.send(string(locale, "SERVER_PREFIX", { prefix: Discord.Util.escapeMarkdown(serverPrefix), id: client.user.id }));
 	}
