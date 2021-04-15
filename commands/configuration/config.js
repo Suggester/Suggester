@@ -160,7 +160,7 @@ module.exports = {
 			let command = client.commands.find((c) => c.controls.name.toLowerCase() === input || c.controls.aliases && c.controls.aliases.includes(input));
 			if (!command) return string(locale, "UNKNOWN_COMMAND_ERROR", {}, "error");
 			command = command.controls.name;
-			if (["config", "db", "deploy", "eval", "flags", "reboot", "shell", "globalban", "acknowledgement", "allowlist"].includes(command)) return string(locale, "CFG_DISABLED_CMD_ERROR", {}, "error")
+			if (["config", "db", "deploy", "eval", "flags", "reboot", "shell", "globalban", "acknowledgement", "allowlist"].includes(command)) return string(locale, "CFG_DISABLED_CMD_ERROR", {}, "error");
 			switch (action) {
 			case "add":
 				if (qServerDB.config.disabled_commands.includes(command)) return string(locale, "CFG_DISABLED_COMMANDS_ALREADY_ADDED_ERROR", {}, "error");

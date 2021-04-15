@@ -1,5 +1,4 @@
 const { suggestionEmbed, fetchUser, logEmbed } = require("../../utils/misc.js");
-const { dbModify } = require("../../utils/db");
 const { string } = require("../../utils/strings");
 const { serverLog } = require("../../utils/logs");
 const { channelPermissions, suggestionEditCommandCheck } = require("../../utils/checks");
