@@ -123,32 +123,57 @@ module.exports = {
 			} else return string(locale, "CFG_EMOJI_NOT_FOUND_ERROR", {}, "error");
 		}
 
-		async function handleCommandsChannelInput (locale, input, server, current_name, check_perms, done_str, action) {
+		async function handleCommandsChannelInput (locale, input, server, current_name, str_name, check_perms, done_str, action, force) {
 			if (!input) return string(locale, "CFG_NO_CHANNEL_SPECIFIED_ERROR", {}, "error");
 			let qServerDB = await server.db;
 
 			let channel = await findChannel(input, server.channels.cache);
 			if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+			if (current_name === "disabled" && action === "add" && !force && qServerDB.config.channels.suggestions === channel.id) return "CONFIRM";
+			if (current_name === "disabled" && force) qServerDB.config.in_channel_suggestions = false;
 			let permissions = await channelPermissions(locale, check_perms, channel, server.client);
 			if (permissions) return permissions;
 
-			if (qServerDB.config.channels.commands) {
+			if (current_name === "commands_new" && qServerDB.config.channels.commands) {
 				qServerDB.config.channels.commands_new.push(qServerDB.config.channels.commands);
 				qServerDB.config.channels.commands = "";
 			}
 			switch (action) {
 			case "add":
-				if (qServerDB.config.channels.commands_new.includes(channel.id)) return string(locale, "CFG_COMMANDS_ALREADY_ADDED_ERROR", {}, "error");
-				qServerDB.config.channels.commands_new.push(channel.id);
+				if (qServerDB.config.channels[current_name].includes(channel.id)) return string(locale, `CFG_${str_name.toUpperCase()}_ALREADY_ADDED_ERROR`, {}, "error");
+				qServerDB.config.channels[current_name].push(channel.id);
 				break;
 			case "remove":
-				if (!qServerDB.config.channels.commands_new.includes(channel.id)) return string(locale, "CFG_COMMANDS_NOT_ADDED_ERROR", {}, "error");
-				qServerDB.config.channels.commands_new.splice(qServerDB.config.channels.commands_new.findIndex(c => c.toString() === channel.id), 1);
+				if (!qServerDB.config.channels[current_name].includes(channel.id)) return string(locale, `CFG_${str_name.toUpperCase()}_NOT_ADDED_ERROR`, {}, "error");
+				qServerDB.config.channels[current_name].splice(qServerDB.config.channels[current_name].findIndex(c => c.toString() === channel.id), 1);
 				break;
 			}
 
 			await dbModify("Server", {id: server.id}, qServerDB);
 			return string(locale, done_str, { channel: `<#${channel.id}>` }, "success");
+		}
+
+		async function handleCommandInput (locale, input, server, done_str, action) {
+			if (!input) return string(locale, "UNKNOWN_COMMAND_ERROR", {}, "error");
+			let qServerDB = await server.db;
+			input = input.toLowerCase();
+			let command = client.commands.find((c) => c.controls.name.toLowerCase() === input || c.controls.aliases && c.controls.aliases.includes(input));
+			if (!command) return string(locale, "UNKNOWN_COMMAND_ERROR", {}, "error");
+			command = command.controls.name;
+			if (["config", "db", "deploy", "eval", "flags", "reboot", "shell", "globalban", "acknowledgement", "allowlist"].includes(command)) return string(locale, "CFG_DISABLED_CMD_ERROR", {}, "error");
+			switch (action) {
+			case "add":
+				if (qServerDB.config.disabled_commands.includes(command)) return string(locale, "CFG_DISABLED_COMMANDS_ALREADY_ADDED_ERROR", {}, "error");
+				qServerDB.config.disabled_commands.push(command);
+				break;
+			case "remove":
+				if (!qServerDB.config.disabled_commands.includes(command)) return string(locale, "CFG_DISABLED_COMMANDS_NOT_ADDED_ERROR", {}, "error");
+				qServerDB.config.disabled_commands.splice(qServerDB.config.disabled_commands.findIndex(c => c.toString() === command), 1);
+				break;
+			}
+
+			await dbModify("Server", {id: server.id}, qServerDB);
+			return string(locale, done_str, { command }, "success");
 		}
 
 		let elements = [{
@@ -469,13 +494,13 @@ module.exports = {
 				switch (args[1] || "") {
 				case "add":
 				case "+": {
-					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_ADD_SUCCESS", "add")));
+					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands_new", "commands", "commands", "CFG_COMMANDS_ADD_SUCCESS", "add")));
 				}
 				case "remove":
 				case "-":
 				case "rm":
 				case "delete": {
-					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands", "commands", "CFG_COMMANDS_REMOVED_SUCCESS", "remove")));
+					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "commands_new", "commands", "commands", "CFG_COMMANDS_REMOVED_SUCCESS", "remove")));
 				}
 				case "list": {
 					return message.channel.send((await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND")))[0]);
@@ -522,7 +547,7 @@ module.exports = {
 			examples: "`{{p}}config mode review`\nSets the mode to `review`\n\n`{{p}}config mode autoapprove`\nSets the mode to `autoapprove`",
 			docs: "mode",
 			cfg: async function() {
-				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:MODE", {}, "success")} ${qServerDB.config.mode}`);
+				if (!args[1]) return message.channel.send(`**${string(locale, "CONFIG_NAME:MODE", {}, "success")}:** ${qServerDB.config.mode}`);
 				switch (args[1].toLowerCase()) {
 				case "review":
 					qServerDB.config.mode = "review";
@@ -1217,6 +1242,73 @@ module.exports = {
 					return message.channel.send(string(locale, "ON_OFF_TOGGLE_ERROR", {}, "error"));
 				}
 			}
+		}, {
+			names: ["disabledcommands", "disablecommand", "disablecommands", "disabledcommand", "disablecmd", "disabledcmd", "dcmd"],
+			name: "Disabled Commands",
+			description: "This setting controls what commands are disabled on this server",
+			examples: "`{{p}}config disabledcommands add shard`\nDisables the `shard` command on this server\n\n`{{p}}config disabledcommands remove shard`\nEnables the `shard` command on this server\n\n`{{p}}config disabledcommands list`\nLists disabled commands",
+			cfg: async function() {
+				if (!args[1]) return message.channel.send(string(locale, "CFG_DISABLED_CMDS_LIST", { num: qServerDB.config.disabled_commands.length.toString(), commands: qServerDB.config.disabled_commands.join(", ") || string(locale, "NONE") }));
+				switch (args[1] || "") {
+				case "add":
+				case "+": {
+					return message.channel.send((await handleCommandInput(locale, args.splice(2).join(" ").toLowerCase(), server, "CFG_DISABLED_CMD_ADDED", "add")));
+				}
+				case "remove":
+				case "-":
+				case "rm":
+				case "delete": {
+					return message.channel.send((await handleCommandInput(locale, args.splice(2).join(" ").toLowerCase(), server, "CFG_DISABLED_CMD_REMOVED", "remove")));
+				}
+				case "list": {
+					return message.channel.send(string(locale, "CFG_DISABLED_CMDS_LIST", { num: qServerDB.config.disabled_commands.length.toString(), commands: qServerDB.config.disabled_commands.join(", ") || string(locale, "NONE") }));
+				}
+				default: {
+					if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+					else return message.channel.send(string(locale, "CFG_DISABLED_CMDS_LIST", { num: qServerDB.config.disabled_commands.length.toString(), commands: qServerDB.config.disabled_commands.join(", ") || string(locale, "NONE") }));
+				}
+				}
+			}
+		}, {
+			names: ["disabledchannels", "disablechannel", "disablechannels", "disabledchannel", "disablechnl", "disabledchnl", "dchnl"],
+			name: "Disabled Channels",
+			description: "This setting controls channels where the bot will not respond to any commands",
+			examples: "`{{p}}config disabledchannels add #chat`\nDisables all commands in the #chat channel\n\n`{{p}}config disabledchannels remove 567385190196969493`\nRemoves the 567385190196969493 channel from the list of disabled channels\n\n`{{p}}config disabledchannels list`\nLists the configured disabled channels",
+			docs: "",
+			cfg: async function() {
+				switch (args[1] || "") {
+				case "add":
+				case "+": {
+					let chInput = args.splice(2).join(" ").toLowerCase();
+					let output = await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add");
+					if (output === "CONFIRM") {
+						if ((
+							await confirmation(
+								message,
+								string(locale, "DISABLE_INCHANNEL_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+								{
+									deleteAfterReaction: true
+								}
+							)
+						)) return message.channel.send((await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add", true)));
+						else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
+					} else return message.channel.send(output);
+				}
+				case "remove":
+				case "-":
+				case "rm":
+				case "delete": {
+					return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_REMOVED_SUCCESS", "remove")));
+				}
+				case "list": {
+					return message.channel.send((await showCommandsChannels(qServerDB.config.channels.disabled, "", server, "CONFIG_NAME:COMMANDSCHANNELS", false))[0]);
+				}
+				default: {
+					if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+					else return message.channel.send((await showCommandsChannels(qServerDB.config.channels.disabled, "", server, "CONFIG_NAME:DISABLEDCHANNELS", false))[0]);
+				}
+				}
+			}
 		}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
@@ -1324,9 +1416,12 @@ module.exports = {
 				await dbModify("Server", {id: server.id}, qServerDB);
 			}
 			cfgChannelsArr.push(archiveChannel[0]);
-			// Commands channel
+			// Commands channels
 			let commandsChannel = await showCommandsChannels(qServerDB.config.channels.commands_new, qServerDB.config.channels.commands, server, "CONFIG_NAME:COMMANDSCHANNELS", false, string(locale, "CFG_COMMANDS_CHANNEL_APPEND"));
 			cfgChannelsArr.push(commandsChannel[0]);
+			// Disabled channels
+			let disabledChannel = await showCommandsChannels(qServerDB.config.channels.disabled, "", server, "CONFIG_NAME:DISABLEDCHANNELS", false);
+			cfgChannelsArr.push(disabledChannel[0]);
 			// Emojis
 			if (server.emojis && server.id === message.guild.id) {
 				let upEmoji = (await findEmoji(checkEmoji(qServerDB.config.emojis.up), server.emojis.cache))[1] || (qServerDB.config.emojis.up === "none" ? string(locale, "CFG_UPVOTE_REACTION_DISABLED") : "👍");
@@ -1374,6 +1469,8 @@ module.exports = {
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:COMMENTTIMESTAMPS", {}, "success")}:** ${string(locale, qServerDB.config.comment_timestamps ? "ENABLED" : "DISABLED")}`);
 			// Live Vote Counts
 			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:VOTECOUNT", {}, "success")}:** ${string(locale, qServerDB.config.live_votes ? "ENABLED" : "DISABLED")}`);
+			// Disabled Commands
+			cfgOtherArr.push(`**${string(locale, "CONFIG_NAME:DISABLEDCOMMANDS", {}, "success")}:** ${qServerDB.config.disabled_commands.length ? qServerDB.config.disabled_commands.join(", ") : string(locale, "NONE")}`);
 
 
 			let embeds = [new Discord.MessageEmbed().setTitle(string(locale, "ROLE_CONFIGURATION_TITLE")).setDescription(cfgRolesArr.join("\n")),

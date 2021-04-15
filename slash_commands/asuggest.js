@@ -38,6 +38,8 @@ module.exports = async function (interaction, client) {
 	if (!member) return respond(string(locale, "ERROR", {}, "error"));
 	let permission = await checkPermissions(member, client);
 
+	if (permission > 10) return respond(string(locale, "USER_BLOCKED_SLASH_RESPONSE", {}, "error"));
+
 	if (qServerDB.config.allowed_roles && qServerDB.config.allowed_roles.length > 0 && permission > 3) {
 		console.log(qServerDB.config.allowed_roles, interaction.member.roles);
 		if (!qServerDB.config.allowed_roles.some(r => interaction.member.roles.includes(r))) {

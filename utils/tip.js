@@ -139,20 +139,19 @@ module.exports = {
 				},
 				admin: true,
 				members: 5000
-			},
-			owo: {
-				string: "LOCALE_EASTER_EGG_ACTIVATED",
-				special_emotes: "<a:owo:717918218043260969>"
 			}
 		};
 		let qUserDB = await message.author.db;
+		if (message.guild) {
+			let qServerDB = await message.guild.db;
+			if (qServerDB.flags.includes("PROTIPS_DISABLED")) return;
+		}
 		const randomChance = Math.floor(Math.random() * 5);
 		if (!qUserDB.protips || randomChance !== 2) return;
 		let filteredList = Object.keys(list).filter(k => !qUserDB.displayed_protips.includes(k) && (command ? (list[k].command && list[k].command.includes(command)) : !list[k].command) && !not.includes(k) && (!admin ? !list[k].admin : true) && (list[k].members ? (message.guild ? message.guild.memberCount >= list[k].members : false) : true));
 		if (force && qUserDB.displayed_protips.includes(force)) return;
 		let key = force || filteredList[Math.floor(Math.random()*filteredList.length)];
-		if (Math.floor(Math.random() * 100) < 5) key = "spooky";
-		else if (Math.floor(Math.random() * 100) === 5) key = "rickroll";
+		if (Math.floor(Math.random() * 100) === 5) key = "rickroll";
 		let str = list[key];
 		if (!str) return;
 		if (message.guild && !message.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {

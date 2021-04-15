@@ -23,7 +23,7 @@ module.exports = async (Discord, client, message) => {
 	if (message.guild) {
 		qServerDB = await dbQuery("Server", {id: message.guild.id});
 		if (qServerDB.blocked) return message.guild.leave();
-		if (qServerDB.flags.includes(`DISABLE_CHANNEL:${message.channel.id}`)) return;
+		if (qServerDB.flags.includes(`DISABLE_CHANNEL:${message.channel.id}`) || qServerDB.config.channels.disabled.includes(message.channel.id)) return;
 		if (qServerDB.config.channels.suggestions === message.channel.id && !message.content.startsWith("\\") && !message.content.startsWith(qServerDB.config.prefix) && !message.content.startsWith(`<@${client.user.id}>`) && !message.content.startsWith(`<@!${client.user.id}>`) && qServerDB.config.in_channel_suggestions) {
 			command = client.commands.find((c) => c.controls.name.toLowerCase() === "suggest");
 			noCommand = true;
@@ -56,10 +56,10 @@ module.exports = async (Discord, client, message) => {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
 		return message.channel.send(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
 	}
-	if (command.controls.enabled === false || (qServerDB ? qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase()) : false)) {
+	if (command.controls.enabled === false || (qServerDB ? (qServerDB.flags.includes(`disable:${command.controls.name}`.toUpperCase()) || qServerDB.config.disabled_commands.includes(command.controls.name)) : false)) {
 		commandLog(`🚫 ${message.author.tag} (\`${message.author.id}\`) attempted to run command \`${command.controls.name}\` in ${message.guild ? `the **${message.channel.name}** (\`${message.channel.id}\`) channel of **${message.guild.name}** (\`${message.guild.id}\`)` : "DMs" } but the command is disabled.`, message);
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
-		return message.channel.send(string(locale, !command.controls.enabled ? "COMMAND_DISABLED" : "COMMAND_DISABLED_FLAG", {}, "error"));
+		return message.channel.send(string(locale, !command.controls.enabled ? "COMMAND_DISABLED" : "COMMAND_DISABLED_SERVER", {}, "error"));
 	}
 	if (permission > command.controls.permission) {
 		await commandExecuted(command, message, { pre, post: new Date(), success: false });
@@ -147,7 +147,7 @@ module.exports = async (Discord, client, message) => {
 				let errorText;
 				if (err.stack) errorText = err.stack;
 				else if (err.error) errorText = err.error;
-				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+				message.channel.send(`${string(locale, "ERROR", {}, "error")} ${(client.admins.has(message.author.id) || qUserDB.flags.includes("SHOW_ERRORS") || qServerDB.flags.includes("SHOW_ERRORS")) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 				errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 				console.log(err);
@@ -158,7 +158,7 @@ module.exports = async (Discord, client, message) => {
 		let errorText;
 		if (err.stack) errorText = err.stack;
 		else if (err.error) errorText = err.error;
-		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${client.admins.has(message.author.id) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
+		message.channel.send(`${string(locale, "ERROR", {}, "error")} ${(client.admins.has(message.author.id) || qUserDB.flags.includes("SHOW_ERRORS") || qServerDB.flags.includes("SHOW_ERRORS")) && errorText ? `\n\`\`\`${(errorText).length >= 1000 ? (errorText).substring(locale, 0, 1000) + " content too long..." : err.stack}\`\`\`` : ""}`);
 		errorLog(client, err, "Command Handler", `Message Content: ${message.content}`);
 
 		console.log(err);
