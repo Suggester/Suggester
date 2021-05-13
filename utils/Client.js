@@ -18,7 +18,7 @@ module.exports = class extends Client {
 		this.config = config;
 		this.reactInProgress = false;
 		let baseColors = {
-			"default": "#7289da",
+			"default": "#5865F2",
 			"red": "#e74c3c",
 			"green": "#2ecc71",
 			"blue": "#3498db",

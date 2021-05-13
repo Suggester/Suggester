@@ -26,10 +26,10 @@ module.exports = {
 
 		let globalPosArr = [];
 		let posArr = [];
-		if (client.admins.has(user.id)) globalPosArr.push(`<:sdev:740193484685967450> ${string(locale, "VERIFY_ACK_DEVELOPER_GA")}`);
+		if (client.admins.has(user.id)) globalPosArr.push(`<:sdev:842489745723752469> ${string(locale, "VERIFY_ACK_DEVELOPER_GA")}`);
 
 		if (qUserDB) {
-			if (qUserDB.flags.includes("STAFF")) globalPosArr.push(`<:sstaff:740196140061818911>  ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
+			if (qUserDB.flags.includes("STAFF")) globalPosArr.push(`<:sstaff:842489745812226078>  ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
 			if (qUserDB.flags.includes("TRANSLATOR")) globalPosArr.push(`<:stranslator:741037425761058898>  ${string(locale, "VERIFY_ACK_TRANSLATOR")}`);
 			if (qUserDB.flags.includes("NO_COOLDOWN")) globalPosArr.push(`<:sunlock:740204044928155788> ${string(locale, "VERIFY_ACK_GLOBAL_NO_COOLDOWN")}`);
 			if (qUserDB.flags.includes("PROTECTED")) globalPosArr.push(`<:sprotected:740234389484470272> ${string(locale, "VERIFY_ACK_GLOBAL_PROTECTED")}`);
