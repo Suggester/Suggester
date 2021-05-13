@@ -8,9 +8,9 @@ module.exports = {
 	permLevelToRole: (locale, permLevel) => {
 		switch (permLevel) {
 		case 0:
-			return string(locale, "BOT_ADMIN_PERMISSION_SENTENCE");
+			return string(locale, "BOT_ADMIN_PERMISSION_SENTENCE_NEW");
 		case 1:
-			return string(locale, "GLOBAL_STAFF_PERMISSION_SENTENCE");
+			return string(locale, "GLOBAL_STAFF_PERMISSION_SENTENCE_NEW");
 		case 2:
 			return string(locale, "SERVER_ADMIN_PERMISSION_SENTENCE");
 		case 3:
