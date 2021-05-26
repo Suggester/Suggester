@@ -1309,7 +1309,7 @@ module.exports = {
 				}
 				}
 			}
-		}, {
+		}/*, {
 				names: ["canned", "cannedreasons", "savedreasons", "cannedreason", "savedreason"],
 				name: "Saved Reasons",
 				description: "A list of custom reasons that can be inserted into approval/denial reasons",
@@ -1349,7 +1349,7 @@ module.exports = {
 						}
 					}
 				}
-			}];
+			}*/];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
 		case "help": {
