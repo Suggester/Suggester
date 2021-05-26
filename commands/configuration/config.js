@@ -1309,7 +1309,47 @@ module.exports = {
 				}
 				}
 			}
-		}];
+		}, {
+				names: ["canned", "cannedreasons", "savedreasons", "cannedreason", "savedreason"],
+				name: "Saved Reasons",
+				description: "A list of custom reasons that can be inserted into approval/denial reasons",
+				examples: "`{{p}}config canned add invalid This suggestion is not valid.`\nAdds the canned response \`invalid\` which responds with \"This suggestion is not valid.\"\n\n`{{p}}config canned remove invalid`\nRemoves the \`invalid\` canned response\n\n`{{p}}config canned list`\nLists the configured canned responses",
+				docs: "",
+				cfg: async function() {
+					switch (args[1] || "") {
+						case "add":
+						case "+": {
+							let chInput = args.splice(2).join(" ").toLowerCase();
+							let output = await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add");
+							if (output === "CONFIRM") {
+								if ((
+									await confirmation(
+										message,
+										string(locale, "DISABLE_INCHANNEL_WARNING", { check: `<:${emoji.check}>`, x: `<:${emoji.x}>`}),
+										{
+											deleteAfterReaction: true
+										}
+									)
+								)) return message.channel.send((await handleCommandsChannelInput(locale, chInput, server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_ADD_SUCCESS", "add", true)));
+								else return message.channel.send(string(locale, "CANCELLED", {}, "error"));
+							} else return message.channel.send(output);
+						}
+						case "remove":
+						case "-":
+						case "rm":
+						case "delete": {
+							return message.channel.send((await handleCommandsChannelInput(locale, args.splice(2).join(" ").toLowerCase(), server, "disabled", "disabled_chnl", [], "CFG_DISABLED_CHNL_REMOVED_SUCCESS", "remove")));
+						}
+						case "list": {
+							return message.channel.send((await showCommandsChannels(qServerDB.config.channels.disabled, "", server, "CONFIG_NAME:COMMANDSCHANNELS", false))[0]);
+						}
+						default: {
+							if (args[1]) return message.channel.send(string(locale, "CFG_INVALID_ROLE_PARAM_ERROR"));
+							else return message.channel.send((await showCommandsChannels(qServerDB.config.channels.disabled, "", server, "CONFIG_NAME:DISABLEDCHANNELS", false))[0]);
+						}
+					}
+				}
+			}];
 
 		switch (args[0] ? args[0].toLowerCase() : "help") {
 		case "help": {

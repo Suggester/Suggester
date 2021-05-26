@@ -106,7 +106,7 @@ module.exports = {
 		sendWebhook(client, log_hooks.core, "<@&804739962569883719>", { embeds: [embed], disableMentions: "none" });
 	},
 	joinLeaveLog: async function (guild, action) {
-		let document = {
+		/*let document = {
 			date: Date.now(),
 			id: guild.id,
 			action
@@ -122,7 +122,7 @@ module.exports = {
 		else if (action === "leave" && maxJoins === 0) document.timesJoined = 1;
 		else document.timesJoined = maxJoins;
 
-		return new models.ServerLog(document).save();
+		return new models.ServerLog(document).save();*/
 	},
 	commandExecuted: function (command, message, { pre, post, success } = { pre: 0, post: 0, success: false }) {
 		if (process.env.NODE_ENV !== "production" || message.client.config.logCommands === false) return;
