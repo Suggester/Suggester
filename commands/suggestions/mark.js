@@ -8,14 +8,14 @@ const { cleanCommand } = require("../../utils/actions");
 const { actCard, trelloComment } = require("../../utils/trello");
 module.exports = {
 	controls: {
-		name: "status",
+		name: "markstatus",
 		permission: 3,
-		aliases: ["mark"],
+		aliases: ["mark", "status"],
 		usage: "mark [suggestion id] [status] (comment)",
 		description: "Marks a status on a suggestion",
 		image: "images/Mark.gif",
 		enabled: true,
-		examples: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:822457150507974666> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
+		examples: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:842488332562071612> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "MANAGE_MESSAGES"],
 		cooldown: 10,
 		docs: "staff/mark"
@@ -54,8 +54,8 @@ module.exports = {
 		let statusInput = args[1];
 		let shifted = false;
 		if (!status(args[1])[0]) {
-			let m = await message.channel.send(`${string(locale, "NONE_OR_INVALID_STATUS_ERROR", { x: `<:${emoji.x}>`, list: `<:simplemented:822458050161147914> ${string(locale, "STATUS_IMPLEMENTED")}\n<:sprogress:822458050374795295> ${string(locale, "STATUS_PROGRESS")}\n<:sconsider:822458050111340544> ${string(locale, "STATUS_CONSIDERATION")}\n<:sdefault:822457150507974666> ${string(locale, "STATUS_DEFAULT")}\n<:sno:822458049801355315> ${string(locale, "STATUS_NO")}` })}`);
-			let emotes = [["simplementednum:822458050161147914", "implemented"], ["sworkingnum:822458050374795295", "working"], ["sconsidernum:822458050111340544", "consider"], ["sdefaultnum:822457150507974666", "default"], ["snonum:822458049801355315", "no"], [emoji.x, "cancel"]];
+			let m = await message.channel.send(`${string(locale, "NONE_OR_INVALID_STATUS_ERROR", { x: `<:${emoji.x}>`, list: `<:simplemented:822458050161147914> ${string(locale, "STATUS_IMPLEMENTED")}\n<:sprogress:822458050374795295> ${string(locale, "STATUS_PROGRESS")}\n<:sconsider:822458050111340544> ${string(locale, "STATUS_CONSIDERATION")}\n<:sdefault:842488332562071612> ${string(locale, "STATUS_DEFAULT")}\n<:sno:822458049801355315> ${string(locale, "STATUS_NO")}` })}`);
+			let emotes = [["simplementednum:822458050161147914", "implemented"], ["sworkingnum:822458050374795295", "working"], ["sconsidernum:822458050111340544", "consider"], ["sdefaultnum2:842488332562071612", "default"], ["snonum:822458049801355315", "no"], [emoji.x, "cancel"]];
 			const filter = ({ emoji }, { id }) => emotes.find(em => em[0] === `${emoji.name}:${emoji.id}`) && id === message.author.id;
 
 			for await (let emote of emotes) await m.react(emote[0]);

@@ -3028,12 +3028,12 @@ module.exports = {
 			string: "View Guild Insights",
 			context: "String representing the View Guild Insights permission"
 		},
-		"BOT_ADMIN_PERMISSION_SENTENCE": {
-			string: "<:sdev:740193484685967450> This command is only usable by bot administrators",
+		"BOT_ADMIN_PERMISSION_SENTENCE_NEW": {
+			string: "<:sdev:842489745723752469> This command is only usable by bot administrators",
 			context: "Permission shown in the help command if only bot admins can use the command"
 		},
-		"GLOBAL_STAFF_PERMISSION_SENTENCE": {
-			string: "<:sstaff:740196140061818911> This command is only usable by global Suggester staff",
+		"GLOBAL_STAFF_PERMISSION_SENTENCE_NEW": {
+			string: "<:sstaff:842489745812226078> This command is only usable by global Suggester staff",
 			context: "Permission shown in the help command if global staff+ can use the command"
 		},
 		"SERVER_ADMIN_PERMISSION_SENTENCE": {
@@ -4274,17 +4274,17 @@ module.exports = {
 			context: "Description for the listqueue command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_DESC:STATUS": {
+		"COMMAND_DESC:MARKSTATUS": {
 			string: "Marks a status on a suggestion",
 			context: "Description for the mark command"
 		},
-		"COMMAND_USAGE:STATUS": {
+		"COMMAND_USAGE:MARKSTATUS": {
 			string: "mark [suggestion id] [status] (comment)",
 			context: "Description for the mark command\n" +
 				"**Translate the names of arguments (ex. \"suggestion id\"), don't translate actual arguments that are input into the bot (ex. \"on\", \"off\", \"toggle\")**"
 		},
-		"COMMAND_EXAMPLES:STATUS": {
-			string: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:822457150507974666> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
+		"COMMAND_EXAMPLES:MARKSTATUS": {
+			string: "`{{p}}mark 1 implemented`\nMarks suggestion #1 as implemented\n\n`{{p}}mark 1 working This will be released soon!`\nMarks suggestion #1 as in progress and adds a comment saying \"This will be released soon!\"\n\n>>> **Status List:**\n<:simplementednum:822458050161147914> Implemented (`implemented`)\n<:sworkingnum:822458050374795295> In Progress (`working`)\n<:sconsider:822458050111340544> In Consideration (`considered`)\n<:sdefault1:842488332562071612> Default (`default`)\n<:snonum:822458049801355315> Not Happening (`no`)",
 			context: "Examples for the mark command\n" +
 				"**Leave** `{{p}}` **as-is, it is replaced in the help command.**"
 		},

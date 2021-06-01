@@ -160,7 +160,7 @@ module.exports = {
 				if (perms) return message.channel.send(perms);
 			} else return message.channel.send(string(locale, "NO_SUGGESTION_CHANNEL_ERROR", {}, "error"));
 
-			await new Suggestion({
+			let qSuggestionDB = await new Suggestion({
 				id: message.guild.id,
 				suggester: message.author.id,
 				suggestion,
@@ -171,7 +171,6 @@ module.exports = {
 				submitted: new Date()
 			}).save();
 
-			let qSuggestionDB = await dbQuery("Suggestion", { suggestionId: id });
 			let embedSuggest = await suggestionEmbed(guildLocale, qSuggestionDB, qServerDB, client);
 			client.channels.cache.get(qServerDB.config.channels.suggestions)
 				.send(qServerDB.config.feed_ping_role ? (qServerDB.config.feed_ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.feed_ping_role}>`) : "", { embed: embedSuggest, disableMentions: "none" })
