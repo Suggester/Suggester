@@ -43,7 +43,7 @@ module.exports = {
 					return this.find(i => i.id === toGet);
 				};
 				server.iconURL = function(params) {
-					return `https://cdn.discordapp.com/icons/${this.id}/${this.icon}.${this.icon.startsWith("a_") && params.dynamic ? "gif" : (params.format || "png")}`;
+					return this.icon ? `https://cdn.discordapp.com/icons/${this.id}/${this.icon}.${this.icon.startsWith("a_") && params.dynamic ? "gif" : (params.format || "png")}` : "";
 				};
 				args = args.splice(1);
 				// eslint-disable-next-line no-empty
@@ -1521,11 +1521,11 @@ module.exports = {
 			if (["--flags", "-flags"].some(e => e === args[args.length-1].toLowerCase()) && permission <= 1) {
 				const permissions = require("../../utils/permissions");
 				let hasPermissionList = [];
-				Object.keys(permissions).forEach(perm => {
+				if (server.me) Object.keys(permissions).forEach(perm => {
 					server.me.permissions.has(perm) ? hasPermissionList.push(string(locale, `PERMISSION:${perm}`)) : "";
 				});
 
-				embeds.push(new Discord.MessageEmbed().setTitle(string(locale, "CFG_INTERNAL_TITLE")).addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : "None").addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.length > 0 ? qServerDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")));
+				embeds.push(new Discord.MessageEmbed().setTitle(string(locale, "CFG_INTERNAL_TITLE")).addField(string(locale, "CFG_PERMISSIONS_TITLE"), hasPermissionList.length > 0 ? hasPermissionList.join(", ") : server.me ? "None" : "Permissions Not Findable").addField(string(locale, "CFG_FLAGS_TITLE"), qServerDB.flags.length > 0 ? qServerDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")));
 			}
 
 			embeds.forEach(e => {
