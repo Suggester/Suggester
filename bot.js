@@ -116,6 +116,7 @@ client.ws.on("INTERACTION_CREATE", async interaction => {
 	try {
 		if (client.slashcommands.get(interaction.data.name)) {
 			commandLog(`<:slashcommands:785919558376488990> ${interaction.member.user.username}#${interaction.member.user.discriminator} (\`${interaction.member.user.id}\`) ran slash command \`${interaction.data.name}\` in the \`${interaction.channel_id}\` channel of \`${interaction.guild_id}\``, { client, content: "" });
+			if (!interaction.member) interaction.member = {user: interaction.user};
 			await client.slashcommands.get(interaction.data.name)(interaction, client, Discord);
 		}
 	} catch (e) {
