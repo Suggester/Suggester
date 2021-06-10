@@ -82,7 +82,7 @@ module.exports = {
 
 		async function showChannel (channel, server, title, fatal, append) {
 			let foundChannel = server.channels.cache.get(channel);
-			if (!foundChannel || !["text", 0].includes(foundChannel.type)) {
+			if (!foundChannel || !["text", 0, 5, "news"].includes(foundChannel.type)) {
 				return [`**${string(locale, title, {}, "error")}:** ${string(locale, "NONE_CONFIGURED")} ${append ? append : ""}`, true];
 			}
 			return [`**${string(locale, title, {}, "success")}:** <#${foundChannel.id}> (\`${foundChannel.id}\`)`];
@@ -94,7 +94,7 @@ module.exports = {
 			let foundChannels = [];
 			for await (let c of channelsToTest) {
 				let foundChannel = server.channels.cache.get(c);
-				if (foundChannel && ["text", 0].includes(foundChannel.type)) foundChannels.push(foundChannel);
+				if (foundChannel && ["text", "news", 0, 5].includes(foundChannel.type)) foundChannels.push(foundChannel);
 			}
 			return foundChannels.length > 0 ? [`**${string(locale, title, {}, "success")}:** ${foundChannels.map(c => `<#${c.id}> (\`${c.id}\`)`).join(", ")}`] : [`**${string(locale, title, {}, "error")}:** ${string(locale, "NONE_CONFIGURED")} ${append ? append : ""}`, true];
 		}
@@ -128,7 +128,7 @@ module.exports = {
 			let qServerDB = await server.db;
 
 			let channel = await findChannel(input, server.channels.cache);
-			if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+			if (!channel || !["text", "news", 0, 5].includes(channel.type)) return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
 			if (current_name === "disabled" && action === "add" && !force && qServerDB.config.channels.suggestions === channel.id) return "CONFIRM";
 			if (current_name === "disabled" && force) qServerDB.config.in_channel_suggestions = false;
 			let permissions = await channelPermissions(locale, check_perms, channel, server.client);

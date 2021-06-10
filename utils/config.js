@@ -112,7 +112,7 @@ module.exports = {
 			return string(locale, reset_str, {}, "success");
 		}
 		let channel = await findChannel(input, server.channels.cache);
-		if (!channel || channel.type !== "text") return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
+		if (!channel || !["text", "news", 0, 5].includes(channel.type)) return string(locale, "CFG_INVALID_CHANNEL_ERROR", {}, "error");
 		let permissions = await channelPermissions(locale, check_perms, channel, server.client);
 		if (permissions) return permissions;
 		qServerDB.config.channels[current_name] = channel.id;
