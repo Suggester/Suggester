@@ -17,6 +17,7 @@ module.exports = class extends Client {
 		this.cooldowns = new Collection();
 		this.config = config;
 		this.reactInProgress = false;
+		this.topInProgress = false;
 		let baseColors = {
 			"default": "#5865F2",
 			"red": "#e74c3c",

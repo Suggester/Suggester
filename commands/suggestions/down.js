@@ -27,6 +27,7 @@ module.exports = {
 		let m = await message.channel.send(string(locale, "SUGGESTION_LOADING"));
 
 		let time = (args[0] ? ms(args[0]) : null) || null;
+		client.topInProgress = true;
 		message.channel.startTyping();
 
 		let listArray = [];
@@ -72,7 +73,11 @@ module.exports = {
 			});
 			index++;
 		}
-		if (!embedArray[0]) return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
+		if (!embedArray[0]) {
+			client.topInProgress = false;
+			message.channel.stopTyping(true);
+			return message.channel.send(string(locale, "NO_SUGGESTIONS_FOUND", {}, "error"));
+		}
 
 		if (!qServerDB.flags.includes("LARGE") && !qServerDB.flags.includes("MORE_TOP")) {
 			let embed = new Discord.MessageEmbed()
@@ -85,6 +90,7 @@ module.exports = {
 				})
 			}));
 			embedArray.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
+			client.topInProgress = false;
 			message.channel.stopTyping(true);
 			return m.edit("", embed);
 		} else {
@@ -105,6 +111,7 @@ module.exports = {
 				chunk.forEach(f => embed.addField(f.fieldTitle, f.fieldDescription));
 				embeds.push(embed);
 			}
+			client.topInProgress = false;
 			message.channel.stopTyping(true);
 			pages(locale, message, embeds);
 			return m.delete();

@@ -57,7 +57,7 @@ module.exports = {
 
 			qSuggestionDB.edited_by = suggester.id !== message.author.id ? message.author.id : null;
 			qSuggestionDB.suggestion = newSuggestion;
-			qSuggestionDB.save();
+			await qSuggestionDB.save();
 			let embedReview = reviewEmbed(guildLocale, qSuggestionDB, suggester, "yellow", null, suggester.id !== message.author.id ? message.author : null);
 			embedReview.addField(string(guildLocale, "APPROVE_DENY_HEADER"), string(guildLocale, "REVIEW_COMMAND_INFO_NEW", { approve: `<:${emoji.check}>`, deny: `<:${emoji.x}>`, channel: `<#${qServerDB.config.channels.suggestions}>` }));
 			if (qSuggestionDB.reviewMessage && (qSuggestionDB.channels.staff || qServerDB.config.channels.staff)) client.channels.cache.get(qSuggestionDB.channels.staff || qServerDB.config.channels.staff).messages.fetch(qSuggestionDB.reviewMessage).then(fetched => fetched.edit(qServerDB.config.ping_role ? (qServerDB.config.ping_role === message.guild.id ? "@everyone" : `<@&${qServerDB.config.ping_role}>`) : "", { embed: embedReview, disableMentions: "none" })).catch(() => {});
@@ -96,7 +96,7 @@ module.exports = {
 				qSuggestionDB.pending_edit.messageid = reviewMessage.id;
 				qSuggestionDB.pending_edit.channelid = reviewMessage.channel.id;
 				qSuggestionDB.pending_edit.content = newSuggestion;
-				qSuggestionDB.save();
+				await qSuggestionDB.save();
 				client.reactInProgress = false;
 				if (qServerDB.config.channels.log) {
 					let embedLog = logEmbed(guildLocale, qSuggestionDB, message.author, "LOG_EDIT_SUBMITTED_REVIEW_TITLE", "yellow")
@@ -109,7 +109,7 @@ module.exports = {
 				//Admin, don't send for review
 				qSuggestionDB.edited_by = suggester.id !== message.author.id ? message.author.id : null;
 				qSuggestionDB.suggestion = newSuggestion;
-				qSuggestionDB.save();
+				await qSuggestionDB.save();
 
 				let editFeed = await editFeedMessage({ guild: guildLocale, user: locale }, qSuggestionDB, qServerDB, client);
 				if (editFeed) return message.channel.send(editFeed).then(sent => cleanCommand(message, sent, qServerDB));
