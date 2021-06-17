@@ -9,7 +9,6 @@ const { string } = require("../utils/strings");
 const humanizeDuration = require("humanize-duration");
 const { initTrello } = require("../utils/trello");
 module.exports = async function (interaction, client) {
-	console.log(interaction);
 	function respond(data) {
 		client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 			type: 4,
@@ -21,8 +20,11 @@ module.exports = async function (interaction, client) {
 		});
 	}
 	let qUserDB = await dbQuery("User", { id: interaction.member.user.id });
+	let locale = qUserDB.locale || "en";
+	if (!interaction.guild_id) return respond(string(locale, "COMMAND_SERVER_ONLY", {}, "error"));
 	let qServerDB = await dbQuery("Server", { id: interaction.guild_id });
-	let locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "en";
+	locale = qUserDB.locale || (qServerDB ? qServerDB.config.locale : "") || "en";
+
 	if (!qServerDB) return respond(string(locale, "UNCONFIGURED_ERROR", {}, "error"));
 	const guildLocale = qServerDB.config.locale;
 

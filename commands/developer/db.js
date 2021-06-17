@@ -1,5 +1,6 @@
 const { dbQueryNoNew, dbModify } = require("../../utils/db.js");
 const { string } = require("../../utils/strings");
+const { pages } = require("../../utils/actions");
 module.exports = {
 	controls: {
 		name: "db",
@@ -37,12 +38,19 @@ module.exports = {
 			.setTitle(string(locale, modified ? "DB_EMBED_TITLE_MODIFIED" : "DB_EMBED_TITLE_QUERY"))
 			.setDescription(string(locale, "DB_EMBED_QUERY_INFO", { collection: collection, query: JSON.stringify(query) }));
 
-		if (modified) {
-			embed.addField(string(locale, "DB_EMBED_TITLE_MODIFIED"), string(locale, "DB_EMBED_MODIFY_INFO", { field: modifyField, oldValue: oldValue, newValue: modifyValue }));
+		if (modified) embed.addField(string(locale, "DB_EMBED_TITLE_MODIFIED"), string(locale, "DB_EMBED_MODIFY_INFO", { field: modifyField, oldValue: oldValue, newValue: modifyValue }));
+
+		let embeds = [];
+		let paginatedResult = result ? result.toString().match(/.{1,1000}/gs) : [""];
+		for (let r of paginatedResult) {
+			let subEmbed = new Discord.MessageEmbed(embed);
+			subEmbed.addField(string(locale, "RESULT_FIELD_TITLE"), r ? `\`\`\`${r.toString()}\`\`\`` : string(locale, "DB_NO_RESULT_FOUND"))
+				.setColor(r ? client.colors.default : "#ff0000");
+			if (paginatedResult.length > 1) subEmbed.setAuthor(string(locale, "PAGINATION_PAGE_COUNT"))
+				.setFooter(string(locale, "PAGINATION_NAVIGATION_INSTRUCTIONS"));
+			embeds.push(subEmbed);
 		}
 
-		embed.addField(string(locale, "RESULT_FIELD_TITLE"), result ? `\`\`\`${result.toString().substr(0, 1005)}\`\`\`` : string(locale, "DB_NO_RESULT_FOUND"))
-			.setColor(result ? client.colors.default : "#ff0000");
-		return message.channel.send(embed);
+		return pages(locale, message, embeds);
 	}
 };

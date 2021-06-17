@@ -5,10 +5,10 @@ const blapi = require("blapi");
 const chalk = require("chalk");
 
 module.exports = async (Discord, client) => {
-	function checkReact(c, callback) {
-		while (c.reactInProgress) {
+	function checkReactAndTop(c, callback) {
+		while (c.reactInProgress || c.topInProgress) {
 			setTimeout(function() {
-				checkReact(c, callback);
+				checkReactAndTop(c, callback);
 			}, 5000);
 			return;
 		}
@@ -58,7 +58,7 @@ module.exports = async (Discord, client) => {
 		client.guilds.cache.forEach(g => g.members.cache.sweep(m => m.id !== client.user.id));
 		client.users.cache.sweep(() => true);
 		if ((process.memoryUsage().heapUsed).toFixed(2) > 314572800) {
-			checkReact(client,function() {
+			checkReactAndTop(client,function() {
 				coreLog(`🎛️ Rebooting shard ${client.shard.ids[0]} due to memory usage`, client);
 				setTimeout(function() {
 					process.exit();
