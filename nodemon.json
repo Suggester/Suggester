@@ -1,7 +1,6 @@
 {
   "exitcrash": false,
   "verbose": true,
-  "runOnChangeOnly": true,
   "watch": [
     "."
   ],
