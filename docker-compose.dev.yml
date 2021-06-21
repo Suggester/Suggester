@@ -5,3 +5,7 @@ services:
     command: 'npm run dev'
     volumes:
       - '.:/usr/src/app'
+
+  database:
+    logging:
+      driver: 'none'
