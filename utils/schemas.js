@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { prefix } = require("../config.json");
+const cache = require("./cache");
 // IMPORTANT: Snowflakes MUST be Strings, not Numbers
 
 const settings = new Schema({
@@ -169,6 +170,14 @@ const serverLog = new Schema({
 	timesJoined: { type: Number, required: false },
 	date: { type: Date, required: true }
 }/*, { capped: true, size: 10000000 }*/); // can be made into a capped collection if needed.
+
+suggestion.post("save", (res, next) => {
+	if (res && res.suggestionId) {
+		cache.suggestions.set(res.suggestionId, res);
+	}
+
+	next();
+});
 
 module.exports = {
 	Server: model("servers", settings, "settings"),

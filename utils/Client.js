@@ -5,6 +5,7 @@ require("./Structures/Guild");
 const { Client, Team, Collection, User } = require("discord.js");
 const config = require("../config.json");
 const chalk = require("chalk");
+const cache = require("./cache");
 
 module.exports = class extends Client {
 	constructor (options) {
@@ -18,6 +19,8 @@ module.exports = class extends Client {
 		this.config = config;
 		this.reactInProgress = false;
 		this.topInProgress = false;
+		this.cache = cache;
+
 		let baseColors = {
 			"default": "#5865F2",
 			"red": "#e74c3c",
