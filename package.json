@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node index.js",
     "lint": "eslint .",
-    "dev": "npx nodemon --exec 'node --trace-warnings index.js' --ignore node_modules/ --ignore i18n/"
+    "dev": "nodemon",
+    "docker:dev": "docker-compose up -d -f docker-compose.yml -f docker-compose.dev.yml",
+    "docker-exec:bot": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec bot",
+    "docker-exec:db": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec database"
   },
   "dependencies": {
     "@sentry/node": "^5.29.2",

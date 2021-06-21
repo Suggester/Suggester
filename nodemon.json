@@ -1,0 +1,17 @@
+{
+  "exitcrash": false,
+  "verbose": true,
+  "runOnChangeOnly": true,
+  "watch": [
+    "."
+  ],
+  "ignore": [
+    "./node_modules",
+    "./build",
+    "./test",
+    "*.log",
+    "*.vim"
+  ],
+  "ext": "js,ts,json,yaml,yml,toml",
+  "exec": "node -r dotenv/config --trace-warnings index.js"
+}
