@@ -1,0 +1,19 @@
+*
+
+!/package.json
+!/package-lock.json
+
+!/.gitmodules
+!/commands
+!/events
+!/images
+!/slash_commands
+!/utils
+!/bot.js
+!/config.json
+!/.env
+!/index.js
+!/config.json
+!/nodemon.json
+
+# vim ft:gitignore

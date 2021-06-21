@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  bot:
+    build: '.'
+    depends_on:
+      - 'database'
+
+  database:
+    image: 'mongo'
+    volumes:
+      - 'mongodb_data:/data/db'
+
+volumes:
+  mongodb_data:
