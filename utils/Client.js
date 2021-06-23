@@ -2,9 +2,10 @@ require("./Structures/GuildMember");
 require("./Structures/User");
 require("./Structures/Guild");
 
-const { Client, Team, Collection, User } = require("discord.js");
+const { Team, Collection, User } = require("discord.js");
 const config = require("../config.json");
 const chalk = require("chalk");
+const { Client } = require("discord.js-light");
 
 module.exports = class extends Client {
 	constructor (options) {
