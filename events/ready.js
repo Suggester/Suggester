@@ -16,6 +16,7 @@ module.exports = async (Discord, client) => {
 	}
 
 	const team = await client.fetchTeam()
+		.then((t) => t.filter(Boolean))
 		.catch(() => console.log(chalk`{red [{bold ERROR}] Error fetching team members.}`));
 
 	for (const admin of team) {
