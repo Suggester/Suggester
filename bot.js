@@ -17,11 +17,18 @@ if (process.env.SENTRY_DSN) {
 const intents = new Discord.Intents(["GUILDS", "GUILD_EMOJIS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "GUILD_MEMBERS"]);
 
 const client = new Client({
-	ws: { intents: intents },
+	ws: { intents },
 	disableMentions: "everyone",
 	messageCacheLifetime: 450,
 	messageSweepInterval: 750,
-	partials: ["MESSAGE", "REACTION", "USER"]
+	partials: ["MESSAGE", "REACTION", "USER"],
+
+	cacheGuilds: true,
+	cacheChannels: true,
+	cacheOverwrites: true,
+	cacheRoles: true,
+	cacheEmojis: true,
+	cachePresences: false,
 });
 
 if (!process.env.TOKEN) return console.log(chalk`{yellowBright [{bold MISSING}] Missing {bold process.env.TOKEN}}\n{red {bold Shutting Down}}`);

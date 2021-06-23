@@ -19,6 +19,7 @@
     "chalk": "^4.1.0",
     "color-string": "^1.5.4",
     "discord.js": "^12.5.1",
+    "discord.js-light": "^3.5.11",
     "dotenv": "^8.2.0",
     "form-data": "^3.0.0",
     "humanize-duration": "^3.25.0",
