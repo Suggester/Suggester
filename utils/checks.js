@@ -172,7 +172,7 @@ module.exports = {
 		const validUrl = require("valid-url");
 		if (validUrl.isUri(url)){
 			let noparams = url.split("?")[0];
-			return (noparams.match(/\.(jpeg|jpg|gif|png)$/) != null);
+			return (noparams.match(/\.(jpeg|jpg|gif|png|webp|mp4|webm)$/) != null);
 		} else return false;
 	}
 };
