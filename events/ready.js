@@ -1,6 +1,6 @@
 const { coreLog } = require("../utils/logs");
 const { Suggestion } = require("../utils/schemas");
-const { release, lists } = require("../config.json");
+const { release, lists, memoryReboot } = require("../config.json");
 const blapi = require("blapi");
 const chalk = require("chalk");
 
@@ -57,7 +57,7 @@ module.exports = async (Discord, client) => {
 	client.setInterval(async function() {
 		client.guilds.cache.forEach(g => g.members.cache.sweep(m => m.id !== client.user.id));
 		client.users.cache.sweep(() => true);
-		if ((process.memoryUsage().heapUsed).toFixed(2) > 314572800) {
+		if (memoryReboot) if ((process.memoryUsage().heapUsed).toFixed(2) > 314572800) {
 			checkReactAndTop(client,function() {
 				coreLog(`🎛️ Rebooting shard ${client.shard.ids[0]} due to memory usage`, client);
 				setTimeout(function() {
