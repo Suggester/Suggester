@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  bot:
+    command: 'npm run dev'
+    volumes:
+      - '.:/usr/src/app'
+    ports:
+      - '9229:9229'
+
+  database:
+    logging:
+      driver: 'none'
