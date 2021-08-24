@@ -10,6 +10,7 @@ RUN npm ci
 
 COPY . .
 
+RUN git submodule add https://github.com/suggester/i18n.git i18n
 RUN git submodule update --init --recursive
 
 USER node
