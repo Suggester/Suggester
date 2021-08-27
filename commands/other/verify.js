@@ -24,15 +24,15 @@ module.exports = {
 
 		await message.guild.members.fetch(user.id).catch(() => {});
 
-		const DEV_BADGE = '<:new_dev1:880747651115655189>';
-		const DONATOR_BADGE = '<:new_donator:880747316980645939>';
-		const GLOBAL_STAFF_BADGE = '<:new_globalstaff:880747347083157525>';
-		const NO_COOLDOWN_BADGE = '<:new_nocooldown:880747397624528896>';
-		const SERVER_ADMIN_BADGE = '<:new_serveradmin:880747442528714752>';
-		const SERVER_STAFF_BADGE = '<:new_serverstaff:880747424694534205>';
-		const TRANSLATOR_BADGE = '<:new_translator:880897355942068224>';
-		const BLOCKED_BADGE = '<:red_lock:880896793175523328>';
-		const PROTECTED_BADGE = '<:yellow_lock:880896842974511134>';
+		const DEV_BADGE = "<:new_dev1:880747651115655189>";
+		const DONATOR_BADGE = "<:new_donator:880747316980645939>";
+		const GLOBAL_STAFF_BADGE = "<:new_globalstaff:880747347083157525>";
+		const NO_COOLDOWN_BADGE = "<:new_nocooldown:880747397624528896>";
+		const SERVER_ADMIN_BADGE = "<:new_serveradmin:880747442528714752>";
+		const SERVER_STAFF_BADGE = "<:new_serverstaff:880747424694534205>";
+		const TRANSLATOR_BADGE = "<:new_translator:880897355942068224>";
+		const BLOCKED_BADGE = "<:red_lock:880896793175523328>";
+		const PROTECTED_BADGE = "<:yellow_lock:880896842974511134>";
 
 		let globalPosArr = [];
 		let posArr = [];
@@ -64,7 +64,7 @@ module.exports = {
 
 		if (args[0] && ["--flags", "-flags"].some(e => e === args[args.length-1].toLowerCase()) && senderPermissionLevel <= 1) {
 			embed.addField(string(locale, "VERIFY_FLAGS_TITLE"), `${qUserDB.flags.length > 0 ? qUserDB.flags.join(", ") : string(locale, "NO_FLAGS_SET")}`)
-	.addField(string(locale, "HELP_ADDITIONAL_INFO"), `**${string(locale, "CONFIG_NAME:LOCALE")}:** ${qUserDB.locale && client.locales.find(l => l.settings.code === qUserDB.locale) ? client.locales.find(l => l.settings.code === qUserDB.locale).settings.native : string(locale, "NONE_CONFIGURED")}\n**${string(locale, "CONFIG_NAME:NOTIFY")}:** ${qUserDB.notify ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_TITLE")} ${qUserDB.protips ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_SHOWN_TITLE")} ${qUserDB.displayed_protips.join(", ")}`);
+				.addField(string(locale, "HELP_ADDITIONAL_INFO"), `**${string(locale, "CONFIG_NAME:LOCALE")}:** ${qUserDB.locale && client.locales.find(l => l.settings.code === qUserDB.locale) ? client.locales.find(l => l.settings.code === qUserDB.locale).settings.native : string(locale, "NONE_CONFIGURED")}\n**${string(locale, "CONFIG_NAME:NOTIFY")}:** ${qUserDB.notify ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_TITLE")} ${qUserDB.protips ? string(locale, "ENABLED") : string(locale, "DISABLED")}\n${string(locale, "PROTIPS_SHOWN_TITLE")} ${qUserDB.displayed_protips.join(", ")}`);
 		}
 		if (qUserDB.ack) embed.setDescription(qUserDB.ack);
 		if (!embed.description && embed.fields.length < 1) embed.setDescription(string(locale, "VERIFY_NO_ACKS"));
