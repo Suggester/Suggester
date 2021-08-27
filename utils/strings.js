@@ -1052,6 +1052,10 @@ module.exports = {
 			string: "Blocked on this server",
 			context: "Verify acknowledgement for Blocked on this server"
 		},
+		"VERIFY_ACK_DONATOR": {
+			string: "Donator",
+			context: "Verify acknowledgement for users who donate to Suggester"
+		},
 		"VERIFY_TITLE_GLOBAL_ACKS": {
 			string: "Global Acknowledgements",
 			context: "Header for the global acknowledgements section of the verify command"

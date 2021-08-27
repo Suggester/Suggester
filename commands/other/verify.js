@@ -24,23 +24,34 @@ module.exports = {
 
 		await message.guild.members.fetch(user.id).catch(() => {});
 
+		const DEV_BADGE = "<:new_dev1:880747651115655189>";
+		const DONATOR_BADGE = "<:new_donator:880747316980645939>";
+		const GLOBAL_STAFF_BADGE = "<:new_globalstaff:880747347083157525>";
+		const NO_COOLDOWN_BADGE = "<:new_nocooldown:880747397624528896>";
+		const SERVER_ADMIN_BADGE = "<:new_serveradmin:880747442528714752>";
+		const SERVER_STAFF_BADGE = "<:new_serverstaff:880747424694534205>";
+		const TRANSLATOR_BADGE = "<:new_translator:880897355942068224>";
+		const BLOCKED_BADGE = "<:red_lock:880896793175523328>";
+		const PROTECTED_BADGE = "<:yellow_lock:880896842974511134>";
+
 		let globalPosArr = [];
 		let posArr = [];
-		if (client.admins.has(user.id)) globalPosArr.push(`<:sdev:842489745723752469> ${string(locale, "VERIFY_ACK_DEVELOPER_GA")}`);
+		if (client.admins.has(user.id)) globalPosArr.push(`${DEV_BADGE} ${string(locale, "VERIFY_ACK_DEVELOPER_GA")}`);
 
 		if (qUserDB) {
-			if (qUserDB.flags.includes("STAFF")) globalPosArr.push(`<:sstaff:842489745812226078>  ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
-			if (qUserDB.flags.includes("TRANSLATOR")) globalPosArr.push(`<:stranslator:741037425761058898>  ${string(locale, "VERIFY_ACK_TRANSLATOR")}`);
-			if (qUserDB.flags.includes("NO_COOLDOWN")) globalPosArr.push(`<:sunlock:740204044928155788> ${string(locale, "VERIFY_ACK_GLOBAL_NO_COOLDOWN")}`);
-			if (qUserDB.flags.includes("PROTECTED")) globalPosArr.push(`<:sprotected:740234389484470272> ${string(locale, "VERIFY_ACK_GLOBAL_PROTECTED")}`);
-			if (qUserDB.blocked) globalPosArr.push(`<:slock:740204044450005103> ${string(locale, "VERIFY_ACK_GLOBAL_BLOCK")}`);
+			if (qUserDB.flags.includes("STAFF")) globalPosArr.push(`${GLOBAL_STAFF_BADGE}  ${string(locale, "VERIFY_ACK_GLOBAL_STAFF")}`);
+			if (qUserDB.flags.includes("DONATOR")) globalPosArr.push(`${DONATOR_BADGE}  ${string(locale, "VERIFY_ACK_DONATOR")}`);
+			if (qUserDB.flags.includes("TRANSLATOR")) globalPosArr.push(`${TRANSLATOR_BADGE}  ${string(locale, "VERIFY_ACK_TRANSLATOR")}`);
+			if (qUserDB.flags.includes("NO_COOLDOWN")) globalPosArr.push(`${NO_COOLDOWN_BADGE} ${string(locale, "VERIFY_ACK_GLOBAL_NO_COOLDOWN")}`);
+			if (qUserDB.flags.includes("PROTECTED")) globalPosArr.push(`${PROTECTED_BADGE} ${string(locale, "VERIFY_ACK_GLOBAL_PROTECTED")}`);
+			if (qUserDB.blocked) globalPosArr.push(`${BLOCKED_BADGE} ${string(locale, "VERIFY_ACK_GLOBAL_BLOCK")}`);
 		}
 		if (message.guild.members.cache.get(user.id)) {
 			let member = message.guild.members.cache.get(user.id);
-			if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) posArr.push(`<:ssadmin:740199955981140030> ${string(locale, "VERIFY_ACK_SERVER_ADMIN")}`);
-			if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) posArr.push(`<:ssstaff:740199956429799515> ${string(locale, "VERIFY_ACK_SERVER_STAFF")}`);
-			if (qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r)) || (qServerDB.config.blocklist.includes(user.id) || qServerDB.config.blocklist.find(b => b.id === user.id && b.expires > Date.now()))) posArr.push(`<:slock:740204044450005103> ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
-		} else if (qServerDB.config.blocklist.includes(user.id) || qServerDB.config.blocklist.find(b => b.id === user.id && b.expires > Date.now())) posArr.push(`<:slock:740204044450005103> ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
+			if (member.hasPermission("MANAGE_GUILD") || qServerDB.config.admin_roles.some(r => member.roles.cache.has(r))) posArr.push(`${SERVER_ADMIN_BADGE} ${string(locale, "VERIFY_ACK_SERVER_ADMIN")}`);
+			if (qServerDB.config.staff_roles.some(r => member.roles.cache.has(r))) posArr.push(`${SERVER_STAFF_BADGE} ${string(locale, "VERIFY_ACK_SERVER_STAFF")}`);
+			if (qServerDB.config.blocked_roles.some(r => member.roles.cache.has(r)) || (qServerDB.config.blocklist.includes(user.id) || qServerDB.config.blocklist.find(b => b.id === user.id && b.expires > Date.now()))) posArr.push(`${BLOCKED_BADGE} ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
+		} else if (qServerDB.config.blocklist.includes(user.id) || qServerDB.config.blocklist.find(b => b.id === user.id && b.expires > Date.now())) posArr.push(`${BLOCKED_BADGE} ${string(locale, "VERIFY_ACK_SERVER_BLOCK")}`);
 
 		let permissionLevel = await checkPermissions(message.guild.members.cache.get(user.id), client);
 		let senderPermissionLevel = await checkPermissions(message.member, client);
