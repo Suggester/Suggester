@@ -30,7 +30,7 @@ module.exports = {
 		const NO_COOLDOWN_BADGE = "<:new_nocooldown:880747397624528896>";
 		const SERVER_ADMIN_BADGE = "<:new_serveradmin:880747442528714752>";
 		const SERVER_STAFF_BADGE = "<:new_serverstaff:880747424694534205>";
-		const TRANSLATOR_BADGE = "<:new_translator:880897355942068224>";
+		const TRANSLATOR_BADGE = "<:new_translator:880914243472457788>";
 		const BLOCKED_BADGE = "<:red_lock:880896793175523328>";
 		const PROTECTED_BADGE = "<:yellow_lock:880896842974511134>";
 
