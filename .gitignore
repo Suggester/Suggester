@@ -4,4 +4,4 @@
 
 *.vim
 *.swp
-/*.json*
+/*.json5
