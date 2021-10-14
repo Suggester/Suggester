@@ -1,0 +1,157 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -- TODO LIST --
+// - Trello
+// - Rest of config stuff
+
+model GuildConfig {
+  id     String @id
+  locale String @default("en")
+
+  adminRoles String[] @map("admin_roles")
+  staffRoles String[] @map("staff_roles")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // TBD: Should these go in the feed table?
+  logChannel     String? @map("log_channel")
+  reviewChannel  String? @map("review_channel")
+  deniedChannel  String? @map("denied_channel")
+  archiveChannel String? @map("archive_channel")
+
+  logHookId    String? @map("log_hook_id")
+  logHookToken String? @map("log_hook_token")
+
+  flags String[]
+
+  /// many -> one relation for suggestion feeds a server has
+  feeds SuggestionFeed[]
+}
+
+/// Configuration options for suggestion feeds
+/// Each guild can have multiple feeds (many -> one), so many
+/// options are added to the feed table instead of the guild config table.
+model SuggestionFeed {
+  id      String @unique @map("channel_id")
+  guildId String
+
+  emojiUp   String? @default("👍") @map("emoji_up")
+  emojiMid  String? @default("🤷") @map("emoji_mid")
+  emojiDown String? @default("👎") @map("emoji_down")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mode              SuggestionFeedMode @default(AUTOAPPROVE)
+  commentTimestamps Boolean?           @default(true) @map("comment_timestamps")
+
+  // TBD: is this something we have a way of implementing?
+  // inChannelSuggest Boolean @default(false) @map("in_channel_suggest")
+
+  guildConfig   GuildConfig              @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  subscriptions SuggestionSubscription[]
+  suggestions   Suggestion[]
+}
+
+model User {
+  id String @id
+
+  blocked       Boolean  @default(false)
+  ack           String?
+  autoSubscribe Boolean  @default(false) @map("auto_subscribe")
+  flags         String[]
+
+  subscriptions SuggestionSubscription[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model SuggestionSubscription {
+  id Int @id @default(autoincrement())
+
+  userId       String @map("user_id")
+  feedId       String @map("feed_id")
+  suggestionId Int    @map("suggestion_id")
+
+  feed       SuggestionFeed @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suggestion Suggestion     @relation(fields: [feedId, suggestionId], references: [feedId, id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, feedId, suggestionId])
+}
+
+model Suggestion {
+  // This field only exists because without it, Prisma throws an error. lol
+  globalId Int @id @default(autoincrement()) @map("global_id")
+
+  // Suggestion IDs are assigned automatically by trigger `generate_suggestion_id`
+  // Each suggestion feed starts at `1` and increases by one each time a row is inserted.
+  // THe only reason this is `@default(0)` is so the typedef file doesnt make the field required
+  id Int @default(0)
+
+  // TODO: change this to the channel ID?
+  feedId        String  @map("feed_id")
+  guildId       String  @map("guild_id")
+  authorId      String  @map("author_id")
+  feedMessageId String? @map("feed_message_id")
+
+  /// ID from before the migration. This will still be usable but no longer assigned.
+  legacyId Int? @map("legacy_id")
+
+  body String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subscriptions SuggestionSubscription[]
+  feed          SuggestionFeed?          @relation(fields: [feedId], references: [id], onDelete: Cascade)
+
+  @@unique([id, feedId])
+}
+
+enum SuggestionFeedMode {
+  AUTOAPPROVE
+  REVIEW
+}
+
+// TODO:
+enum SuggestionStatus {
+  APPROVED
+  IN_PROGRESS
+  DENIED
+}
+
+// plpgsql function for generating automatically incrementing suggestion IDs:
+//
+// DROP TRIGGER IF EXISTS generate_suggestion_id ON "Suggestion";
+// DROP FUNCTION IF EXISTS generate_suggestion_id;
+
+// CREATE FUNCTION generate_suggestion_id() RETURNS TRIGGER AS $$
+// BEGIN
+//   SELECT (COALESCE(MAX(id), 0) + 1)
+//   INTO NEW.id
+//   FROM "Suggestion"
+//   WHERE feed_id = NEW.feed_id;
+//   RETURN NEW;
+// END;
+// $$ LANGUAGE plpgsql;
+
+// CREATE TRIGGER generate_suggestion_id
+// BEFORE INSERT
+// ON "Suggestion"
+// FOR EACH ROW
+// EXECUTE PROCEDURE generate_suggestion_id();
+
+// vim:si

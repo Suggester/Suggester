@@ -1,0 +1,7 @@
+/build
+/node_modules
+/*.env
+
+*.vim
+*.swp
+/*.json*
