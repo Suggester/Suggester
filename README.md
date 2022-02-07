@@ -1,28 +1,42 @@
+<div align="center">
+  <a href="https://suggester.js.org">
+    <img src="https://cdn.discordapp.com/attachments/576057292491980800/940194078660886598/suggester_square.png" alt="Logo" width="150" height="150">
+  </a>
+
+  <h3 align="center">Suggester</h3>
+
+  <p align="center">
+   A suggestion-focused Discord bot in more than 20,000 servers
+    <br />
+    <a href="https://suggester.js.org/"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://suggester.js.org/#/topics/onboarding">View Demo</a>
+    ·
+    <a href="https://suggester.js.org/invite">Invite</a>
+    ·
+    <a href="https://suggester.js.org/support">Support Server</a>
+  </p>
+</div>
+
 <p align="center">
-  <img src="https://cdn.discordapp.com/attachments/654421515646795784/671360271930884096/suggester_banner.png" alt="Suggester Banner" />
+  <a href="https://ko-fi.com/suggester" target="_blank">
+    <img src="https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support our development" />
+  </a>
+  <a href=" " target="_blank">
+    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="Made with JS" />
+  </a>
+  <a href="https://twitter.com/SuggesterBot" target="_blank">
+    <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" alt="Suggester is on Twitter" />
+  </a>
 </p>
 
-<p align="center">
-  <a href="https://discord.com/invite/G5pEdUp" target="_blank">
-    <img src="https://canary.discord.com/api/guilds/566002482166104066/widget.png" alt="Discord Server" />
-  </a>
-  <a href="https://github.com/Suggester/Suggester/releases" target="_blank">
-    <img src="https://img.shields.io/github/release/Suggester/Suggester.svg" alt="Latest Release" />
-  </a>
-  <a href="https://suggester.js.org" target="_blank">
-    <img src="https://img.shields.io/website-up-down-green-red/https/suggester.js.org.svg" alt="Website Status" />
-  </a>
-  <a href="https://github.com/Suggester/Suggester/actions" target="_blank">
-    <img src="https://github.com/Suggester/Suggester/workflows/Suggester%20CI/badge.svg" alt="Suggester CI" />
-  </a>
-</p>
+Suggester is a suggestion-focused Discord bot whose main purpose is to allow server managers to receive feedback from their members and improve their communities. It makes handling suggestions quick and simple thanks to its extra granular configuration system. Suggester gives staff teams the freedom to manage suggestion flows however they want, through wizard-like setup options, statuses, comments and much more!
 
-### Suggester is a bot that manages server suggestions, allowing staff to review suggestions before they are posted and manage them in many ways.
+## Selfhosting & Contibutions
+Suggester's code is open sourced to allow the community to contribute to its development. You can contribute by submitting a pull request to the [staging](https://github.com/Suggester/Suggester/tree/staging) branch. We expect a clear description of what your PR is about and what problem does it solve/feature does it add. Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the Support Server.
 
-Suggester is a **public** bot available for everyone. You can find more information about the bot in its <a href="https://discord.com/invite/G5pEdUp" target="_blank">Support Server</a>.
+⚠ **We do not allow people to host their own clone of Suggester publicly or provide support for it. While selfhosting for strictly private use is allowed, doing so counts as waiving your right to ask for support with it.**
 
-The code of the bot is open source to allow for community contributions. Please take note of the following:
-**You may not host your own clone of Suggester publicly and/or provide support for it.**
 
-## How do I contribute?
-You can contribute by submitting a pull request to the [**staging** branch](https://github.com/Suggester/Suggester/tree/staging). Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the <a href="https://discord.com/invite/G5pEdUp" target="_blank">Support Server</a>.
+
