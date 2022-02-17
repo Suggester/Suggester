@@ -1,0 +1,14 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "suggester": ["./lib"]
+    },
+    "typeRoots": ["node_modules/@types", "lib/types/**"]
+  },
+  "include": ["src/**/*.ts", "lib/**/*.ts"]
+}
