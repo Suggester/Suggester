@@ -24,7 +24,7 @@
     "build": "prisma generate && yarn build:protos && tsc && tsc-alias -s",
     "build:clean": "rimraf build && yarn run build",
     "build:protos": "./scripts/make_protos",
-    "fmt": "gts fix",
+    "fmt": "gts fix && yarn prisma format",
     "prepare": "husky install",
     "pretest": "yarn run build",
     "posttest": "yarn run lint",

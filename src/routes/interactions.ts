@@ -1,4 +1,10 @@
-import {APIInteraction, InteractionType} from 'discord-api-types/v9';
+import {
+  APIInteraction,
+  APIInteractionResponse,
+  InteractionResponseType,
+  InteractionType,
+  MessageFlags,
+} from 'discord-api-types/v9';
 import {FastifyPluginCallback} from 'fastify';
 
 import {Database, HttpStatusCode, verifyInteraction} from 'suggester';
@@ -45,8 +51,16 @@ export const registerInteractionRoutes = (
           });
 
           if (!canUse) {
-            w.code(HttpStatusCode.NOT_FOUND);
-            return;
+            // TODO: localize
+            const msg: APIInteractionResponse = {
+              type: InteractionResponseType.ChannelMessageWithSource,
+              data: {
+                content: ':x: This bot cannot be used in this server.',
+                flags: MessageFlags.Ephemeral,
+              },
+            };
+
+            return msg;
           }
         } else {
           // TODO: should commands in DMs work?
@@ -70,6 +84,13 @@ export const registerInteractionRoutes = (
           console.log(
             `${username}#${discriminator} used command ${body.data.name} in ${body.guild_id}`
           );
+
+          return {
+            type: InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              content: 'Server is allowed to use bot :D',
+            },
+          };
         }
       }
 

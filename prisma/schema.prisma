@@ -15,14 +15,17 @@ model Instance {
   publicKey String          @unique @map("public_key")
   public    Boolean         @default(false)
   guilds    InstanceGuild[]
+
+  @@map("Instances")
 }
 
 /// A guild with access to an instance
 model InstanceGuild {
   id       Int      @id @default(autoincrement())
   botId    String   @map("bot_id")
-  guildId  String
+  guildId  String   @map("guild_id")
   instance Instance @relation(fields: [botId], references: [botId], onDelete: Cascade)
 
   @@unique([guildId, botId])
+  @@map("InstanceGuilds")
 }
