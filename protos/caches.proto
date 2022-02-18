@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message CachedInstance {
+  int32 id = 1;
+  string botId = 2;
+  string token = 3;
+  string publicKey = 4;
+  bool public = 5;
+}
+
+message CachedInstanceGuild {
+  int32 id = 1;
+  string botId = 2;
+  string guildId = 3;
+}

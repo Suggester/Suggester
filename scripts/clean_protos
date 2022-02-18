@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+root="$(dirname "$0")/.."
+
+find \
+  "$root/lib/protos" \
+  -type f \
+  -name '*.ts' \
+  -not -name 'index.ts' \
+  -exec rm {} \;

@@ -1,4 +1,8 @@
 /node_modules
+/build
 
-/.env
+*.swp
 *.vim
+
+.DS_STORE
+.env

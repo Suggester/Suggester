@@ -4,11 +4,12 @@
     "rootDir": ".",
     "outDir": "build",
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "suggester": ["./lib"]
     },
     "typeRoots": ["node_modules/@types", "lib/types/**"]
   },
-  "include": ["src/**/*.ts", "lib/**/*.ts"]
+  "include": ["src/**/*.ts", "lib/**/*.ts", "scripts/**/*.ts"]
 }
