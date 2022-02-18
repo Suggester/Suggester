@@ -37,7 +37,7 @@ export const registerInteractionRoutes = (
         return;
       }
 
-      if (body.type !== InteractionType.Ping) {
+      if (!instance.public && body.type !== InteractionType.Ping) {
         if (body.guild_id) {
           const canUse = await db.instanceGuilds.get({
             botId: r.params.id,
