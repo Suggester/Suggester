@@ -43,37 +43,38 @@ export const registerInteractionRoutes = (
         return;
       }
 
-      if (!instance.public && body.type !== InteractionType.Ping) {
-        if (body.guild_id) {
-          const canUse = await db.instanceGuilds.get({
-            botId: r.params.id,
-            guildId: body.guild_id,
-          });
+      if (body.type === InteractionType.Ping) {
+        return {type: 1};
+      }
 
-          if (!canUse) {
-            // TODO: localize
-            const msg: APIInteractionResponse = {
-              type: InteractionResponseType.ChannelMessageWithSource,
-              data: {
-                content: ':x: This bot cannot be used in this server.',
-                flags: MessageFlags.Ephemeral,
-              },
-            };
-
-            return msg;
-          }
-        } else {
-          // TODO: should commands in DMs work?
+      if (!instance.public) {
+        if (!body.guild_id) {
           w.code(HttpStatusCode.NOT_FOUND);
-          return;
+          return {
+            type: InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              content: ':x: Commands can only be used in servers.',
+            },
+          } as APIInteractionResponse;
+        }
+
+        const canUse = await db.instanceGuilds.checkInstanceUsability({
+          botId: r.params.id,
+          guildId: body.guild_id,
+        });
+        if (!canUse) {
+          w.code(HttpStatusCode.NOT_FOUND);
+          return {
+            type: InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              content: ':x: This bot cannot be used in this server.',
+              flags: MessageFlags.Ephemeral,
+            },
+          } as APIInteractionResponse;
         }
       }
 
       switch (body.type) {
-        case InteractionType.Ping: {
-          return {type: 1};
-        }
-
         case InteractionType.ApplicationCommand: {
           if (!body.member) {
             return;

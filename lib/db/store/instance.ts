@@ -7,53 +7,6 @@ export class InstanceStore extends DatabaseStore<Instance> {
     super();
   }
 
-  async allInstances() {
-    return this.prisma.instance.findMany();
-  }
-
-  async allInstanceIds() {
-    return this.prisma.instance.findMany({
-      select: {
-        botId: true,
-      },
-    });
-  }
-
-  async allGuildsForInstance(botId: string) {
-    return this.prisma.instance.findFirst({
-      where: {
-        botId,
-      },
-      include: {
-        guilds: true,
-      },
-    });
-  }
-
-  async allInstancesWithGuilds() {
-    return this.prisma.instance.findMany({
-      include: {
-        guilds: true,
-      },
-    });
-  }
-
-  async getInstanceWithGuild(botId: string, guildId: string) {
-    return this.prisma.instance.findFirst({
-      where: {
-        botId,
-      },
-      include: {
-        guilds: {
-          where: {
-            botId,
-            guildId,
-          },
-        },
-      },
-    });
-  }
-
   async create(instance: Omit<Instance, 'id'>) {
     return this.prisma.instance.create({data: instance});
   }
