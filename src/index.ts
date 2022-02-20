@@ -5,7 +5,9 @@ import {Database} from 'suggester';
 
 import {registerInteractionRoutes} from './routes/interactions';
 
-const server = fastify();
+const server = fastify({
+  logger: true,
+});
 
 const start = async () => {
   const prisma = new PrismaClient();

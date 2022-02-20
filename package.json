@@ -31,6 +31,7 @@
     "dev": "nodemon"
   },
   "dependencies": {
+    "@fluent/bundle": "^0.17.1",
     "@noble/ed25519": "^1.6.0",
     "@prisma/client": "^3.9.2",
     "dotenv": "^16.0.0",

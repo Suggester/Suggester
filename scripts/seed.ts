@@ -18,24 +18,28 @@ const main = async () => {
   const db = new Database(prisma);
 
   try {
-    const instance: Omit<Instance, 'id'> = {
+    const instance: Omit<Instance, 'id' | 'updatedAt' | 'createdAt'> = {
       botId: BOT_ID,
       token: DISCORD_TOKEN,
       publicKey: PUBLIC_KEY,
       public: false,
     };
 
-    const instanceGuild: Omit<InstanceGuild, 'id'> = {
-      botId: BOT_ID,
-      guildId: GUILD_ID,
-    };
+    const instanceGuild: Omit<InstanceGuild, 'id' | 'updatedAt' | 'createdAt'> =
+      {
+        botId: BOT_ID,
+        guildId: GUILD_ID,
+      };
 
-    const createdInstance = await db.instances.upsert(BOT_ID, instance);
+    const createdInstance = await db.instances.upsert(
+      BOT_ID,
+      instance as Instance
+    );
     console.log('Created instance:', createdInstance);
 
     const createdInstanceGuild = await db.instanceGuilds.upsert(
       {botId: BOT_ID, guildId: GUILD_ID},
-      instanceGuild
+      instanceGuild as InstanceGuild
     );
     console.log('Created instance guild:', createdInstanceGuild);
   } catch (err) {
