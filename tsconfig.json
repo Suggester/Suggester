@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
+    "lib": ["ESNext"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "baseUrl": ".",
