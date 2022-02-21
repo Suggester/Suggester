@@ -1,4 +1,5 @@
 import {FluentBundle, FluentResource, FluentVariable} from '@fluent/bundle';
+import {APIInteraction} from 'discord-api-types/v9';
 import {readFileSync, readdirSync, statSync} from 'fs';
 import path from 'path';
 
@@ -14,7 +15,7 @@ export class LocalizationService {
   readonly bundles = new Map<string, FluentBundle>();
 
   // TODO: switch to fs promises?
-  loadAll() {
+  loadAll(): this {
     const inDir = readdirSync(LOCALE_DIR, {withFileTypes: true});
     const common = inDir.find(d => d.isFile() && d.name === COMMON_FILE_NAME);
     const subDirs = inDir.filter(d => d.isDirectory()).map(d => d.name);
@@ -52,11 +53,13 @@ export class LocalizationService {
 
       this.bundles.set(langCode, bundle);
     }
+
+    return this;
   }
 }
 
 export class Localizer {
-  constructor(private ctx: Context) {}
+  constructor(private ctx: Context<APIInteraction>) {}
 
   /** Format a message using the user's preferred locale */
   async user(
