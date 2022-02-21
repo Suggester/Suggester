@@ -1,12 +1,14 @@
 import {Instance} from '@prisma/client';
 import {
   APIApplicationCommandAutocompleteInteraction,
-  APIApplicationCommandInteraction,
+  APIChatInputApplicationCommandInteraction,
   APIInteraction,
   APIInteractionResponse,
   APIMessageComponentInteraction,
   APIModalSubmitInteraction,
   APIPingInteraction,
+  ApplicationCommandOptionType,
+  ApplicationCommandType,
   InteractionResponseType,
   InteractionType,
   MessageFlags,
@@ -21,11 +23,12 @@ import {
   LocalizationService,
   verifyInteraction,
 } from '..';
+import {Command, SubCommand, SubCommandGroup} from './command';
 
 export type FrameworkEvents = {
   [InteractionType.Ping]: [Context<APIPingInteraction>];
   [InteractionType.ApplicationCommand]: [
-    Context<APIApplicationCommandInteraction>
+    Context<APIChatInputApplicationCommandInteraction>
   ];
   [InteractionType.ApplicationCommandAutocomplete]: [
     Context<APIApplicationCommandAutocompleteInteraction>
@@ -35,7 +38,7 @@ export type FrameworkEvents = {
 };
 
 export class Framework extends EventEmitter<FrameworkEvents> {
-  constructor(readonly db: Database, readonly locales: LocalizationService) {
+  constructor(readonly db: Database, readonly locales: LocalizationService, readonly cmds: Map<string, Command>) {
     super();
   }
 
@@ -128,7 +131,15 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       }
 
       case InteractionType.ApplicationCommand: {
-        this.emit(InteractionType.ApplicationCommand, mkCtx(i));
+        // TODO: support context menus
+        if (i.data.type !== ApplicationCommandType.ChatInput) {
+          return;
+        }
+
+        this.emit(
+          InteractionType.ApplicationCommand,
+          mkCtx(i) as Context<APIChatInputApplicationCommandInteraction>
+        );
         break;
       }
 
@@ -148,4 +159,51 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       }
     }
   }
+
+  routeCommand(
+    i: APIChatInputApplicationCommandInteraction
+  ): Command | SubCommand | undefined {
+    const cmdName = i.data.name;
+    const cmd = this.cmds.get(cmdName);
+    if (!cmd) {
+      return;
+    }
+
+    let run: Command | SubCommand = cmd;
+
+    const ops = i.data.options;
+    if (ops?.length === 1) {
+      const [op] = ops;
+      if (op.type === ApplicationCommandOptionType.SubcommandGroup) {
+        const [subCmd] = op.options;
+
+        const cg = cmd.subCommands.find(
+          c => c.type === ApplicationCommandOptionType.SubcommandGroup
+        ) as SubCommandGroup | undefined;
+
+        if (cg) {
+          const sc = cg.subCommands.find(c => c.name === subCmd.name);
+
+          if (sc) {
+            run = sc;
+          }
+        }
+      } else if (op.type === ApplicationCommandOptionType.Subcommand) {
+        const sc = cmd.subCommands.find(
+          c =>
+            c.type === ApplicationCommandOptionType.Subcommand &&
+            c.name === op.name
+        ) as SubCommand | undefined;
+
+        if (sc) {
+          run = sc;
+        }
+      }
+    }
+
+    return run;
+  }
 }
+
+export * from './command';
+export * from './module';
