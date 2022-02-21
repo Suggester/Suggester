@@ -13,7 +13,7 @@ import {
 import {MiscModule} from './cmds/misc';
 
 const server = fastify({
-  logger: true,
+  logger: false,
 });
 
 const mods: CommandModule[] = [new MiscModule()];

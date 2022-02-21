@@ -38,7 +38,11 @@ export type FrameworkEvents = {
 };
 
 export class Framework extends EventEmitter<FrameworkEvents> {
-  constructor(readonly db: Database, readonly locales: LocalizationService, readonly cmds: Map<string, Command>) {
+  constructor(
+    readonly db: Database,
+    readonly locales: LocalizationService,
+    readonly cmds: Map<string, Command>
+  ) {
     super();
   }
 
@@ -96,10 +100,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       };
     }
 
-    this.handleInteraction(r.body);
-
-    w.send();
-    return;
+    this.handleInteraction(r.body, instance);
   }
 
   async checkInstanceUsability(
@@ -114,13 +115,14 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     return this.db.instanceGuilds.checkInstanceUsability({botId, guildId});
   }
 
-  handleInteraction(i: APIInteraction) {
+  handleInteraction(i: APIInteraction, instance: Instance) {
     const mkCtx = <T extends APIInteraction>(i: T) =>
       new Context({
         db: this.db,
         locales: this.locales,
         framework: this,
         interaction: i,
+        instance,
       });
 
     // TODO: can this be cleaned up?
