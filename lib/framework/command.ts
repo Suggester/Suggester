@@ -1,9 +1,12 @@
 import {
+  APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandBasicOption,
   APIApplicationCommandInteraction,
   APIApplicationCommandOption,
   APIApplicationCommandSubcommandGroupOption,
   APIApplicationCommandSubcommandOption,
+  APIMessageComponentInteraction,
+  APIModalSubmitInteraction,
   ApplicationCommandOptionType,
   ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -21,10 +24,23 @@ export abstract class Command
   options: APIApplicationCommandOption[] = [];
   subCommands: (SubCommand | SubCommandGroup)[] = [];
 
-  async run(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
-    ctx;
-    return;
-  }
+  buttonIds: string[] = [];
+  selectIds: string[] = [];
+  modalIds: string[] = [];
+  autocompleteIds: string[] = [];
+
+  // TODO: is there a better way to do this?
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async command(
+    ctx: Context<APIApplicationCommandInteraction>
+  ): Promise<void> {}
+  async button(ctx: Context<APIMessageComponentInteraction>): Promise<void> {}
+  async select(ctx: Context<APIMessageComponentInteraction>): Promise<void> {}
+  async modal(ctx: Context<APIModalSubmitInteraction>): Promise<void> {}
+  async autocomplete(
+    ctx: Context<APIApplicationCommandAutocompleteInteraction>
+  ): Promise<void> {}
+  /* eslint-enable */
 
   toJSON(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     const pl: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -76,7 +92,23 @@ export abstract class SubCommand
   abstract description: string;
   options: APIApplicationCommandBasicOption[] = [];
 
-  abstract run(ctx: Context<APIApplicationCommandInteraction>): Promise<void>;
+  buttonIds: string[] = [];
+  selectIds: string[] = [];
+  modalIds: string[] = [];
+  autocompleteIds: string[] = [];
+
+  // TODO: is there a better way to do this?
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  abstract command(
+    ctx: Context<APIApplicationCommandInteraction>
+  ): Promise<void>;
+  async button(ctx: Context<APIMessageComponentInteraction>): Promise<void> {}
+  async select(ctx: Context<APIMessageComponentInteraction>): Promise<void> {}
+  async modal(ctx: Context<APIModalSubmitInteraction>): Promise<void> {}
+  async autocomplete(
+    ctx: Context<APIApplicationCommandAutocompleteInteraction>
+  ): Promise<void> {}
+  /* eslint-enable */
 
   toJSON(): APIApplicationCommandSubcommandOption {
     return {
@@ -87,3 +119,23 @@ export abstract class SubCommand
     };
   }
 }
+
+export type CommandFunction = (
+  ctx: Context<APIApplicationCommandInteraction>
+) => Promise<void>;
+
+export type ButtonFunction = (
+  ctx: Context<APIMessageComponentInteraction>
+) => Promise<void>;
+
+export type SelectFunction = (
+  ctx: Context<APIMessageComponentInteraction>
+) => Promise<void>;
+
+export type ModalFunction = (
+  ctx: Context<APIModalSubmitInteraction>
+) => Promise<void>;
+
+export type AutocompleteFunction = (
+  ctx: Context<APIApplicationCommandAutocompleteInteraction>
+) => Promise<void>;

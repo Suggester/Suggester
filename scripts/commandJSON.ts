@@ -1,7 +1,13 @@
-import {CommandModule} from 'suggester';
+import {Command, Framework} from 'suggester';
 
-import {MiscModule} from '../src/cmds/misc';
+Framework.discoverModules().then(mods => {
+  let cmds: Command[] = [];
 
-const mods: CommandModule[] = [new MiscModule()];
-const json = mods.map(m => m.commands.map(c => c.toJSON())).flat();
-console.log(JSON.stringify(json));
+  for (const Mod of mods) {
+    const m = new Mod();
+    cmds = cmds.concat(m.commands);
+  }
+
+  const json = cmds.map(c => c.toJSON());
+  console.log(JSON.stringify(json));
+});

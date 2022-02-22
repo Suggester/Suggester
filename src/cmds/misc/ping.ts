@@ -6,7 +6,7 @@ export class PingCommand extends Command {
   name = 'ping';
   description = 'Check the response time of the bot';
 
-  async run(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
+  async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
     const localizer = ctx.localizer();
     const origMessage = await localizer.user('cmd-ping_original');
 

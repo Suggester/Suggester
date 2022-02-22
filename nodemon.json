@@ -1,9 +1,9 @@
 {
-  "exitcrash": false,
-  "verbose": true,
-  "runOnChangeOnly": true,
-  "watch": ["src", "lib"],
-  "ignore": ["./node_modules", "./build", "./test", "*.log", "*.vim"],
-  "ext": "js,ts,json,yaml,yml,toml",
-  "exec": "ts-node -r tsconfig-paths/register -r dotenv/config -P tsconfig.json --files src/index.ts"
+    "exitcrash": false,
+    "verbose": true,
+    "runOnChangeOnly": true,
+    "watch": ["src", "lib", "lang"],
+    "ignore": ["./node_modules", "./build", "./test", "*.log", "*.vim"],
+    "ext": "js,ts,json,yaml,yml,toml,ftl",
+    "exec": "ts-node -r tsconfig-paths/register -r dotenv/config -P tsconfig.json --files src/index.ts"
 }

@@ -1,0 +1,1 @@
+[{"type":1,"name":"ping","description":"Check the response time of the bot","default_permission":true,"options":[]},{"type":1,"name":"suggest","description":"Submit a suggestion","default_permission":true,"options":[{"type":11,"name":"attachment","description":"Attach an image to your suggestion","required":false}]}]
