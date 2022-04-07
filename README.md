@@ -34,6 +34,6 @@
 Suggester is a suggestion-focused Discord bot whose main purpose is to allow server managers to receive feedback from their members and improve their communities. It makes handling suggestions quick and simple thanks to its extra granular configuration system. Suggester gives staff teams the freedom to manage suggestion flows however they want, through wizard-like setup options, statuses, comments and much more!
 
 ## Selfhosting & Contributions
-Suggester's code is open sourced to allow the community to contribute to its development. You can contribute by submitting a pull request to the [staging](https://github.com/Suggester/Suggester/tree/staging) branch. We expect a clear description of what your PR is about and what problem it solves or what feature it adds. Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the Support Server.
+Suggester's code is open sourced to allow the community to contribute to its development. You can contribute by submitting a pull request. We expect a clear description of what your PR is about and what problem it solves or what feature it adds. Make sure to use appropriate formatting when you make contributions. If you have any questions, feel free to ask in the Support Server.
 
 ⚠ **We do not allow people to host their own clone of Suggester publicly or provide support for it. While selfhosting for strictly private use is allowed, doing so counts as waiving your right to ask for support with it.**
