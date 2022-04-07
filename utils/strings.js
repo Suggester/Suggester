@@ -3367,16 +3367,12 @@ module.exports = {
 			}
 		},
 		"PROTIP_VOTING": {
-			string: "If you enjoy Suggester, consider helping to support us by voting on bot lists! If you have a minute, click [here]({{list}}) and vote. If you're in our [Support Server]({{support_invite}}) you can get cool rewards for voting!\n\nIf you want to help even more, you can use `{{prefix}}vote` to see the full list of sites where you can vote. Thanks for your support!",
+			string: "If you enjoy Suggester, consider helping to support us by voting on bot lists! If you have a minute, click [here]({{list}}) and vote.\nIf you want to help even more, you can use `{{prefix}}vote` to see the full list of sites where you can vote. Thanks for your support!",
 			context: "Protip for voting",
 			replaced: {
 				prefix: {
 					to_replace: "{{prefix}}",
 					description: "The server prefix"
-				},
-				support_invite: {
-					to_replace: "{{support_invite}}",
-					description: "The link to the support server"
 				},
 				list: {
 					to_replace: "{{list}}",
