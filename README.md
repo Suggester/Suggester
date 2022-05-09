@@ -6,7 +6,7 @@
   <h3 align="center">Suggester</h3>
 
   <p align="center">
-   A suggestion-focused Discord bot in more than 27,000 servers
+   A suggestion-focused Discord bot in more than 30,000 servers
     <br />
     <a href="https://suggester.js.org/"><strong>Explore the docs »</strong></a>
     <br />
