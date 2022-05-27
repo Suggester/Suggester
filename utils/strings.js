@@ -1481,7 +1481,7 @@ module.exports = {
 			context: "Success message when the implemented suggestions archive channel is reset"
 		},
 		"CFG_PREFIX_TOO_LONG_ERROR": {
-			string: "Your prefix must be 20 characters or less.",
+			string: "Your prefix must be 3 characters or less.",
 			context: "Error shown when a specified prefix is too long"
 		},
 		"CFG_PREFIX_DISALLOWED_ERROR": {
