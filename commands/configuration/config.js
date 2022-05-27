@@ -532,7 +532,7 @@ module.exports = {
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(`${string(locale, "CONFIG_NAME:PREFIX", {}, "success")} ${Discord.escapeMarkdown(qServerDB.config.prefix)}`);
 				let prefix = args[1];
-				if (prefix.length > 20) return message.channel.send(string(locale, "CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
+				if (prefix.length > 3) return message.channel.send(string(locale, "CFG_PREFIX_TOO_LONG_ERROR", {}, "error"));
 				let disallowed = ["suggester:", `${client.user.id}:`];
 				if (disallowed.includes(prefix.toLowerCase())) return message.channel.send(string(locale, "CFG_PREFIX_DISALLOWED_ERROR", {}, "error"));
 				qServerDB.config.prefix = prefix.toLowerCase();
