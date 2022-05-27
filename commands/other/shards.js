@@ -34,7 +34,7 @@ module.exports = {
 
 		shardInfo.forEach(i => {
 			console.log(i);
-			embed.addField(`${i[1] === "process" && i[6] ? "<:online:812356089868845087>" : "<:dnd:812356143783346196>"} ${string(locale, "PING_SHARD_FOOTER", { shard: (parseInt(i[0]) + 1).toString() })}`, `\`\`\`js
+			embed.addField(`${i[1] === "process" && i[6] ? "<:online:831202036010975253>" : "<:outage:831202078180376606>"} ${string(locale, "PING_SHARD_FOOTER", { shard: (parseInt(i[0]) + 1).toString() })}`, `\`\`\`js
 ${string(locale, "SHARDS_DETAIL", { servers: i[2] ? i[2].toLocaleString() : "N/A", channels: i[3] ? i[3].toLocaleString() : "N/A", users: i[4] ? i[4].toString() : "N/A", memory: i[5] ? i[5].toLocaleString() : "N/A", api: i[6] ? i[6].toLocaleString() : "N/A" })}\`\`\``, true);
 		});
 
@@ -45,7 +45,7 @@ ${string(locale, "SHARDS_DETAIL", { servers: i[2] ? i[2].toLocaleString() : "N/A
 			const totalGuilds = results[0].reduce((prev, guildCount) => prev + guildCount, 0);
 			const totalMembers = results[1].reduce((prev, memberCount) => prev + memberCount, 0);
 
-			embed.addField("<:online:812356089868845087> Total Stats", `\`\`\`js\n${string(locale, "SHARDS_DETAIL", { servers: totalGuilds ? totalGuilds.toLocaleString() : "N/A", channels: totalChannels ? totalChannels.toLocaleString() : "N/A", users: totalMembers ? totalMembers.toString() : "N/A", memory: totalMemory ? totalMemory.toLocaleString() : "N/A", api: avgLatency ? avgLatency.toLocaleString() : "N/A" })}\`\`\``);
+			embed.addField("<:online:831202036010975253> Total Stats", `\`\`\`js\n${string(locale, "SHARDS_DETAIL", { servers: totalGuilds ? totalGuilds.toLocaleString() : "N/A", channels: totalChannels ? totalChannels.toLocaleString() : "N/A", users: totalMembers ? totalMembers.toString() : "N/A", memory: totalMemory ? totalMemory.toLocaleString() : "N/A", api: avgLatency ? avgLatency.toLocaleString() : "N/A" })}\`\`\``);
 			embed.setTimestamp();
 			m.delete();
 			message.channel.send(embed);
