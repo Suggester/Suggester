@@ -2,7 +2,7 @@ const { emoji } = require("../config.json");
 module.exports = {
 	/**
 	 * Translate something
-	 * @param {string}locale The locale to use
+	 * @param {string} locale The locale to use
 	 * @param {string} string_name The string to use
 	 * @param {object} [replaced] Stuff to replace
 	 * @param {string} [prefix_with] Prefix the string with something
@@ -583,8 +583,8 @@ module.exports = {
 			context: "Used when a command is disabled globally"
 		},
 		"COMMAND_DISABLED_SERVER": {
-			string: "This command has been disabled on this server",
-			context: "Error shown when a command is disabled for a server"
+			string: "This command has been disabled on this server.",
+			context: "Error shown when a command is disabled on a server"
 		},
 		"INVITE_BOT": {
 			string: "You can invite {{name}} to your server with this link: {{link}}",
@@ -2295,19 +2295,19 @@ module.exports = {
 			}
 		},
 		"NO_DENIED_CHANNEL_ERROR": {
-			string: "I could not find your configured denied suggestions channel! Please reconfigure or remove your set denied suggestions channel.",
+			string: "I could not find your configured denied suggestions channel! You will need to configure it again.",
 			context: "Error when the configured denied suggestions channel is not found"
 		},
 		"NO_ARCHIVE_CHANNEL_ERROR": {
-			string: "I could not find your implemented suggestions archive channel! Please reconfigure or remove your set implemented suggestions archive channel.",
+			string: "I could not find your implemented suggestions archive channel! You will need to configure it again.",
 			context: "Error when the configured implemented suggestions channel is not found"
 		},
 		"DELETION_REASON_TOO_LONG_ERROR": {
-			string: "Deletion reasons are limited to a length of 1024 characters.",
+			string: "Deletion reasons are limited to 1024 characters.",
 			context: "Error when the deletion reason is too long"
 		},
 		"DENIAL_REASON_TOO_LONG_ERROR": {
-			string: "Denial reasons are limited to a length of 1024 characters.",
+			string: "Denial reasons are limited to 1024 characters.",
 			context: "Error when the denial reason is too long"
 		},
 		"SUGGESTION_DELETED_TITLE": {
@@ -2793,7 +2793,7 @@ module.exports = {
 			}
 		},
 		"COOLDOWN_SPAM_FLAG": {
-			string: "{{mention}} ⚠️ You have been flagged by the command spam protection filter. This is generally caused when you use a lot of commands too quickly over a period of time. Due to this, you cannot use commands temporarily until a Suggester staff member reviews your situation. If you believe this is an error, please join {{support}} and contact our Support Team.",
+			string: "{{mention}} ⚠️ You have been flagged by the command spam protection filter. This usually happens when you use a lot of commands too quickly over a short period of time. As such, you cannot use commands temporarily until a Suggester Staff member reviews your situation. If you believe this is an error, please join {{support}} and contact our team.",
 			context: "Message shown when a user triggers the command cooldown spam filter",
 			replaced: {
 				mention: {
@@ -2821,7 +2821,7 @@ module.exports = {
 			context: "Header for the tutorial embed"
 		},
 		"TUTORIAL_DESC": {
-			string: "Suggester will help you easily and efficiently manage your server's suggestions, letting you get feedback from your community while also keeping out spam/unwanted suggestions! Staff members can also perform a number of actions on suggestions including (but not limited to) adding comments and marking statuses! The bot's prefix is `{{prefix}}` by default, but can be changed at any time using the `config` command.",
+			string: "Suggester will help you easily and efficiently manage your server's suggestions, letting you get feedback from your community while also keeping out unwanted suggestions! Staff members can also perform a number of actions on suggestions including adding comments or marking statuses! The bot's prefix is `{{prefix}}` by default, but can be changed at any time using the `config` command.",
 			context: "Description for the tutorial embed",
 			replaced: {
 				prefix: {
