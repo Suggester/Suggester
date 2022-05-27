@@ -806,10 +806,10 @@ module.exports = {
 			}
 		},
 		{
-			names: ["inchannelsuggestions", "sendinchannel", "suggestionsinchannel", "sendinchnl"],
-			name: "In-Suggestions Channel Suggestion Submission",
-			description: "This setting controls whether or not users can submit suggestions via sending a message in the suggestions feed channel.",
-			examples: "`{{p}}config inchannelsuggestions on`\nAllows users to submit suggestions via any message in the suggestions feed channel\n\n`{{p}}config inchannelsuggestions off`\nPrevents users from submitting suggestions via any message in the suggestions feed channel",
+			names: ["inchannelsuggestions", "sendinchannel", "suggestionsinchannel", "sendinchnl", "commandless", "commandlesssuggestions", "icss"],
+			name: "Commandless Suggestions",
+			description: "This setting controls whether or not users can submit suggestions by sending a message in the suggestions feed channel.",
+			examples: "`{{p}}config commandless on`\nAllows users to submit suggestions via any message in the suggestions feed channel\n\n`{{p}}config commandless off`\nPrevents users from submitting suggestions via any message in the suggestions feed channel",
 			docs: "inchannelsuggestions",
 			cfg: async function() {
 				if (!args[1]) return message.channel.send(string(locale, qServerDB.config.in_channel_suggestions ? "CFG_INCHANNEL_ENABLED" : "CFG_INCHANNEL_DISABLED"));
@@ -876,7 +876,7 @@ module.exports = {
 		{
 			names: ["locale", "language", "lang", "locales"],
 			name: "Locale",
-			description: "The language the bot will respond in. If a user has a locale configured via the `locale` command, the bot will respond to them in their preferred language. If they don't, the bot will respond in the language configured here.",
+			description: "The language the bot will respond in. If a user has configured a locale via the `locale` command, the bot will respond to them in their preferred language, otherwise it will respond in the language configured here.",
 			examples: "`{{p}}config locale en`\nSets the server language to English.",
 			docs: "locale",
 			cfg: async function() {
