@@ -57,25 +57,5 @@ export class InstanceGuildStore extends DatabaseStore<InstanceGuild> {
     });
 
     return count > 0;
-
-    // const instanceCount = await this.prisma.instance.findFirst({
-    //   where: query,
-    //   select: {
-    //     instanceGuilds: {
-    //       select: {
-    //         guildId: true,
-    //       },
-    //     },
-    //     _count: {
-    //       select: {
-    //         instanceGuilds: true,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // console.log(instanceCount);
-
-    // return true;
   }
 }
