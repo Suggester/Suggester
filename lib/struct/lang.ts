@@ -1,9 +1,10 @@
-import {FluentBundle, FluentResource, FluentVariable} from '@fluent/bundle';
+import {FluentBundle, FluentResource} from '@fluent/bundle';
 import {APIInteraction} from 'discord-api-types/v9';
 import {readFileSync, readdirSync, statSync} from 'fs';
 import path from 'path';
 
 import {Context} from '..';
+import {Messages} from './fluentMessages';
 
 const FALLBACK_LOCALE = 'en-US';
 
@@ -64,29 +65,29 @@ export class Localizer {
   constructor(private ctx: Context<APIInteraction>) {}
 
   /** Format a message using the user's preferred locale */
-  async user(
-    id: string,
-    placeholders?: {[key: string]: FluentVariable}
+  async user<T extends keyof Messages>(
+    id: T,
+    args?: Messages[T]
   ): Promise<string> {
     // TODO: check database
     const langCode = this.ctx.interaction.user?.locale || FALLBACK_LOCALE;
-    return this.get(langCode, id, placeholders);
+    return this.get(langCode, id, args);
   }
 
   /** Format a message using a guild's preferred locale */
-  async guild(
-    id: string,
-    placeholders?: {[key: string]: FluentVariable}
+  async guild<T extends keyof Messages>(
+    id: T,
+    args?: Messages[T]
   ): Promise<string> {
     // TODO: check database
     const langCode = this.ctx.interaction.guild_id || FALLBACK_LOCALE;
-    return this.get(langCode, id, placeholders);
+    return this.get(langCode, id, args);
   }
 
-  get(
+  get<T extends keyof Messages>(
     langCode: string,
-    id: string,
-    placeholders?: {[key: string]: FluentVariable}
+    id: T,
+    args?: Messages[T]
   ): string {
     const bundles = this.ctx.locales.bundles;
     const bundle = bundles.get(langCode);
@@ -100,7 +101,7 @@ export class Localizer {
     }
 
     const errors: Error[] = [];
-    const formatted = bundle.formatPattern(msg.value, placeholders, errors);
+    const formatted = bundle.formatPattern(msg.value, args, errors);
     if (errors.length) {
       console.error(
         `Failed to format message \`${id}\` for language code \`${langCode}\`:`,

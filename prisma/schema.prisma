@@ -7,156 +7,241 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -- TODO LIST --
-// - Trello
-// - Rest of config stuff
-
-/// An instance of the bot
 model Instance {
-  id        Int             @id @default(autoincrement())
-  botId     String          @unique @map("bot_id")
-  token     String          @unique
-  publicKey String          @unique @map("public_key")
-  public    Boolean         @default(false)
-  guilds    InstanceGuild[]
+  id            Int    @id @default(autoincrement())
+  applicationId String @unique @map("application_id")
+  token         String @unique
+  publicKey     String @unique @map("public_key")
 
+  isPublic Boolean @default(false) @map("is_public")
+  isActive Boolean @map("is_active")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  instanceGuilds InstanceGuild[]
+  guildConfigs   GuildConfig[]
 
   @@map("Instances")
 }
 
-/// A guild with access to an instance
+// TODO: is this even really needed?
 model InstanceGuild {
-  id       Int      @id @default(autoincrement())
-  botId    String   @map("bot_id")
-  guildId  String   @map("guild_id")
-  instance Instance @relation(fields: [botId], references: [botId], onDelete: Cascade)
+  id              Int     @id @default(autoincrement())
+  applicationId   String  @map("application_id")
+  // FIXME: this is here for convenience. is there a better way to use nested
+  // applicationId Int @map("application_id")
+  guildId         String  @map("guild_id")
+  accessGrantedBy String? @map("access_granted_by")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([guildId, botId])
+  instance Instance @relation(fields: [applicationId], references: [applicationId], onDelete: Cascade)
+
+  // @@unique([instanceId, guildId])
+  @@unique([applicationId, guildId])
   @@map("InstanceGuilds")
 }
 
+// TODO: isPremium? or premium table
 model GuildConfig {
-  id     String @id
-  locale String @default("en")
+  id            Int    @id @default(autoincrement())
+  applicationId String @map("application_id")
+  guildId       String @map("guild_id")
 
+  locale     String
+  flags      Int      @default(0)
   adminRoles String[] @map("admin_roles")
   staffRoles String[] @map("staff_roles")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // TBD: Should these go in the feed table?
-  logChannel     String? @map("log_channel")
-  reviewChannel  String? @map("review_channel")
-  deniedChannel  String? @map("denied_channel")
-  archiveChannel String? @map("archive_channel")
+  instance       Instance         @relation(fields: [applicationId], references: [applicationId], onDelete: Cascade)
+  SuggestionFeed SuggestionFeed[]
 
-  logHookId    String? @map("log_hook_id")
-  logHookToken String? @map("log_hook_token")
-
-  flags String[]
-
-  /// many -> one relation for suggestion feeds a server has
-  feeds SuggestionFeed[]
-
+  @@unique([applicationId, guildId])
   @@map("GuildConfigs")
 }
 
-/// Configuration options for suggestion feeds
-/// Each guild can have multiple feeds (many -> one), so many
-/// options are added to the feed table instead of the guild config table.
 model SuggestionFeed {
-  id      String @unique @map("channel_id")
-  guildId String
+  id            Int    @id @default(autoincrement())
+  applicationId String @map("applicationId")
+  guildId       String @map("guild_id")
 
-  emojiUp   String? @default("👍") @map("emoji_up")
-  emojiMid  String? @default("🤷") @map("emoji_mid")
-  emojiDown String? @default("👎") @map("emoji_down")
+  name             String?
+  description      String?
+  // TODO: make this unique if not null
+  commandAliasName String? @map("command_alias_name")
+
+  channelId        String  @map("channel_id")
+  reviewChannelId  String? @map("review_channel_id")
+  logChannelId     String? @map("log_channel_id")
+  deniedChannelId  String? @map("denied_channel_id")
+  archiveChannelId String? @map("archive_channel_id")
+
+  mode SuggestionFeedMode @default(AUTOAPPROVE)
+
+  // roles allowed to vote
+  votingRoles  String[] @map("voting_roles")
+  // roles allowed to submit stuff to this feed
+  allowedRoles String[] @map("allowed_roles")
+  // roles not allowed to submit stuff to this feed
+  blockedRoles String[] @map("blocked_roles")
+
+  // TODO: what do these do?
+  pingRole     String? @map("ping_role")
+  feedPingRole String? @map("feed_ping_role")
+
+  // role given when user has suggestion approved
+  approvedRole    String? @map("approved_role")
+  // role given when user has suggestion implemented
+  implementedRole String? @map("implemented_role")
+
+  upvoteEmoji   String? @map("upvote_emoji")
+  midEmoji      String? @map("mid_emoji")
+  downvoteEmoji String? @map("downvote_emoji")
+
+  logWebhookId    String? @map("log_webhook_id")
+  logWebhookToken String? @map("log_webhook_token")
+
+  // how often users can submit
+  submitCooldown Int? @map("submit_cooldown")
+  suggestionCap  Int? @map("suggestion_cap")
+
+  showCommentTimestamps Boolean @default(true) @map("show_comment_timestamps")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  mode              SuggestionFeedMode @default(AUTOAPPROVE)
-  commentTimestamps Boolean?           @default(true) @map("comment_timestamps")
+  guildConfig GuildConfig @relation(fields: [applicationId, guildId], references: [applicationId, guildId], onDelete: Cascade)
 
-  // TBD: is this something we have a way of implementing?
-  inChannelSuggest Boolean @default(false) @map("in_channel_suggest")
+  suggestions Suggestion[]
 
-  guildConfig   GuildConfig              @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  subscriptions SuggestionSubscription[]
-  suggestions   Suggestion[]
-
+  @@unique([applicationId, guildId, channelId])
   @@map("SuggestionFeeds")
 }
 
-model User {
-  id String @id
+model Suggestion {
+  id            Int    @id @default(autoincrement())
+  applicationId String @map("applicationId")
+  guildId       String @map("guild_id")
+  feedChannelId String @map("feed_channel_id")
+  authorId      String @map("author_id")
 
-  blocked       Boolean  @default(false)
-  ack           String?
-  autoSubscribe Boolean  @default(false) @map("auto_subscribe")
-  flags         String[]
+  // this field is automatically set by a trigger in the datebase (see bottom of file)
+  // however, prisma will complain if we don't provide a value for it, so setting default to 0 works
+  suggestionId  Int     @default(0) @map("suggestion_id")
+  feedMessageId String? @map("feed_message_id")
 
-  subscriptions SuggestionSubscription[]
+  body           String
+  approvalStatus SuggestionApprovalStatus
+  displayStatus  SuggestionDisplayStatus  @default(DEFAULT)
+
+  denialReason String? @map("denial_reason")
+
+  attachmentURL      String? @map("attachment_url")
+  trelloAttachmentId String? @map("trello_attachment_id")
+
+  trelloCard String? @map("trello_card")
+
+  pendingEditBody      String?   @map("pending_edit_body")
+  pendingEditCreatedAt DateTime? @default(now()) @map("pending_edit_created_at")
+
+  lastEditedBy String? @map("last_modified_by")
+  isAnonymous  Boolean @default(false) @map("is_anonymous")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("Users")
+  feed          SuggestionFeed           @relation(fields: [feedChannelId, applicationId, guildId], references: [channelId, applicationId, guildId], onDelete: Cascade)
+  comments      SuggestionComment[]
+  votes         SuggestionVote[]
+  subscriptions SuggestionSubscription[]
+
+  @@unique([feedChannelId, suggestionId])
+  @@map("Suggestions")
+}
+
+model SuggestionComment {
+  id           Int    @id @default(autoincrement())
+  suggestionId Int    @map("suggestion_id")
+  authorId     String @map("author_id")
+  // TODO: figure out how to generate this
+  commentId    Int    @map("comment_id")
+
+  body          String
+  trelloComment String? @map("trello_comment")
+  isAnonymous   Boolean @default(false) @map("is_anonymous")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@map("SuggestionComments")
+}
+
+model SuggestionVote {
+  id           Int    @id @default(autoincrement())
+  suggestionId Int    @map("suggestion_id")
+  userId       String @map("user_id")
+
+  kind SuggestionVoteKind
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@map("SuggestionVotes")
 }
 
 model SuggestionSubscription {
-  id Int @id @default(autoincrement())
-
-  userId       String @map("user_id")
-  feedId       String @map("feed_id")
+  id           Int    @id @default(autoincrement())
   suggestionId Int    @map("suggestion_id")
-
-  feed       SuggestionFeed @relation(fields: [feedId], references: [id], onDelete: Cascade)
-  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  suggestion Suggestion     @relation(fields: [feedId, suggestionId], references: [feedId, id], onDelete: Cascade)
+  userId       String @map("user_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([userId, feedId, suggestionId])
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, userId])
   @@map("SuggestionSubscriptions")
 }
 
-model Suggestion {
-  // This field only exists because without it, Prisma throws an error. lol
-  globalId Int @id @default(autoincrement()) @map("global_id")
+model GlobalUser {
+  id     Int    @id @default(autoincrement())
+  userId String @map("user_id")
 
-  // Suggestion IDs are assigned automatically by trigger `generate_suggestion_id`
-  // Each suggestion feed starts at `1` and increases by one each time a row is inserted.
-  // THe only reason this is `@default(0)` is so the typedef file doesnt make the field required
-  id Int @default(0)
-
-  // TODO: change this to the channel ID?
-  feedId        String  @map("feed_id")
-  guildId       String  @map("guild_id")
-  authorId      String  @map("author_id")
-  feedMessageId String? @map("feed_message_id")
-
-  /// ID from before the migration. This will still be usable but no longer assigned.
-  legacyId Int? @map("legacy_id")
-
-  body String
+  // TODO: en-US the correct name?
+  locale        String   @default("en-US")
+  flags         Int      @default(0)
+  showProtips   Boolean  @default(true) @map("show_protips")
+  protipsViewed String[] @map("protips_viewed")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  subscriptions SuggestionSubscription[]
-  feed          SuggestionFeed?          @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  @@map("GlobalUsers")
+}
 
-  @@unique([id, feedId])
-  @@map("Suggestions")
+model GlobalBlock {
+  id        Int     @id @default(autoincrement())
+  entityId  String  @map("entity_id")
+  blockedBy String? @map("blocked_by")
+
+  kind   GlobalBlockKind
+  reason String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([entityId, kind])
+  @@map("GlobalBlocks")
 }
 
 enum SuggestionFeedMode {
@@ -164,14 +249,32 @@ enum SuggestionFeedMode {
   REVIEW
 }
 
-// TODO:
-enum SuggestionStatus {
+enum SuggestionApprovalStatus {
   APPROVED
-  IN_PROGRESS
+  IN_QUEUE
   DENIED
 }
 
-// plpgsql function for generating automatically incrementing suggestion IDs:
+enum SuggestionDisplayStatus {
+  DEFAULT
+  IMPLEMENTED
+  CONSIDERING
+  IN_PROGRESS
+  NOT_HAPPENING
+}
+
+enum SuggestionVoteKind {
+  UPVOTE
+  MID
+  DOWNVOTE
+}
+
+enum GlobalBlockKind {
+  USER
+  GUILD
+}
+
+// postgres function for generating automatically incrementing suggestion IDs:
 
 // DROP TRIGGER IF EXISTS generate_suggestion_id ON "Suggestions";
 // DROP FUNCTION IF EXISTS generate_suggestion_id;

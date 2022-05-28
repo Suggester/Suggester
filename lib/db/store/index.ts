@@ -6,5 +6,7 @@ export abstract class DatabaseStore<T> {
   abstract delete(query: unknown): Promise<T | null>;
 }
 
+export * from './guildConfig';
 export * from './instance';
 export * from './instanceGuild';
+export * from './suggestionFeed';

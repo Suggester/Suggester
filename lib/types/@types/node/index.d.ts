@@ -12,6 +12,9 @@ declare global {
       DEV_DISCORD_PUBLIC_KEY?: string;
       DEV_DISCORD_BOT_ID?: string;
       DEV_DISCORD_GUILD_ID?: string;
+      DEV_DISCORD_CHANNEL_ID?: string;
+      DEV_DISCORD_USER_ID?: string;
+      SENTRY_DSN: string;
     }
   }
 }

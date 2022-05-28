@@ -175,14 +175,17 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
   async checkInstanceUsability(
     instance: Instance,
-    botId: string,
+    applicationId: string,
     guildId: string | undefined
   ): Promise<boolean> {
-    if (instance.public || !guildId) {
+    if (instance.isPublic || !guildId) {
       return true;
     }
 
-    return this.db.instanceGuilds.checkInstanceUsability({botId, guildId});
+    return this.db.instanceGuilds.checkInstanceUsability({
+      applicationId,
+      guildId,
+    });
   }
 
   handleInteraction(i: APIInteraction, instance: Instance) {

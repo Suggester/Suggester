@@ -7,7 +7,7 @@ export class InstanceGuildStore extends DatabaseStore<InstanceGuild> {
     super();
   }
 
-  async create(row: Omit<InstanceGuild, 'id'>) {
+  async create(row: Omit<InstanceGuild, 'id' | 'updatedAt' | 'createdAt'>) {
     return this.prisma.instanceGuild.create({
       data: row,
     });
@@ -20,44 +20,62 @@ export class InstanceGuildStore extends DatabaseStore<InstanceGuild> {
   }
 
   async update(
-    query: {guildId: string; botId: string},
-    update: Partial<Omit<InstanceGuild, 'id'>>
+    query: {guildId: string; applicationId: string},
+    update: Omit<InstanceGuild, 'id' | 'updatedAt' | 'createdAt'>
   ) {
     return this.prisma.instanceGuild.update({
-      where: {
-        guildId_botId: query,
-      },
+      where: {applicationId_guildId: query},
       data: update,
     });
   }
 
   async upsert(
-    query: {guildId: string; botId: string},
-    row: Omit<InstanceGuild, 'id'>
+    query: {guildId: string; applicationId: string},
+    row: Omit<InstanceGuild, 'id' | 'updatedAt' | 'createdAt'>
   ) {
     return this.prisma.instanceGuild.upsert({
       where: {
-        guildId_botId: query,
+        applicationId_guildId: query,
       },
       update: row,
       create: row,
     });
   }
 
-  async delete(query: {guildId: string; botId: string}) {
+  async delete(query: {guildId: string; applicationId: string}) {
     return this.prisma.instanceGuild.delete({
-      where: {guildId_botId: query},
+      where: {applicationId_guildId: query},
     });
   }
 
   async checkInstanceUsability(query: {
     guildId: string;
-    botId: string;
+    applicationId: string;
   }): Promise<boolean> {
     const count = await this.prisma.instanceGuild.count({
       where: query,
     });
 
     return count > 0;
+
+    // const instanceCount = await this.prisma.instance.findFirst({
+    //   where: query,
+    //   select: {
+    //     instanceGuilds: {
+    //       select: {
+    //         guildId: true,
+    //       },
+    //     },
+    //     _count: {
+    //       select: {
+    //         instanceGuilds: true,
+    //       },
+    //     },
+    //   },
+    // });
+
+    // console.log(instanceCount);
+
+    // return true;
   }
 }
