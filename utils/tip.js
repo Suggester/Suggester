@@ -12,12 +12,6 @@ module.exports = {
 					bot_invite: slash_url.replace("[ID]", client.user.id)
 				}
 			},
-			support: {
-				string: "PROTIP_SUPPORT",
-				use: {
-					support_invite: `https://discord.gg/${support_invite}`
-				}
-			},
 			approve_reason: {
 				string: "PROTIP_REASON_APPROVE",
 				use: {
