@@ -5,7 +5,7 @@ const { string } = require("../utils/strings");
 const { prefix } = require("../config.json");
 const { errorLog } = require("../utils/logs");
 module.exports = async (Discord, client, messageReaction, user) => {
-	if (!["text", "news", "dm"].includes(message.channel.type)) return;
+	if (!["text", "news", "dm"].includes(messageReaction.message.channel.type)) return;
 	if (user.id === client.user.id) return;
 	const nodeEmoji = require("node-emoji");
 	if (messageReaction.message.partial) messageReaction.message = await messageReaction.message.fetch();
