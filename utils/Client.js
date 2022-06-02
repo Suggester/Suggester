@@ -1,6 +1,7 @@
 require("./Structures/GuildMember");
 require("./Structures/User");
 require("./Structures/Guild");
+require("./Structures/VoiceChannel");
 
 const { Client, Team, Collection, User } = require("discord.js");
 const config = require("../config.json");

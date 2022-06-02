@@ -1,7 +1,7 @@
 const { MessageManager, Structures: { extend } } = require("discord.js");
 
-extend("VoiceChannel", (GM) => {
-	return class extends GM {
+extend("VoiceChannel", (VC) => {
+	return class extends VC {
 		constructor (client, data) {
 			super(client, data);
 			this._client = client;
