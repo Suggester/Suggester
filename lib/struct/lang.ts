@@ -1,5 +1,5 @@
 import {FluentBundle, FluentResource} from '@fluent/bundle';
-import {APIInteraction} from 'discord-api-types/v9';
+import {APIInteraction} from 'discord-api-types/v10';
 import {readFileSync, readdirSync, statSync} from 'fs';
 import path from 'path';
 
@@ -59,6 +59,34 @@ export class LocalizationService {
 
     return this;
   }
+
+  get<T extends keyof Messages>(
+    langCode: string,
+    id: T,
+    args?: Messages[T]
+  ): string {
+    const bundles = this.bundles;
+    const bundle = bundles.get(langCode);
+    if (!bundle) {
+      return id;
+    }
+
+    const msg = bundle.getMessage(id);
+    if (!msg || !msg.value) {
+      return id;
+    }
+
+    const errors: Error[] = [];
+    const formatted = bundle.formatPattern(msg.value, args, errors);
+    if (errors.length) {
+      console.error(
+        `Failed to format message \`${id}\` for language code \`${langCode}\`:`,
+        errors.join('\n')
+      );
+    }
+
+    return formatted;
+  }
 }
 
 export class Localizer {
@@ -80,7 +108,7 @@ export class Localizer {
     args?: Messages[T]
   ): Promise<string> {
     // TODO: check database
-    const langCode = this.ctx.interaction.guild_id || FALLBACK_LOCALE;
+    const langCode = this.ctx.interaction.guild_locale || FALLBACK_LOCALE;
     return this.get(langCode, id, args);
   }
 
@@ -89,26 +117,6 @@ export class Localizer {
     id: T,
     args?: Messages[T]
   ): string {
-    const bundles = this.ctx.locales.bundles;
-    const bundle = bundles.get(langCode);
-    if (!bundle) {
-      return id;
-    }
-
-    const msg = bundle.getMessage(id);
-    if (!msg || !msg.value) {
-      return id;
-    }
-
-    const errors: Error[] = [];
-    const formatted = bundle.formatPattern(msg.value, args, errors);
-    if (errors.length) {
-      console.error(
-        `Failed to format message \`${id}\` for language code \`${langCode}\`:`,
-        errors.join('\n')
-      );
-    }
-
-    return formatted;
+    return this.ctx.locales.get(langCode, id, args);
   }
 }

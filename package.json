@@ -21,9 +21,13 @@
     "lint": "gts lint",
     "clean": "gts clean && rimraf build && yarn clean:protos",
     "clean:protos": "./scripts/clean_protos",
-    "build": "prisma generate && yarn build:protos && tsc && tsc-alias -s",
+    "build": "yarn build:prisma && yarn build:lang && yarn build:protos && yarn build:ts",
+    "build:dum": "dum build:prisma && dum build:lang && dum build:protos && dum build:ts",
     "build:clean": "rimraf build && yarn run build",
+    "build:lang": "fluent-types $(pwd)/lang/common.ftl $(pwd)/lang/en-US/*.ftl -o $(pwd)/lib/struct/fluentMessages.ts",
+    "build:prisma": "prisma generate > /dev/null",
     "build:protos": "./scripts/make_protos",
+    "build:ts": "tsc && tsc-alias -s",
     "fmt": "gts fix && yarn prisma format",
     "prepare": "husky install",
     "pretest": "yarn run build",
@@ -32,18 +36,20 @@
   },
   "dependencies": {
     "@fluent/bundle": "^0.17.1",
+    "@ltd/j-toml": "^1.30.0",
     "@noble/ed25519": "^1.6.0",
     "@prisma/client": "^3.9.2",
     "dotenv": "^16.0.0",
     "fastify": "^3.27.1",
     "ioredis": "^4.28.5",
     "ts-proto": "^1.105.2",
-    "undici": "^4.14.1"
+    "undici": "^4.14.1",
+    "zod": "^3.17.3"
   },
   "engines": {
     "node": ">=v17.5.0"
   },
   "prisma": {
-    "seed": "ts-node -r tsconfig-paths/register -r dotenv/config scripts/seed.ts"
+    "seed": "ts-node --files -r tsconfig-paths/register -r dotenv/config scripts/seed.ts"
   }
 }

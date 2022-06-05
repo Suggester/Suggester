@@ -1,5 +1,5 @@
 import {verify} from '@noble/ed25519';
-import {APIInteraction} from 'discord-api-types/v9';
+import {APIInteraction} from 'discord-api-types/v10';
 
 export async function verifyInteraction(
   pubkey: string,

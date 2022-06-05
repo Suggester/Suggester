@@ -30,8 +30,6 @@ model Instance {
 model InstanceGuild {
   id              Int     @id @default(autoincrement())
   applicationId   String  @map("application_id")
-  // FIXME: this is here for convenience. is there a better way to use nested
-  // applicationId Int @map("application_id")
   guildId         String  @map("guild_id")
   accessGrantedBy String? @map("access_granted_by")
 

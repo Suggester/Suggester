@@ -12,18 +12,12 @@ Suggester is built to be able to easily start up "custom instances" (bots with c
 Create a file called `.env` in the project root, containing the following content:
 
 ```
-DATABASE_URL=''
 NODE_ENV='dev'
-REDIS_URL=''
-PORT='3000'
-DEV_DISCORD_TOKEN=''
-DEV_DISCORD_PUBLIC_KEY=''
-DEV_DISCORD_BOT_ID=''
-DEV_DISCORD_GUILD_ID=''
-DEV_DISCORD_CHANNEL_ID=''
 ```
 
-To create locale types, run `fluent-types lang/common.ftl lang/en-US/**/*.ftl -o lib/struct/fluentMessages.d.ts`
+Copy `config_example.toml` to `config.toml` and modify the relevant lines
+
+To create locale types, run `fluent-types lang/common.ftl lang/en-US/**/*.ftl -o lib/struct/fluentMessages.ts`
 
 To initialize the database, run `yarn prisma migrate deploy` followed by `yarn prisma db seed`
 

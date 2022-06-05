@@ -21,7 +21,7 @@ import {
   RESTPostAPIWebhookWithTokenWaitResult,
   RouteBases,
   Routes,
-} from 'discord-api-types/v9';
+} from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
 import {Database, Framework, LocalizationService, Localizer} from '..';
@@ -49,7 +49,7 @@ export class Context<T extends APIInteraction> {
     this.instance = cfg.instance;
   }
 
-  localizer(): Localizer {
+  getLocalizer(): Localizer {
     return new Localizer(this);
   }
 

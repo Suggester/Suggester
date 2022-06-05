@@ -10,17 +10,64 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v9';
+} from 'discord-api-types/v10';
 
-import {Context} from '..';
+import {Context, LocalizationService} from '..';
+import {Messages} from '../struct/fluentMessages';
+
+const toLocalizedMap = (
+  l: LocalizationService,
+  availableLocales: string[],
+  key: keyof Messages,
+  def: string
+) =>
+  availableLocales.reduce((prev, curr) => {
+    const lo = l.get(curr, key);
+    prev[curr] = lo === key ? def : lo;
+    return prev;
+  }, {} as {[key: string]: string});
+
+const localize = (
+  struct: Command | SubCommand | SubCommandGroup,
+  l: LocalizationService
+) => {
+  const availableLocales = [...l.bundles.keys()];
+
+  const descriptionKey = struct.description;
+  const defaultDesc = l.get('en-US', descriptionKey);
+  const descriptionLocalizations = toLocalizedMap(
+    l,
+    availableLocales,
+    descriptionKey,
+    defaultDesc
+  );
+  struct.defaultDescription = defaultDesc;
+  struct.description_localizations = descriptionLocalizations;
+
+  const nameKey = struct.name;
+  const defaultName = l.get('en-US', nameKey);
+  const nameLocalizations = toLocalizedMap(
+    l,
+    availableLocales,
+    nameKey,
+    defaultName
+  );
+  struct.defaultName = defaultName;
+  struct.name_localizations = nameLocalizations;
+};
 
 export abstract class Command
   implements RESTPostAPIChatInputApplicationCommandsJSONBody
 {
   readonly type = ApplicationCommandType.ChatInput;
-  abstract name: string;
-  abstract description: string;
-  defaultPermission = true;
+  defaultName = '';
+  abstract name: keyof Messages;
+  name_localizations = {};
+  defaultDescription = '';
+  abstract description: keyof Messages;
+  description_localizations = {};
+  default_member_permissions = '0';
+  dm_permission = false;
   options: APIApplicationCommandOption[] = [];
   subCommands: (SubCommand | SubCommandGroup)[] = [];
 
@@ -28,6 +75,11 @@ export abstract class Command
   selectIds: string[] = [];
   modalIds: string[] = [];
   autocompleteIds: string[] = [];
+
+  init(l: LocalizationService): this {
+    localize(this, l);
+    return this;
+  }
 
   // TODO: is there a better way to do this?
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -45,9 +97,12 @@ export abstract class Command
   toJSON(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     const pl: RESTPostAPIChatInputApplicationCommandsJSONBody = {
       type: this.type,
-      name: this.name,
-      description: this.description,
-      default_permission: this.defaultPermission,
+      name: this.defaultName,
+      name_localizations: this.name_localizations,
+      description: this.defaultDescription,
+      description_localizations: this.description_localizations,
+      default_member_permissions: this.default_member_permissions,
+      dm_permission: this.dm_permission,
       options: this.options,
     };
 
@@ -63,16 +118,28 @@ export abstract class SubCommandGroup
   implements APIApplicationCommandSubcommandGroupOption
 {
   readonly type = ApplicationCommandOptionType.SubcommandGroup;
-  abstract name: string;
-  abstract description: string;
+  defaultName = '';
+  abstract name: keyof Messages;
+  name_localizations = {};
+  defaultDescription = '';
+  abstract description: keyof Messages;
+  description_localizations = {};
+
   options?: APIApplicationCommandSubcommandOption[] = [];
   subCommands: SubCommand[] = [];
+
+  init(l: LocalizationService): this {
+    localize(this, l);
+    return this;
+  }
 
   toJSON(): APIApplicationCommandSubcommandGroupOption {
     const pl: APIApplicationCommandSubcommandGroupOption = {
       type: this.type,
-      name: this.name,
-      description: this.description,
+      name: this.defaultName,
+      name_localizations: this.name_localizations,
+      description: this.defaultDescription,
+      description_localizations: this.description_localizations,
       options: this.options,
     };
 
@@ -88,8 +155,13 @@ export abstract class SubCommand
   implements APIApplicationCommandSubcommandOption
 {
   readonly type = ApplicationCommandOptionType.Subcommand;
-  abstract name: string;
-  abstract description: string;
+  defaultName = '';
+  abstract name: keyof Messages;
+  name_localizations = {};
+  defaultDescription = '';
+  abstract description: keyof Messages;
+  description_localizations = {};
+
   options: APIApplicationCommandBasicOption[] = [];
 
   buttonIds: string[] = [];
@@ -110,11 +182,18 @@ export abstract class SubCommand
   ): Promise<void> {}
   /* eslint-enable */
 
+  init(l: LocalizationService): this {
+    localize(this, l);
+    return this;
+  }
+
   toJSON(): APIApplicationCommandSubcommandOption {
     return {
       type: this.type,
-      name: this.name,
-      description: this.description,
+      name: this.defaultName,
+      name_localizations: this.name_localizations,
+      description: this.defaultDescription,
+      description_localizations: this.description_localizations,
       options: this.options,
     };
   }

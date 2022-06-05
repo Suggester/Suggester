@@ -1,14 +1,14 @@
-import {APIApplicationCommandInteraction} from 'discord-api-types/v9';
+import {APIApplicationCommandInteraction} from 'discord-api-types/v10';
 
-import {Command, Context} from 'suggester';
+import {Command, Context, Messages} from 'suggester';
 
 export class PingCommand extends Command {
-  name = 'ping';
-  description = 'Check the response time of the bot';
+  name: keyof Messages = 'command-name--ping';
+  description: keyof Messages = 'command-desc--ping';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
-    const localizer = ctx.localizer();
-    const origMessage = await localizer.user('cmd-ping_original');
+    const localizer = ctx.getLocalizer();
+    const origMessage = await localizer.user('ping-original');
 
     const before = Date.now();
     await ctx.send({
@@ -16,7 +16,7 @@ export class PingCommand extends Command {
     });
     const after = Date.now();
 
-    const afterMsg = await localizer.user('cmd-ping_edited', {
+    const afterMsg = await localizer.user('ping-edited', {
       ms: after - before,
     });
 

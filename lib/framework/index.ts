@@ -1,5 +1,6 @@
 import {Instance} from '@prisma/client';
 import {
+  APIApplicationCommand,
   APIApplicationCommandAutocompleteInteraction,
   APIChatInputApplicationCommandInteraction,
   APIInteraction,
@@ -15,14 +16,18 @@ import {
   InteractionResponseType,
   InteractionType,
   MessageFlags,
-} from 'discord-api-types/v9';
+  RouteBases,
+  Routes,
+} from 'discord-api-types/v10';
 import EventEmitter from 'events';
 import {FastifyReply, FastifyRequest} from 'fastify';
 import {readdirSync} from 'fs';
 import path from 'path';
+import {fetch} from 'undici';
 
 import {
   AutocompleteFunction,
+  BotConfig,
   ButtonFunction,
   Command,
   CommandModule,
@@ -93,6 +98,22 @@ const getAndExecFn = async <
   }
 };
 
+const initCommands = (l: LocalizationService, cmds: Command[]) => {
+  for (const cmd of cmds) {
+    cmd.init(l);
+    for (const grp of cmd.subCommands) {
+      if (grp instanceof SubCommandGroup) {
+        grp.init(l);
+        for (const sub of grp.subCommands) {
+          sub.init(l);
+        }
+      } else {
+        grp.init(l);
+      }
+    }
+  }
+};
+
 export class Framework extends EventEmitter<FrameworkEvents> {
   readonly modules = new Map<string, CommandModule>();
   readonly cmds = new Map<string, Command>();
@@ -104,7 +125,11 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
   ['constructor']: typeof Framework;
 
-  constructor(readonly db: Database, readonly locales: LocalizationService) {
+  constructor(
+    readonly db: Database,
+    readonly locales: LocalizationService,
+    readonly config: BotConfig
+  ) {
     super();
   }
 
@@ -151,7 +176,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       interaction: body,
     });
 
-    const localize = ctx.localizer();
+    const localize = ctx.getLocalizer();
 
     const usable = await this.checkInstanceUsability(
       instance,
@@ -315,7 +340,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         ) as SubCommandGroup | undefined;
 
         if (cg) {
-          const sc = cg.subCommands.find(c => c.name === subCmd.name);
+          const sc = cg.subCommands.find(c => c.defaultName === subCmd.name);
 
           if (sc) {
             run = sc;
@@ -325,7 +350,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         const sc = cmd.subCommands.find(
           c =>
             c.type === ApplicationCommandOptionType.Subcommand &&
-            c.name === op.name
+            c.defaultName === op.name
         ) as SubCommand | undefined;
 
         if (sc) {
@@ -344,8 +369,9 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       const m = new Mod();
       this.modules.set(m.name, m);
 
+      initCommands(this.locales, m.commands);
       for (const cmd of m.commands) {
-        this.cmds.set(cmd.name, cmd);
+        this.cmds.set(cmd.defaultName, cmd);
 
         const ld = <
           T extends
@@ -382,6 +408,39 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         }
       }
     }
+  }
+
+  static async bulkCreateCommands(
+    l: LocalizationService,
+    token: string,
+    guildId?: string
+  ): Promise<APIApplicationCommand[]> {
+    const applicationId = Buffer.from(token.split('.')[0], 'base64').toString();
+
+    let cmds: Command[] = [];
+    const mods = await this.discoverModules();
+    for (const Mod of mods) {
+      const m = new Mod();
+      cmds = cmds.concat(m.commands);
+      initCommands(l, cmds);
+    }
+
+    const json = cmds.map(c => c.toJSON());
+
+    const url =
+      RouteBases.api +
+      (guildId
+        ? Routes.applicationGuildCommands(applicationId, guildId)
+        : Routes.applicationCommands(applicationId));
+
+    return fetch(url, {
+      method: 'PUT',
+      body: JSON.stringify(json),
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bot ${token}`,
+      },
+    }).then(r => r.json() as Promise<APIApplicationCommand[]>);
   }
 
   static async discoverModules(): Promise<CommandModuleSubClass[]> {

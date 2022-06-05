@@ -1,7 +1,6 @@
 {
     "exitcrash": false,
     "verbose": true,
-    "runOnChangeOnly": true,
     "watch": ["src", "lib", "lang"],
     "ignore": ["./node_modules", "./build", "./test", "*.log", "*.vim"],
     "ext": "js,ts,json,yaml,yml,toml,ftl",
