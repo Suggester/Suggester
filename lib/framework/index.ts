@@ -86,13 +86,15 @@ const getAndExecFn = async <
   ctx: Context<T>,
   map: Map<string, U>
 ) => {
-  const fn = map.get(id);
+  const fn = [...map.entries()].find(([k]) =>
+    id.toLowerCase().startsWith(k.toLowerCase())
+  );
   if (!fn) {
     return;
   }
 
   try {
-    await fn(ctx as any); // eslint-disable-line
+    await fn[1](ctx as any); // eslint-disable-line
   } catch (err) {
     console.error(`Error while executing handler for: ${id}:`, err);
   }

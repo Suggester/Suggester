@@ -68,10 +68,11 @@ model SuggestionFeed {
   applicationId String @map("application_id")
   guildId       String @map("guild_id")
 
-  name             String?
+  name             String  @default("Server Suggestions")
   description      String?
   // TODO: make this unique if not null
   commandAliasName String? @map("command_alias_name")
+  isDefault        Boolean @default(false) @map("is_default")
 
   channelId        String  @map("channel_id")
   reviewChannelId  String? @map("review_channel_id")

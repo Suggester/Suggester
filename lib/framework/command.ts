@@ -54,6 +54,8 @@ const localize = (
   );
   struct.defaultName = defaultName;
   struct.name_localizations = nameLocalizations;
+
+  // TODO: localize options
 };
 
 export abstract class Command

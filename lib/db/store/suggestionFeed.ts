@@ -23,6 +23,27 @@ export class SuggestionFeedStore extends DatabaseStore<SuggestionFeed> {
     });
   }
 
+  getAll(query: {
+    applicationId: string;
+    guildId: string;
+  }): Promise<SuggestionFeed[]> {
+    return this.prisma.suggestionFeed.findMany({
+      where: query,
+    });
+  }
+
+  getDefault(query: {
+    applicationId: string;
+    guildId: string;
+  }): Promise<SuggestionFeed | null> {
+    return this.prisma.suggestionFeed.findFirst({
+      where: {
+        isDefault: true,
+        ...query,
+      },
+    });
+  }
+
   update(
     query: {
       applicationId: string;

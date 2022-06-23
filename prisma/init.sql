@@ -20,3 +20,9 @@ CREATE OR REPLACE TRIGGER set_suggestion_id
 BEFORE INSERT ON suggestions
 FOR EACH ROW
 EXECUTE PROCEDURE set_suggestion_id_fn();
+
+--
+
+CREATE UNIQUE INDEX
+ON suggestion_feeds (is_default)
+WHERE is_default = TRUE;

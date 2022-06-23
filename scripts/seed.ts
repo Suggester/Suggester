@@ -117,7 +117,7 @@ const main = async () => {
         logWebhookId: null,
         logWebhookToken: null,
         midEmoji: null,
-        name: null,
+        name: 'Server Suggestions',
         pingRole: null,
         reviewChannelId: null,
         showCommentTimestamps: true,
@@ -125,6 +125,7 @@ const main = async () => {
         suggestionCap: null,
         upvoteEmoji: null,
         votingRoles: [],
+        isDefault: true,
       };
       const suggestionFeed = await db.suggestionFeeds.upsert(
         {
