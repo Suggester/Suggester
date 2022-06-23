@@ -5,6 +5,7 @@ import {InviteCommand} from './invite';
 import {PingCommand} from './ping';
 import {PrivacyCommand} from './privacy';
 import {SupportCommand} from './support';
+import {VoteCommand} from './vote';
 
 export class MiscModule extends CommandModule {
   readonly name = 'misc';
@@ -17,5 +18,6 @@ export class MiscModule extends CommandModule {
     new PingCommand(),
     new PrivacyCommand(),
     new SupportCommand(),
+    new VoteCommand(),
   ];
 }

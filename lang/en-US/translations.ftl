@@ -15,6 +15,7 @@ command-name--invite = invite
 command-name--privacy = privacy
 command-name--support = support
 command-name--suggest = suggest
+command-name--vote = vote
 
 ## ---------------- OLD TRANSLATIONS ----------------
 
