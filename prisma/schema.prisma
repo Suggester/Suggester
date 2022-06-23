@@ -23,7 +23,7 @@ model Instance {
   instanceGuilds InstanceGuild[]
   guildConfigs   GuildConfig[]
 
-  @@map("Instances")
+  @@map("instances")
 }
 
 // TODO: is this even really needed?
@@ -38,9 +38,8 @@ model InstanceGuild {
 
   instance Instance @relation(fields: [applicationId], references: [applicationId], onDelete: Cascade)
 
-  // @@unique([instanceId, guildId])
   @@unique([applicationId, guildId])
-  @@map("InstanceGuilds")
+  @@map("instance_guilds")
 }
 
 // TODO: isPremium? or premium table
@@ -61,12 +60,12 @@ model GuildConfig {
   SuggestionFeed SuggestionFeed[]
 
   @@unique([applicationId, guildId])
-  @@map("GuildConfigs")
+  @@map("guild_configs")
 }
 
 model SuggestionFeed {
   id            Int    @id @default(autoincrement())
-  applicationId String @map("applicationId")
+  applicationId String @map("application_id")
   guildId       String @map("guild_id")
 
   name             String?
@@ -111,6 +110,8 @@ model SuggestionFeed {
 
   showCommentTimestamps Boolean @default(true) @map("show_comment_timestamps")
 
+  lastSuggestionId Int @default(0) @map("last_suggestion_id")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -119,24 +120,26 @@ model SuggestionFeed {
   suggestions Suggestion[]
 
   @@unique([applicationId, guildId, channelId])
-  @@map("SuggestionFeeds")
+  @@map("suggestion_feeds")
 }
 
 model Suggestion {
   id            Int    @id @default(autoincrement())
-  applicationId String @map("applicationId")
+  publicId      Int    @default(dbgenerated()) @map("public_id")
+  // id            Int    @id @default(autoincrement())
+  applicationId String @map("application_id")
   guildId       String @map("guild_id")
   feedChannelId String @map("feed_channel_id")
   authorId      String @map("author_id")
 
   // this field is automatically set by a trigger in the datebase (see bottom of file)
   // however, prisma will complain if we don't provide a value for it, so setting default to 0 works
-  suggestionId  Int     @default(0) @map("suggestion_id")
+  // suggestionId  Int     @default(0) @map("suggestion_id")
   feedMessageId String? @map("feed_message_id")
 
   body           String
-  approvalStatus SuggestionApprovalStatus
-  displayStatus  SuggestionDisplayStatus  @default(DEFAULT)
+  approvalStatus SuggestionApprovalStatus @map("approval_status")
+  displayStatus  SuggestionDisplayStatus  @default(DEFAULT) @map("display_status")
 
   denialReason String? @map("denial_reason")
 
@@ -159,12 +162,13 @@ model Suggestion {
   votes         SuggestionVote[]
   subscriptions SuggestionSubscription[]
 
-  @@unique([feedChannelId, suggestionId])
-  @@map("Suggestions")
+  @@unique([applicationId, feedChannelId, publicId])
+  @@map("suggestions")
 }
 
 model SuggestionComment {
   id           Int    @id @default(autoincrement())
+  // feedChannelId String @map("feed_channel_id")
   suggestionId Int    @map("suggestion_id")
   authorId     String @map("author_id")
   // TODO: figure out how to generate this
@@ -179,11 +183,12 @@ model SuggestionComment {
 
   suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
 
-  @@map("SuggestionComments")
+  @@map("suggestion_comments")
 }
 
 model SuggestionVote {
   id           Int    @id @default(autoincrement())
+  // feedChannelId String @map("feed_channel_id")
   suggestionId Int    @map("suggestion_id")
   userId       String @map("user_id")
 
@@ -194,11 +199,12 @@ model SuggestionVote {
 
   suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
 
-  @@map("SuggestionVotes")
+  @@map("suggestion_votes")
 }
 
 model SuggestionSubscription {
   id           Int    @id @default(autoincrement())
+  // feedChannelId String @map("feed_channel_id")
   suggestionId Int    @map("suggestion_id")
   userId       String @map("user_id")
 
@@ -208,7 +214,7 @@ model SuggestionSubscription {
   suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
 
   @@unique([suggestionId, userId])
-  @@map("SuggestionSubscriptions")
+  @@map("suggestion_subscriptions")
 }
 
 model GlobalUser {
@@ -224,7 +230,7 @@ model GlobalUser {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("GlobalUsers")
+  @@map("global_users")
 }
 
 model GlobalBlock {
@@ -239,18 +245,22 @@ model GlobalBlock {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([entityId, kind])
-  @@map("GlobalBlocks")
+  @@map("global_blocks")
 }
 
 enum SuggestionFeedMode {
   AUTOAPPROVE
   REVIEW
+
+  @@map("suggestion_feed_mode")
 }
 
 enum SuggestionApprovalStatus {
   APPROVED
   IN_QUEUE
   DENIED
+
+  @@map("suggestion_approval_status")
 }
 
 enum SuggestionDisplayStatus {
@@ -259,38 +269,21 @@ enum SuggestionDisplayStatus {
   CONSIDERING
   IN_PROGRESS
   NOT_HAPPENING
+
+  @@map("suggestion_display_status")
 }
 
 enum SuggestionVoteKind {
   UPVOTE
   MID
   DOWNVOTE
+
+  @@map("suggestion_vote_kind")
 }
 
 enum GlobalBlockKind {
   USER
   GUILD
+
+  @@map("global_block_kind")
 }
-
-// postgres function for generating automatically incrementing suggestion IDs:
-
-// DROP TRIGGER IF EXISTS generate_suggestion_id ON "Suggestions";
-// DROP FUNCTION IF EXISTS generate_suggestion_id;
-
-// CREATE FUNCTION generate_suggestion_id() RETURNS TRIGGER AS $$
-// BEGIN
-//   SELECT (COALESCE(MAX(id), 0) + 1)
-//   INTO NEW.id
-//   FROM "Suggestions"
-//   WHERE feed_id = NEW.feed_id;
-//   RETURN NEW;
-// END;
-// $$ LANGUAGE plpgsql;
-
-// CREATE TRIGGER generate_suggestion_id
-// BEFORE INSERT
-// ON "Suggestions"
-// FOR EACH ROW
-// EXECUTE PROCEDURE generate_suggestion_id();
-
-// vim:si

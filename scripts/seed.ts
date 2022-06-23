@@ -9,6 +9,7 @@ import {
   SuggestionFeed,
   SuggestionFeedMode,
 } from '@prisma/client';
+import {readFile} from 'fs/promises';
 import path from 'path';
 import {inspect} from 'util';
 
@@ -27,8 +28,18 @@ const main = async () => {
     throw new Error('no dev instances in config file');
   }
 
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({
+    log: ['query'],
+  });
   const db = new Database(prisma);
+
+  const initFile = await readFile(
+    path.join(process.cwd(), 'prisma', 'init.sql'),
+    'utf8'
+  );
+
+  const rawQueries = initFile.split('--').map(q => prisma.$executeRawUnsafe(q));
+  await prisma.$transaction(rawQueries);
 
   try {
     for (const devInstance of config.data.dev) {
@@ -86,7 +97,7 @@ const main = async () => {
 
       const suggestionFeedConfig: Omit<
         SuggestionFeed,
-        'id' | 'updatedAt' | 'createdAt'
+        'id' | 'lastSuggestionId' | 'updatedAt' | 'createdAt'
       > = {
         applicationId: BOT_ID,
         guildId: GUILD_ID,
@@ -127,10 +138,9 @@ const main = async () => {
 
       const suggestionConfig: Omit<
         Suggestion,
-        'id' | 'updatedAt' | 'createdAt'
+        'id' | 'publicId' | 'updatedAt' | 'createdAt'
       > = {
         body: 'owo',
-        suggestionId: 0,
         applicationId: BOT_ID,
         guildId: GUILD_ID,
         feedChannelId: CHANNEL_ID,
@@ -147,6 +157,10 @@ const main = async () => {
         trelloAttachmentId: null,
         trelloCard: null,
       };
+      const suggestion = await prisma.suggestion.create({
+        data: suggestionConfig,
+      });
+      console.log('Inserted Suggestion:', suggestion);
     }
   } catch (err) {
     console.error('failed to seed the database:', err);

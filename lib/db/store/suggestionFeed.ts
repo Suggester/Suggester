@@ -45,7 +45,10 @@ export class SuggestionFeedStore extends DatabaseStore<SuggestionFeed> {
       guildId: string;
       channelId: string;
     },
-    row: Omit<SuggestionFeed, 'id' | 'updatedAt' | 'createdAt'>
+    row: Omit<
+      SuggestionFeed,
+      'id' | 'lastSuggestionId' | 'updatedAt' | 'createdAt'
+    >
   ): Promise<SuggestionFeed> {
     return this.prisma.suggestionFeed.upsert({
       where: {
