@@ -10,9 +10,9 @@ module.exports = {
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
 		cooldown: 5,
 		dmAvailable: true,
-		docs: "legal"
+		docs: "legal/privacy"
 	},
 	do: (locale, message) => {
-		return message.channel.send(string(locale, "PRIVACY_INFO", { link: "https://suggester.js.org/#/legal" }));
+		return message.channel.send(string(locale, "PRIVACY_INFO", { link: "https://suggester.js.org/#/legal/privacy" }));
 	}
 };
