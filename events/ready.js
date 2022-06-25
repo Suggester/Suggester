@@ -36,7 +36,7 @@ module.exports = async (Discord, client) => {
 		["PLAYING", `See the latest updates by using "@${client.user.username} changelog"`],
 		["WATCHING", async () => `${(await Suggestion.countDocuments())} suggestions`],
 		["PLAYING", `Support Suggester by upvoting it! Use "@${client.user.username} vote" for more info`],
-		["PLAYING", `Join our support server! Use "@${client.user.username}" support for more info`]
+		["PLAYING", `Join our support server! Use "@${client.user.username} support" for more info`]
 	];
 
 	let p = 0;
@@ -52,7 +52,7 @@ module.exports = async (Discord, client) => {
 	await setPresence();
 	client.setInterval(async function() {
 		await setPresence();
-	}, 1800000); //Change presence every 30 minutes
+	}, 3600000); //Change presence every 60 minutes
 
 	client.setInterval(async function() {
 		client.guilds.cache.forEach(g => g.members.cache.sweep(m => m.id !== client.user.id));
