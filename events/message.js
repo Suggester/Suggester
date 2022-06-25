@@ -100,10 +100,10 @@ module.exports = async (Discord, client, message) => {
 
 			counts.set(message.author.id, userCount);
 			let preLimit = 10;
-			let cooldownLimit = 15;
+			let cooldownLimit = 30;
 			if (userCount > preLimit) {
 				if (userCount < cooldownLimit) return;
-				//If more than 15 cooldown breaches occur over the duration of the bot being up, auto-block the user and notify the developers
+				//If more than 30 cooldown breaches occur over the duration of the bot being up, auto-block the user and notify the developers
 				qUserDB.blocked = true;
 				await dbModify("User", { id: message.author.id }, qUserDB);
 
