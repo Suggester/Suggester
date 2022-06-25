@@ -1083,13 +1083,10 @@ module.exports = {
 			}
 		},
 		"VOTE_INFO": {
-			string: "You can vote for Suggester on various bot lists, which is a great way to support the bot! If you're in the Suggester support server ({{link}}), you can get special rewards for voting 🤩\n>>> __Links to Vote:__\n{{links}}",
+			string: "You can vote for Suggester on various bot lists, which is a great way to support the bot!\n>>> __Links to Vote:__\n{{links}}",
 			context: "Response to the vote command",
 			replaced: {
-				link: {
-					to_replace: "{{link}}",
-					description: "Link to the support server"
-				},
+				
 				links: {
 					to_replace: "{{links}}",
 					description: "Links to vote for the bot (takes up multiple lines)"
