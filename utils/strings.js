@@ -3269,7 +3269,7 @@ module.exports = {
 			context: "Header for the useful links section of the help embed"
 		},
 		"HELP_USEFUL_LINKS_DESC_NEW": {
-			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Documentation](https://suggester.js.org/)\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://suggester.js.org/#/supporting/info)\n[Privacy Policy](https://suggester.js.org/#/legal)",
+			string: "[Join our Support Server](https://discord.gg/{{support_invite}})\n[Documentation](https://suggester.js.org/)\n[Invite Me]({{bot_invite}})\n[Support Suggester](https://ko-fi.com/suggester)\n[Privacy Policy](https://suggester.js.org/#/legal/privacy)",
 			context: "Shows useful links on the help command",
 			replaced: {
 				support_invite: {
