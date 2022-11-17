@@ -2148,7 +2148,7 @@ module.exports = {
 		},
 		"DISABLE_INCHANNEL_WARNING": {
 			string: "This channel is your suggestions channel, so disabling this channel will also disable the in channel suggestions feature. React with {{check}} if you would like to disable this channel, and {{x}} if you would like to cancel.",
-			context: "Warning about giving the everyone role staff/admin permissions",
+			context: "Warning about disabling commands in the suggestion channel when commandless suggestions are enabled",
 			replaced: {
 				check: {
 					to_replace: "{{check}}",
