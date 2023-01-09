@@ -14,8 +14,8 @@ module.exports = {
 		permission: 3,
 		aliases: ["top", "best", "upvoted", "upvotes"],
 		usage: "top (time)",
-		description: "Shows the top 10 most highly voted suggestions",
-		examples: "`{{p}}top`\nShows the top 10 suggestions\n\n`{{p}}top 1w`\nShows the top 10 suggestions from the last week",
+		description: "Shows the top 20 most highly voted suggestions",
+		examples: "`{{p}}top`\nShows the top 20 suggestions\n\n`{{p}}top 1w`\nShows the top 20 suggestions from the last week",
 		enabled: true,
 		permissions: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS", "USE_EXTERNAL_EMOJIS"],
 		cooldown: 60,
@@ -66,7 +66,7 @@ module.exports = {
 			}
 		}
 		let index = 1;
-		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 10)) {
+		for await (let i of listArray.filter(i => i.opinion && !isNaN(i.opinion) && i.opinion > 0).sort((a, b) => b.opinion - a.opinion).splice(0, qServerDB.flags.includes("LARGE") ? 50 : 20)) {
 			embedArray.push({
 				"fieldTitle": `${index}: ${string(locale, "SUGGESTION_HEADER")} #${i.suggestion.suggestionId.toString()} (${string(locale, "SUGGESTION_VOTES")} ${i.opinion})`,
 				"fieldDescription": `[${string(locale, "SUGGESTION_FEED_LINK")}](https://discord.com/channels/${i.suggestion.id}/${qServerDB.config.channels.suggestions}/${i.suggestion.messageId})`,
@@ -95,7 +95,7 @@ module.exports = {
 			message.channel.stopTyping(true);
 			return m.edit("", embed);
 		} else {
-			let chunks = embedArray.chunk(10);
+			let chunks = embedArray.chunk(20);
 			let embeds = [];
 			for await (let chunk of chunks) {
 				let embed = new Discord.MessageEmbed()
