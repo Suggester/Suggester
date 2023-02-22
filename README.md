@@ -4,6 +4,9 @@
 Suggester uses [Bazel](https://bazel.build) as its build tool. To get started, follow [Bazel's installation instructions](https://bazel.build/install).
 
 ```sh
+# create .bazelignore
+$ ./scripts/bootstrap_bazelrc.sh
+
 # build one service
 $ bazel build //services/commands
 
