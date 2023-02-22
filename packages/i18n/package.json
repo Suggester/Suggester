@@ -1,0 +1,20 @@
+{
+  "name": "@suggester/i18n",
+  "main": "build/lib/index.js",
+  "devDependencies": {
+    "@suggester/configs": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "discord-api-types": "^0.37.33",
+    "eslint": "^7",
+    "prettier": "^2.8.4"
+  },
+  "dependencies": {
+    "@fluent/bundle": "^0.17.1",
+    "@suggester/database": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "fmt": "prettier --write --ignore-path=.eslintignore ."
+  }
+}

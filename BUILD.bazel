@@ -1,0 +1,18 @@
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+copy_to_bin(
+  name = "lang-files",
+  srcs = ["lang/common.ftl"] + glob(["lang/**/translations.ftl"]),
+  visibility = ["//visibility:public"],
+)
+
+copy_to_bin(
+  name = "config",
+  srcs = ["config.toml"],
+  visibility = ["//services:__subpackages__"],
+)
+
+exports_files(["lang/common.ftl"] + glob(["lang/**/translations.ftl"]))

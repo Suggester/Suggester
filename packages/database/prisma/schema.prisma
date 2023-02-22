@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../prisma-out"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// TODO: isPremium? or premium table
+model GuildConfig {
+  id         Int    @id @default(autoincrement())
+  guildID    String @unique @map("guild_id")
+
+  locale     String?
+  flags      Int      @default(0)
+  adminRoles String[] @map("admin_roles")
+  staffRoles String[] @map("staff_roles")
+
+  // TODO: these are in the database as (string | {id: string, expires:number})[]
+  // blockedUsers String[] @map("blocked_users")
+
+  // legacy -- will show a notice saying to use slash commands if someone tries
+  // to use a text command/prefix
+  prefix String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  SuggestionFeed SuggestionFeed[]
+
+  @@map("guild_configs")
+}
+
+// TODO: this is missing a lot of stuff
+
+model SuggestionFeed {
+  id         Int    @id @default(autoincrement())
+  guildID    String @map("guild_id")
+
+  name             String  @default("Server Suggestions")
+  description      String?
+  // TODO: make this unique if not null
+  commandAliasName String? @map("command_alias_name")
+  isDefault        Boolean @default(false) @map("is_default")
+
+  feedChannelID    String  @map("feed_channel_id")
+  reviewChannelID  String? @map("review_channel_id")
+  logChannelID     String? @map("log_channel_id")
+  deniedChannelID  String? @map("denied_channel_id")
+  archiveChannelID String? @map("archive_channel_id")
+
+  mode SuggestionFeedMode @default(AUTOAPPROVE)
+
+  // roles allowed to vote
+  votingRoles  String[] @map("voting_roles")
+  // roles allowed to submit stuff to this feed
+  allowedRoles String[] @map("allowed_roles")
+  // roles not allowed to submit stuff to this feed
+  blockedRoles String[] @map("blocked_roles")
+
+  // TODO: what do these do?
+  pingRole     String? @map("ping_role")
+  feedPingRole String? @map("feed_ping_role")
+
+  // role given when user has suggestion approved
+  approvedRole    String? @map("approved_role")
+  // role given when user has suggestion implemented
+  implementedRole String? @map("implemented_role")
+
+  upvoteEmoji   String? @map("upvote_emoji")
+  midEmoji      String? @map("mid_emoji")
+  downvoteEmoji String? @map("downvote_emoji")
+
+  logWebhookID    String? @map("log_webhook_id")
+  logWebhookToken String? @map("log_webhook_token")
+
+  // how often users can submit
+  submitCooldown        Int?    @map("submit_cooldown")
+  suggestionCap         Int?    @map("suggestion_cap")
+  showCommentTimestamps Boolean @default(true) @map("show_comment_timestamps")
+
+  // reaction options
+  allowSelfVote        Boolean @default(true) @map("allow_self_vote")
+  colorChangeEnabled   Boolean @default(true) @map("color_change_enabled")
+  colorChangeThreshold Int     @default(15) @map("color_change_threshold")
+  colorChangeColor     Int     @default(16766720) @map("color_change_color") // #FFD700
+
+  // TODO: setup notification tables
+  notifyAuthor  Boolean @default(true) @map("notify_author")
+  autoSubscribe Boolean @default(true) @map("auto_subscribe") // notify voters
+
+  // REQUIRES GATEWAY
+  implicitSuggest Boolean @default(true) @map("implicit_suggest")
+
+  onlyAnonymous Boolean @default(false) @map("only_anonymous")
+
+  lastSuggestionID Int @default(0) @map("last_suggestion_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  guildConfig GuildConfig @relation(fields: [guildID], references: [guildID], onDelete: Cascade)
+
+  suggestions Suggestion[]
+
+  @@unique([guildID, feedChannelID])
+  @@map("suggestion_feeds")
+}
+
+model Suggestion {
+  id       Int  @id @default(autoincrement())
+  // this field is automatically set by a trigger in the datebase
+  publicID Int  @default(dbgenerated()) @map("public_id")
+  // old ID pre-migration
+  legacyID Int? @map("legacy_id")
+
+  // TODO: should this map to feed unique id instead of all of these?
+  guildID       String @map("guild_id")
+  feedChannelID String @map("feed_channel_id")
+  authorID      String @map("author_id")
+
+  // this field is automatically set by a trigger in the datebase (see bottom of file)
+  // however, prisma will complain if we don't provide a value for it, so setting default to 0 works
+  // suggestionID  Int     @default(0) @map("suggestion_id")
+  feedMessageID String? @map("feed_message_id")
+
+  body           String
+  approvalStatus SuggestionApprovalStatus @map("approval_status")
+  displayStatus  SuggestionDisplayStatus  @default(DEFAULT) @map("display_status")
+
+  denialReason String? @map("denial_reason")
+
+  attachmentURL      String? @map("attachment_url")
+  trelloAttachmentID String? @map("trello_attachment_id")
+
+  trelloCard String? @map("trello_card")
+
+  // TODO: review msg
+  pendingEditBody      String?   @map("pending_edit_body")
+  pendingEditCreatedAt DateTime? @default(now()) @map("pending_edit_created_at")
+
+  lastEditedBy String? @map("last_modified_by")
+  isAnonymous  Boolean @default(false) @map("is_anonymous")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  feed          SuggestionFeed           @relation(fields: [feedChannelID, guildID], references: [feedChannelID, guildID], onDelete: Cascade)
+  comments      SuggestionComment[]
+  votes         SuggestionVote[]
+  subscriptions SuggestionSubscription[]
+
+  @@unique([feedChannelID, publicID])
+  @@map("suggestions")
+}
+
+model SuggestionComment {
+  id           Int    @id @default(autoincrement())
+  suggestionID Int    @map("suggestion_id")
+  authorID     String @map("author_id")
+  // TODO: figure out how to generate this
+  commentID    Int    @map("comment_id")
+
+  body          String
+  trelloComment String? @map("trello_comment")
+  isAnonymous   Boolean @default(false) @map("is_anonymous")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
+
+  @@map("suggestion_comments")
+}
+
+model SuggestionVote {
+  id           Int    @id @default(autoincrement())
+  suggestionID Int    @map("suggestion_id")
+  userID       String @map("user_id")
+
+  kind SuggestionVoteKind
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
+
+  @@map("suggestion_votes")
+}
+
+model SuggestionSubscription {
+  id           Int    @id @default(autoincrement())
+  suggestionID Int    @map("suggestion_id")
+  userID       String @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionID, userID])
+  @@map("suggestion_subscriptions")
+}
+
+model GlobalUser {
+  id     Int    @id @default(autoincrement())
+  userID String @map("user_id")
+
+  // TODO: en-US the correct name?
+  locale        String   @default("en-US")
+  flags         Int      @default(0)
+  showProtips   Boolean  @default(true) @map("show_protips")
+  protipsViewed String[] @map("protips_viewed")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("global_users")
+}
+
+model GlobalBlock {
+  id        Int     @id @default(autoincrement())
+  entityID  String  @map("entity_id")
+  blockedBy String? @map("blocked_by")
+
+  kind   GlobalBlockKind
+  reason String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([entityID, kind])
+  @@map("global_blocks")
+}
+
+enum SuggestionFeedMode {
+  AUTOAPPROVE
+  REVIEW
+
+  @@map("suggestion_feed_mode")
+}
+
+enum SuggestionApprovalStatus {
+  APPROVED
+  IN_QUEUE
+  DENIED
+
+  @@map("suggestion_approval_status")
+}
+
+enum SuggestionDisplayStatus {
+  DEFAULT
+  IMPLEMENTED
+  CONSIDERING
+  IN_PROGRESS
+  NOT_HAPPENING
+
+  @@map("suggestion_display_status")
+}
+
+enum SuggestionVoteKind {
+  UPVOTE
+  MID
+  DOWNVOTE
+
+  @@map("suggestion_vote_kind")
+}
+
+enum GlobalBlockKind {
+  USER
+  GUILD
+
+  @@map("global_block_kind")
+}

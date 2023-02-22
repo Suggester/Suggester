@@ -1,0 +1,26 @@
+{
+  "name": "@suggester/commands",
+  "main": "src/index.js",
+  "dependencies": {
+    "@suggester/configs": "workspace:*",
+    "@suggester/database": "workspace:*",
+    "@suggester/framework": "workspace:*",
+    "@suggester/i18n": "workspace:*",
+    "@suggester/util": "workspace:*",
+    "discord-api-types": "^0.37.33",
+    "fastify": "^4.13.0",
+    "undici": "^5.19.1",
+    "zod": "^3.20.6"
+  },
+  "devDependencies": {
+    "@suggester/types": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "eslint": "^7",
+    "prettier": "^2.8.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "fmt": "prettier --write --ignore-path=.eslintignore ."
+  }
+}

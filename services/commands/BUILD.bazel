@@ -1,0 +1,43 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project", "ts_config")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+ts_config(
+  name = "tsconfig",
+  src = "tsconfig.json",
+  deps = [":node_modules/@suggester/configs"],
+)
+
+ts_project(
+  name = "commands-ts",
+  srcs = glob(["src/**/*.ts"]),
+  tsconfig = ":tsconfig",
+  source_map = True,
+  declaration = True,
+  out_dir = "build",
+  deps = [
+    "//:node_modules/@types/node",
+    ":node_modules/@suggester/database",
+    ":node_modules/@suggester/framework",
+    ":node_modules/@suggester/i18n",
+    ":node_modules/@suggester/util",
+    ":node_modules/@suggester/types",
+    ":node_modules/discord-api-types",
+    ":node_modules/fastify",
+    ":node_modules/undici",
+    ":node_modules/zod",
+  ],
+  assets = ["//:lang-files"],
+)
+
+js_binary(
+  name = "commands",
+  data = [
+    ":commands-ts",
+    "package.json",
+    "//:config",
+  ],
+  entry_point = "build/src/index.js"
+)

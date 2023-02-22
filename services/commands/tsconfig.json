@@ -1,0 +1,11 @@
+{
+  "extends": "./node_modules/@suggester/configs/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["@suggester/types"]
+  },
+  "include": ["src/**/*.ts"]
+}

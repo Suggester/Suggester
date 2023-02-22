@@ -1,0 +1,9 @@
+{
+  "name": "@suggester/types",
+  "main": "./index.js",
+  "types": "./lib",
+  "private": true,
+  "dependencies": {
+    "@suggester/configs": "workspace:*"
+  }
+}

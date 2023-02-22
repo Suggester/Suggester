@@ -1,0 +1,10 @@
+{
+  "extends": "./node_modules/@suggester/configs/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["lib/**/*.ts"]
+}

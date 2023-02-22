@@ -1,0 +1,14 @@
+{
+  "name": "@suggester/database",
+  "main": "build/index.js",
+  "dependencies": {
+    "@prisma/client": "^4.10.1",
+    "@suggester/configs": "workspace:*"
+  },
+  "devDependencies": {
+    "prisma": "^4.10.1"
+  },
+  "scripts": {
+    "build": "prisma generate && tsc"
+  }
+}

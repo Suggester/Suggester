@@ -1,0 +1,12 @@
+{
+  "name": "@suggester/configs",
+  "files": [
+    ".prettierrc.js",
+    ".eslintrc.js",
+    "tsconfig.json"
+  ],
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "gts": "^3.1.1"
+  }
+}

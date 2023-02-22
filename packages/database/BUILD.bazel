@@ -1,0 +1,50 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project", "ts_config")
+load("@npm//:prisma/package_json.bzl", prisma_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+prisma_bin.prisma(
+  name = "prisma-generate",
+  args = ["generate"],
+  out_dirs = ["prisma-out"],
+  chdir = package_name(),
+  srcs = [
+    "//packages/database/prisma:schema",
+    ":node_modules/@prisma/client",
+  ]
+)
+
+ts_config(
+  name = "tsconfig",
+  src = "tsconfig.json",
+  deps = [":node_modules/@suggester/configs"],
+)
+
+ts_project(
+  name = "database-ts",
+  srcs = [":prisma-generate"] + glob(["lib/**/*"]),
+  tsconfig = ":tsconfig",
+  source_map = True,
+  declaration = True,
+  out_dir = "build",
+  root_dir = "lib",
+  deps = [
+    "//:node_modules/@types/node",
+    ":node_modules/@prisma/client",
+  ],
+  assets = [
+    ":prisma-generate",
+  ],
+)
+
+npm_package(
+  name = "database",
+  srcs = [
+    "package.json",
+    ":database-ts",
+  ],
+  package = "@suggester/database",
+  visibility = ["//visibility:public"],
+)

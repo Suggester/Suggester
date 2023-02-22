@@ -1,0 +1,11 @@
+node_modules
+
+services/commands/node_modules
+
+packages/amqp/node_modules
+packages/configs/node_modules
+packages/database/node_modules
+packages/framework/node_modules
+packages/i18n/node_modules
+packages/types/node_modules
+packages/util/node_modules

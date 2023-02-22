@@ -1,0 +1,5 @@
+/.bazelrc
+/bazel-*
+/lang
+/node_modules
+config.toml
