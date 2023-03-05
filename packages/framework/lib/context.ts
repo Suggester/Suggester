@@ -40,7 +40,11 @@ import {FastifyReply, FastifyRequest} from 'fastify';
 
 import {Database} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
-import {DeepReadonly, HttpStatusCode} from '@suggester/util';
+import {
+  DeepReadonly,
+  HttpStatusCode,
+  KebabCaseToCamelCase,
+} from '@suggester/util';
 
 import {Framework} from '.';
 
@@ -337,6 +341,50 @@ export class Context<
     }
   }
 
+  getFlatOptions<
+    Opts extends OptionsToMapByName<Options>,
+    Typ extends {
+      [Name in keyof Opts as KebabCaseToCamelCase<
+        Name extends string ? Name : never
+      >]: Opts[Name]['required'] extends true
+        ? ApplicationCommandOptionTypeMap[Opts[Name]['type']]
+        : ApplicationCommandOptionTypeMap[Opts[Name]['type']] | undefined;
+    }
+  >(): Typ {
+    if (
+      (this.interaction.type !== InteractionType.ApplicationCommand &&
+        this.interaction.type !==
+          InteractionType.ApplicationCommandAutocomplete) ||
+      this.interaction.data.type !== ApplicationCommandType.ChatInput
+    ) {
+      throw new Error('Interaction is not ApplicationCommand');
+    }
+
+    const ops = this.getOptions();
+    const flatOpts = {} as Typ;
+
+    if (!ops) {
+      return flatOpts;
+    }
+
+    const kebabToCamel = <T extends string>(s: T): KebabCaseToCamelCase<T> => {
+      const camel = s.replace(/-(\w)/g, w => w[1].toUpperCase());
+
+      return (
+        camel.endsWith('Id') ? camel.slice(0, -2) + 'ID' : camel
+      ) as KebabCaseToCamelCase<T>;
+    };
+
+    return ops.reduce((a, c) => {
+      if ('value' in c) {
+        // @ts-expect-error reduce isn't typed strictly enough
+        a[kebabToCamel(c.name)] = c.value;
+      }
+
+      return a;
+    }, flatOpts);
+  }
+
   getOption<
     Opts extends FlattenOptions<Options>,
     Name extends Opts[number]['name'],
@@ -374,6 +422,20 @@ type OptionTypeMap = {
   11: APIApplicationCommandInteractionDataAttachmentOption;
 };
 
+type ApplicationCommandOptionTypeMap = {
+  [ApplicationCommandOptionType.Subcommand]: never;
+  [ApplicationCommandOptionType.SubcommandGroup]: never;
+  [ApplicationCommandOptionType.String]: string;
+  [ApplicationCommandOptionType.Integer]: number;
+  [ApplicationCommandOptionType.Boolean]: boolean;
+  [ApplicationCommandOptionType.User]: string;
+  [ApplicationCommandOptionType.Channel]: string;
+  [ApplicationCommandOptionType.Role]: string;
+  [ApplicationCommandOptionType.Mentionable]: string;
+  [ApplicationCommandOptionType.Number]: string;
+  [ApplicationCommandOptionType.Attachment]: string;
+};
+
 export type FlattenOptions<
   Options extends DeepReadonly<APIApplicationCommandOption[]>
 > = Options[number] extends DeepReadonly<
@@ -391,6 +453,12 @@ export type FlattenOptions<
     >
   ? Options[number]['options']
   : Options;
+
+type OptionsToMapByName<
+  Options extends DeepReadonly<APIApplicationCommandOption[]>
+> = {
+  [Name in Options[number]['name']]: Extract<Options[number], {name: Name}>;
+};
 
 // FIXME: can this be made better?
 type MapCommandOptionsToResponseOptions<

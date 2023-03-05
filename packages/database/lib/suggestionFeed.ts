@@ -78,4 +78,11 @@ export class SuggestionFeedStore {
       },
     });
   }
+
+  async update(id: number, data: Partial<PartialSuggestionFeed>) {
+    return this.prisma.suggestionFeed.update({
+      where: {id},
+      data,
+    });
+  }
 }

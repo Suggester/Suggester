@@ -111,7 +111,7 @@ export class FeedsGetCommand extends SubCommand {
   async button(ctx: Context<APIMessageComponentInteraction>): Promise<void> {
     const l = ctx.getLocalizer();
 
-    const [, selected, _id] = ctx.interaction.data.custom_id.split(':');
+    const [, selected, _id, opts] = ctx.interaction.data.custom_id.split(':');
     const id = parseInt(_id);
 
     const clearButtonsAndError = async (err: string) => {
@@ -151,9 +151,25 @@ export class FeedsGetCommand extends SubCommand {
 
     const embed = PAGES_MAP[selected](feed).localize(l, l.getGuildLocale());
 
+    // 'e' option makes the message ephemeral
+    const flags =
+      (+opts?.includes('e') << 6) | (ctx.interaction.message.flags || 0);
+
+    // 's' option sends a new message instead of updating the prev one
+    if (opts?.includes('s')) {
+      await ctx.send({
+        embeds: [embed],
+        components: pageButtons(l, selected, id),
+        flags,
+      });
+
+      return;
+    }
+
     await ctx.update({
       embeds: [embed],
       components: pageButtons(l, selected, id),
+      flags,
     });
   }
 }

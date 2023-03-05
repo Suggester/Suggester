@@ -2,14 +2,28 @@ import {
   APIApplicationCommandAutocompleteInteraction,
   APIChatInputApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  ButtonStyle,
   ChannelType,
+  ComponentType,
   MessageFlags,
 } from 'discord-api-types/v10';
 
+import {SuggestionFeed} from '@suggester/database';
+import {PartialSuggestionFeed} from '@suggester/database/build/suggestionFeed';
 import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
 
 import {feedNameAutocomplete} from '../../../../util/commandComponents';
+
+const parseEmoji = (s?: string): string | undefined => {
+  if (!s) {
+    return;
+  }
+
+  const RE = /<a?:\w{2,32}:(\d{16,20})>|(\p{Extended_Pictographic})/gu;
+
+  return RE.exec(s.trim())?.[1];
+};
 
 const options = [
   feedNameAutocomplete,
@@ -32,12 +46,12 @@ const options = [
     description: 'Make this feed the default feed',
     type: ApplicationCommandOptionType.Boolean,
   },
-  {
-    name: 'implicit-suggest',
-    description:
-      'Automatically treat messages posted in the feed channel as if they had been `/suggest`ed',
-    type: ApplicationCommandOptionType.Boolean,
-  },
+  // {
+  //   name: 'implicit-suggest',
+  //   description:
+  //     'Automatically treat messages posted in the feed channel as if they had been `/suggest`ed',
+  //   type: ApplicationCommandOptionType.Boolean,
+  // },
 
   // channels
   {
@@ -124,11 +138,9 @@ export class FeedsEditSetCommand extends SubCommand {
       return;
     }
 
-    const opts = ctx.getOptions();
+    const opts = ctx.getFlatOptions();
 
-    console.log(opts);
-
-    if (!opts.length) {
+    if (Object.keys(opts) === ['name']) {
       const m = l.user('feeds-edit-set-no-options-provided');
       await ctx.send({
         content: m,
@@ -137,8 +149,80 @@ export class FeedsEditSetCommand extends SubCommand {
       return;
     }
 
+    type OptionKeys = Exclude<keyof typeof opts, 'name'>;
+    const mappedOpts: Partial<PartialSuggestionFeed> = Object.entries(
+      opts
+    ).reduce((a, [key, value]) => {
+      const MAP: {
+        [key in OptionKeys]: keyof SuggestionFeed;
+      } = {
+        mode: 'mode',
+        default: 'isDefault',
+        reviewChannel: 'reviewChannelID',
+        logChannel: 'logChannelID',
+        deniedChannel: 'deniedChannelID',
+        implementedChannel: 'implementedChannelID',
+        upvoteEmoji: 'upvoteEmoji',
+        midEmoji: 'midEmoji',
+        downvoteEmoji: 'downvoteEmoji',
+      };
+
+      const newKey = MAP[key as OptionKeys];
+      if (!newKey) {
+        return a;
+      }
+
+      // @ts-expect-error this whole function is a type mess
+      a[newKey] = value;
+
+      return a;
+    }, {} as Partial<PartialSuggestionFeed>);
+
+    for (const emoji of ['upvoteEmoji', 'midEmoji', 'downvoteEmoji'] as const) {
+      if (!(emoji in mappedOpts)) {
+        continue;
+      }
+
+      const parsed = parseEmoji(mappedOpts[emoji]);
+
+      if (!parsed) {
+        const m = l.user('feeds-edit-set-invalid-emoji', {
+          opt: {
+            upvoteEmoji: 'upvote-emoji',
+            midEmoji: 'mid-emoji',
+            downvoteEmoji: 'downvote-emoji',
+          }[emoji]!,
+        });
+
+        await ctx.send({
+          content: m,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      mappedOpts[emoji] = parsed;
+    }
+
+    await ctx.db.suggestionFeeds.update(feed.id, mappedOpts);
+
+    const m = l.guild('feeds-edit-set-success');
     await ctx.send({
-      content: '```json\n' + JSON.stringify(opts, null, 2) + '```',
+      content: m,
+      components: [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: 'View Config',
+              custom_id: `feeds-get:overview:${feed.id}:es`,
+            },
+          ],
+        },
+      ],
     });
   }
 

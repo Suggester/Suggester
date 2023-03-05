@@ -52,3 +52,23 @@ export interface GitHubReleaseData {
   zipball_url: string;
   body: string;
 }
+
+export type DelimCaseToCamelCase<
+  S extends string,
+  Delim extends string
+> = S extends `${infer Fst}${Delim}${infer SndFstLetter}${infer Snd}`
+  ? `${Fst}${Uppercase<SndFstLetter>}${DelimCaseToCamelCase<Snd, Delim>}`
+  : UppercaseID<S>;
+
+// I'm picky and like ID more than Id
+export type UppercaseID<S extends string> = S extends `${infer Fst}Id`
+  ? `${Fst}ID`
+  : S;
+
+export type KebabCaseToCamelCase<S extends string> = UppercaseID<
+  DelimCaseToCamelCase<S, '-'>
+>;
+
+export type SnakeCaseToCamelCase<S extends string> = UppercaseID<
+  DelimCaseToCamelCase<S, '_'>
+>;
