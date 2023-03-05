@@ -25,10 +25,23 @@ const parseEmoji = (s?: string): string | undefined => {
   return RE.exec(s.trim())?.[1];
 };
 
+const parseHex = (s: string): number | undefined => {
+  const RE = /^#?([a-fA-F0-9]{6})$/;
+
+  const hex = RE.exec(s.trim())?.[1];
+
+  if (!hex) {
+    return;
+  }
+
+  return parseInt(hex, 16);
+};
+
 const options = [
   feedNameAutocomplete,
 
-  // TODO: add the rest of the options
+  // TODO: cooldown
+  // TODO: trello/3p
 
   {
     name: 'mode',
@@ -102,13 +115,100 @@ const options = [
     min_length: 1,
     max_length: 50, // TODO: what's the max length for an emoji?
   },
+
+  // roles
+  {
+    name: 'approved-reward-role',
+    description:
+      'A role to be given to a user when their suggestion is approved',
+    type: ApplicationCommandOptionType.Role,
+  },
+  {
+    name: 'implemented-reward-role',
+    description:
+      'A role to be given to a user when their suggestion is marked as implemented',
+    type: ApplicationCommandOptionType.Role,
+  },
+  {
+    name: 'review-ping-role',
+    description:
+      'A role to be pinged when a new suggestion is added to the review queue',
+    type: ApplicationCommandOptionType.Role,
+  },
+  {
+    name: 'new-suggestion-ping-role',
+    description:
+      'A role to be given to a user when their suggestion is marked as implemented',
+    type: ApplicationCommandOptionType.Role,
+  },
+
+  // color change
+  {
+    name: 'enable-color-change',
+    description:
+      'Change the color of a suggestion when it reaches a certain number of upvotes',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+  {
+    name: 'color-change-threshold',
+    description:
+      'The number of upvotes required to change the color of a suggestion',
+    type: ApplicationCommandOptionType.Integer,
+    min_value: 1,
+  },
+  {
+    name: 'color-change-color',
+    description: 'What color (hex code) to change suggestions to',
+    type: ApplicationCommandOptionType.String,
+    min_length: 6,
+    max_length: 7,
+  },
+
+  // notifications
+  {
+    name: 'auto-follow-on-interact',
+    description:
+      'Should members automatically follow suggestions they interact with?',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+  {
+    name: 'auto-follow-own-suggestions',
+    description:
+      'Should members automatically subscribe to notifications for their own suggestions?',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+
+  // votes/voting
+  {
+    name: 'allow-voting-on-own-suggestion',
+    description: 'Should members be able to vote on their own suggestion?',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+  {
+    name: 'show-vote-count',
+    description: 'Should the vote count be shown on the suggestion post?',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+
+  // other
+  {
+    name: 'allow-anonymous-suggestions',
+    description:
+      'Should members be able to submit suggestions anonymously (moderators can still see the author)?',
+    type: ApplicationCommandOptionType.Boolean,
+  },
+  {
+    name: 'suggestion-feed-cap',
+    description:
+      'The maximum number of approved suggestions there can be at any given time',
+    type: ApplicationCommandOptionType.Integer,
+    min_value: 1,
+  },
 ] as const;
 
 export class FeedsEditSetCommand extends SubCommand {
   name: MessageNames = 'cmd-feeds-edit-set.name';
   description: MessageNames = 'cmd-feeds-edit-set.desc';
-
-  buttonIDs = ['hi'];
 
   options = options;
 
@@ -165,6 +265,23 @@ export class FeedsEditSetCommand extends SubCommand {
         upvoteEmoji: 'upvoteEmoji',
         midEmoji: 'midEmoji',
         downvoteEmoji: 'downvoteEmoji',
+
+        approvedRewardRole: 'approvedRole',
+        implementedRewardRole: 'implementedRole',
+        reviewPingRole: 'reviewPingRole',
+        newSuggestionPingRole: 'feedPingRole',
+
+        enableColorChange: 'colorChangeEnabled',
+        colorChangeThreshold: 'colorChangeThreshold',
+        colorChangeColor: 'colorChangeColor',
+
+        autoFollowOnInteract: 'autoSubscribe',
+        autoFollowOwnSuggestions: 'notifyAuthor',
+
+        allowVotingOnOwnSuggestion: 'allowSelfVote',
+        showVoteCount: 'showVoteCount',
+        suggestionFeedCap: 'suggestionCap',
+        allowAnonymousSuggestions: 'allowAnonymous',
       };
 
       const newKey = MAP[key as OptionKeys];
@@ -203,6 +320,24 @@ export class FeedsEditSetCommand extends SubCommand {
       }
 
       mappedOpts[emoji] = parsed;
+    }
+
+    if ('colorChangeColor' in mappedOpts) {
+      const colorOpt = opts.colorChangeColor!;
+      const parsedColor = parseHex(colorOpt);
+
+      if (parsedColor === undefined) {
+        const m = l.user('feeds-edit-set-invalid-color');
+
+        await ctx.send({
+          content: m,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      mappedOpts.colorChangeColor = parsedColor;
     }
 
     await ctx.db.suggestionFeeds.update(feed.id, mappedOpts);

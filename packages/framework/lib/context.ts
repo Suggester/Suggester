@@ -432,7 +432,7 @@ type ApplicationCommandOptionTypeMap = {
   [ApplicationCommandOptionType.Channel]: string;
   [ApplicationCommandOptionType.Role]: string;
   [ApplicationCommandOptionType.Mentionable]: string;
-  [ApplicationCommandOptionType.Number]: string;
+  [ApplicationCommandOptionType.Number]: number;
   [ApplicationCommandOptionType.Attachment]: string;
 };
 
