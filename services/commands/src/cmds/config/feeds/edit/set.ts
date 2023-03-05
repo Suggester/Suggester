@@ -128,6 +128,15 @@ export class FeedsEditSetCommand extends SubCommand {
 
     console.log(opts);
 
+    if (!opts.length) {
+      const m = l.user('feeds-edit-set-no-options-provided');
+      await ctx.send({
+        content: m,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     await ctx.send({
       content: '```json\n' + JSON.stringify(opts, null, 2) + '```',
     });
