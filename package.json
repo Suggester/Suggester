@@ -8,6 +8,8 @@
     "typescript": "4.7.4"
   },
   "scripts": {
-    "dev:commands": "ibazel run //services/commands"
+    "dev:commands": "ibazel run //services/commands",
+    "build:db": "pnpm --filter '@suggester/database' run build",
+    "build:lang": "pnpm --filter '@suggester/i18n' run build"
   }
 }

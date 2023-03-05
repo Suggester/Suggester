@@ -4,11 +4,11 @@ import {
 } from 'discord-api-types/v10';
 
 import {Command, Context} from '@suggester/framework';
-import {Messages} from '@suggester/i18n';
+import {MessageNames} from '@suggester/i18n';
 
 export class InviteCommand extends Command {
-  name: keyof Messages = 'command-name--invite';
-  description: keyof Messages = 'command-desc--invite';
+  name: MessageNames = 'cmd-invite.name';
+  description: MessageNames = 'cmd-invite.desc';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
     const localizer = ctx.getLocalizer();

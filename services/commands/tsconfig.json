@@ -7,5 +7,5 @@
     "skipLibCheck": true,
     "types": ["@suggester/types"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "scripts/*.ts"]
 }

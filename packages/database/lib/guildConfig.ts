@@ -45,4 +45,32 @@ export class GuildConfigStore {
       }
     }).then(r => r?.locale);
   }
+
+  /** Creates a config if one does not exist, and returns it */
+  async getOrCreate(guildID: string) {
+    // prisma doesn't have a `findOrCreate` method, but
+    // upsert with an empty update behaves the same (mostly)
+
+    // TODO: does this bump updatedAt
+    return this.prisma.guildConfig.upsert({
+      where: {guildID},
+      update: {},
+      create: {guildID},
+    });
+  }
+
+  /** Creates a config if one does not exist, but doesn't return it */
+  async ensureExists(guildID: string) {
+    // prisma doesn't have a `findOrCreate` method, but
+    // upsert with an empty update behaves the same (mostly)
+
+    // TODO: does this bump updatedAt
+    await this.prisma.guildConfig.upsert({
+      where: {guildID},
+      update: {},
+      create: {guildID},
+      // prisma doesn't let you return nothing
+      select: {id: true},
+    });
+  }
 }

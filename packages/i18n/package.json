@@ -13,7 +13,7 @@
     "@suggester/database": "workspace:*"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "fluent-types ../../lang/en-US/translations.ftl -o ./lib/fluentMessages.ts && tsc",
     "lint": "eslint .",
     "fmt": "prettier --write --ignore-path=.eslintignore ."
   }

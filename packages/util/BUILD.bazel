@@ -22,6 +22,7 @@ ts_project(
     ":node_modules/zod",
     ":node_modules/@ltd/j-toml",
     ":node_modules/discord-api-types",
+    ":node_modules/@suggester/database",
     ":node_modules/@suggester/i18n",
   ]
 )

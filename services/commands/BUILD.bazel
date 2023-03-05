@@ -12,7 +12,7 @@ ts_config(
 
 ts_project(
   name = "commands-ts",
-  srcs = glob(["src/**/*.ts"]),
+  srcs = glob(["src/**/*.ts", "scripts/**/*.ts"]),
   tsconfig = ":tsconfig",
   source_map = True,
   declaration = True,
@@ -40,4 +40,14 @@ js_binary(
     "//:config",
   ],
   entry_point = "build/src/index.js"
+)
+
+js_binary(
+  name = "create-cmds",
+  data = [
+    ":commands-ts",
+    "package.json",
+    "//:config",
+  ],
+  entry_point = "build/scripts/createCommands.js"
 )

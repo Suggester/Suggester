@@ -18,6 +18,7 @@ import {
   APIApplicationCommandSubcommandOption,
   APICommandAutocompleteInteractionResponseCallbackData,
   APIInteraction,
+  APIInteractionResponse,
   APIInteractionResponseCallbackData,
   APIMessageComponentInteraction,
   APIModalInteractionResponseCallbackData,
@@ -27,25 +28,27 @@ import {
   ComponentType,
   InteractionResponseType,
   InteractionType,
+  MessageFlags,
   ModalSubmitComponent,
   RESTPatchAPIWebhookWithTokenMessageJSONBody,
   RESTPatchAPIWebhookWithTokenMessageResult,
   RESTPostAPIWebhookWithTokenJSONBody,
   RESTPostAPIWebhookWithTokenWaitResult,
-  RouteBases,
   Routes,
 } from 'discord-api-types/v10';
-import {fetch} from 'undici';
+import {FastifyReply, FastifyRequest} from 'fastify';
 
 import {Database} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
-import {DeepReadonly} from '@suggester/util';
+import {DeepReadonly, HttpStatusCode} from '@suggester/util';
 
 import {Framework} from '.';
 
 export interface ContextConfig<T extends APIInteraction> {
   interaction: T;
   framework: Framework;
+  req: FastifyRequest;
+  reply: FastifyReply;
 }
 
 export class Context<
@@ -59,6 +62,9 @@ export class Context<
   readonly interaction: T;
   readonly framework: Framework;
 
+  readonly fastifyReq: FastifyRequest;
+  readonly fastifyReply: FastifyReply;
+
   #sentInitial = false;
 
   constructor(cfg: ContextConfig<T>) {
@@ -66,6 +72,8 @@ export class Context<
     this.locales = cfg.framework.locales;
     this.interaction = cfg.interaction;
     this.framework = cfg.framework;
+    this.fastifyReq = cfg.req;
+    this.fastifyReply = cfg.reply;
   }
 
   getLocalizer(): Localizer {
@@ -74,43 +82,56 @@ export class Context<
 
   // Intraction methods
 
-  async send(
-    payload: APIInteractionResponseCallbackData,
-    type: InteractionResponseType = InteractionResponseType.ChannelMessageWithSource
-  ): Promise<RESTPostAPIWebhookWithTokenWaitResult | undefined> {
-    const url =
-      RouteBases.api +
-      (this.#sentInitial
-        ? Routes.webhook(
-            this.interaction.application_id,
-            this.interaction.token
-          )
-        : Routes.interactionCallback(
-            this.interaction.id,
-            this.interaction.token
-          ));
+  async respond(payload: APIInteractionResponse): Promise<void> {
+    if (this.#sentInitial) {
+      throw new Error('Already Responded');
+    }
 
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(
-          this.#sentInitial
-            ? payload
-            : {
-                type: type,
-                data: payload,
-              }
-        ),
-        headers: {
-          'content-type': 'application/json',
-        },
+    // useful for debugging interactions failing
+    // but slower (don't use in prod)
+    if (process.env.CMDS_RESPOND_WITH_REST) {
+      const url = Routes.interactionCallback(
+        this.interaction.id,
+        this.interaction.token
+      );
+
+      await this.framework.rest.post(url, {
+        body: payload,
       });
 
-      if (this.#sentInitial) {
-        return res.json() as Promise<RESTPostAPIWebhookWithTokenWaitResult>;
-      }
-    } catch (err) {
-      console.error('Failed to respond to interaction:', err);
+      this.#sentInitial = true;
+      return;
+    }
+
+    if (!this.fastifyReply.sent) {
+      await this.fastifyReply.code(HttpStatusCode.OK).send(payload);
+
+      this.#sentInitial = true;
+      return;
+    }
+
+    throw new Error('Fastify request has already been responded to');
+  }
+
+  async send(
+    payload: APIInteractionResponseCallbackData
+  ): Promise<RESTPostAPIWebhookWithTokenWaitResult | undefined> {
+    if (!this.#sentInitial) {
+      await this.respond({
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: payload,
+      });
+      return;
+    }
+
+    const url = Routes.webhook(
+      this.interaction.application_id,
+      this.interaction.token
+    );
+
+    const res = await this.framework.rest.post(url, {body: payload});
+    if (this.#sentInitial) {
+      return res as RESTPostAPIWebhookWithTokenWaitResult;
     }
 
     this.#sentInitial = true;
@@ -118,96 +139,80 @@ export class Context<
     return;
   }
 
-  // TODO: the next two methods are basically identical. can they be combined?
+  async update(payload: APIInteractionResponseCallbackData) {
+    return this.respond({
+      type: InteractionResponseType.UpdateMessage,
+      data: payload,
+    });
+  }
 
-  // TODO: combine this with send?
-  async sendModal(payload: APIModalInteractionResponseCallbackData) {
-    const url =
-      RouteBases.api +
-      Routes.interactionCallback(this.interaction.id, this.interaction.token);
+  async defer(ephemeral = false): Promise<void> {
+    if (this.isMessageComponent()) {
+      return this.respond({
+        type: InteractionResponseType.DeferredMessageUpdate,
+      });
+    }
 
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: InteractionResponseType.Modal,
-        data: payload,
-      }),
-      headers: {
-        'content-type': 'application/json',
+    return this.respond({
+      type: InteractionResponseType.DeferredChannelMessageWithSource,
+      data: {
+        flags: ephemeral ? MessageFlags.Ephemeral : 0,
       },
+    });
+  }
+
+  async sendModal(payload: APIModalInteractionResponseCallbackData) {
+    return this.respond({
+      type: InteractionResponseType.Modal,
+      data: payload,
     });
   }
 
   async sendAutocomplete(
     payload: APICommandAutocompleteInteractionResponseCallbackData
   ) {
-    const url =
-      RouteBases.api +
-      Routes.interactionCallback(this.interaction.id, this.interaction.token);
-
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: InteractionResponseType.ApplicationCommandAutocompleteResult,
-        data: payload,
-      }),
-      headers: {
-        'content-type': 'application/json',
-      },
+    return this.respond({
+      type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+      data: payload,
     });
   }
 
   async followup(
     body: RESTPostAPIWebhookWithTokenJSONBody
   ): Promise<RESTPostAPIWebhookWithTokenWaitResult> {
-    const url =
-      RouteBases.api +
-      Routes.webhook(this.interaction.application_id, this.interaction.token);
+    const url = Routes.webhook(
+      this.interaction.application_id,
+      this.interaction.token
+    );
 
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'content-type': 'application/json',
-      },
-    }).then(r => r.json()) as Promise<RESTPostAPIWebhookWithTokenWaitResult>;
+    return this.framework.rest.post(url, {
+      body,
+    }) as Promise<RESTPostAPIWebhookWithTokenWaitResult>;
   }
 
   async edit(
     msgId: string,
-    payload: RESTPatchAPIWebhookWithTokenMessageJSONBody
+    body: RESTPatchAPIWebhookWithTokenMessageJSONBody
   ): Promise<RESTPatchAPIWebhookWithTokenMessageResult> {
-    const url =
-      RouteBases.api +
-      Routes.webhookMessage(
-        this.interaction.application_id,
-        this.interaction.token,
-        msgId
-      );
+    const url = Routes.webhookMessage(
+      this.interaction.application_id,
+      this.interaction.token,
+      msgId
+    );
 
-    return (await fetch(url, {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
-      headers: {
-        'content-type': 'application/json',
-      },
-    }).then(r =>
-      r.json()
-    )) as Promise<RESTPatchAPIWebhookWithTokenMessageResult>;
+    return this.framework.rest.patch(url, {
+      body,
+    }) as Promise<RESTPatchAPIWebhookWithTokenMessageResult>;
   }
 
   async delete(msgId: string) {
-    const url =
-      RouteBases.api +
-      Routes.webhookMessage(
-        this.interaction.application_id,
-        this.interaction.token,
-        msgId
-      );
+    const url = Routes.webhookMessage(
+      this.interaction.application_id,
+      this.interaction.token,
+      msgId
+    );
 
-    await fetch(url, {
-      method: 'DELETE',
-    });
+    await this.framework.rest.delete(url);
   }
 
   // type checking

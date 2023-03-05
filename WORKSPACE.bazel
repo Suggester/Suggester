@@ -39,31 +39,12 @@ rules_ts_dependencies(
     ts_version_from = "//:package.json",
 )
 
-git_repository(
-  name = "fluent_types",
-  remote = "https://github.com/benricheson101/fluent-types.git",
-  commit = "1897b578a32231d94460ba031e44d406a47baab3",
+http_archive(
+  name = "rules_fluent_types",
+  url = "https://github.com/Benricheson101/rules_fluent_types/archive/e213570f13aa964917b8accae275dbe9ba949621.tar.gz",
+  sha256 = "00352a791405068c29223a9b7827db5024359c3a2ded511f55d7341c35bfddf3",
+  strip_prefix = "rules_fluent_types-e213570f13aa964917b8accae275dbe9ba949621",
 )
 
-# local_repository(
-#   name = "fluent_types",
-#   path = "/Users/benricheson/Documents/code/rust/fluent-types",
-# )
-
-load("@fluent_types//:repositories.bzl", "rules_fluent_types_dependencies")
-rules_fluent_types_dependencies()
-
-load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
-load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
-rules_rust_dependencies()
-rust_register_toolchains(edition = "2021")
-
-# TODO: can I put this in fluent-types somehow?
-crates_repository(
-    name = "crate_index",
-    cargo_lockfile = "@fluent_types//:Cargo.lock",
-    manifests = ["@fluent_types//:Cargo.toml"],
-)
-
-load("@crate_index//:defs.bzl", "crate_repositories")
-crate_repositories()
+load("@rules_fluent_types//:deps.bzl", "register_fluent_types_toolchain")
+register_fluent_types_toolchain()

@@ -27,7 +27,6 @@ ts_project(
     ":node_modules/discord-api-types",
     ":node_modules/discord-verify",
     ":node_modules/fastify",
-    ":node_modules/undici",
   ]
 )
 

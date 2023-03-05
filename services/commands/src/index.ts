@@ -20,10 +20,11 @@ const start = async () => {
     return;
   }
 
-  const db = new Database();
+  const db = new Database(config.storage.postgres_url);
   const locales = new LocalizationService().loadAll();
   const fw = new Framework({db, locales, config});
 
+  // TODO: switch from fastify to node:http?
   server.post('/interactions', fw.handleRequest.bind(fw));
 
   await fw.loadModules();
@@ -47,4 +48,4 @@ const start = async () => {
   }
 };
 
-start().catch(console.error);
+start().catch(err => console.error('start() threw:', err));

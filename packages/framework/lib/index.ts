@@ -18,6 +18,7 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   ComponentType,
+  InteractionResponseType,
   InteractionType,
   Routes,
 } from 'discord-api-types/v10';
@@ -51,32 +52,30 @@ const MODULE_DIR = path.join(
 );
 
 export enum Events {
-  PING = 'ping',
-  COMMAND = 'command',
-  USER_CONTEXT_COMMAND = 'user_context_command',
-  MESSAGE_CONTEXT_COMMAND = 'message_context_command',
-  BUTTON = 'button',
-  SELECT = 'select',
-  AUTOCOMPLETE = 'autocomplete',
-  MODAL = 'modal',
+  Ping = 'ping',
+  Command = 'command',
+  UserContextCommand = 'user_context_command',
+  MessageComponentCommand = 'message_context_command',
+  Button = 'button',
+  Select = 'select',
+  Autocomplete = 'autocomplete',
+  Modal = 'modal',
 }
 
 export type FrameworkEvents = {
-  [Events.PING]: [Context<APIPingInteraction>];
-  [Events.COMMAND]: [Context<APIChatInputApplicationCommandInteraction>];
-  [Events.MESSAGE_CONTEXT_COMMAND]: [
+  [Events.Ping]: [Context<APIPingInteraction>];
+  [Events.Command]: [Context<APIChatInputApplicationCommandInteraction>];
+  [Events.MessageComponentCommand]: [
     Context<APIMessageApplicationCommandInteraction>
   ];
-  [Events.USER_CONTEXT_COMMAND]: [
-    Context<APIUserApplicationCommandInteraction>
-  ];
-  [Events.COMMAND]: [Context<APIChatInputApplicationCommandInteraction>];
-  [Events.AUTOCOMPLETE]: [
+  [Events.UserContextCommand]: [Context<APIUserApplicationCommandInteraction>];
+  [Events.Command]: [Context<APIChatInputApplicationCommandInteraction>];
+  [Events.Autocomplete]: [
     Context<APIApplicationCommandAutocompleteInteraction>
   ];
-  [Events.BUTTON]: [Context<APIMessageComponentInteraction>];
-  [Events.SELECT]: [Context<APIMessageComponentInteraction>];
-  [Events.MODAL]: [Context<APIModalSubmitInteraction>];
+  [Events.Button]: [Context<APIMessageComponentInteraction>];
+  [Events.Select]: [Context<APIMessageComponentInteraction>];
+  [Events.Modal]: [Context<APIModalSubmitInteraction>];
 };
 
 const getAndExecFn = async <
@@ -89,33 +88,56 @@ const getAndExecFn = async <
 >(
   id: string,
   ctx: Context<T>,
-  map: Map<string, U>
+  map: Map<string | RegExp, U>
 ) => {
-  const fn = [...map.entries()].find(([k]) =>
-    id.toLowerCase().startsWith(k.toLowerCase())
-  );
+  // map.get is O(1) so if the ID name is constant, it will be faster than Array::find
+  const fn =
+    map.get(id) ||
+    [...map.entries()].find(([k]: readonly [string | RegExp, U]) =>
+      typeof k === 'string'
+        ? id.toLowerCase().startsWith(k.toLowerCase())
+        : k.test(id.toLowerCase())
+    )?.[1];
   if (!fn) {
     return;
   }
 
   try {
-    await fn[1](ctx as any); // eslint-disable-line
+    await fn(ctx as any); // eslint-disable-line
   } catch (err) {
     console.error(`Error while executing handler for: ${id}:`, err);
   }
 };
 
-const initCommands = (l: LocalizationService, cmds: Command[]) => {
+// ugly hack to localize commands and set
+// their ID (used for command mentions in chat)
+const initCommands = (
+  l: LocalizationService,
+  cmds: Command[],
+  fw?: Framework,
+  remoteCmds?: APIApplicationCommand[]
+) => {
   for (const cmd of cmds) {
     cmd.init(l);
+    cmd.framework = fw!;
+
+    const remoteCmd = remoteCmds?.find(c => c.name === cmd.defaultName);
+    cmd.remoteCmd = remoteCmd;
+
     for (const grp of cmd.subCommands) {
       if (grp instanceof SubCommandGroup) {
         grp.init(l);
+        grp.framework = fw!;
+        grp.remoteCmd = remoteCmd;
         for (const sub of grp.subCommands) {
           sub.init(l);
+          sub.framework = fw!;
+          sub.remoteCmd = remoteCmd;
         }
       } else {
         grp.init(l);
+        grp.framework = fw!;
+        grp.remoteCmd = remoteCmd;
       }
     }
   }
@@ -125,9 +147,9 @@ export class Framework extends EventEmitter<FrameworkEvents> {
   readonly modules = new Map<string, CommandModule>();
   readonly cmds = new Map<string, Command>();
 
-  readonly buttonFns = new Map<string, ButtonFunction>();
-  readonly selectFns = new Map<string, SelectFunction>();
-  readonly modalFns = new Map<string, ModalFunction>();
+  readonly buttonFns = new Map<string | RegExp, ButtonFunction>();
+  readonly selectFns = new Map<string | RegExp, SelectFunction>();
+  readonly modalFns = new Map<string | RegExp, ModalFunction>();
   readonly autocompleteFns = new Map<string, AutocompleteFunction>();
 
   readonly db: Database;
@@ -156,8 +178,8 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     this.config = config;
 
     this.rest = new REST({
-      api: proxyURL,
-    });
+      api: proxyURL || 'https://discord.com/api',
+    }).setToken(config.discord_application.token);
   }
 
   async handleRequest(
@@ -190,25 +212,39 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     }
 
     if (body.type === InteractionType.Ping) {
-      await w.status(HttpStatusCode.OK).send({type: 1});
+      await w
+        .status(HttpStatusCode.OK)
+        .send({type: InteractionResponseType.Pong});
       return w;
     }
-    this.handleInteraction(body);
+
+    await this.handleInteraction(body, r, w);
+
+    if (!w.sent) {
+      await w.code(HttpStatusCode.INTERNAL_SERVER_ERROR).send();
+      return w;
+    }
 
     return w;
   }
 
-  handleInteraction(i: APIInteraction) {
+  async handleInteraction(
+    i: APIInteraction,
+    req: FastifyRequest,
+    reply: FastifyReply
+  ) {
     const mkCtx = <T extends APIInteraction>(i: T) =>
       new Context({
         framework: this,
         interaction: i,
+        req,
+        reply,
       });
 
     // TODO: can this be cleaned up?
     switch (i.type) {
       case InteractionType.Ping: {
-        this.emit(Events.PING, mkCtx(i));
+        this.emit(Events.Ping, mkCtx(i));
         break;
       }
 
@@ -216,7 +252,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         switch (i.data.type) {
           case ApplicationCommandType.ChatInput: {
             const ctx = mkCtx(i as APIChatInputApplicationCommandInteraction);
-            this.emit(Events.COMMAND, ctx);
+            this.emit(Events.Command, ctx);
 
             const cmd = this.routeCommand(
               i as APIChatInputApplicationCommandInteraction
@@ -226,7 +262,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
             }
 
             try {
-              cmd.command(ctx);
+              await cmd.command(ctx);
             } catch (err) {
               console.error(`Error while running command: ${cmd.name}:`, err);
             }
@@ -236,7 +272,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
           // TODO: should context commands be handled the same way as other interaction types?
           case ApplicationCommandType.Message: {
             this.emit(
-              Events.MESSAGE_CONTEXT_COMMAND,
+              Events.MessageComponentCommand,
               mkCtx(i as APIMessageApplicationCommandInteraction)
             );
             break;
@@ -244,7 +280,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
           case ApplicationCommandType.User: {
             this.emit(
-              Events.USER_CONTEXT_COMMAND,
+              Events.UserContextCommand,
               mkCtx(i as APIUserApplicationCommandInteraction)
             );
             break;
@@ -255,7 +291,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
       case InteractionType.ApplicationCommandAutocomplete: {
         const ctx = mkCtx(i);
-        this.emit(Events.AUTOCOMPLETE, ctx);
+        this.emit(Events.Autocomplete, ctx);
 
         const cmd = this.routeCommand(i);
         if (!cmd) {
@@ -263,7 +299,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         }
 
         try {
-          cmd.autocomplete(ctx);
+          await cmd.autocomplete(ctx);
         } catch (err) {
           console.error(`Error while executing handler for: ${cmd.name}:`, err);
         }
@@ -275,17 +311,17 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         switch (i.data.component_type) {
           case ComponentType.Button: {
             const ctx = mkCtx(i);
-            this.emit(Events.BUTTON, ctx);
+            this.emit(Events.Button, ctx);
             // TODO: is it a problem to not await this?
-            getAndExecFn(i.data.custom_id, ctx, this.buttonFns);
+            await getAndExecFn(i.data.custom_id, ctx, this.buttonFns);
             break;
           }
 
           // TODO: other select types
           case ComponentType.StringSelect: {
             const ctx = mkCtx(i);
-            this.emit(Events.SELECT, ctx);
-            getAndExecFn(i.data.custom_id, ctx, this.selectFns);
+            this.emit(Events.Select, ctx);
+            await getAndExecFn(i.data.custom_id, ctx, this.selectFns);
             break;
           }
         }
@@ -294,8 +330,8 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
       case InteractionType.ModalSubmit: {
         const ctx = mkCtx(i);
-        this.emit(Events.MODAL, ctx);
-        getAndExecFn(i.data.custom_id, ctx, this.modalFns);
+        this.emit(Events.Modal, ctx);
+        await getAndExecFn(i.data.custom_id, ctx, this.modalFns);
         break;
       }
     }
@@ -349,6 +385,19 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     return run;
   }
 
+  mentionCmd(cmd: string) {
+    const MD_MENTION = `\`/${cmd}\``;
+
+    const [name] = cmd.split(' ');
+    const c = this.cmds.get(name);
+
+    if (!c || !c.remoteCmd) {
+      return MD_MENTION;
+    }
+
+    return `</${cmd}:${c.remoteCmd.id}>`;
+  }
+
   async loadModules() {
     const mods = await this.constructor.discoverModules();
 
@@ -356,7 +405,11 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       const m = new Mod();
       this.modules.set(m.name, m);
 
-      initCommands(this.locales, m.commands);
+      const cmds = (await this.rest.get(
+        Routes.applicationCommands(this.config.discord_application.id)
+      )) as APIApplicationCommand[];
+
+      initCommands(this.locales, m.commands, this, cmds);
       for (const cmd of m.commands) {
         this.cmds.set(cmd.defaultName, cmd);
 
@@ -367,9 +420,9 @@ export class Framework extends EventEmitter<FrameworkEvents> {
             | ModalFunction
             | AutocompleteFunction
         >(
-          ids: string[],
+          ids: (string | RegExp)[],
           fn: T,
-          map: Map<string, T>
+          map: Map<string | RegExp, T>
         ) => {
           for (const id of ids) {
             map.set(id, fn);
@@ -377,10 +430,10 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         };
 
         const loadIds = (c: Command | SubCommand) => {
-          ld(c.buttonIds, c.button.bind(c), this.buttonFns);
-          ld(c.modalIds, c.modal.bind(c), this.modalFns);
-          ld(c.selectIds, c.select.bind(c), this.selectFns);
-          ld(c.autocompleteIds, c.autocomplete.bind(c), this.autocompleteFns);
+          ld(c.buttonIDs, c.button.bind(c), this.buttonFns);
+          ld(c.modalIDs, c.modal.bind(c), this.modalFns);
+          ld(c.selectIDs, c.select.bind(c), this.selectFns);
+          ld(c.autocompleteIDs, c.autocomplete.bind(c), this.autocompleteFns);
         };
 
         loadIds(cmd);
@@ -400,30 +453,38 @@ export class Framework extends EventEmitter<FrameworkEvents> {
   static async bulkCreateCommands(
     l: LocalizationService,
     token: string,
-    guildID?: string
-  ): Promise<APIApplicationCommand[]> {
+    adminServers: string[] = []
+  ): Promise<{
+    global: APIApplicationCommand[];
+    admin: {[key: string]: APIApplicationCommand[]};
+  }> {
     const applicationID = Buffer.from(token.split('.')[0], 'base64').toString();
     const rest = new REST().setToken(token);
 
-    let cmds: Command[] = [];
+    let publicCmds: Command[] = [];
+    let adminCmds: Command[] = [];
     const mods = await this.discoverModules();
     for (const Mod of mods) {
       const m = new Mod();
-      cmds = cmds.concat(m.commands);
-      initCommands(l, cmds);
+      publicCmds = publicCmds.concat(m.commands.filter(c => !c.adminCommand));
+      adminCmds = adminCmds.concat(m.commands.filter(c => c.adminCommand));
+      initCommands(l, publicCmds);
     }
 
-    const json = cmds.map(c => c.toJSON());
+    const createdGlobal = (await rest.put(
+      Routes.applicationCommands(applicationID),
+      {body: publicCmds.map(c => c.toJSON())}
+    )) as APIApplicationCommand[];
 
-    const url = guildID
-      ? Routes.applicationGuildCommands(applicationID, guildID)
-      : Routes.applicationCommands(applicationID);
+    const createdAdmin: {[key: string]: APIApplicationCommand[]} = {};
+    for (const adminServer of adminServers) {
+      createdAdmin[adminServer] = (await rest.put(
+        Routes.applicationGuildCommands(applicationID, adminServer),
+        {body: adminCmds.map(c => c.toJSON())}
+      )) as APIApplicationCommand[];
+    }
 
-    const created: APIApplicationCommand[] = (await rest.put(url, {
-      body: json,
-    })) as APIApplicationCommand[];
-
-    return created;
+    return {global: createdGlobal, admin: createdAdmin};
   }
 
   static async discoverModules(): Promise<CommandModuleSubClass[]> {

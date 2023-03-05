@@ -8,7 +8,7 @@ import {
   APIEmbedVideo,
 } from 'discord-api-types/v10';
 
-import {Localizer, Messages} from '@suggester/i18n';
+import {Localizer, MessageNames, Placeholders} from '@suggester/i18n';
 
 export class EmbedBuilder implements APIEmbed {
   title?: string;
@@ -25,9 +25,9 @@ export class EmbedBuilder implements APIEmbed {
 
   #titleLocalized?: [string, FluentArgs];
   #descriptionLocalized?: [string, FluentArgs];
-  #footerLocalized?: [LocalizedAPIEmbedFooter<keyof Messages>, FluentArgs];
-  #authorLocalized?: [LocalizedAPIEmbedAuthor<keyof Messages>, FluentArgs];
-  #fieldsLocalized?: [LocalizedAPIEmbedField<keyof Messages>, FluentArgs][];
+  #footerLocalized?: [LocalizedAPIEmbedFooter<MessageNames>, FluentArgs];
+  #authorLocalized?: [LocalizedAPIEmbedAuthor<MessageNames>, FluentArgs];
+  #fieldsLocalized?: [LocalizedAPIEmbedField<MessageNames>, FluentArgs][];
 
   constructor(embed?: APIEmbed) {
     Object.assign(this, embed || {});
@@ -89,41 +89,41 @@ export class EmbedBuilder implements APIEmbed {
     return this;
   }
 
-  setTitleLocalized<T extends keyof Messages>(
+  setTitleLocalized<T extends MessageNames>(
     title: T,
-    args?: Messages[T]
+    args?: Placeholders<T>
   ): this {
     this.#titleLocalized = [title, args];
     return this;
   }
 
-  setDescriptionLocalized<T extends keyof Messages>(
+  setDescriptionLocalized<T extends MessageNames>(
     description: T,
-    args?: Messages[T]
+    args?: Placeholders<T>
   ): this {
     this.#descriptionLocalized = [description, args];
     return this;
   }
 
-  setFooterLocalized<T extends keyof Messages>(
+  setFooterLocalized<T extends MessageNames>(
     footer: LocalizedAPIEmbedFooter<T>,
-    args?: Messages[T]
+    args?: Placeholders<T>
   ): this {
     this.#footerLocalized = [footer, args];
     return this;
   }
 
-  setAuthorLocalized<T extends keyof Messages>(
+  setAuthorLocalized<T extends MessageNames>(
     author: LocalizedAPIEmbedAuthor<T>,
-    args?: Messages[T]
+    args?: Placeholders<T>
   ): this {
     this.#authorLocalized = [author, args];
     return this;
   }
 
-  addFieldLocalized<T extends keyof Messages>(
+  addFieldLocalized<T extends MessageNames>(
     field: LocalizedAPIEmbedField<T>,
-    args?: Messages[T]
+    args?: Placeholders<T>
   ): this {
     this.#fieldsLocalized = (this.#fieldsLocalized || []).concat([field, args]);
     return this;
@@ -134,7 +134,7 @@ export class EmbedBuilder implements APIEmbed {
     if (this.#titleLocalized) {
       this.title = l.get(
         langCode,
-        this.#titleLocalized[0] as keyof Messages,
+        this.#titleLocalized[0] as MessageNames,
         this.#titleLocalized[1]
       );
     }
@@ -142,7 +142,7 @@ export class EmbedBuilder implements APIEmbed {
     if (this.#descriptionLocalized) {
       this.description = l.get(
         langCode,
-        this.#descriptionLocalized[0] as keyof Messages,
+        this.#descriptionLocalized[0] as MessageNames,
         this.#descriptionLocalized[1]
       );
     }
@@ -183,23 +183,24 @@ export class EmbedBuilder implements APIEmbed {
 
 export type FluentArgs = {[key: string]: string | number | Date} | undefined;
 
-export interface LocalizedAPIEmbedFooter<T extends keyof Messages> {
+export interface LocalizedAPIEmbedFooter<T extends MessageNames> {
   text: T;
   icon_url?: string;
   proxy_icon_url?: string;
 }
 
-export interface LocalizedAPIEmbedAuthor<T extends keyof Messages> {
+export interface LocalizedAPIEmbedAuthor<T extends MessageNames> {
   name: T;
   url?: string;
   icon_url?: string;
   proxy_icon_url?: string;
 }
 
-export interface LocalizedAPIEmbedField<T extends keyof Messages> {
+export interface LocalizedAPIEmbedField<T extends MessageNames> {
   name: T;
   value: T;
   inline?: boolean;
 }
 
 export * from './changelog';
+export * from './feeds';

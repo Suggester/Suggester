@@ -5,7 +5,7 @@ import {
 import {fetch} from 'undici';
 
 import {Command, Context} from '@suggester/framework';
-import {Messages} from '@suggester/i18n';
+import {MessageNames} from '@suggester/i18n';
 import {
   ChangelogEmbed,
   GitHubReleaseData,
@@ -14,8 +14,8 @@ import {
 } from '@suggester/util';
 
 export class ChangelogCommand extends Command {
-  name: keyof Messages = 'command-name--changelog';
-  description: keyof Messages = 'command-desc--changelog';
+  name: MessageNames = 'cmd-changelog.name';
+  description: MessageNames = 'cmd-changelog.desc';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
     const latestGitHubChangelog = (await fetch(

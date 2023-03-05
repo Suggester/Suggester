@@ -4,11 +4,11 @@ import {
 } from 'discord-api-types/v10';
 
 import {Command, Context} from '@suggester/framework';
-import {Messages} from '@suggester/i18n';
+import {MessageNames} from '@suggester/i18n';
 
 export class SupportCommand extends Command {
-  name: keyof Messages = 'command-name--support';
-  description: keyof Messages = 'command-desc--support';
+  name: MessageNames = 'cmd-support.name';
+  description: MessageNames = 'cmd-support.desc';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
     const localizer = ctx.getLocalizer();

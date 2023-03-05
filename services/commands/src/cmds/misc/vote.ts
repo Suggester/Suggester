@@ -4,11 +4,11 @@ import {
 } from 'discord-api-types/v10';
 
 import {Command, Context} from '@suggester/framework';
-import {Messages} from '@suggester/i18n';
+import {MessageNames} from '@suggester/i18n';
 
 export class VoteCommand extends Command {
-  name: keyof Messages = 'command-name--vote';
-  description: keyof Messages = 'command-desc--vote';
+  name: MessageNames = 'cmd-vote.name';
+  description: MessageNames = 'cmd-vote.desc';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
     const voteLinks = [

@@ -1,4 +1,5 @@
 import {
+  APIApplicationCommand,
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandBasicOption,
   APIApplicationCommandInteraction,
@@ -13,15 +14,16 @@ import {
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 
-import {LocalizationService, Messages} from '@suggester/i18n';
+import {LocalizationService, MessageNames} from '@suggester/i18n';
 import {DeepReadonly} from '@suggester/util';
 
+import {Framework} from '.';
 import {Context} from './context';
 
 const toLocalizedMap = (
   l: LocalizationService,
   availableLocales: string[],
-  key: keyof Messages,
+  key: MessageNames,
   def: string
 ) =>
   availableLocales.reduce((prev, curr) => {
@@ -65,10 +67,10 @@ export abstract class Command {
   // implements RESTPostAPIChatInputApplicationCommandsJSONBody
   readonly type = ApplicationCommandType.ChatInput;
   defaultName = '';
-  abstract name: keyof Messages;
+  abstract name: MessageNames;
   name_localizations = {};
   defaultDescription = '';
-  abstract description: keyof Messages;
+  abstract description: MessageNames;
   description_localizations = {};
   default_member_permissions = '0';
   dm_permission = false;
@@ -77,11 +79,16 @@ export abstract class Command {
 
   /** adds the command as a guild command in these servers */
   guilds?: string[];
+  /** makes the command a guild command only available in configured admin_servers */
+  adminCommand = false;
 
-  buttonIds: string[] = [];
-  selectIds: string[] = [];
-  modalIds: string[] = [];
-  autocompleteIds: string[] = [];
+  buttonIDs: (string | RegExp)[] = [];
+  selectIDs: (string | RegExp)[] = [];
+  modalIDs: (string | RegExp)[] = [];
+  autocompleteIDs: (string | RegExp)[] = [];
+
+  framework!: Framework;
+  remoteCmd?: APIApplicationCommand;
 
   init(l: LocalizationService): this {
     localize(this, l);
@@ -126,14 +133,18 @@ export abstract class SubCommandGroup
 {
   readonly type = ApplicationCommandOptionType.SubcommandGroup;
   defaultName = '';
-  abstract name: keyof Messages;
+  abstract name: MessageNames;
   name_localizations = {};
   defaultDescription = '';
-  abstract description: keyof Messages;
+  abstract description: MessageNames;
   description_localizations = {};
 
   options?: APIApplicationCommandSubcommandOption[] = [];
   subCommands: SubCommand[] = [];
+
+  framework!: Framework;
+  remoteCmd?: APIApplicationCommand;
+  parent!: Command;
 
   init(l: LocalizationService): this {
     localize(this, l);
@@ -161,18 +172,18 @@ export abstract class SubCommandGroup
 export abstract class SubCommand {
   readonly type = ApplicationCommandOptionType.Subcommand;
   defaultName = '';
-  abstract name: keyof Messages;
+  abstract name: MessageNames;
   name_localizations = {};
   defaultDescription = '';
-  abstract description: keyof Messages;
+  abstract description: MessageNames;
   description_localizations = {};
 
   options: DeepReadonly<APIApplicationCommandOption[]> = [];
 
-  buttonIds: string[] = [];
-  selectIds: string[] = [];
-  modalIds: string[] = [];
-  autocompleteIds: string[] = [];
+  buttonIDs: (string | RegExp)[] = [];
+  selectIDs: (string | RegExp)[] = [];
+  modalIDs: (string | RegExp)[] = [];
+  autocompleteIDs: (string | RegExp)[] = [];
 
   // TODO: is there a better way to do this?
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -186,6 +197,10 @@ export abstract class SubCommand {
     _ctx: Context<APIApplicationCommandAutocompleteInteraction>
   ): Promise<void> {}
   /* eslint-enable */
+
+  framework!: Framework;
+  remoteCmd?: APIApplicationCommand;
+  parent!: Command | SubCommandGroup;
 
   init(l: LocalizationService): this {
     localize(this, l);

@@ -1,12 +1,12 @@
 import {readFileSync, readdirSync, statSync} from 'node:fs';
 
-import {FluentBundle, FluentResource} from '@fluent/bundle';
+import {FluentBundle, FluentResource, FluentValue} from '@fluent/bundle';
 import {APIInteraction} from 'discord-api-types/v10';
 import path from 'path';
 
 import {Database} from '@suggester/database';
 
-import {Messages} from './fluentMessages';
+import {MessageNames, Placeholders} from './fluentMessages';
 
 const FALLBACK_LOCALE = 'en-US';
 
@@ -17,7 +17,6 @@ const LOCALE_FILE_NAME = 'translations.ftl';
 export class LocalizationService {
   readonly bundles = new Map<string, FluentBundle>();
 
-  // TODO: switch to fs promises?
   loadAll(): this {
     const inDir = readdirSync(LOCALE_DIR, {withFileTypes: true});
     const common = inDir.find(d => d.isFile() && d.name === COMMON_FILE_NAME);
@@ -47,6 +46,29 @@ export class LocalizationService {
 
       const bundle = new FluentBundle([langCode], {
         useIsolating: false,
+        functions: {
+          // mentions
+          ROLE_MENTION: (roleIDs: FluentValue[]) =>
+            roleIDs.map(r => `<@&${r}>`).join(' '),
+          USER_MENTION: (userIDs: FluentValue[]) =>
+            userIDs.map(u => `<@${u}>`).join(' '),
+          CHANNEL_MENTION: (channelIDs: FluentValue[]) =>
+            channelIDs.map(c => `<#${c}>`).join(' '),
+
+          // markdown
+          BOLD: (text: FluentValue[]) => `**${text.join(' ')}**`,
+          ITALIC: (text: FluentValue[]) => `*${text.join(' ')}*`,
+          UNDERLINE: (text: FluentValue[]) => `__${text.join(' ')}__`,
+          INLINE_CODE: (text: FluentValue[]) => `\`${text.join(' ')}\``,
+          BLOCK_QUOTE: (
+            text: FluentValue[],
+            {multiline}: Record<string, FluentValue>
+          ) => `${multiline === 'true' ? '>>>' : '>'} ${text.join(' ')}`,
+          BLOCK_CODE: (
+            text: FluentValue[],
+            {lang = ''}: Record<string, FluentValue>
+          ) => '```' + lang + '\n' + text.join(' ') + '\n```',
+        },
       });
 
       const translations = readFileSync(translationFile, {
@@ -62,10 +84,10 @@ export class LocalizationService {
     return this;
   }
 
-  get<T extends keyof Messages>(
+  get<Name extends MessageNames>(
     langCode: string,
-    id: T,
-    args?: Messages[T]
+    id: Name,
+    args?: Placeholders<Name>
   ): string {
     const bundles = this.bundles;
     const bundle = bundles.get(langCode);
@@ -73,13 +95,17 @@ export class LocalizationService {
       return id;
     }
 
-    const msg = bundle.getMessage(id);
-    if (!msg || !msg.value) {
+    const [msgName, attr] = id.split('.');
+
+    const msg = bundle.getMessage(msgName);
+    const value = attr ? msg?.attributes[attr] : msg?.value;
+
+    if (!value) {
       return id;
     }
 
     const errors: Error[] = [];
-    const formatted = bundle.formatPattern(msg.value, args, errors);
+    const formatted = bundle.formatPattern(value, args, errors);
     if (errors.length) {
       console.error(
         `Failed to format message \`${id}\` for language code \`${langCode}\`:`,
@@ -106,21 +132,23 @@ export class Localizer {
   //   private db: Database,
   // ) {}
 
-  async getUserLocale(): Promise<string> {
+  getUserLocale(): string {
     // TODO: check database?
     return this.i.user?.locale || FALLBACK_LOCALE;
   }
 
   // TODO: returns guild locale key
-  async getGuildLocale(): Promise<string> {
+  getGuildLocale(): string {
     if (!this.i.guild_id) {
       return FALLBACK_LOCALE;
     }
 
-    const fromDB = await this.db.guildConfigs.getLocale(this.i.guild_id);
+    return this.i.guild_locale || FALLBACK_LOCALE;
 
-    // TODO: figure out what order this should be
-    return fromDB || this.i.guild_locale || FALLBACK_LOCALE;
+    // const fromDB = await this.db.guildConfigs.getLocale(this.i.guild_id);
+
+    // // TODO: figure out what order this should be
+    // return fromDB || this.i.guild_locale || FALLBACK_LOCALE;
   }
 
   /**
@@ -128,11 +156,8 @@ export class Localizer {
    *
    * Use this for messages only visible to one user (DMs, ephemeral)
    */
-  async user<T extends keyof Messages>(
-    id: T,
-    args?: Messages[T]
-  ): Promise<string> {
-    const langCode = await this.getUserLocale();
+  user<Name extends MessageNames>(id: Name, args?: Placeholders<Name>): string {
+    const langCode = this.getUserLocale();
     return this.get(langCode, id, args);
   }
 
@@ -141,26 +166,21 @@ export class Localizer {
    *
    * Use this for messages visible to many users (non-ephemeral, feed)
    */
-  async guild<T extends keyof Messages>(
-    id: T,
-    args?: Messages[T]
-  ): Promise<string> {
-    const langCode = await this.getGuildLocale();
+  guild<Name extends MessageNames>(
+    id: Name,
+    args?: Placeholders<Name>
+  ): string {
+    const langCode = this.getGuildLocale();
     return this.get(langCode, id, args);
   }
 
-  get<T extends keyof Messages>(
+  get<Name extends MessageNames>(
     langCode: string,
-    id: T,
-    args?: Messages[T]
+    id: Name,
+    args?: Placeholders<Name>
   ): string {
     return this.ls.get(langCode, id, args);
   }
 }
-
-// export enum LocalizerType {
-//   USER,
-//   GUILD,
-// }
 
 export * from './fluentMessages';

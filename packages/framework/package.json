@@ -15,8 +15,7 @@
     "@suggester/util": "workspace:*",
     "discord-api-types": "^0.37.33",
     "discord-verify": "^1.0.0",
-    "fastify": "^4.13.0",
-    "undici": "^5.19.1"
+    "fastify": "^4.13.0"
   },
   "scripts": {
     "build": "tsc",
