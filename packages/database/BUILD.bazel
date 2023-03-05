@@ -44,6 +44,7 @@ npm_package(
   srcs = [
     "package.json",
     ":database-ts",
+    ":prisma",
   ],
   package = "@suggester/database",
   visibility = ["//visibility:public"],
