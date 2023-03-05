@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../prisma-out"
+  output   = "../prisma-out"
 }
 
 datasource db {
@@ -10,15 +10,15 @@ datasource db {
 
 // TODO: isPremium? or premium table
 model GuildConfig {
-  id         Int    @id @default(autoincrement())
-  guildID    String @unique @map("guild_id")
+  id      Int    @id @default(autoincrement())
+  guildID String @unique @map("guild_id")
 
-  locale     String?
-  flags      Int      @default(0)
+  locale String?
+  flags  Int     @default(0)
 
   // legacy -- replaced with native command perms
-  adminRoles String[] @map("admin_roles") @default([])
-  staffRoles String[] @map("staff_roles") @default([])
+  adminRoles String[] @default([]) @map("admin_roles")
+  staffRoles String[] @default([]) @map("staff_roles")
 
   // TODO: these are in the database as (string | {id: string, expires:number})[]
   // blockedUsers String[] @map("blocked_users")
@@ -38,19 +38,19 @@ model GuildConfig {
 // TODO: this is missing a lot of stuff
 
 model SuggestionFeed {
-  id         Int    @id @default(autoincrement())
-  guildID    String @map("guild_id")
+  id      Int    @id @default(autoincrement())
+  guildID String @map("guild_id")
 
-  name             String @db.VarChar(100)  @default("Server Suggestions")
+  name             String  @default("Server Suggestions") @db.VarChar(100)
   description      String?
   // TODO: make this unique if not null
   commandAliasName String? @map("command_alias_name")
   isDefault        Boolean @default(false) @map("is_default")
 
-  feedChannelID    String  @map("feed_channel_id")
-  reviewChannelID  String? @map("review_channel_id")
-  logChannelID     String? @map("log_channel_id")
-  deniedChannelID  String? @map("denied_channel_id")
+  feedChannelID        String  @map("feed_channel_id")
+  reviewChannelID      String? @map("review_channel_id")
+  logChannelID         String? @map("log_channel_id")
+  deniedChannelID      String? @map("denied_channel_id")
   implementedChannelID String? @map("implemented_channel_id")
 
   mode SuggestionFeedMode @default(AUTOAPPROVE)
@@ -63,17 +63,17 @@ model SuggestionFeed {
   blockedRoles String[] @map("blocked_roles")
 
   // TODO: what do these do?
-  reviewPingRole     String? @map("review_ping_role")
-  feedPingRole String? @map("feed_ping_role")
+  reviewPingRole String? @map("review_ping_role")
+  feedPingRole   String? @map("feed_ping_role")
 
   // role given when user has suggestion approved
   approvedRole    String? @map("approved_role")
   // role given when user has suggestion implemented
   implementedRole String? @map("implemented_role")
 
-  upvoteEmoji   String @map("upvote_emoji") @default("👍")
-  midEmoji      String @map("mid_emoji") @default("🤷")
-  downvoteEmoji String @map("downvote_emoji") @default("👎")
+  upvoteEmoji   String @default("👍") @map("upvote_emoji")
+  midEmoji      String @default("🤷") @map("mid_emoji")
+  downvoteEmoji String @default("👎") @map("downvote_emoji")
 
   logWebhookID    String? @map("log_webhook_id")
   logWebhookToken String? @map("log_webhook_token")
@@ -84,7 +84,7 @@ model SuggestionFeed {
   showCommentTimestamps Boolean @default(true) @map("show_comment_timestamps")
 
   // reaction options
-  allowSelfVote        Boolean @default(true) @map("allow_self_vote")
+  allowSelfVote Boolean @default(true) @map("allow_self_vote")
   showVoteCount Boolean @default(true) @map("show_vote_count")
 
   colorChangeEnabled   Boolean @default(true) @map("color_change_enabled")

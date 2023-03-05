@@ -1,6 +1,9 @@
-import {PrismaClient, GuildConfig} from "../prisma-out";
+import {GuildConfig, PrismaClient} from '../prisma-out';
 
-export type PartialGuildConfig = Omit<GuildConfig, 'id' | 'createdAt' | 'updatedAt'>;
+export type PartialGuildConfig = Omit<
+  GuildConfig,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 /**
  * An abstraction around the guild_configs table
@@ -12,8 +15,8 @@ export class GuildConfigStore {
     return this.prisma.guildConfig.findFirst({
       where: {
         guildID,
-      }
-    })
+      },
+    });
   }
 
   async update(guildID: string, row: PartialGuildConfig) {
@@ -28,7 +31,7 @@ export class GuildConfigStore {
       where: {guildID},
       update: row,
       create: row,
-    })
+    });
   }
 
   async delete(guildID: string) {
@@ -38,12 +41,14 @@ export class GuildConfigStore {
   }
 
   async getLocale(guildID: string) {
-    return this.prisma.guildConfig.findFirst({
-      where: {guildID},
-      select: {
-        locale: true,
-      }
-    }).then(r => r?.locale);
+    return this.prisma.guildConfig
+      .findFirst({
+        where: {guildID},
+        select: {
+          locale: true,
+        },
+      })
+      .then(r => r?.locale);
   }
 
   /** Creates a config if one does not exist, and returns it */

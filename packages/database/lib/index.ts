@@ -1,5 +1,4 @@
 import {PrismaClient} from '../prisma-out';
-
 import {GuildConfigStore} from './guildConfig';
 import {SuggestionFeedStore} from './suggestionFeed';
 

@@ -2,13 +2,18 @@
   "name": "@suggester/database",
   "main": "build/index.js",
   "dependencies": {
-    "@prisma/client": "^4.10.1",
+    "@prisma/client": "^4.11.0",
     "@suggester/configs": "workspace:*"
   },
   "devDependencies": {
-    "prisma": "^4.10.1"
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "eslint": "^7",
+    "prettier": "^2.8.4",
+    "prisma": "^4.11.0"
   },
   "scripts": {
-    "build": "prisma generate && tsc"
+    "build": "prisma generate && tsc",
+    "lint": "eslint .",
+    "fmt": "prisma format && prettier --write --ignore-path=.eslintignore ."
   }
 }
