@@ -9,8 +9,7 @@
     "prettier": "^2.8.4"
   },
   "dependencies": {
-    "@fluent/bundle": "^0.17.1",
-    "@suggester/database": "workspace:*"
+    "@fluent/bundle": "^0.17.1"
   },
   "scripts": {
     "build": "fluent-types ../../lang/en-US/translations.ftl -o ./lib/fluentMessages.ts && tsc",

@@ -81,7 +81,7 @@ export class Context<
   }
 
   getLocalizer(): Localizer {
-    return new Localizer(this.interaction, this.locales, this.db);
+    return new Localizer(this.interaction, this.locales);
   }
 
   // Intraction methods

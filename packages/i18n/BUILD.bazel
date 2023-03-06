@@ -26,7 +26,6 @@ ts_project(
   out_dir = "build",
   deps = [
     "//:node_modules/@types/node",
-    ":node_modules/@suggester/database",
     ":node_modules/@fluent/bundle",
     ":node_modules/discord-api-types",
   ],

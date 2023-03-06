@@ -3,4 +3,4 @@
 /lang
 /node_modules
 /old
-config.toml
+config*.toml

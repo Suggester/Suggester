@@ -4,8 +4,6 @@ import {FluentBundle, FluentResource, FluentValue} from '@fluent/bundle';
 import {APIInteraction} from 'discord-api-types/v10';
 import path from 'path';
 
-import {Database} from '@suggester/database';
-
 import {MessageNames, Placeholders} from './fluentMessages';
 
 const FALLBACK_LOCALE = 'en-US';
@@ -118,37 +116,18 @@ export class LocalizationService {
 }
 
 export class Localizer {
-  constructor(
-    private i: APIInteraction,
-    private ls: LocalizationService,
-    private db: Database
-  ) {}
-  // constructor(
-  //   private locales: {
-  //     guild?: string;
-  //     user?: string;
-  //   },
-  //   private ls: LocalizationService,
-  //   private db: Database,
-  // ) {}
+  constructor(private i: APIInteraction, private ls: LocalizationService) {}
 
   getUserLocale(): string {
-    // TODO: check database?
     return this.i.user?.locale || FALLBACK_LOCALE;
   }
 
-  // TODO: returns guild locale key
   getGuildLocale(): string {
     if (!this.i.guild_id) {
       return FALLBACK_LOCALE;
     }
 
     return this.i.guild_locale || FALLBACK_LOCALE;
-
-    // const fromDB = await this.db.guildConfigs.getLocale(this.i.guild_id);
-
-    // // TODO: figure out what order this should be
-    // return fromDB || this.i.guild_locale || FALLBACK_LOCALE;
   }
 
   /**
