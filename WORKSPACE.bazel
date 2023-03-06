@@ -1,50 +1,112 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# --- downlaod rules ---
 
 http_archive(
-    name = "aspect_rules_js",
-    sha256 = "3ad6684d744ebbc6592d404cc3aa81d0da634eccb3499f6fd198ae122fa28489",
-    strip_prefix = "rules_js-1.19.0",
-    url = "https://github.com/aspect-build/rules_js/releases/download/v1.19.0/rules_js-v1.19.0.tar.gz",
+  name = "aspect_rules_js",
+  sha256 = "3ad6684d744ebbc6592d404cc3aa81d0da634eccb3499f6fd198ae122fa28489",
+  strip_prefix = "rules_js-1.19.0",
+  url = "https://github.com/aspect-build/rules_js/releases/download/v1.19.0/rules_js-v1.19.0.tar.gz",
 )
+
+http_archive(
+  name = "aspect_rules_ts",
+  sha256 = "db77d904284d21121ae63dbaaadfd8c75ff6d21ad229f92038b415c1ad5019cc",
+  strip_prefix = "rules_ts-1.3.0",
+  url = "https://github.com/aspect-build/rules_ts/releases/download/v1.3.0/rules_ts-v1.3.0.tar.gz",
+)
+
+http_archive(
+  name = "rules_fluent_types",
+  url = "https://github.com/Benricheson101/rules_fluent_types/archive/1fc66f83b2e135234f4673c394c87023248aad02.tar.gz",
+  sha256 = "9bcd540d9efe600d1675a6a5a329e270e38a4aedb6d2e1ef9d5fc3c78f5adac9",
+  strip_prefix = "rules_fluent_types-1fc66f83b2e135234f4673c394c87023248aad02",
+)
+
+http_archive(
+  name = "io_bazel_rules_docker",
+  sha256 = "b1e80761a8a8243d03ebca8845e9cc1ba6c82ce7c5179ce2b295cd36f7e394bf",
+  urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.25.0/rules_docker-v0.25.0.tar.gz"],
+)
+
+http_archive(
+  name = "io_bazel_rules_go",
+  sha256 = "dd926a88a564a9246713a9c00b35315f54cbd46b31a26d5d8fb264c07045f05d",
+  urls = [
+    "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.38.1/rules_go-v0.38.1.zip",
+    "https://github.com/bazelbuild/rules_go/releases/download/v0.38.1/rules_go-v0.38.1.zip",
+  ],
+)
+
+http_archive(
+  name = "bazel_gazelle",
+  sha256 = "ecba0f04f96b4960a5b250c8e8eeec42281035970aa8852dda73098274d14a1d",
+  urls = [
+    "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.29.0/bazel-gazelle-v0.29.0.tar.gz",
+    "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.29.0/bazel-gazelle-v0.29.0.tar.gz",
+  ],
+)
+
+# --- setup toolchains ---
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 rules_js_dependencies()
 
 load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
 nodejs_register_toolchains(
-    name = "nodejs",
-    node_version = DEFAULT_NODE_VERSION,
+  name = "nodejs",
+  node_version = DEFAULT_NODE_VERSION,
 )
 
 load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 npm_translate_lock(
-    name = "npm",
-    pnpm_lock = "//:pnpm-lock.yaml",
-    verify_node_modules_ignored = "//:.bazelignore",
+  name = "npm",
+  pnpm_lock = "//:pnpm-lock.yaml",
+  verify_node_modules_ignored = "//:.bazelignore",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
 npm_repositories()
 
-http_archive(
-    name = "aspect_rules_ts",
-    sha256 = "db77d904284d21121ae63dbaaadfd8c75ff6d21ad229f92038b415c1ad5019cc",
-    strip_prefix = "rules_ts-1.3.0",
-    url = "https://github.com/aspect-build/rules_ts/releases/download/v1.3.0/rules_ts-v1.3.0.tar.gz",
-)
-
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
 rules_ts_dependencies(
-    ts_version_from = "//:package.json",
-)
-
-http_archive(
-  name = "rules_fluent_types",
-  url = "https://github.com/Benricheson101/rules_fluent_types/archive/e213570f13aa964917b8accae275dbe9ba949621.tar.gz",
-  sha256 = "00352a791405068c29223a9b7827db5024359c3a2ded511f55d7341c35bfddf3",
-  strip_prefix = "rules_fluent_types-e213570f13aa964917b8accae275dbe9ba949621",
+  ts_version_from = "//:package.json",
 )
 
 load("@rules_fluent_types//:deps.bzl", "register_fluent_types_toolchain")
 register_fluent_types_toolchain()
+
+# TODO: pull language files and build docker image
+
+# workaround for rules_docker not working on M1 macs
+# load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+# go_rules_dependencies()
+# go_register_toolchains(version = "1.19.5")
+
+# load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+# gazelle_dependencies(
+#   go_repository_default_config = "//:WORKSPACE.bazel"
+# )
+
+# load(
+#   "@io_bazel_rules_docker//repositories:repositories.bzl",
+#   container_repositories = "repositories",
+# )
+
+# container_repositories()
+
+# load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+# container_deps(
+#   go_repository_default_config = "@//:WORKSPACE.bazel",
+# )
+
+# load(
+#   "@io_bazel_rules_docker//container:container.bzl",
+#   "container_pull",
+# )
+# container_pull(
+#   name = "node19_base",
+#   registry = "docker.io",
+#   repository = "node",
+#   digest = "sha256:ff7e511abfa57825e17a0655896cf9a644450179f6fa3159ec9813e4c2b87625",
+# )
