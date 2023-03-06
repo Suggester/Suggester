@@ -21,7 +21,7 @@ export const BotConfigStruct = z.object({
   }),
 
   storage: z.object({
-    auto_migrate: z.boolean().default(true),
+    // auto_migrate: z.boolean().default(true),
     postgres_url: z.string(),
     redis_url: z.string(),
 
