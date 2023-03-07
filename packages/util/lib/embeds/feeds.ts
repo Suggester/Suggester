@@ -1,13 +1,38 @@
 import {SuggestionFeed} from '@suggester/database';
+import {
+  Attrs,
+  FluentPlaceholder,
+  Localizer,
+  MessageNames,
+} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
+import {
+  TimestampStyle,
+  bold,
+  channel,
+  code,
+  emoji,
+  quote,
+  role,
+  timestamp,
+} from '..';
 
 const formatBoolYesNo = (b?: boolean | null) => (b ? 'Yes' : 'No');
-const formatChannel = (c?: string | null) => (c ? `<#${c}>` : 'None');
-const formatRole = (r?: string | null) => (r ? `<@&${r}>` : 'None');
+const formatChannel = (c?: string | null) => (c ? channel(c) : 'None');
+const formatRole = (r?: string | null) => (r ? role(r) : 'None');
 const formatEmoji = (e?: string | null) =>
-  e ? (e.length < 15 ? e : `<:emoji:${e}>`) : 'Button disabled';
+  e ? (e.length < 15 ? e : emoji(e)) : 'Button disabled';
 const formatStr = (s?: string | null) => s || 'None';
+
+const buildFromParts = (
+  l: Localizer,
+  parts: {[key in keyof Attrs<'feed-info-embed'>]?: FluentPlaceholder}
+): string[] =>
+  Object.entries(parts).map(([k, v]) => {
+    const key = l.guild(('feed-info-embed.' + k) as MessageNames);
+    return `${bold(key)}: ${v}`;
+  });
 
 class BaseFeedInfoEmbed extends EmbedBuilder {
   constructor(feed: SuggestionFeed) {
@@ -22,69 +47,105 @@ class BaseFeedInfoEmbed extends EmbedBuilder {
 }
 
 export class FeedInfoOverviewEmbed extends BaseFeedInfoEmbed {
-  constructor(feed: SuggestionFeed) {
+  constructor(feed: SuggestionFeed, l: Localizer) {
     super(feed);
 
-    super.setDescriptionLocalized('feed-info-embed-overview.description', {
-      isDefault: formatBoolYesNo(feed.isDefault),
-      mode: feed.mode,
-      logChannel: formatChannel(feed.logChannelID),
-      feedChannel: formatChannel(feed.feedChannelID),
-      reviewChannel: formatChannel(feed.reviewChannelID),
+    const misc = buildFromParts(l, {
+      default: formatBoolYesNo(feed.isDefault),
+      mode: l.guild('feed-mode', {mode: feed.mode}),
+      'log-channel': formatChannel(feed.logChannelID),
+      'feed-channel': formatChannel(feed.feedChannelID),
+      'review-channel': formatChannel(feed.reviewChannelID),
     });
+
+    const times = buildFromParts(l, {
+      created: timestamp(feed.createdAt, TimestampStyle.RelativeTime),
+      'last-updated': timestamp(feed.updatedAt, TimestampStyle.RelativeTime),
+    });
+
+    const desc = [misc, '', times].flat();
+
+    super.setDescription(desc.join('\n'));
   }
 }
 
 export class FeedInfoRolesEmbed extends BaseFeedInfoEmbed {
-  constructor(feed: SuggestionFeed) {
+  constructor(feed: SuggestionFeed, l: Localizer) {
     super(feed);
 
-    super.setDescriptionLocalized('feed-info-embed-roles.description', {
-      reviewPingRole: formatRole(feed.reviewPingRole),
-      feedPingRole: formatRole(feed.feedPingRole),
-      approvedRole: formatRole(feed.approvedRole),
-      implementedRole: formatRole(feed.implementedRole),
+    const desc = buildFromParts(l, {
+      'review-ping-role': formatRole(feed.reviewPingRole),
+      'feed-ping-role': formatRole(feed.feedPingRole),
+      'approved-role': formatRole(feed.approvedRole),
+      'implemented-role': formatRole(feed.implementedRole),
     });
+
+    super.setDescription(desc.join('\n'));
   }
 }
 
 export class FeedInfoChannelsEmbed extends BaseFeedInfoEmbed {
-  constructor(feed: SuggestionFeed) {
+  constructor(feed: SuggestionFeed, l: Localizer) {
     super(feed);
 
-    super.setDescriptionLocalized('feed-info-embed-channels.description', {
-      feedChannel: formatChannel(feed.feedChannelID),
-      reviewChannel: formatChannel(feed.reviewChannelID),
-      logChannel: formatChannel(feed.logChannelID),
-      deniedChannel: formatChannel(feed.deniedChannelID),
-      implementedChannel: formatChannel(feed.implementedChannelID),
+    const desc = buildFromParts(l, {
+      'feed-channel': formatChannel(feed.feedChannelID),
+      'review-channel': formatChannel(feed.reviewChannelID),
+      'log-channel': formatChannel(feed.logChannelID),
+      'denied-channel': formatChannel(feed.deniedChannelID),
+      'implemented-channel': formatChannel(feed.implementedChannelID),
     });
+
+    super.setDescription(desc.join('\n'));
   }
 }
 
 export class FeedInfoOtherEmbed extends BaseFeedInfoEmbed {
-  constructor(feed: SuggestionFeed) {
+  constructor(feed: SuggestionFeed, l: Localizer) {
     super(feed);
 
-    super.setDescriptionLocalized('feed-info-embed-other.description', {
-      mode: feed.mode,
-      selfVote: formatBoolYesNo(feed.allowSelfVote),
-      showVoteCount: formatBoolYesNo(feed.showVoteCount),
-      commandAliasName: formatStr(feed.commandAliasName),
-      suggestionCap: feed.suggestionCap ? feed.suggestionCap : 'Unlimited',
+    const other = buildFromParts(l, {
+      mode: l.guild('feed-mode', {mode: feed.mode}),
+      'self-vote': formatBoolYesNo(feed.allowSelfVote),
+      'show-vote-count': formatBoolYesNo(feed.showVoteCount),
+      'command-alias': formatStr(feed.commandAliasName),
+      'suggestion-cap': feed.suggestionCap ? feed.suggestionCap : 'Unlimited',
       // TODO: suggestionCooldown: feed.submitCooldown,
-      anonAllowed: formatBoolYesNo(feed.allowAnonymous),
-
-      upvoteEmoji: formatEmoji(feed.upvoteEmoji),
-      midEmoji: formatEmoji(feed.midEmoji),
-      downvoteEmoji: formatEmoji(feed.downvoteEmoji),
-
-      colorChangeEnabled: formatBoolYesNo(feed.colorChangeEnabled),
-      colorChangeThreshold: feed.colorChangeThreshold,
-      colorChangeColor: `#${feed.colorChangeColor.toString(16).toUpperCase()}`, // hex code
-
-      notifyAuthor: formatBoolYesNo(feed.notifyAuthor),
-      autoSubscribe: formatBoolYesNo(feed.autoSubscribe),
+      'annon-allowed': formatBoolYesNo(feed.allowAnonymous),
     });
+
+    const voteButtons = buildFromParts(l, {
+      upvote: formatEmoji(feed.upvoteEmoji),
+      mid: formatEmoji(feed.midEmoji),
+      downvote: formatEmoji(feed.downvoteEmoji),
+    }).map(n => quote(n));
+
+    const colorChange = buildFromParts(l, {
+      'color-change-enabled': formatBoolYesNo(feed.colorChangeEnabled),
+      'color-change-threshold': feed.colorChangeThreshold,
+      'color-change-color': code(
+        '#' + feed.colorChangeColor.toString(16).toUpperCase()
+      ),
+    }).map(n => quote(n));
+
+    const notifications = buildFromParts(l, {
+      'notify-author': formatBoolYesNo(feed.notifyAuthor),
+      'auto-subscribe': formatBoolYesNo(feed.autoSubscribe),
+    }).map(n => quote(n));
+
+    const desc = [
+      other,
+      '',
+      bold(l.guild('feed-info-embed.header-vote-buttons')),
+      voteButtons,
+      '',
+      bold(l.guild('feed-info-embed.header-color-change')),
+      colorChange,
+      '',
+      bold(l.guild('feed-info-embed.header-notifications')),
+      notifications,
+    ].flat();
+
+    super.setDescription(desc.join('\n'));
   }
 }

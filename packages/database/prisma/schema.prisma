@@ -71,9 +71,10 @@ model SuggestionFeed {
   // role given when user has suggestion implemented
   implementedRole String? @map("implemented_role")
 
-  upvoteEmoji   String @default("👍") @map("upvote_emoji")
-  midEmoji      String @default("🤷") @map("mid_emoji")
-  downvoteEmoji String @default("👎") @map("downvote_emoji")
+  // null = disable
+  upvoteEmoji   String? @default("👍") @map("upvote_emoji")
+  midEmoji      String? @default("🤷") @map("mid_emoji")
+  downvoteEmoji String? @default("👎") @map("downvote_emoji")
 
   logWebhookID    String? @map("log_webhook_id")
   logWebhookToken String? @map("log_webhook_token")

@@ -80,7 +80,7 @@ export class FeedsGetCommand extends SubCommand {
       return;
     }
 
-    const overviewEmbed = new FeedInfoOverviewEmbed(feed).localize(
+    const overviewEmbed = new FeedInfoOverviewEmbed(feed, l).localize(
       l,
       l.getGuildLocale()
     );
@@ -126,10 +126,10 @@ export class FeedsGetCommand extends SubCommand {
     };
 
     const PAGES_MAP: {[key: string]: (feed: SuggestionFeed) => EmbedBuilder} = {
-      overview: feed => new FeedInfoOverviewEmbed(feed),
-      channels: feed => new FeedInfoChannelsEmbed(feed),
-      roles: feed => new FeedInfoRolesEmbed(feed),
-      other: feed => new FeedInfoOtherEmbed(feed),
+      overview: feed => new FeedInfoOverviewEmbed(feed, l),
+      channels: feed => new FeedInfoChannelsEmbed(feed, l),
+      roles: feed => new FeedInfoRolesEmbed(feed, l),
+      other: feed => new FeedInfoOtherEmbed(feed, l),
     };
 
     if (!(selected in PAGES_MAP)) {

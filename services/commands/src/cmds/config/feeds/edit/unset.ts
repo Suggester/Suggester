@@ -1,9 +1,89 @@
-import {APIChatInputApplicationCommandInteraction} from 'discord-api-types/v10';
+import {
+  APIApplicationCommandAutocompleteInteraction,
+  APIChatInputApplicationCommandInteraction,
+  ApplicationCommandOptionType,
+  ButtonStyle,
+  ComponentType,
+  MessageFlags,
+} from 'discord-api-types/v10';
 
 import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
 
-const options = [] as const;
+import {feedNameAutocomplete} from '../../../../util/commandComponents';
+
+const options = [
+  feedNameAutocomplete,
+
+  {
+    name: 'option',
+    description: 'The option to unset for this feed',
+    type: ApplicationCommandOptionType.String,
+    required: true,
+    choices: [
+      {
+        name: 'Review Channel',
+        value: 'reviewChannelID',
+      },
+      {
+        name: 'Log Channel',
+        value: 'logChannelID',
+      },
+      {
+        name: 'Denied Channel',
+        value: 'deniedChannelID',
+      },
+      {
+        name: 'Implemented Channel',
+        value: 'implementedChannelID',
+      },
+      {
+        name: 'Upvote Emoji',
+        value: 'upvoteEmoji',
+      },
+      {
+        name: 'Mid Emoji',
+        value: 'midEmoji',
+      },
+      {
+        name: 'Downvote Emoji',
+        value: 'downvoteEmoji',
+      },
+      {
+        name: 'Approved Suggestion Reward Role',
+        value: 'approvedRole',
+      },
+      {
+        name: 'Implemented Suggestion Reward Role',
+        value: 'implementedRole',
+      },
+      {
+        name: 'Review Ping Role',
+        value: 'reviewPingRole',
+      },
+      {
+        name: 'New Suggestion Ping Role',
+        value: 'feedPingRole',
+      },
+      {
+        name: 'Suggestion Feed Cap',
+        value: 'suggestionCap',
+      },
+    ],
+  },
+
+  // name: 'mode',
+  // name: 'default',
+  //
+  // name: 'enable-color-change',
+  // name: 'color-change-threshold',
+  // name: 'color-change-color',
+  // name: 'auto-follow-on-interact',
+  // name: 'auto-follow-own-suggestions',
+  // name: 'allow-voting-on-own-suggestion',
+  // name: 'show-vote-count',
+  // name: 'allow-anonymous-suggestions',
+] as const;
 
 export class FeedsEditUnsetCommand extends SubCommand {
   name: MessageNames = 'cmd-feeds-edit-unset.name';
@@ -13,5 +93,96 @@ export class FeedsEditUnsetCommand extends SubCommand {
 
   async command(
     ctx: Context<APIChatInputApplicationCommandInteraction, typeof options>
-  ): Promise<void> {}
+  ): Promise<void> {
+    const l = ctx.getLocalizer();
+
+    const name = ctx.getOption('name').value;
+    const feed = await ctx.db.suggestionFeeds.getByName(
+      ctx.interaction.guild_id!,
+      name
+    );
+
+    if (!feed) {
+      const mention = ctx.framework.mentionCmd('feeds create');
+      const m = l.user('unknown-feed', {
+        name: name,
+        cmd: mention,
+      });
+
+      await ctx.send({
+        content: m,
+        flags: MessageFlags.Ephemeral,
+      });
+
+      return;
+    }
+
+    const defaultValues: Record<string, string | null> = {
+      reviewChannelID: null,
+      logChannelID: null,
+      deniedChannelID: null,
+      implementedChannelID: null,
+      upvoteEmoji: null,
+      midEmoji: null,
+      downvoteEmoji: null,
+      approvedRole: null,
+      implementedRole: null,
+      reviewPingRole: null,
+      feedPingRole: null,
+      suggestionCap: null,
+    };
+
+    const option = ctx.getOption('option').value;
+
+    if (!(option in defaultValues)) {
+      // TODO: error message
+      return;
+    }
+
+    const newValue = defaultValues[option];
+    const upd = {[option]: newValue};
+
+    await ctx.db.prisma.suggestionFeed.update({
+      where: {
+        id: feed.id,
+      },
+      data: upd,
+    });
+
+    const m = l.guild('feeds-edit-set-success');
+    await ctx.send({
+      content: m,
+      components: [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: 'View Config',
+              custom_id: `feeds-get:overview:${feed.id}:es`,
+            },
+          ],
+        },
+      ],
+    });
+  }
+
+  async autocomplete(
+    ctx: Context<APIApplicationCommandAutocompleteInteraction, typeof options>
+  ): Promise<void> {
+    const focused = ctx.getFocusedOption();
+
+    if (
+      focused?.name === 'name' &&
+      focused.type === ApplicationCommandOptionType.String
+    ) {
+      const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
+        ctx.interaction.guild_id!,
+        focused.value
+      );
+
+      await ctx.sendAutocomplete(suggestions);
+    }
+  }
 }

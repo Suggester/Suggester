@@ -300,7 +300,7 @@ export class FeedsEditSetCommand extends SubCommand {
         continue;
       }
 
-      const parsed = parseEmoji(mappedOpts[emoji]);
+      const parsed = parseEmoji(mappedOpts[emoji]!);
 
       if (!parsed) {
         const m = l.user('feeds-edit-set-invalid-emoji', {
