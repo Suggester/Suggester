@@ -72,10 +72,10 @@ export abstract class Command {
   defaultDescription = '';
   abstract description: MessageNames;
   description_localizations = {};
-  default_member_permissions = '0';
   dm_permission = false;
   options: DeepReadonly<APIApplicationCommandOption[]> = [];
   subCommands: (SubCommand | SubCommandGroup)[] = [];
+  defaultMemberPermissions: BigInt | null = null;
 
   /** adds the command as a guild command in these servers */
   guilds?: string[];
@@ -115,7 +115,7 @@ export abstract class Command {
       name_localizations: this.name_localizations,
       description: this.defaultDescription,
       description_localizations: this.description_localizations,
-      default_member_permissions: this.default_member_permissions,
+      default_member_permissions: this.defaultMemberPermissions?.toString(),
       dm_permission: this.dm_permission,
       options: this.options as APIApplicationCommandOption[],
     };

@@ -22,5 +22,8 @@
     "build": "tsc",
     "lint": "eslint .",
     "fmt": "prettier --write --ignore-path=.eslintignore ."
+  },
+  "engines": {
+    "node": ">=18.15.0"
   }
 }

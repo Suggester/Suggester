@@ -1,6 +1,6 @@
 import {
-  APIApplicationCommandAutocompleteInteraction,
-  APIChatInputApplicationCommandInteraction,
+  APIApplicationCommandAutocompleteGuildInteraction,
+  APIChatInputApplicationCommandGuildInteraction,
   ApplicationCommandOptionType,
   ButtonStyle,
   ChannelType,
@@ -21,7 +21,6 @@ const parseEmoji = (s?: string): string | undefined => {
   }
 
   const RE = /<a?:\w{2,32}:(\d{16,20})>|(\p{Extended_Pictographic})/gu;
-
   return RE.exec(s.trim())?.[1];
 };
 
@@ -213,13 +212,13 @@ export class FeedsEditSetCommand extends SubCommand {
   options = options;
 
   async command(
-    ctx: Context<APIChatInputApplicationCommandInteraction, typeof options>
+    ctx: Context<APIChatInputApplicationCommandGuildInteraction, typeof options>
   ): Promise<void> {
     const l = ctx.getLocalizer();
     const feedName = ctx.getOption('name').value;
 
     const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id!,
+      ctx.interaction.guild_id,
       feedName
     );
 
@@ -362,7 +361,10 @@ export class FeedsEditSetCommand extends SubCommand {
   }
 
   async autocomplete(
-    ctx: Context<APIApplicationCommandAutocompleteInteraction, typeof options>
+    ctx: Context<
+      APIApplicationCommandAutocompleteGuildInteraction,
+      typeof options
+    >
   ): Promise<void> {
     const focused = ctx.getFocusedOption();
 
@@ -371,7 +373,7 @@ export class FeedsEditSetCommand extends SubCommand {
       focused.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id!,
+        ctx.interaction.guild_id,
         focused.value
       );
 

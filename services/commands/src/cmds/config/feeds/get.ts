@@ -1,9 +1,9 @@
 import {
   APIActionRowComponent,
-  APIApplicationCommandAutocompleteInteraction,
-  APIChatInputApplicationCommandInteraction,
+  APIApplicationCommandAutocompleteGuildInteraction,
+  APIChatInputApplicationCommandGuildInteraction,
   APIMessageActionRowComponent,
-  APIMessageComponentInteraction,
+  APIMessageComponentGuildInteraction,
   ApplicationCommandOptionType,
   ButtonStyle,
   ComponentType,
@@ -56,14 +56,14 @@ export class FeedsGetCommand extends SubCommand {
   buttonIDs = ['feeds-get:'];
 
   async command(
-    ctx: Context<APIChatInputApplicationCommandInteraction, typeof options>
+    ctx: Context<APIChatInputApplicationCommandGuildInteraction, typeof options>
   ): Promise<void> {
     const l = ctx.getLocalizer();
 
     const feedName = ctx.getOption('name').value;
 
     const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id!,
+      ctx.interaction.guild_id,
       feedName
     );
 
@@ -92,7 +92,10 @@ export class FeedsGetCommand extends SubCommand {
   }
 
   async autocomplete(
-    ctx: Context<APIApplicationCommandAutocompleteInteraction, typeof options>
+    ctx: Context<
+      APIApplicationCommandAutocompleteGuildInteraction,
+      typeof options
+    >
   ): Promise<void> {
     const opt = ctx.getFocusedOption();
     if (
@@ -100,7 +103,7 @@ export class FeedsGetCommand extends SubCommand {
       opt?.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id!,
+        ctx.interaction.guild_id,
         opt.value
       );
 
@@ -108,7 +111,9 @@ export class FeedsGetCommand extends SubCommand {
     }
   }
 
-  async button(ctx: Context<APIMessageComponentInteraction>): Promise<void> {
+  async button(
+    ctx: Context<APIMessageComponentGuildInteraction>
+  ): Promise<void> {
     const l = ctx.getLocalizer();
 
     const [, selected, _id, opts] = ctx.interaction.data.custom_id.split(':');
@@ -139,7 +144,7 @@ export class FeedsGetCommand extends SubCommand {
     }
 
     const feed = await ctx.db.suggestionFeeds.getByID(
-      ctx.interaction.guild_id!,
+      ctx.interaction.guild_id,
       id
     );
 

@@ -85,4 +85,10 @@ export class SuggestionFeedStore {
       data,
     });
   }
+
+  async delete(id: number) {
+    return this.prisma.suggestionFeed.delete({
+      where: {id},
+    });
+  }
 }
