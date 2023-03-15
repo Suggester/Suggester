@@ -24,6 +24,8 @@ ts_project(
     ":node_modules/@suggester/types",
     ":node_modules/@suggester/util",
     ":node_modules/@discordjs/rest",
+    ":node_modules/@sentry/node",
+    ":node_modules/@sentry/tracing",
     ":node_modules/discord-api-types",
     ":node_modules/discord-verify",
     ":node_modules/fastify",

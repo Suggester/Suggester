@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@discordjs/rest": "^1.5.0",
+    "@sentry/node": "^7.42.0",
+    "@sentry/tracing": "^7.42.0",
     "@suggester/database": "workspace:*",
     "@suggester/i18n": "workspace:*",
     "@suggester/types": "workspace:*",

@@ -1,3 +1,4 @@
+import {Scope} from '@sentry/node';
 import {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataAttachmentOption,
@@ -38,7 +39,7 @@ import {
 } from 'discord-api-types/v10';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
-import {Database} from '@suggester/database';
+import {ContextualDatabase, Database} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
 import {
   DeepReadonly,
@@ -53,6 +54,7 @@ export interface ContextConfig<T extends APIInteraction> {
   framework: Framework;
   req: FastifyRequest;
   reply: FastifyReply;
+  scope: Scope;
 }
 
 export class Context<
@@ -61,10 +63,11 @@ export class Context<
     APIApplicationCommandOption[]
   >
 > {
-  readonly db: Database;
+  readonly db: ContextualDatabase;
   readonly locales: LocalizationService;
   readonly interaction: T;
   readonly framework: Framework;
+  readonly scope: Scope;
 
   readonly fastifyReq: FastifyRequest;
   readonly fastifyReply: FastifyReply;
@@ -72,12 +75,19 @@ export class Context<
   #sentInitial = false;
 
   constructor(cfg: ContextConfig<T>) {
-    this.db = cfg.framework.db;
     this.locales = cfg.framework.locales;
     this.interaction = cfg.interaction;
     this.framework = cfg.framework;
     this.fastifyReq = cfg.req;
     this.fastifyReply = cfg.reply;
+    this.scope = cfg.scope;
+
+    this.db = new ContextualDatabase({
+      db: cfg.framework.db,
+      guildID: this.interaction.guild_id,
+      channelID: this.interaction.channel_id,
+      userID: (this.interaction.member?.user.id || this.interaction.user?.id)!,
+    });
   }
 
   getLocalizer(): Localizer {

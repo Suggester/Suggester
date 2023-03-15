@@ -16,5 +16,9 @@
   },
   "engines": {
     "node": ">=18.15.0"
+  },
+  "dependencies": {
+    "@sentry/node": "^7.42.0",
+    "@sentry/tracing": "^7.42.0"
   }
 }

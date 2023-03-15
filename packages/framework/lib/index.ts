@@ -4,9 +4,12 @@ import {readdirSync} from 'node:fs';
 import path from 'node:path';
 
 import {REST} from '@discordjs/rest';
+import * as Sentry from '@sentry/node';
+import {Scope} from '@sentry/node';
 import {
   APIApplicationCommand,
   APIApplicationCommandAutocompleteInteraction,
+  APIApplicationCommandInteractionDataOption,
   APIChatInputApplicationCommandInteraction,
   APIInteraction,
   APIInteractionResponse,
@@ -80,16 +83,15 @@ export type FrameworkEvents = {
 
 const getAndExecFn = async <
   T extends APIInteraction,
-  U extends
-    | ButtonFunction
-    | SelectFunction
-    | ModalFunction
-    | AutocompleteFunction
+  U extends ButtonFunction | SelectFunction | ModalFunction
 >(
   id: string,
   ctx: Context<T>,
-  map: Map<string | RegExp, U>
+  map: Map<string | RegExp, U>,
+  kind: string
 ) => {
+  ctx.scope.setTag('handler', kind);
+
   // map.get is O(1) so if the ID name is constant, it will be faster than Array::find
   const fn =
     map.get(id) ||
@@ -105,7 +107,9 @@ const getAndExecFn = async <
   try {
     await fn(ctx as any); // eslint-disable-line
   } catch (err) {
-    console.error(`Error while executing handler for: ${id}:`, err);
+    console.error(`Error while executing ${kind} handler for: ${id}:`, err);
+
+    Sentry.captureException(err, ctx.scope);
   }
 };
 
@@ -164,7 +168,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     db,
     locales,
     config,
-    proxyURL = undefined,
+    proxyURL = 'https://discord.com/api',
   }: {
     readonly db: Database;
     readonly locales: LocalizationService;
@@ -192,6 +196,8 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     }>,
     w: FastifyReply
   ): Promise<APIInteractionResponse | void> {
+    const scope = new Scope();
+
     const body = r.body;
     const publicKey = this.config.discord_application.public_key;
 
@@ -218,7 +224,15 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       return w;
     }
 
-    await this.handleInteraction(body, r, w);
+    const dUser = body.member?.user || body.user;
+    scope.setUser({
+      id: dUser?.id || 'unknown',
+      username: dUser
+        ? `${dUser.username}#${dUser.discriminator}`
+        : 'Unknown#0000',
+    });
+
+    await this.handleInteraction(body, r, w, scope);
 
     if (!w.sent) {
       await w.code(HttpStatusCode.INTERNAL_SERVER_ERROR).send();
@@ -231,7 +245,8 @@ export class Framework extends EventEmitter<FrameworkEvents> {
   async handleInteraction(
     i: APIInteraction,
     req: FastifyRequest,
-    reply: FastifyReply
+    reply: FastifyReply,
+    scope: Scope
   ) {
     const mkCtx = <T extends APIInteraction>(i: T) =>
       new Context({
@@ -239,6 +254,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         interaction: i,
         req,
         reply,
+        scope,
       });
 
     // TODO: can this be cleaned up?
@@ -252,6 +268,10 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         switch (i.data.type) {
           case ApplicationCommandType.ChatInput: {
             const ctx = mkCtx(i as APIChatInputApplicationCommandInteraction);
+
+            scope.setTag('handler', 'command');
+            scope.setTag('command', ctx.interaction.data.name);
+
             this.emit(Events.Command, ctx);
 
             const cmd = this.routeCommand(
@@ -264,7 +284,12 @@ export class Framework extends EventEmitter<FrameworkEvents> {
             try {
               await cmd.command(ctx);
             } catch (err) {
-              console.error(`Error while running command: ${cmd.name}:`, err);
+              console.error(
+                `Error while running command: ${cmd.defaultName}:`,
+                err
+              );
+
+              Sentry.captureException(err, scope);
             }
             break;
           }
@@ -291,6 +316,10 @@ export class Framework extends EventEmitter<FrameworkEvents> {
 
       case InteractionType.ApplicationCommandAutocomplete: {
         const ctx = mkCtx(i);
+
+        scope.setTag('command', ctx.interaction.data.name);
+        scope.setTag('handler', 'autocomplete');
+
         this.emit(Events.Autocomplete, ctx);
 
         const cmd = this.routeCommand(i);
@@ -301,7 +330,11 @@ export class Framework extends EventEmitter<FrameworkEvents> {
         try {
           await cmd.autocomplete(ctx);
         } catch (err) {
-          console.error(`Error while executing handler for: ${cmd.name}:`, err);
+          console.error(
+            `Error while executing autocomplete handler for: ${cmd.defaultName}:`,
+            err
+          );
+          Sentry.captureException(err, scope);
         }
         break;
       }
@@ -313,7 +346,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
             const ctx = mkCtx(i);
             this.emit(Events.Button, ctx);
             // TODO: is it a problem to not await this?
-            await getAndExecFn(i.data.custom_id, ctx, this.buttonFns);
+            await getAndExecFn(i.data.custom_id, ctx, this.buttonFns, 'button');
             break;
           }
 
@@ -321,7 +354,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
           case ComponentType.StringSelect: {
             const ctx = mkCtx(i);
             this.emit(Events.Select, ctx);
-            await getAndExecFn(i.data.custom_id, ctx, this.selectFns);
+            await getAndExecFn(i.data.custom_id, ctx, this.selectFns, 'select');
             break;
           }
         }
@@ -331,7 +364,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       case InteractionType.ModalSubmit: {
         const ctx = mkCtx(i);
         this.emit(Events.Modal, ctx);
-        await getAndExecFn(i.data.custom_id, ctx, this.modalFns);
+        await getAndExecFn(i.data.custom_id, ctx, this.modalFns, 'modal');
         break;
       }
     }
@@ -516,6 +549,38 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     return mods;
   }
 }
+
+export const stringifyCommand = (
+  cmd:
+    | APIChatInputApplicationCommandInteraction
+    | APIApplicationCommandAutocompleteInteraction
+) => {
+  const fullcmd: (string | number | boolean)[] = [cmd.data.name];
+
+  const down = (s: APIApplicationCommandInteractionDataOption[]) => {
+    for (const op of s) {
+      if ('value' in op && op.value) {
+        fullcmd.push(`${op.name}:`, `\`${op.value}\``);
+      } else {
+        fullcmd.push(op.name);
+      }
+
+      if ('options' in op) {
+        if (op.options) {
+          down(op.options);
+        }
+      }
+    }
+  };
+
+  if ('options' in cmd.data) {
+    if (cmd.data.options) {
+      down(cmd.data.options);
+    }
+  }
+
+  return '/' + fullcmd.join(' ');
+};
 
 export * from './context';
 export * from './command';
