@@ -3,16 +3,13 @@ import {
   APIButtonComponent,
   APIChatInputApplicationCommandGuildInteraction,
   APIGuildInteraction,
-  APIInteraction,
   APIMessage,
-  APIMessageComponent,
   APIModalSubmitGuildInteraction,
   ApplicationCommandOptionType,
   ButtonStyle,
   ComponentType,
   MessageFlags,
   RESTPostAPIChannelMessageJSONBody,
-  RouteBases,
   Routes,
   TextInputStyle,
 } from 'discord-api-types/v10';
@@ -24,7 +21,7 @@ import {
 } from '@suggester/database';
 import {Command, Context} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
-import {SuggestionEmbed, channel} from '@suggester/util';
+import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
 
@@ -43,6 +40,16 @@ const createSuggestion = async <C extends APIGuildInteraction>(
 
   const l = ctx.getLocalizer();
 
+  if (anon && !feed.allowAnonymous) {
+    const m = l.user('suggest-anon-disallowed-error');
+    await ctx.send({
+      content: m,
+      flags: MessageFlags.Ephemeral,
+    });
+
+    return;
+  }
+
   const createdSuggestion = await ctx.db.createSuggestion({
     body,
     feedChannelID: feed.feedChannelID,
@@ -58,8 +65,64 @@ const createSuggestion = async <C extends APIGuildInteraction>(
   try {
     switch (feed.mode) {
       case SuggestionFeedMode.Review: {
-        // TODO: send to review channel
-        break;
+        if (!feed.reviewChannelID) {
+          await ctx.send({
+            content: l.user('review-channel-not-set-error', {
+              cmd: ctx.framework.mentionCmd('feeds edit set'),
+            }),
+            flags: MessageFlags.Ephemeral,
+          });
+
+          return;
+        }
+
+        const embed = new NewSuggestionReviewQueueEmbed(
+          l,
+          createdSuggestion,
+          ctx.interaction.member.user
+        );
+
+        await sendMsg(feed.reviewChannelID, {
+          embeds: [embed],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Success,
+                  custom_id: `review:approve:${createdSuggestion.id}`,
+                  label: l.guild('review-queue-buttons.approve'),
+                },
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Secondary,
+                  custom_id: `review:deny:${createdSuggestion.id}`,
+                  label: l.guild('review-queue-buttons.deny'),
+                },
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Danger,
+                  custom_id: `review:delete:${createdSuggestion.id}`,
+                  label: l.guild('review-queue-buttons.delete'),
+                },
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Primary,
+                  custom_id: `review:status:${createdSuggestion.id}`,
+                  label: l.guild('review-queue-buttons.change-status'),
+                },
+              ],
+            },
+          ],
+        });
+
+        await ctx.send({
+          content: l.guild('suggest-success.review'),
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
       }
 
       case SuggestionFeedMode.AutoApprove: {
@@ -81,13 +144,9 @@ const createSuggestion = async <C extends APIGuildInteraction>(
             ([action, emoji]) =>
               emoji && {
                 type: ComponentType.Button,
-                style: ButtonStyle.Primary,
+                style: ButtonStyle.Secondary,
                 emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
                 custom_id: `${action}:${createdSuggestion.id}`,
-                // TODO: label or no label?
-                label: l.guild(
-                  ('suggestion-vote-buttons.' + action) as MessageNames
-                ),
               }
           )
           .filter(Boolean) as APIButtonComponent[];
@@ -126,7 +185,7 @@ const createSuggestion = async <C extends APIGuildInteraction>(
           feedMessageID: createdMsg.id,
         });
 
-        break;
+        return;
       }
     }
   } catch (err) {
@@ -134,7 +193,6 @@ const createSuggestion = async <C extends APIGuildInteraction>(
 
     await ctx.db.deleteSuggestion(createdSuggestion.id);
 
-    // TODO: delete suggsetion from db
     const msg = l.user('err_generic');
     await ctx.sendOrUpdate({
       content: msg,

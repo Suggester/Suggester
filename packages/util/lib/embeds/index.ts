@@ -204,4 +204,5 @@ export interface LocalizedAPIEmbedField<T extends MessageNames> {
 
 export * from './changelog';
 export * from './feeds';
+export * from './review';
 export * from './suggestion';

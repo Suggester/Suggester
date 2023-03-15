@@ -76,7 +76,7 @@ export class SuggestionEmbed extends EmbedBuilder {
 
     super.setAuthor({
       name: authorName,
-      icon_url: formatAvatarURL(author),
+      icon_url: suggestion.isAnonymous ? undefined : formatAvatarURL(author),
     });
 
     // -- footer --
