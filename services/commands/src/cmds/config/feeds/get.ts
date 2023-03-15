@@ -21,15 +21,9 @@ import {
   FeedInfoRolesEmbed,
 } from '@suggester/util';
 
-const options = [
-  {
-    name: 'name',
-    description: 'The name of the feed',
-    type: ApplicationCommandOptionType.String,
-    autocomplete: true,
-    required: true,
-  },
-] as const;
+import {feedNameAutocomplete} from '../../../util/commandComponents';
+
+const options = [feedNameAutocomplete] as const;
 
 const pageButtons = (
   l: Localizer,

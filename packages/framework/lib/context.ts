@@ -160,6 +160,12 @@ export class Context<
     });
   }
 
+  async sendOrUpdate(payload: APIInteractionResponseCallbackData) {
+    return this.#sentInitial
+      ? this.edit('@original', payload)
+      : this.send(payload);
+  }
+
   async defer(ephemeral = false): Promise<void> {
     if (this.isMessageComponent()) {
       return this.respond({

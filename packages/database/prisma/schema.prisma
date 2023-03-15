@@ -53,7 +53,7 @@ model SuggestionFeed {
   deniedChannelID      String? @map("denied_channel_id")
   implementedChannelID String? @map("implemented_channel_id")
 
-  mode SuggestionFeedMode @default(AUTOAPPROVE)
+  mode SuggestionFeedMode @default(AutoApprove)
 
   // roles allowed to vote
   votingRoles  String[] @map("voting_roles")
@@ -134,7 +134,7 @@ model Suggestion {
 
   body           String
   approvalStatus SuggestionApprovalStatus @map("approval_status")
-  displayStatus  SuggestionDisplayStatus  @default(DEFAULT) @map("display_status")
+  displayStatus  SuggestionDisplayStatus  @default(Default) @map("display_status")
 
   denialReason String? @map("denial_reason")
 
@@ -242,41 +242,41 @@ model GlobalBlock {
 }
 
 enum SuggestionFeedMode {
-  AUTOAPPROVE
-  REVIEW
+  AutoApprove
+  Review
 
   @@map("suggestion_feed_mode")
 }
 
 enum SuggestionApprovalStatus {
-  APPROVED
-  IN_QUEUE
-  DENIED
+  Approved
+  InQueue
+  Denied
 
   @@map("suggestion_approval_status")
 }
 
 enum SuggestionDisplayStatus {
-  DEFAULT
-  IMPLEMENTED
-  CONSIDERING
-  IN_PROGRESS
-  NOT_HAPPENING
+  Default
+  Implemented
+  Considering
+  InProgress
+  NotHappening
 
   @@map("suggestion_display_status")
 }
 
 enum SuggestionVoteKind {
-  UPVOTE
-  MID
-  DOWNVOTE
+  Upvote
+  Mid
+  Downvote
 
   @@map("suggestion_vote_kind")
 }
 
 enum GlobalBlockKind {
-  USER
-  GUILD
+  User
+  Guild
 
   @@map("global_block_kind")
 }

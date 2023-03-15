@@ -1,3 +1,5 @@
+import {APIUser, RouteBases} from 'discord-api-types/v10';
+
 export enum TimestampStyle {
   /** 6:14 PM */
   ShortTime = 't',
@@ -37,3 +39,9 @@ export const role = (r: string) => `<@&${r}>`;
 
 export const emoji = (id: string, animated = false) =>
   `<${animated ? 'a' : ''}:aa:${id}>`;
+
+export const formatAvatarURL = (user: APIUser) =>
+  RouteBases.cdn +
+  (user.avatar
+    ? `/avatars/${user.id}/${user.avatar}.png`
+    : `/embed/avatars/${Number(user.discriminator) % 5}.png`);

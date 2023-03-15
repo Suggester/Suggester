@@ -35,8 +35,8 @@ const options = [
       'Should submitted suggestions be sent for manual review or be automatically approved?',
     type: ApplicationCommandOptionType.String,
     choices: [
-      {name: 'Require Manual Review', value: 'REVIEW'},
-      {name: 'Automatically Approve', value: 'AUTOAPPROVE'},
+      {name: 'Require Manual Review', value: 'Review'},
+      {name: 'Automatically Approve', value: 'AutoApprove'},
     ],
   },
   {

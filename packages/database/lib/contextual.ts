@@ -1,9 +1,18 @@
 import {Database} from '.';
-import {SuggestionFeed} from '../prisma-out';
+import {
+  Suggestion,
+  SuggestionApprovalStatus,
+  SuggestionFeed,
+} from '../prisma-out';
 
 export type PartialSuggestionFeed = Omit<
   SuggestionFeed,
   'id' | 'lastSuggestionID' | 'createdAt' | 'updatedAt'
+>;
+
+export type PartialSuggestion = Omit<
+  Suggestion,
+  'id' | 'createdAt' | 'updatedAt' | 'guildID'
 >;
 
 export interface ContextualDatabaseConfig {
@@ -130,6 +139,44 @@ export class ContextualDatabase {
     return this.db.prisma.suggestionFeed.update({
       where: {id},
       data,
+    });
+  }
+
+  // --- suggestions ---
+
+  async createSuggestion(
+    data: Partial<PartialSuggestion> &
+      Pick<Suggestion, 'body' | 'feedChannelID' | 'approvalStatus'>
+  ) {
+    if (!this.guildID) {
+      throw new Error('guildID missing in ContextualDatabase');
+    }
+
+    return this.db.prisma.suggestion.create({
+      data: {
+        ...data,
+        guildID: this.guildID,
+        authorID: this.userID,
+        feedChannelID: data.feedChannelID,
+        approvalStatus: data.approvalStatus,
+      },
+    });
+  }
+
+  async updateSuggestion(id: number, data: Partial<PartialSuggestion>) {
+    if (!this.guildID) {
+      throw new Error('guildID missing in ContextualDatabase');
+    }
+
+    return this.db.prisma.suggestion.update({
+      where: {id},
+      data,
+    });
+  }
+
+  async deleteSuggestion(id: number) {
+    return this.db.prisma.suggestion.delete({
+      where: {id},
     });
   }
 
