@@ -40,8 +40,8 @@ const start = async () => {
   // TODO: switch from fastify to node:http?
   server.post('/interactions', fw.handleRequest.bind(fw));
 
-  await fw.loadModules();
-  console.log(`Loaded ${fw.modules.size} modules and ${fw.cmds.size} commands`);
+  await fw.loadCommands();
+  console.log(`Loaded ${fw.cmds.size} commands`);
 
   try {
     await server.listen({

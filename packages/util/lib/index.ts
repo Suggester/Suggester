@@ -4,4 +4,5 @@ export * from './embeds';
 export * from './flags';
 export * from './httpStatusCodes';
 export * from './md';
+export * from './readdir';
 export * from './types';

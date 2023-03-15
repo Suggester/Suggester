@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import EventEmitter from 'node:events';
-import {readdirSync} from 'node:fs';
 import path from 'node:path';
 
 import {REST} from '@discordjs/rest';
@@ -30,22 +29,21 @@ import {FastifyReply, FastifyRequest} from 'fastify';
 
 import {Database} from '@suggester/database';
 import {LocalizationService} from '@suggester/i18n';
-import {HttpStatusCode} from '@suggester/util';
-import {BotConfig} from '@suggester/util';
+import {BotConfig, HttpStatusCode, readdir} from '@suggester/util';
 
 import {
   AutocompleteFunction,
   ButtonFunction,
   Command,
+  CommandSubClass,
   ModalFunction,
   SelectFunction,
   SubCommand,
   SubCommandGroup,
 } from './command';
 import {Context} from './context';
-import {CommandModule, CommandModuleSubClass} from './module';
 
-const MODULE_DIR = path.join(
+const COMMAND_DIR = path.join(
   process.cwd(),
   'services',
   'commands',
@@ -148,7 +146,6 @@ const initCommands = (
 };
 
 export class Framework extends EventEmitter<FrameworkEvents> {
-  readonly modules = new Map<string, CommandModule>();
   readonly cmds = new Map<string, Command>();
 
   readonly buttonFns = new Map<string | RegExp, ButtonFunction>();
@@ -431,53 +428,49 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     return `</${cmd}:${c.remoteCmd.id}>`;
   }
 
-  async loadModules() {
-    const mods = await this.constructor.discoverModules();
+  async loadCommands() {
+    const foundCmds = await this.constructor.discoverCommands();
+    const cmds = foundCmds.map(C => new C());
 
-    for (const Mod of mods) {
-      const m = new Mod();
-      this.modules.set(m.name, m);
+    const remoteCmds = (await this.rest.get(
+      Routes.applicationCommands(this.config.discord_application.id)
+    )) as APIApplicationCommand[];
 
-      const cmds = (await this.rest.get(
-        Routes.applicationCommands(this.config.discord_application.id)
-      )) as APIApplicationCommand[];
+    initCommands(this.locales, cmds, this, remoteCmds);
+    for (const cmd of cmds) {
+      this.cmds.set(cmd.defaultName, cmd);
 
-      initCommands(this.locales, m.commands, this, cmds);
-      for (const cmd of m.commands) {
-        this.cmds.set(cmd.defaultName, cmd);
+      const ld = <
+        T extends
+          | ButtonFunction
+          | SelectFunction
+          | ModalFunction
+          | AutocompleteFunction
+      >(
+        ids: (string | RegExp)[],
+        fn: T,
+        map: Map<string | RegExp, T>
+      ) => {
+        for (const id of ids) {
+          map.set(id, fn);
+        }
+      };
 
-        const ld = <
-          T extends
-            | ButtonFunction
-            | SelectFunction
-            | ModalFunction
-            | AutocompleteFunction
-        >(
-          ids: (string | RegExp)[],
-          fn: T,
-          map: Map<string | RegExp, T>
-        ) => {
-          for (const id of ids) {
-            map.set(id, fn);
+      const loadIds = (c: Command | SubCommand) => {
+        ld(c.buttonIDs, c.button.bind(c), this.buttonFns);
+        ld(c.modalIDs, c.modal.bind(c), this.modalFns);
+        ld(c.selectIDs, c.select.bind(c), this.selectFns);
+        ld(c.autocompleteIDs, c.autocomplete.bind(c), this.autocompleteFns);
+      };
+
+      loadIds(cmd);
+      for (const grp of cmd.subCommands) {
+        if (grp instanceof SubCommandGroup) {
+          for (const sub of grp.subCommands) {
+            loadIds(sub);
           }
-        };
-
-        const loadIds = (c: Command | SubCommand) => {
-          ld(c.buttonIDs, c.button.bind(c), this.buttonFns);
-          ld(c.modalIDs, c.modal.bind(c), this.modalFns);
-          ld(c.selectIDs, c.select.bind(c), this.selectFns);
-          ld(c.autocompleteIDs, c.autocomplete.bind(c), this.autocompleteFns);
-        };
-
-        loadIds(cmd);
-        for (const grp of cmd.subCommands) {
-          if (grp instanceof SubCommandGroup) {
-            for (const sub of grp.subCommands) {
-              loadIds(sub);
-            }
-          } else {
-            loadIds(grp);
-          }
+        } else {
+          loadIds(grp);
         }
       }
     }
@@ -494,15 +487,24 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     const applicationID = Buffer.from(token.split('.')[0], 'base64').toString();
     const rest = new REST().setToken(token);
 
-    let publicCmds: Command[] = [];
-    let adminCmds: Command[] = [];
-    const mods = await this.discoverModules();
-    for (const Mod of mods) {
-      const m = new Mod();
-      publicCmds = publicCmds.concat(m.commands.filter(c => !c.adminCommand));
-      adminCmds = adminCmds.concat(m.commands.filter(c => c.adminCommand));
-      initCommands(l, publicCmds);
-    }
+    const cmds = await this.discoverCommands().then(cs => cs.map(C => new C()));
+    initCommands(l, cmds);
+
+    const {publicCmds, adminCmds} = cmds.reduce(
+      (a, c) => {
+        if (c.adminCommand) {
+          a.adminCmds.push(c);
+        } else {
+          a.publicCmds.push(c);
+        }
+
+        return a;
+      },
+      {adminCmds: [], publicCmds: []} as {
+        adminCmds: Command[];
+        publicCmds: Command[];
+      }
+    );
 
     const createdGlobal = (await rest.put(
       Routes.applicationCommands(applicationID),
@@ -520,33 +522,20 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     return {global: createdGlobal, admin: createdAdmin};
   }
 
-  static async discoverModules(): Promise<CommandModuleSubClass[]> {
-    const modsDir = readdirSync(MODULE_DIR, {withFileTypes: true})
-      .filter(f => f.isDirectory())
-      .map(f => path.join(MODULE_DIR, f.name));
+  static async discoverCommands(): Promise<CommandSubClass[]> {
+    let cmds: CommandSubClass[] = [];
 
-    let mods: CommandModuleSubClass[] = [];
+    const cmdFiles = readdir(COMMAND_DIR, '.js');
+    for await (const cmdFile of cmdFiles) {
+      const imported = await import(cmdFile);
+      const loadedCmds = Object.values(imported).filter(
+        m => Object.getPrototypeOf(m) === Command
+      ) as CommandSubClass[];
 
-    for (const modDir of modsDir) {
-      const mod = readdirSync(modDir, {withFileTypes: true}).find(
-        d =>
-          d.isFile() &&
-          d.name === (__filename.endsWith('js') ? 'index.js' : 'index.ts')
-      );
-
-      if (mod) {
-        const modFile = path.join(modDir, mod.name);
-        const imported = await import(modFile);
-
-        const loadedMods = Object.values(imported).filter(
-          m => Object.getPrototypeOf(m) === CommandModule
-        ) as CommandModuleSubClass[];
-
-        mods = mods.concat(loadedMods);
-      }
+      cmds = cmds.concat(loadedCmds);
     }
 
-    return mods;
+    return cmds;
   }
 }
 
@@ -584,4 +573,3 @@ export const stringifyCommand = (
 
 export * from './context';
 export * from './command';
-export * from './module';

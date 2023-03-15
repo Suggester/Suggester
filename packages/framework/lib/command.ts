@@ -238,3 +238,5 @@ export type ModalFunction = (
 export type AutocompleteFunction = (
   ctx: Context<APIApplicationCommandAutocompleteInteraction>
 ) => Promise<void>;
+
+export type CommandSubClass = new () => Command;
