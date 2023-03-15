@@ -97,10 +97,7 @@ export class FeedsEditUnsetCommand extends SubCommand {
     const l = ctx.getLocalizer();
 
     const name = ctx.getOption('name').value;
-    const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id!,
-      name
-    );
+    const feed = await ctx.db.getFeedByName(name);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
@@ -142,12 +139,7 @@ export class FeedsEditUnsetCommand extends SubCommand {
     const newValue = defaultValues[option];
     const upd = {[option]: newValue};
 
-    await ctx.db.prisma.suggestionFeed.update({
-      where: {
-        id: feed.id,
-      },
-      data: upd,
-    });
+    await ctx.db.updateFeed(feed.id, upd);
 
     const m = l.guild('feeds-edit-set-success');
     await ctx.send({
@@ -177,11 +169,7 @@ export class FeedsEditUnsetCommand extends SubCommand {
       focused?.name === 'name' &&
       focused.type === ApplicationCommandOptionType.String
     ) {
-      const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id!,
-        focused.value
-      );
-
+      const suggestions = await ctx.db.autocompleteFeeds(focused.value);
       await ctx.sendAutocomplete(suggestions);
     }
   }

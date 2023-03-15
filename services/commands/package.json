@@ -2,6 +2,9 @@
   "name": "@suggester/commands",
   "main": "src/index.js",
   "dependencies": {
+    "@sentry/integrations": "^7.42.0",
+    "@sentry/node": "^7.42.0",
+    "@sentry/tracing": "^7.42.0",
     "@suggester/configs": "workspace:*",
     "@suggester/database": "workspace:*",
     "@suggester/framework": "workspace:*",

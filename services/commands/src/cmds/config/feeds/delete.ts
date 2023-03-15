@@ -34,10 +34,7 @@ export class FeedsDeleteCommand extends SubCommand {
     const l = ctx.getLocalizer();
     const name = ctx.getOption('name').value;
 
-    const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id,
-      name
-    );
+    const feed = await ctx.db.getFeedByName(name);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
@@ -95,11 +92,7 @@ export class FeedsDeleteCommand extends SubCommand {
       opt?.name === 'name' &&
       opt?.type === ApplicationCommandOptionType.String
     ) {
-      const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id,
-        opt.value
-      );
-
+      const suggestions = await ctx.db.autocompleteFeeds(opt.value);
       await ctx.sendAutocomplete(suggestions);
     }
   }
@@ -119,10 +112,7 @@ export class FeedsDeleteCommand extends SubCommand {
       return;
     }
 
-    const feed = await ctx.db.suggestionFeeds.getByID(
-      ctx.interaction.guild_id,
-      id
-    );
+    const feed = await ctx.db.getFeedByID(id);
 
     if (!feed) {
       const m = l.guild('feeds-delete-unknown-feed');
@@ -134,19 +124,15 @@ export class FeedsDeleteCommand extends SubCommand {
       return;
     }
 
+    let m = l.guild('feeds-delete-cancel');
     if (confirm === 't') {
-      await ctx.db.suggestionFeeds.delete(id);
-      const m = l.guild('feeds-delete-success', {name: feed.name});
-      await ctx.update({
-        content: m,
-        components: [],
-      });
-    } else {
-      const m = l.guild('feeds-delete-cancel');
-      await ctx.update({
-        content: m,
-        components: [],
-      });
+      await ctx.db.deleteFeed(id);
+      m = l.guild('feeds-delete-success', {name: feed.name});
     }
+
+    await ctx.update({
+      content: m,
+      components: [],
+    });
   }
 }

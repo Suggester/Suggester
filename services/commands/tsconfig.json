@@ -5,7 +5,9 @@
     "outDir": "build",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["@suggester/types"]
+    "types": ["@suggester/types"],
+    "sourceRoot": "/",
+    "inlineSources": true
   },
   "include": ["src/**/*.ts", "scripts/*.ts"]
 }

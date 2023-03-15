@@ -217,10 +217,8 @@ export class FeedsEditSetCommand extends SubCommand {
     const l = ctx.getLocalizer();
     const feedName = ctx.getOption('name').value;
 
-    const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id,
-      feedName
-    );
+    await ctx.db.ensureConfig();
+    const feed = await ctx.db.getFeedByName(feedName);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
@@ -339,7 +337,7 @@ export class FeedsEditSetCommand extends SubCommand {
       mappedOpts.colorChangeColor = parsedColor;
     }
 
-    await ctx.db.suggestionFeeds.update(feed.id, mappedOpts);
+    await ctx.db.updateFeed(feed.id, mappedOpts);
 
     const m = l.guild('feeds-edit-set-success');
     await ctx.send({
@@ -372,10 +370,7 @@ export class FeedsEditSetCommand extends SubCommand {
       focused?.name === 'name' &&
       focused.type === ApplicationCommandOptionType.String
     ) {
-      const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id,
-        focused.value
-      );
+      const suggestions = await ctx.db.autocompleteFeeds(focused.value);
 
       await ctx.sendAutocomplete(suggestions);
     }

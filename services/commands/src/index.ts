@@ -1,5 +1,8 @@
 import path from 'node:path';
 
+import {RewriteFrames} from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
+import '@sentry/tracing';
 import fastify from 'fastify';
 
 import {Database} from '@suggester/database';
@@ -19,6 +22,16 @@ const start = async () => {
     console.error('Config is null.');
     return;
   }
+
+  Sentry.init({
+    dsn: config.sentry?.dsn,
+    // enabled: process.env.NODE_ENV === 'prod' && !!config.sentry?.dsn,
+    // release: 'v0.0.5',
+
+    // integrations: [
+    //   new RewriteFrames({root: __dirname.slice(0, __dirname.indexOf('src'))}),
+    // ],
+  });
 
   const db = new Database(config.storage.postgres_url);
   const locales = new LocalizationService().loadAll();
@@ -43,6 +56,7 @@ const start = async () => {
     );
   } catch (err) {
     console.error('Failed to bind to port:', err);
+    Sentry.captureException(err);
   } finally {
     db.prisma.$disconnect();
   }

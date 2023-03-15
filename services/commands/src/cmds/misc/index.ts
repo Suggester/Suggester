@@ -1,6 +1,7 @@
 import {CommandModule} from '@suggester/framework';
 
 import {ChangelogCommand} from './changelog';
+import {ErrorCommand} from './error';
 import {GitHubCommand} from './github';
 import {InviteCommand} from './invite';
 import {PingCommand} from './ping';
@@ -21,5 +22,6 @@ export class MiscModule extends CommandModule {
     new PrivacyCommand(),
     new SupportCommand(),
     new VoteCommand(),
+    new ErrorCommand(),
   ];
 }

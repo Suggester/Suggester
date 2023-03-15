@@ -64,7 +64,6 @@ export class GuildConfigStore {
     });
   }
 
-  /** Creates a config if one does not exist, but doesn't return it */
   async ensureExists(guildID: string) {
     // prisma doesn't have a `findOrCreate` method, but
     // upsert with an empty update behaves the same (mostly)

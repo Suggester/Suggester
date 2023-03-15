@@ -82,11 +82,10 @@ export class FeedsCreateCommand extends SubCommand {
     const logChannelID = ctx.getOption('log-channel')?.value;
     const deniedChannelID = ctx.getOption('denied-channel')?.value;
 
-    await ctx.db.guildConfigs.ensureExists(ctx.interaction.guild_id!);
+    await ctx.db.ensureConfig();
 
     try {
-      const feed = await ctx.db.suggestionFeeds.create({
-        guildID: ctx.interaction.guild_id!,
+      const feed = await ctx.db.createFeed({
         feedChannelID,
         mode,
         reviewChannelID,

@@ -1,11 +1,7 @@
 import {PrismaClient} from '../prisma-out';
-import {GuildConfigStore} from './guildConfig';
-import {SuggestionFeedStore} from './suggestionFeed';
 
 export class Database {
-  prisma;
-  guildConfigs: GuildConfigStore;
-  suggestionFeeds: SuggestionFeedStore;
+  readonly prisma;
 
   constructor(postgresURL: string) {
     this.prisma = new PrismaClient({
@@ -15,9 +11,6 @@ export class Database {
         },
       },
     });
-
-    this.guildConfigs = new GuildConfigStore(this.prisma);
-    this.suggestionFeeds = new SuggestionFeedStore(this.prisma);
   }
 }
 
@@ -29,3 +22,4 @@ export enum PrismaErrorCode {
 
 export * from '../prisma-out';
 export * from './constants';
+export * from './contextual';

@@ -61,11 +61,7 @@ export class FeedsGetCommand extends SubCommand {
     const l = ctx.getLocalizer();
 
     const feedName = ctx.getOption('name').value;
-
-    const feed = await ctx.db.suggestionFeeds.getByName(
-      ctx.interaction.guild_id,
-      feedName
-    );
+    const feed = await ctx.db.getFeedByName(feedName);
 
     if (!feed) {
       const msg = l.user('unknown-feed', {
@@ -102,11 +98,7 @@ export class FeedsGetCommand extends SubCommand {
       opt?.name === 'name' &&
       opt?.type === ApplicationCommandOptionType.String
     ) {
-      const suggestions = await ctx.db.suggestionFeeds.autocompleteName(
-        ctx.interaction.guild_id,
-        opt.value
-      );
-
+      const suggestions = await ctx.db.autocompleteFeeds(opt.value);
       await ctx.sendAutocomplete(suggestions);
     }
   }
@@ -143,10 +135,7 @@ export class FeedsGetCommand extends SubCommand {
       return;
     }
 
-    const feed = await ctx.db.suggestionFeeds.getByID(
-      ctx.interaction.guild_id,
-      id
-    );
+    const feed = await ctx.db.getFeedByID(id);
 
     if (!feed) {
       const msg = l.user('feed-info-button-error');
