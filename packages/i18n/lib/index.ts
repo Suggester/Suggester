@@ -1,7 +1,7 @@
 import {readFileSync, readdirSync, statSync} from 'node:fs';
 
 import {FluentBundle, FluentResource, FluentValue} from '@fluent/bundle';
-import {APIInteraction} from 'discord-api-types/v10';
+import {APIInteraction, APIPingInteraction} from 'discord-api-types/v10';
 import path from 'path';
 
 import {MessageNames, Placeholders} from './fluentMessages';
@@ -116,10 +116,13 @@ export class LocalizationService {
 }
 
 export class Localizer {
-  constructor(private i: APIInteraction, private ls: LocalizationService) {}
+  constructor(
+    private i: Exclude<APIInteraction, APIPingInteraction>,
+    private ls: LocalizationService
+  ) {}
 
   getUserLocale(): string {
-    return this.i.user?.locale || FALLBACK_LOCALE;
+    return this.i.locale || FALLBACK_LOCALE;
   }
 
   getGuildLocale(): string {

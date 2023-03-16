@@ -15,6 +15,7 @@ import {
 } from 'discord-api-types/v10';
 
 import {
+  Suggestion,
   SuggestionApprovalStatus,
   SuggestionFeed,
   SuggestionFeedMode,
@@ -24,6 +25,83 @@ import {MessageNames} from '@suggester/i18n';
 import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
+
+export const sendFeedMessage = async <T extends APIGuildInteraction>(
+  ctx: Context<T, []>,
+  suggestion: Suggestion,
+  feed: SuggestionFeed,
+  suggestCmd = true
+): Promise<APIMessage> => {
+  const l = ctx.getLocalizer();
+
+  const embed = new SuggestionEmbed(
+    l,
+    feed,
+    suggestion,
+    [],
+    [],
+    ctx.interaction.member.user
+  );
+
+  const buttons: APIButtonComponent[] = [
+    ['upvote', feed.upvoteEmoji],
+    ['mid', feed.midEmoji],
+    ['downvote', feed.downvoteEmoji],
+  ]
+    .map(
+      ([action, emoji]) =>
+        emoji && {
+          type: ComponentType.Button,
+          style: ButtonStyle.Secondary,
+          emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
+          custom_id: `${action}:${suggestion.id}`,
+        }
+    )
+    .filter(Boolean) as APIButtonComponent[];
+
+  const createdMsg = (await ctx.framework.rest.post(
+    Routes.channelMessages(feed.feedChannelID),
+    {
+      body: {
+        embeds: [embed],
+        components: buttons.length
+          ? [
+              {
+                type: ComponentType.ActionRow,
+                components: buttons,
+              },
+            ]
+          : [],
+      },
+    }
+  )) as APIMessage;
+
+  if (suggestCmd) {
+    await ctx.send({
+      content: l.user('suggest-success.autoapprove'),
+      flags: MessageFlags.Ephemeral,
+      components: [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Link,
+              url: `https://discord.com/channels/${feed.guildID}/${feed.feedChannelID}/${createdMsg.id}`,
+              label: l.user('suggest-success.link-button-label'),
+            },
+          ],
+        },
+      ],
+    });
+
+    await ctx.db.updateSuggestion(suggestion.id, {
+      feedMessageID: createdMsg.id,
+    });
+  }
+
+  return createdMsg;
+};
 
 const createSuggestion = async <C extends APIGuildInteraction>(
   ctx: Context<C>,
@@ -60,8 +138,6 @@ const createSuggestion = async <C extends APIGuildInteraction>(
         : SuggestionApprovalStatus.Approved,
   });
 
-  let createdMsg: APIMessage;
-
   try {
     switch (feed.mode) {
       case SuggestionFeedMode.Review: {
@@ -82,7 +158,7 @@ const createSuggestion = async <C extends APIGuildInteraction>(
           ctx.interaction.member.user
         );
 
-        await sendMsg(feed.reviewChannelID, {
+        const sent = await sendMsg(feed.reviewChannelID, {
           embeds: [embed],
           components: [
             {
@@ -122,69 +198,17 @@ const createSuggestion = async <C extends APIGuildInteraction>(
           flags: MessageFlags.Ephemeral,
         });
 
+        await ctx.db.updateSuggestion(createdSuggestion.id, {
+          approvalQueueMessages: {
+            push: sent.id,
+          },
+        });
+
         return;
       }
 
       case SuggestionFeedMode.AutoApprove: {
-        const embed = new SuggestionEmbed(
-          l,
-          feed,
-          createdSuggestion,
-          [],
-          [],
-          ctx.interaction.member.user
-        );
-
-        const buttons: APIButtonComponent[] = [
-          ['upvote', feed.upvoteEmoji],
-          ['mid', feed.midEmoji],
-          ['downvote', feed.downvoteEmoji],
-        ]
-          .map(
-            ([action, emoji]) =>
-              emoji && {
-                type: ComponentType.Button,
-                style: ButtonStyle.Secondary,
-                emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
-                custom_id: `${action}:${createdSuggestion.id}`,
-              }
-          )
-          .filter(Boolean) as APIButtonComponent[];
-
-        createdMsg = await sendMsg(feed.feedChannelID, {
-          embeds: [embed],
-          components: buttons.length
-            ? [
-                {
-                  type: ComponentType.ActionRow,
-                  components: buttons,
-                },
-              ]
-            : [],
-        });
-
-        await ctx.send({
-          content: l.user('suggest-success.autoapprove'),
-          flags: MessageFlags.Ephemeral,
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Link,
-                  url: `https://discord.com/channels/${feed.guildID}/${feed.feedChannelID}/${createdMsg.id}`,
-                  label: l.user('suggest-success.link-button-label'),
-                },
-              ],
-            },
-          ],
-        });
-
-        await ctx.db.updateSuggestion(createdSuggestion.id, {
-          feedMessageID: createdMsg.id,
-        });
-
+        await sendFeedMessage(ctx, createdSuggestion, feed);
         return;
       }
     }
@@ -233,12 +257,11 @@ export class FeedsCommand extends Command {
   ) {
     const l = ctx.getLocalizer();
 
-    const feedName = ctx.getOption('name').value;
-    const feed = await ctx.db.getFeedByName(feedName);
+    const feedName = ctx.getOption('feed')?.value;
+    const feed = await ctx.db.getFeedByNameOrDefault(feedName);
 
     if (!feed) {
       const msg = l.user('unknown-feed', {
-        name: feedName,
         cmd: ctx.framework.mentionCmd('feeds create'),
       });
 
@@ -283,7 +306,7 @@ export class FeedsCommand extends Command {
   async modal(ctx: Context<APIModalSubmitGuildInteraction>) {
     const [, _id, _anon] = ctx.interaction.data.custom_id.split(':');
     const id = parseInt(_id);
-    const anon = Boolean(_anon);
+    const anon = _anon === 'true';
 
     if (isNaN(id)) {
       return;
@@ -317,7 +340,7 @@ export class FeedsCommand extends Command {
   ): Promise<void> {
     const opt = ctx.getFocusedOption();
     if (
-      opt?.name === 'name' &&
+      opt?.name === 'feed' &&
       opt?.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.autocompleteFeeds(opt.value);

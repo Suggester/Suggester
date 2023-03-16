@@ -23,7 +23,12 @@ import {
 
 import {feedNameAutocomplete} from '../../../util/commandComponents';
 
-const options = [feedNameAutocomplete] as const;
+const options = [
+  {
+    ...feedNameAutocomplete,
+    required: true,
+  },
+] as const;
 
 const pageButtons = (
   l: Localizer,
@@ -54,12 +59,11 @@ export class FeedsGetCommand extends SubCommand {
   ): Promise<void> {
     const l = ctx.getLocalizer();
 
-    const feedName = ctx.getOption('name').value;
+    const feedName = ctx.getOption('feed').value;
     const feed = await ctx.db.getFeedByName(feedName);
 
     if (!feed) {
       const msg = l.user('unknown-feed', {
-        name: feedName,
         cmd: ctx.framework.mentionCmd('feeds create'),
       });
 
@@ -89,7 +93,7 @@ export class FeedsGetCommand extends SubCommand {
   ): Promise<void> {
     const opt = ctx.getFocusedOption();
     if (
-      opt?.name === 'name' &&
+      opt?.name === 'feed' &&
       opt?.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.autocompleteFeeds(opt.value);

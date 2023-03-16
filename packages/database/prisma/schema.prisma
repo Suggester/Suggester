@@ -130,7 +130,8 @@ model Suggestion {
   // this field is automatically set by a trigger in the datebase (see bottom of file)
   // however, prisma will complain if we don't provide a value for it, so setting default to 0 works
   // suggestionID  Int     @default(0) @map("suggestion_id")
-  feedMessageID String? @map("feed_message_id")
+  feedMessageID         String?  @map("feed_message_id")
+  approvalQueueMessages String[] @default([]) @map("approval_queue_messages")
 
   body           String
   approvalStatus SuggestionApprovalStatus @map("approval_status")

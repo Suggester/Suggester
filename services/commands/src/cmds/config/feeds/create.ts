@@ -84,6 +84,8 @@ export class FeedsCreateCommand extends SubCommand {
 
     await ctx.db.ensureConfig();
 
+    const existingFeeds = await ctx.db.countFeeds();
+
     try {
       const feed = await ctx.db.createFeed({
         feedChannelID,
@@ -92,6 +94,7 @@ export class FeedsCreateCommand extends SubCommand {
         logChannelID,
         deniedChannelID,
         name,
+        isDefault: existingFeeds === 0,
       });
 
       const m = l.guild('feed-create-success', {

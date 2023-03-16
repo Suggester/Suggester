@@ -13,8 +13,10 @@ import {MessageNames} from '@suggester/i18n';
 import {feedNameAutocomplete} from '../../../../util/commandComponents';
 
 const options = [
-  feedNameAutocomplete,
-
+  {
+    ...feedNameAutocomplete,
+    required: true,
+  },
   {
     name: 'option',
     description: 'The option to unset for this feed',
@@ -96,13 +98,12 @@ export class FeedsEditUnsetCommand extends SubCommand {
   ): Promise<void> {
     const l = ctx.getLocalizer();
 
-    const name = ctx.getOption('name').value;
-    const feed = await ctx.db.getFeedByName(name);
+    const name = ctx.getOption('feed')?.value;
+    const feed = await ctx.db.getFeedByNameOrDefault(name);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
       const m = l.user('unknown-feed', {
-        name: name,
         cmd: mention,
       });
 
@@ -166,7 +167,7 @@ export class FeedsEditUnsetCommand extends SubCommand {
     const focused = ctx.getFocusedOption();
 
     if (
-      focused?.name === 'name' &&
+      focused?.name === 'feed' &&
       focused.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.autocompleteFeeds(focused.value);

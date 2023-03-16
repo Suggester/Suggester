@@ -14,7 +14,7 @@ import {MessageNames} from '@suggester/i18n';
 const options = [
   {
     name: 'name',
-    description: 'The name of the feed',
+    description: 'The name of the feed to delete',
     type: ApplicationCommandOptionType.String,
     autocomplete: true,
     required: true,
@@ -34,12 +34,11 @@ export class FeedsDeleteCommand extends SubCommand {
     const l = ctx.getLocalizer();
     const name = ctx.getOption('name').value;
 
-    const feed = await ctx.db.getFeedByName(name);
+    const feed = await ctx.db.getFeedByNameOrDefault(name);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
       const m = l.user('unknown-feed', {
-        name: name,
         cmd: mention,
       });
 

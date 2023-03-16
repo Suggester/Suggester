@@ -1,9 +1,5 @@
 import {Database} from '.';
-import {
-  Suggestion,
-  SuggestionApprovalStatus,
-  SuggestionFeed,
-} from '../prisma-out';
+import {Prisma, Suggestion, SuggestionFeed} from '../prisma-out';
 
 export type PartialSuggestionFeed = Omit<
   SuggestionFeed,
@@ -77,6 +73,35 @@ export class ContextualDatabase {
     });
   }
 
+  async getDefaultFeed(): Promise<SuggestionFeed | null> {
+    if (!this.guildID) {
+      throw new Error('guildID missing in ContextualDatabase');
+    }
+
+    return this.db.prisma.suggestionFeed.findFirst({
+      where: {
+        guildID: this.guildID,
+        isDefault: true,
+      },
+    });
+  }
+
+  async getFeedByNameOrDefault(name?: string) {
+    return name ? this.getFeedByName(name) : this.getDefaultFeed();
+  }
+
+  async countFeeds(): Promise<number> {
+    if (!this.guildID) {
+      throw new Error('guildID missing in ContextualDatabase');
+    }
+
+    return this.db.prisma.suggestionFeed.count({
+      where: {
+        guildID: this.guildID,
+      },
+    });
+  }
+
   async autocompleteFeeds(
     name: string
   ): Promise<{choices: {name: string; value: string}[]}> {
@@ -144,6 +169,17 @@ export class ContextualDatabase {
 
   // --- suggestions ---
 
+  async getSuggestionByPublicID(feedID: number, suggestionPubID: number) {
+    return this.db.prisma.suggestion.findFirst({
+      where: {
+        feed: {
+          id: feedID,
+        },
+        publicID: suggestionPubID,
+      },
+    });
+  }
+
   async createSuggestion(
     data: Partial<PartialSuggestion> &
       Pick<Suggestion, 'body' | 'feedChannelID' | 'approvalStatus'>
@@ -163,7 +199,10 @@ export class ContextualDatabase {
     });
   }
 
-  async updateSuggestion(id: number, data: Partial<PartialSuggestion>) {
+  async updateSuggestion(
+    id: number,
+    data: Prisma.SuggestionUpdateArgs['data']
+  ) {
     if (!this.guildID) {
       throw new Error('guildID missing in ContextualDatabase');
     }

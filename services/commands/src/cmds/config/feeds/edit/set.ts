@@ -215,15 +215,14 @@ export class FeedsEditSetCommand extends SubCommand {
     ctx: Context<APIChatInputApplicationCommandGuildInteraction, typeof options>
   ): Promise<void> {
     const l = ctx.getLocalizer();
-    const feedName = ctx.getOption('name').value;
+    const feedName = ctx.getOption('feed')?.value;
 
     await ctx.db.ensureConfig();
-    const feed = await ctx.db.getFeedByName(feedName);
+    const feed = await ctx.db.getFeedByNameOrDefault(feedName);
 
     if (!feed) {
       const mention = ctx.framework.mentionCmd('feeds create');
       const m = l.user('unknown-feed', {
-        name: feedName,
         cmd: mention,
       });
 
@@ -237,7 +236,7 @@ export class FeedsEditSetCommand extends SubCommand {
 
     const opts = ctx.getFlatOptions();
 
-    if (Object.keys(opts) === ['name']) {
+    if (Object.keys(opts) === ['feed']) {
       const m = l.user('feeds-edit-set-no-options-provided');
       await ctx.send({
         content: m,
@@ -246,7 +245,7 @@ export class FeedsEditSetCommand extends SubCommand {
       return;
     }
 
-    type OptionKeys = Exclude<keyof typeof opts, 'name'>;
+    type OptionKeys = Exclude<keyof typeof opts, 'feed'>;
     const mappedOpts: Partial<PartialSuggestionFeed> = Object.entries(
       opts
     ).reduce((a, [key, value]) => {
@@ -291,6 +290,17 @@ export class FeedsEditSetCommand extends SubCommand {
 
       return a;
     }, {} as Partial<PartialSuggestionFeed>);
+
+    if (mappedOpts.isDefault) {
+      await ctx.db.db.prisma.suggestionFeed.updateMany({
+        where: {
+          guildID: ctx.interaction.guild_id,
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+    }
 
     for (const emoji of ['upvoteEmoji', 'midEmoji', 'downvoteEmoji'] as const) {
       if (!(emoji in mappedOpts)) {
@@ -367,7 +377,7 @@ export class FeedsEditSetCommand extends SubCommand {
     const focused = ctx.getFocusedOption();
 
     if (
-      focused?.name === 'name' &&
+      focused?.name === 'feed' &&
       focused.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.autocompleteFeeds(focused.value);

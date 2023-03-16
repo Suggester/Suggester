@@ -40,6 +40,8 @@ export const role = (r: string) => `<@&${r}>`;
 export const emoji = (id: string, animated = false) =>
   `<${animated ? 'a' : ''}:aa:${id}>`;
 
+export const tag = (u: APIUser) => `${u.username}#${u.discriminator}`;
+
 export const formatAvatarURL = (user: APIUser) =>
   RouteBases.cdn +
   (user.avatar

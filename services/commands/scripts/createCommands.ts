@@ -17,4 +17,4 @@ const main = async () => {
   console.dir(created, {depth: null});
 };
 
-main().catch(console.error);
+main().catch(e => console.dir(e, {depth: null}));

@@ -24,6 +24,7 @@ import {
   APIMessageComponentInteraction,
   APIModalInteractionResponseCallbackData,
   APIModalSubmitInteraction,
+  APIPingInteraction,
   ApplicationCommandOptionType,
   ApplicationCommandType,
   ComponentType,
@@ -91,7 +92,10 @@ export class Context<
   }
 
   getLocalizer(): Localizer {
-    return new Localizer(this.interaction, this.locales);
+    return new Localizer(
+      this.interaction as Exclude<APIInteraction, APIPingInteraction>,
+      this.locales
+    );
   }
 
   // Intraction methods

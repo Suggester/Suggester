@@ -8,8 +8,8 @@ export class PingCommand extends Command {
   description: MessageNames = 'cmd-ping.desc';
 
   async command(ctx: Context<APIApplicationCommandInteraction>): Promise<void> {
-    const localizer = ctx.getLocalizer();
-    const origMessage = localizer.user('ping-original');
+    const l = ctx.getLocalizer();
+    const origMessage = l.guild('ping-original');
 
     const before = Date.now();
     await ctx.send({
@@ -17,7 +17,7 @@ export class PingCommand extends Command {
     });
     const after = Date.now();
 
-    const afterMsg = localizer.user('ping-edited', {
+    const afterMsg = l.guild('ping-edited', {
       ms: after - before,
     });
 
