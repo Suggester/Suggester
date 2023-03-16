@@ -1,6 +1,6 @@
 import {APIUser} from 'discord-api-types/v10';
 
-import {Suggestion, SuggestionFeed} from '@suggester/database';
+import {Suggestion} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';

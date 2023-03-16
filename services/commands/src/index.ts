@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import {RewriteFrames} from '@sentry/integrations';
+// import {RewriteFrames} from '@sentry/integrations';
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import fastify from 'fastify';

@@ -40,7 +40,7 @@ import {
 } from 'discord-api-types/v10';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
-import {ContextualDatabase, Database} from '@suggester/database';
+import {ContextualDatabase} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
 import {
   DeepReadonly,

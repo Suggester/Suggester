@@ -35,7 +35,7 @@ export class SuggestionEmbed extends EmbedBuilder {
   ) {
     super();
 
-    const {upvotes, mids, downvotes} = votes.reduce(
+    const {upvotes, downvotes} = votes.reduce(
       (a, c) => {
         switch (c.kind) {
           case SuggestionVoteKind.Upvote: {
