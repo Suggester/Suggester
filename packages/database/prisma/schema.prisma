@@ -194,6 +194,7 @@ model SuggestionVote {
 
   suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
 
+  @@unique([suggestionID, userID])
   @@map("suggestion_votes")
 }
 
@@ -281,3 +282,5 @@ enum GlobalBlockKind {
 
   @@map("global_block_kind")
 }
+
+// vim:et sw=2 ts=2

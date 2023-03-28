@@ -31,9 +31,9 @@ http_archive(
 
 http_archive(
   name = "rules_fluent_types",
-  url = "https://github.com/Benricheson101/rules_fluent_types/archive/1fc66f83b2e135234f4673c394c87023248aad02.tar.gz",
-  sha256 = "9bcd540d9efe600d1675a6a5a329e270e38a4aedb6d2e1ef9d5fc3c78f5adac9",
-  strip_prefix = "rules_fluent_types-1fc66f83b2e135234f4673c394c87023248aad02",
+  url = "https://github.com/Benricheson101/rules_fluent_types/archive/397d04ac3369b490b8b57d5f95dca81f9d0c193d.tar.gz",
+  sha256 = "603f0e4fd7102fbfaea98b3b1337954fe2401ed655af0f156be486c2210f5bc4",
+  strip_prefix = "rules_fluent_types-397d04ac3369b490b8b57d5f95dca81f9d0c193d",
 )
 
 http_archive(

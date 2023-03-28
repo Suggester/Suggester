@@ -5,13 +5,12 @@ import {
   SuggestionComment,
   SuggestionDisplayStatus,
   SuggestionFeed,
-  SuggestionVote,
   SuggestionVoteKind,
 } from '@suggester/database';
 import {Localizer, MessageNames} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
-import {TimestampStyle, code, formatAvatarURL, timestamp, user} from '../md';
+import {TimestampStyle, formatAvatarURL, timestamp, user} from '../md';
 
 // TODO: add to config maybe?
 
@@ -29,41 +28,15 @@ export class SuggestionEmbed extends EmbedBuilder {
     feed: SuggestionFeed,
     suggestion: Suggestion,
     comments: SuggestionComment[],
-    votes: SuggestionVote[],
+    {
+      Upvote: upvotes = 0,
+      Downvote: downvotes = 0,
+    }: {[key in SuggestionVoteKind]?: number},
     author: APIUser,
     editor?: APIUser
   ) {
     super();
-
-    const {upvotes, downvotes} = votes.reduce(
-      (a, c) => {
-        switch (c.kind) {
-          case SuggestionVoteKind.Upvote: {
-            a.upvotes.push(c);
-            break;
-          }
-
-          case SuggestionVoteKind.Mid: {
-            a.mids.push(c);
-            break;
-          }
-
-          case SuggestionVoteKind.Downvote: {
-            a.downvotes.push(c);
-            break;
-          }
-        }
-
-        return a;
-      },
-      {upvotes: [], mids: [], downvotes: []} as {
-        upvotes: SuggestionVote[];
-        mids: SuggestionVote[];
-        downvotes: SuggestionVote[];
-      }
-    );
-
-    const netVotes = upvotes.length - downvotes.length;
+    const netVotes = upvotes - downvotes;
 
     super.setDescription(suggestion.body).setTimestamp(suggestion.createdAt);
 
@@ -146,32 +119,33 @@ export class SuggestionEmbed extends EmbedBuilder {
 
     // -- votes --
 
-    if (feed.showVoteCount && votes.length) {
-      const upPercentage =
-        Math.floor((upvotes.length / votes.length) * 100) + '%';
-      const downPercentage =
-        Math.floor((downvotes.length / votes.length) * 100) + '%';
-      const opinion = netVotes >= 0 ? `+${netVotes}` : netVotes;
+    // TODO: do we still want this? I think it looks better without
+    // const totalVotes = upvotes + downvotes + mids;
 
-      const headerMsg = l.guild('suggestion-embed.votes-header');
+    // if (feed.showVoteCount && totalVotes) {
+    //   const upPercentage = Math.floor((upvotes / totalVotes) * 100) + '%';
+    //   const downPercentage = Math.floor((downvotes / totalVotes) * 100) + '%';
+    //   const opinion = netVotes >= 0 ? `+${netVotes}` : netVotes;
 
-      const val = [
-        l.guild('suggestion-embed.votes-opinion', {opinion}),
-        l.guild('suggestion-embed.votes-up', {
-          upvotes: upvotes.length,
-          percentage: code(upPercentage),
-        }),
-        l.guild('suggestion-embed.votes-down', {
-          downvotes: downvotes.length,
-          percentage: code(downPercentage),
-        }),
-      ].join('\n');
+    //   const headerMsg = l.guild('suggestion-embed.votes-header');
 
-      super.addField({
-        name: headerMsg,
-        value: val,
-      });
-    }
+    //   const val = [
+    //     l.guild('suggestion-embed.votes-opinion', {opinion}),
+    //     l.guild('suggestion-embed.votes-up', {
+    //       upvotes: upvotes,
+    //       percentage: code(upPercentage),
+    //     }),
+    //     l.guild('suggestion-embed.votes-down', {
+    //       downvotes: downvotes,
+    //       percentage: code(downPercentage),
+    //     }),
+    //   ].join('\n');
+
+    //   super.addField({
+    //     name: headerMsg,
+    //     value: val,
+    //   });
+    // }
 
     // TODO: figure out how attachments should work -- should we use S3?
   }

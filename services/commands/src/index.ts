@@ -25,7 +25,7 @@ const start = async () => {
 
   Sentry.init({
     dsn: config.sentry?.dsn,
-    // enabled: process.env.NODE_ENV === 'prod' && !!config.sentry?.dsn,
+    enabled: process.env.NODE_ENV === 'prod' && !!config.sentry?.dsn,
     // release: 'v0.0.5',
 
     // integrations: [
@@ -40,7 +40,7 @@ const start = async () => {
   // TODO: switch from fastify to node:http?
   server.post('/interactions', fw.handleRequest.bind(fw));
 
-  await fw.loadCommands();
+  await fw.init();
   console.log(`Loaded ${fw.cmds.size} commands`);
 
   try {

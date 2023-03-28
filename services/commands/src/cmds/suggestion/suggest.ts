@@ -19,6 +19,7 @@ import {
   SuggestionApprovalStatus,
   SuggestionFeed,
   SuggestionFeedMode,
+  SuggestionVoteKind,
 } from '@suggester/database';
 import {Command, Context} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
@@ -26,12 +27,16 @@ import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
 
-export const sendFeedMessage = async <T extends APIGuildInteraction>(
+export const createFeedMessage = <T extends APIGuildInteraction>(
   ctx: Context<T, []>,
   suggestion: Suggestion,
   feed: SuggestionFeed,
-  suggestCmd = true
-): Promise<APIMessage> => {
+  {
+    Upvote: upvotes = 0,
+    Mid: mids = 0,
+    Downvote: downvotes = 0,
+  }: {[key in SuggestionVoteKind]?: number}
+): RESTPostAPIChannelMessageJSONBody => {
   const l = ctx.getLocalizer();
 
   const embed = new SuggestionEmbed(
@@ -39,40 +44,56 @@ export const sendFeedMessage = async <T extends APIGuildInteraction>(
     feed,
     suggestion,
     [],
-    [],
+    {Upvote: upvotes, Mid: mids, Downvote: downvotes},
     ctx.interaction.member.user
   );
 
-  const buttons: APIButtonComponent[] = [
-    ['upvote', feed.upvoteEmoji],
-    ['mid', feed.midEmoji],
-    ['downvote', feed.downvoteEmoji],
-  ]
+  const buttons: APIButtonComponent[] = (
+    [
+      ['upvote', feed.upvoteEmoji, upvotes],
+      ['mid', feed.midEmoji, mids],
+      ['downvote', feed.downvoteEmoji, downvotes],
+    ] as const
+  )
     .map(
-      ([action, emoji]) =>
+      ([action, emoji, count]) =>
         emoji && {
           type: ComponentType.Button,
           style: ButtonStyle.Secondary,
           emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
+          label: feed.showVoteCount && count.toString(),
           custom_id: `${action}:${suggestion.id}`,
         }
     )
     .filter(Boolean) as APIButtonComponent[];
 
+  return {
+    embeds: [embed],
+    components: buttons.length
+      ? [
+          {
+            type: ComponentType.ActionRow,
+            components: buttons,
+          },
+        ]
+      : [],
+  };
+};
+
+export const sendFeedMessage = async <T extends APIGuildInteraction>(
+  ctx: Context<T, []>,
+  suggestion: Suggestion,
+  feed: SuggestionFeed,
+  suggestCmd = true,
+  votes: {[key in SuggestionVoteKind]?: number} = {}
+): Promise<APIMessage> => {
+  const l = ctx.getLocalizer();
+
+  const msg = createFeedMessage(ctx, suggestion, feed, votes);
   const createdMsg = (await ctx.framework.rest.post(
     Routes.channelMessages(feed.feedChannelID),
     {
-      body: {
-        embeds: [embed],
-        components: buttons.length
-          ? [
-              {
-                type: ComponentType.ActionRow,
-                components: buttons,
-              },
-            ]
-          : [],
-      },
+      body: msg,
     }
   )) as APIMessage;
 

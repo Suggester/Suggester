@@ -1,10 +1,15 @@
 import {APIUser} from 'discord-api-types/v10';
 
-import {Suggestion} from '@suggester/database';
+import {Suggestion, SuggestionApprovalStatus} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
 import {formatAvatarURL, tag} from '../md';
+
+const COLORS = {
+  approved: 0x2ecc71,
+  denied: 0xe74c3c,
+} as const;
 
 export class BaseReviewQueueEmbed extends EmbedBuilder {
   constructor(l: Localizer, suggestion: Suggestion, author: APIUser) {
@@ -60,21 +65,32 @@ export class NewSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
   }
 }
 
-export class ApprovedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
+export class ApprovedDeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
   constructor(
+    status: Exclude<SuggestionApprovalStatus, 'InQueue'>,
     l: Localizer,
     suggestion: Suggestion,
     author: APIUser,
-    denier: APIUser
+    denier: APIUser,
+    reason?: string
   ) {
     super(l, suggestion, author);
 
+    const action = status.toLowerCase() as 'approved' | 'denied';
+
     super.setTitle(
-      l.guild('review-embed.title-approved', {id: suggestion.publicID})
+      l.guild(`review-embed.title-${action}`, {id: suggestion.publicID})
     );
 
+    if (reason) {
+      super.addField({
+        name: l.guild('review-embed.reason-given'),
+        value: reason,
+      });
+    }
+
     const footerText = [
-      l.guild('review-embed.approved-by', {
+      l.guild(`review-embed.${action}-by`, {
         user: tag(denier),
       }),
       l.guild('suggestion-embed.suggestion-id', {
@@ -87,36 +103,36 @@ export class ApprovedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
       icon_url: formatAvatarURL(denier),
     });
 
-    super.setColor(0x2ecc71);
+    super.setColor(COLORS[action]);
   }
 }
-export class DeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
-  constructor(
-    l: Localizer,
-    suggestion: Suggestion,
-    author: APIUser,
-    denier: APIUser
-  ) {
-    super(l, suggestion, author);
+// export class DeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
+//   constructor(
+//     l: Localizer,
+//     suggestion: Suggestion,
+//     author: APIUser,
+//     denier: APIUser
+//   ) {
+//     super(l, suggestion, author);
 
-    super.setTitle(
-      l.guild('review-embed.title-denied', {id: suggestion.publicID})
-    );
+//     super.setTitle(
+//       l.guild('review-embed.title-denied', {id: suggestion.publicID})
+//     );
 
-    const footerText = [
-      l.guild('review-embed.denied-by', {
-        user: tag(denier),
-      }),
-      l.guild('suggestion-embed.suggestion-id', {
-        id: suggestion.publicID,
-      }),
-    ].join(' | ');
+//     const footerText = [
+//       l.guild('review-embed.denied-by', {
+//         user: tag(denier),
+//       }),
+//       l.guild('suggestion-embed.suggestion-id', {
+//         id: suggestion.publicID,
+//       }),
+//     ].join(' | ');
 
-    super.setFooter({
-      text: footerText,
-      icon_url: formatAvatarURL(denier),
-    });
+//     super.setFooter({
+//       text: footerText,
+//       icon_url: formatAvatarURL(denier),
+//     });
 
-    super.setColor(0xe74c3c);
-  }
-}
+//     super.setColor(0xe74c3c);
+//   }
+// }

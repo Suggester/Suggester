@@ -1,5 +1,11 @@
 import {Database} from '.';
-import {Prisma, Suggestion, SuggestionFeed} from '../prisma-out';
+import {
+  Prisma,
+  PrismaClient,
+  Suggestion,
+  SuggestionFeed,
+  SuggestionVoteKind,
+} from '../prisma-out';
 
 export type PartialSuggestionFeed = Omit<
   SuggestionFeed,
@@ -25,12 +31,14 @@ export class ContextualDatabase {
   readonly guildID?: string;
   readonly channelID?: string;
   readonly userID: string;
+  readonly prisma: PrismaClient;
 
   constructor(cfg: ContextualDatabaseConfig) {
     this.db = cfg.db;
     this.guildID = cfg.guildID;
     this.channelID = cfg.channelID;
     this.userID = cfg.userID;
+    this.prisma = cfg.db.prisma;
   }
 
   // --- feeds ---
@@ -40,7 +48,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.findMany({
+    return this.prisma.suggestionFeed.findMany({
       where: {
         guildID: this.guildID,
       },
@@ -52,7 +60,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.findFirst({
+    return this.prisma.suggestionFeed.findFirst({
       where: {
         guildID: this.guildID,
         id,
@@ -65,7 +73,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.findFirst({
+    return this.prisma.suggestionFeed.findFirst({
       where: {
         guildID: this.guildID,
         name,
@@ -78,7 +86,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.findFirst({
+    return this.prisma.suggestionFeed.findFirst({
       where: {
         guildID: this.guildID,
         isDefault: true,
@@ -95,7 +103,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.count({
+    return this.prisma.suggestionFeed.count({
       where: {
         guildID: this.guildID,
       },
@@ -109,7 +117,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    const res = await this.db.prisma.suggestionFeed
+    const res = await this.prisma.suggestionFeed
       .findMany({
         where: {
           guildID: this.guildID,
@@ -140,7 +148,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.create({
+    return this.prisma.suggestionFeed.create({
       data: {
         guildID: this.guildID,
         ...data,
@@ -153,7 +161,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.delete({where: {id}});
+    return this.prisma.suggestionFeed.delete({where: {id}});
   }
 
   async updateFeed(id: number, data: Partial<PartialSuggestionFeed>) {
@@ -161,7 +169,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestionFeed.update({
+    return this.prisma.suggestionFeed.update({
       where: {id},
       data,
     });
@@ -170,7 +178,7 @@ export class ContextualDatabase {
   // --- suggestions ---
 
   async getSuggestionByPublicID(feedID: number, suggestionPubID: number) {
-    return this.db.prisma.suggestion.findFirst({
+    return this.prisma.suggestion.findFirst({
       where: {
         feed: {
           id: feedID,
@@ -188,7 +196,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestion.create({
+    return this.prisma.suggestion.create({
       data: {
         ...data,
         guildID: this.guildID,
@@ -207,16 +215,56 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.db.prisma.suggestion.update({
+    return this.prisma.suggestion.update({
       where: {id},
       data,
     });
   }
 
   async deleteSuggestion(id: number) {
-    return this.db.prisma.suggestion.delete({
+    return this.prisma.suggestion.delete({
       where: {id},
     });
+  }
+
+  // --- votes ---
+
+  async createVote(kind: SuggestionVoteKind, suggestionID: number) {
+    return this.prisma.suggestionVote.create({
+      data: {
+        kind,
+        suggestionID,
+        userID: this.userID,
+      },
+    });
+  }
+
+  async updateVoteKind(kind: SuggestionVoteKind, id: number) {
+    return this.prisma.suggestionVote.update({
+      where: {id},
+      data: {kind},
+    });
+  }
+
+  async deleteVote(id: number) {
+    return this.prisma.suggestionVote.delete({
+      where: {id},
+    });
+  }
+
+  async getOpinion(
+    suggestionID: number
+  ): Promise<{[key in SuggestionVoteKind]: number}> {
+    const votes = await this.prisma.suggestionVote.groupBy({
+      where: {suggestionID},
+      by: [Prisma.SuggestionVoteScalarFieldEnum.kind],
+      _count: true,
+    });
+
+    return votes.reduce(
+      (a, c) => ((a[c.kind] = c._count), a),
+      {} as {[key in SuggestionVoteKind]: number}
+    );
   }
 
   // --- ensures ---
@@ -230,7 +278,7 @@ export class ContextualDatabase {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    await this.db.prisma.guildConfig.upsert({
+    await this.prisma.guildConfig.upsert({
       where: {
         guildID: this.guildID,
       },

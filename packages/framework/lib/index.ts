@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import {webcrypto} from 'node:crypto';
 import EventEmitter from 'node:events';
 import path from 'node:path';
 
@@ -24,7 +24,7 @@ import {
   InteractionType,
   Routes,
 } from 'discord-api-types/v10';
-import {verify} from 'discord-verify/node';
+// import {verify} from 'discord-verify/node';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
 import {Database} from '@suggester/database';
@@ -146,6 +146,8 @@ const initCommands = (
 };
 
 export class Framework extends EventEmitter<FrameworkEvents> {
+  #interactionPubKey!: webcrypto.CryptoKey;
+
   readonly cmds = new Map<string, Command>();
 
   readonly buttonFns = new Map<string | RegExp, ButtonFunction>();
@@ -196,18 +198,25 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     const scope = new Scope();
 
     const body = r.body;
-    const publicKey = this.config.discord_application.public_key;
+    // const publicKey = this.config.discord_application.public_key;
 
     const time = r.headers['x-signature-timestamp'];
     const sig = r.headers['x-signature-ed25519'];
 
-    const isVerified = await verify(
-      JSON.stringify(body),
-      sig,
-      time,
-      publicKey,
-      crypto.webcrypto.subtle
+    const isVerified = await webcrypto.subtle.verify(
+      'Ed25519',
+      this.#interactionPubKey,
+      Buffer.from(sig, 'hex'),
+      Buffer.from(time + JSON.stringify(body))
     );
+
+    // const isVerified = await verify(
+    //   JSON.stringify(body),
+    //   sig,
+    //   time,
+    //   publicKey,
+    //   crypto.webcrypto.subtle
+    // );
 
     if (!isVerified) {
       await w.code(HttpStatusCode.UNAUTHORIZED).send();
@@ -426,6 +435,18 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     }
 
     return `</${cmd}:${c.remoteCmd.id}>`;
+  }
+
+  async init() {
+    this.#interactionPubKey = await webcrypto.subtle.importKey(
+      'raw',
+      Buffer.from(this.config.discord_application.public_key, 'hex'),
+      'Ed25519',
+      true,
+      ['verify']
+    );
+
+    await this.loadCommands();
   }
 
   async loadCommands() {
