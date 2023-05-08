@@ -1,7 +1,8 @@
-import {APIUser} from 'discord-api-types/v10';
+import {APIEmbed, APIUser} from 'discord-api-types/v10';
 
 import {
   Suggestion,
+  SuggestionAttachment,
   SuggestionComment,
   SuggestionDisplayStatus,
   SuggestionFeed,
@@ -26,8 +27,9 @@ export class SuggestionEmbed extends EmbedBuilder {
   constructor(
     l: Localizer,
     feed: SuggestionFeed,
-    suggestion: Suggestion,
-    comments: SuggestionComment[],
+    suggestion: Suggestion & {
+      comments: SuggestionComment[];
+    },
     {
       Upvote: upvotes = 0,
       Downvote: downvotes = 0,
@@ -38,7 +40,10 @@ export class SuggestionEmbed extends EmbedBuilder {
     super();
     const netVotes = upvotes - downvotes;
 
-    super.setDescription(suggestion.body).setTimestamp(suggestion.createdAt);
+    super
+      .setURL('https://suggester.js.org')
+      .setDescription(suggestion.body)
+      .setTimestamp(suggestion.createdAt);
 
     // -- author --
     const authorName = suggestion.isAnonymous
@@ -95,8 +100,8 @@ export class SuggestionEmbed extends EmbedBuilder {
 
     // -- comments --
 
-    if (comments.length) {
-      for (const comment of comments) {
+    if (suggestion.comments.length) {
+      for (const comment of suggestion.comments) {
         let title = comment.isAnonymous
           ? l.guild('suggestion-embed.command-header-anon')
           : l.guild('suggestion-embed.command-header', {
@@ -148,5 +153,37 @@ export class SuggestionEmbed extends EmbedBuilder {
     // }
 
     // TODO: figure out how attachments should work -- should we use S3?
+  }
+
+  static build(
+    l: Localizer,
+    feed: SuggestionFeed,
+    suggestion: Suggestion & {
+      comments: SuggestionComment[];
+      attachments: SuggestionAttachment[];
+    },
+    opinion: {[key in SuggestionVoteKind]?: number},
+    author: APIUser,
+    editor?: APIUser
+  ): APIEmbed[] {
+    const embeds: APIEmbed[] = [
+      new SuggestionEmbed(l, feed, suggestion, opinion, author, editor),
+    ];
+
+    if (suggestion.attachments.length === 1) {
+      embeds[0].image = {
+        url: suggestion.attachments[0].url,
+      };
+    } else {
+      for (const attachment of suggestion.attachments) {
+        embeds.push({
+          url: 'https://suggester.js.org',
+          image: {
+            url: attachment.url,
+          },
+        });
+      }
+    }
+    return embeds;
   }
 }

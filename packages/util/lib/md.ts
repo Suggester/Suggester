@@ -38,7 +38,7 @@ export const channel = (c: string) => `<#${c}>`;
 export const role = (r: string) => `<@&${r}>`;
 
 export const emoji = (id: string, animated = false) =>
-  `<${animated ? 'a' : ''}:aa:${id}>`;
+  id.length > 15 ? `<${animated ? 'a' : ''}:owo:${id}>` : id;
 
 export const tag = (u: APIUser) => `${u.username}#${u.discriminator}`;
 

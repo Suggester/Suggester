@@ -1,13 +1,16 @@
 import {PrismaClient} from '../prisma-out';
+import {S3Client, S3ClientOptions} from './s3';
 
 export class Database {
-  readonly prisma;
+  readonly prisma: PrismaClient;
+  readonly s3: S3Client;
 
-  constructor(postgresURL: string) {
+  constructor(options: S3ClientOptions & {postgres_url: string}) {
+    this.s3 = new S3Client(options);
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: postgresURL,
+          url: options.postgres_url,
         },
       },
     });
@@ -23,3 +26,4 @@ export enum PrismaErrorCode {
 export * from '../prisma-out';
 export * from './constants';
 export * from './contextual';
+export * from './s3';

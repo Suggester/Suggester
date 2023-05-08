@@ -33,6 +33,9 @@ ts_project(
   deps = [
     "//:node_modules/@types/node",
     ":node_modules/@prisma/client",
+    ":node_modules/@aws-sdk/client-s3",
+    ":node_modules/@types/mime",
+    ":node_modules/mime",
   ],
   assets = [
     ":prisma-generate",

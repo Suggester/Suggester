@@ -21,7 +21,8 @@ const parseEmoji = (s?: string): string | undefined => {
   }
 
   const RE = /<a?:\w{2,32}:(\d{16,20})>|(\p{Extended_Pictographic})/gu;
-  return RE.exec(s.trim())?.[1];
+  const match = RE.exec(s.trim());
+  return match?.[1] || match?.[2];
 };
 
 const parseHex = (s: string): number | undefined => {

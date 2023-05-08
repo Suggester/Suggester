@@ -2,11 +2,14 @@
   "name": "@suggester/database",
   "main": "build/index.js",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.301.0",
     "@prisma/client": "^4.11.0",
-    "@suggester/configs": "workspace:*"
+    "@suggester/configs": "workspace:*",
+    "mime": "^3.0.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "@types/mime": "^3.0.1",
     "eslint": "^7",
     "prettier": "^2.8.4",
     "prisma": "^4.11.0"

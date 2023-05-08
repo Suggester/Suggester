@@ -158,6 +158,7 @@ model Suggestion {
   comments      SuggestionComment[]
   votes         SuggestionVote[]
   subscriptions SuggestionSubscription[]
+  attachments   SuggestionAttachment[]
 
   @@unique([feedChannelID, publicID])
   @@map("suggestions")
@@ -180,6 +181,23 @@ model SuggestionComment {
   suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
 
   @@map("suggestion_comments")
+}
+
+model SuggestionAttachment {
+  id           Int    @id @default(autoincrement())
+  suggestionID Int    @map("suggestion_id")
+  url          String
+
+  // legacy
+  s3Key String? @map("s3_key")
+  name  String  @default("Attachment")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  suggestion Suggestion @relation(fields: [suggestionID], references: [id], onDelete: Cascade)
+
+  @@map("suggestion_attachments")
 }
 
 model SuggestionVote {

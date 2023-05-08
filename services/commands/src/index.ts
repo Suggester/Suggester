@@ -33,7 +33,7 @@ const start = async () => {
     // ],
   });
 
-  const db = new Database(config.storage.postgres_url);
+  const db = new Database(config.storage);
   const locales = new LocalizationService().loadAll();
   const fw = new Framework({db, locales, config});
 

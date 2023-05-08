@@ -21,8 +21,7 @@ import {
 const formatBoolYesNo = (b?: boolean | null) => (b ? 'Yes' : 'No');
 const formatChannel = (c?: string | null) => (c ? channel(c) : 'None');
 const formatRole = (r?: string | null) => (r ? role(r) : 'None');
-const formatEmoji = (e?: string | null) =>
-  e ? (e.length < 15 ? e : emoji(e)) : 'Button disabled';
+const formatEmoji = (e?: string | null) => (e ? emoji(e) : 'Button disabled');
 const formatStr = (s?: string | null) => s || 'None';
 
 const buildFromParts = (

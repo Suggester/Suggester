@@ -1,5 +1,7 @@
 import {
+  APIActionRowComponent,
   APIApplicationCommandAutocompleteGuildInteraction,
+  APIAttachment,
   APIButtonComponent,
   APIChatInputApplicationCommandGuildInteraction,
   APIGuildInteraction,
@@ -13,10 +15,13 @@ import {
   Routes,
   TextInputStyle,
 } from 'discord-api-types/v10';
+import {fetch} from 'undici';
 
 import {
   Suggestion,
   SuggestionApprovalStatus,
+  SuggestionAttachment,
+  SuggestionComment,
   SuggestionFeed,
   SuggestionFeedMode,
   SuggestionVoteKind,
@@ -27,62 +32,88 @@ import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
 
+export type FullSuggestion = Suggestion & {
+  comments: SuggestionComment[];
+  attachments: SuggestionAttachment[];
+  feed: SuggestionFeed;
+};
+
+export type Opinion = {[key in SuggestionVoteKind]?: number};
+
 export const createFeedMessage = <T extends APIGuildInteraction>(
   ctx: Context<T, []>,
-  suggestion: Suggestion,
+  suggestion: FullSuggestion,
   feed: SuggestionFeed,
-  {
-    Upvote: upvotes = 0,
-    Mid: mids = 0,
-    Downvote: downvotes = 0,
-  }: {[key in SuggestionVoteKind]?: number}
+  opinion: Opinion,
+  author = ctx.interaction.member.user
 ): RESTPostAPIChannelMessageJSONBody => {
   const l = ctx.getLocalizer();
 
-  const embed = new SuggestionEmbed(
-    l,
+  const embeds = SuggestionEmbed.build(l, feed, suggestion, opinion, author);
+
+  const buttons = createFeedButtons(
     feed,
-    suggestion,
-    [],
-    {Upvote: upvotes, Mid: mids, Downvote: downvotes},
-    ctx.interaction.member.user
+    opinion,
+    suggestion.id,
+    suggestion.attachments.length
   );
 
+  return {
+    embeds,
+    components: buttons,
+  };
+};
+
+export const createFeedButtons = (
+  feed: SuggestionFeed,
+  opinion: Opinion,
+  suggestionID: number,
+  nAttachments = 0
+): APIActionRowComponent<APIButtonComponent>[] => {
   const buttons: APIButtonComponent[] = (
-    [
-      ['upvote', feed.upvoteEmoji, upvotes],
-      ['mid', feed.midEmoji, mids],
-      ['downvote', feed.downvoteEmoji, downvotes],
-    ] as const
-  )
-    .map(
-      ([action, emoji, count]) =>
-        emoji && {
+    (
+      [
+        ['upvote', feed.upvoteEmoji, opinion.Upvote || 0],
+        ['mid', feed.midEmoji, opinion.Mid || 0],
+        ['downvote', feed.downvoteEmoji, opinion.Downvote || 0],
+      ] as const
+    )
+      .map(
+        ([action, emoji, count]) =>
+          emoji && {
+            type: ComponentType.Button,
+            style: ButtonStyle.Secondary,
+            emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
+            label: feed.showVoteCount && count.toString(),
+            custom_id: `${action}:${suggestionID}`,
+          }
+      )
+      .filter(Boolean) as APIButtonComponent[]
+  ).concat(
+    nAttachments
+      ? {
           type: ComponentType.Button,
           style: ButtonStyle.Secondary,
-          emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
-          label: feed.showVoteCount && count.toString(),
-          custom_id: `${action}:${suggestion.id}`,
+          label: `View ${nAttachments} Attachment${
+            nAttachments === 1 ? '' : 's'
+          }`,
+          emoji: {name: '\ud83d\uddbc\ufe0f'}, // picture emoji
+          custom_id: `attachments:${suggestionID}`,
         }
-    )
-    .filter(Boolean) as APIButtonComponent[];
+      : []
+  );
 
-  return {
-    embeds: [embed],
-    components: buttons.length
-      ? [
-          {
-            type: ComponentType.ActionRow,
-            components: buttons,
-          },
-        ]
-      : [],
-  };
+  return [
+    {
+      type: ComponentType.ActionRow,
+      components: buttons,
+    },
+  ];
 };
 
 export const sendFeedMessage = async <T extends APIGuildInteraction>(
   ctx: Context<T, []>,
-  suggestion: Suggestion,
+  suggestion: FullSuggestion,
   feed: SuggestionFeed,
   suggestCmd = true,
   votes: {[key in SuggestionVoteKind]?: number} = {}
@@ -127,7 +158,11 @@ export const sendFeedMessage = async <T extends APIGuildInteraction>(
 const createSuggestion = async <C extends APIGuildInteraction>(
   ctx: Context<C>,
   feed: SuggestionFeed,
-  {anon, body}: {anon: boolean; body: string}
+  {
+    anon,
+    body,
+    attachment,
+  }: {anon: boolean; body: string; attachment?: APIAttachment}
 ) => {
   const sendMsg = async (
     channelID: string,
@@ -149,15 +184,30 @@ const createSuggestion = async <C extends APIGuildInteraction>(
     return;
   }
 
-  const createdSuggestion = await ctx.db.createSuggestion({
-    body,
-    feedChannelID: feed.feedChannelID,
-    isAnonymous: anon,
-    approvalStatus:
-      feed.mode === SuggestionFeedMode.Review
-        ? SuggestionApprovalStatus.InQueue
-        : SuggestionApprovalStatus.Approved,
-  });
+  const attachments: {file: Buffer; type: string}[] = [];
+
+  if (attachment) {
+    const downloadedAttachment = await fetch(attachment.url).then(d =>
+      d.arrayBuffer()
+    );
+    attachments.push({
+      file: Buffer.from(downloadedAttachment),
+      type: attachment.content_type!,
+    });
+  }
+
+  const createdSuggestion = await ctx.db.createSuggestion(
+    {
+      body,
+      feedChannelID: feed.feedChannelID,
+      isAnonymous: anon,
+      approvalStatus:
+        feed.mode === SuggestionFeedMode.Review
+          ? SuggestionApprovalStatus.InQueue
+          : SuggestionApprovalStatus.Approved,
+    },
+    attachments
+  );
 
   try {
     switch (feed.mode) {
@@ -263,9 +313,17 @@ const options = [
     type: ApplicationCommandOptionType.Boolean,
     required: false,
   },
+  {
+    name: 'attachment',
+    description: 'An image to display with your suggestion',
+    type: ApplicationCommandOptionType.Attachment,
+    required: false,
+  },
 ] as const;
 
-export class FeedsCommand extends Command {
+const MAX_ATTACHMENT_SIZE = 100 * 1_024 * 1_024;
+
+export class SuggestCommand extends Command {
   name: MessageNames = 'cmd-suggest.name';
   description: MessageNames = 'cmd-suggest.desc';
 
@@ -321,7 +379,23 @@ export class FeedsCommand extends Command {
       return;
     }
 
-    await createSuggestion(ctx, feed, {anon, body});
+    const attachmentID = ctx.getOption('attachment')?.value;
+    const attachment = attachmentID
+      ? ctx.interaction.data.resolved?.attachments?.[attachmentID]
+      : undefined;
+
+    if (attachment) {
+      // TODO: what mime types should be allowed?
+      if (attachment.size > MAX_ATTACHMENT_SIZE) {
+        await ctx.send({
+          content: l.user('attachment-too-big'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+    }
+
+    await createSuggestion(ctx, feed, {anon, body, attachment});
   }
 
   async modal(ctx: Context<APIModalSubmitGuildInteraction>) {

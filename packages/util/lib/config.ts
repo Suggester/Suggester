@@ -24,7 +24,10 @@ export const BotConfigStruct = z.object({
     // auto_migrate: z.boolean().default(true),
     postgres_url: z.string(),
     redis_url: z.string(),
-
+    s3_bucket: z.string(),
+    s3_endpoint: z.string(),
+    s3_access_key_id: z.string(),
+    s3_secret_access_key: z.string(),
     // TODO: S3 for attachment storage?
   }),
 

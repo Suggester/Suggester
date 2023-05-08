@@ -27,6 +27,7 @@ ts_project(
     ":node_modules/@sentry/integrations",
     ":node_modules/@sentry/node",
     ":node_modules/@sentry/tracing",
+    ":node_modules/@aws-sdk/client-s3",
     ":node_modules/discord-api-types",
     ":node_modules/fastify",
     ":node_modules/undici",

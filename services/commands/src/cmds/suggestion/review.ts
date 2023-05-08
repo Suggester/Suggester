@@ -13,7 +13,6 @@ import {
 
 import {
   Prisma,
-  Suggestion,
   SuggestionApprovalStatus,
   SuggestionFeed,
 } from '@suggester/database';
@@ -24,13 +23,13 @@ import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/util';
 
 import {DefaultModCommandPermissions} from '../../constants';
 import {feedNameAutocomplete} from '../../util/commandComponents';
-import {sendFeedMessage} from './suggest';
+import {FullSuggestion, sendFeedMessage} from './suggest';
 
 const doAction = async <T extends APIGuildInteraction>(
   action: 'approve' | 'deny',
   ctx: Context<T>,
   feed: SuggestionFeed,
-  suggestion: Suggestion | null,
+  suggestion: FullSuggestion | null,
   reason?: string
 ) => {
   const l = ctx.getLocalizer();
@@ -172,7 +171,7 @@ const approveDenyCmds: SubCommand[] = (['Approve', 'Deny'] as const).map(s => {
         return;
       }
 
-      const selectedSuggestion = await ctx.db.getSuggestionByPublicID(
+      const selectedSuggestion = await ctx.db.getFullSuggestionByPublicID(
         feed.id,
         ctx.getOption('suggestion').value
       );
@@ -192,6 +191,8 @@ const approveDenyCmds: SubCommand[] = (['Approve', 'Deny'] as const).map(s => {
         where: {id},
         include: {
           feed: true,
+          attachments: true,
+          comments: true,
         },
       });
 

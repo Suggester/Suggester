@@ -4,3 +4,5 @@
 /node_modules
 /old
 config*.toml
+
+.DS_STORE

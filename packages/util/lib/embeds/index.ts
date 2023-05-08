@@ -202,6 +202,7 @@ export interface LocalizedAPIEmbedField<T extends MessageNames> {
   inline?: boolean;
 }
 
+export * from './attachment';
 export * from './changelog';
 export * from './feeds';
 export * from './review';

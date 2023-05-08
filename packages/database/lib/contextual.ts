@@ -25,6 +25,8 @@ export interface ContextualDatabaseConfig {
   userID: string;
 }
 
+type DownloadedAttachment = {file: Buffer; type: string; name?: string};
+
 /** Contextual database actions */
 export class ContextualDatabase {
   readonly db: Database;
@@ -156,6 +158,7 @@ export class ContextualDatabase {
     });
   }
 
+  // TODO: delete attachments from s3
   async deleteFeed(id: number): Promise<SuggestionFeed> {
     if (!this.guildID) {
       throw new Error('guildID missing in ContextualDatabase');
@@ -188,15 +191,43 @@ export class ContextualDatabase {
     });
   }
 
+  async getFullSuggestion(id: number) {
+    return this.prisma.suggestion.findFirst({
+      where: {id},
+      include: {
+        attachments: true,
+        comments: true,
+        feed: true,
+      },
+    });
+  }
+
+  async getFullSuggestionByPublicID(feedID: number, suggestionPubID: number) {
+    return this.prisma.suggestion.findFirst({
+      where: {
+        feed: {
+          id: feedID,
+        },
+        publicID: suggestionPubID,
+      },
+      include: {
+        attachments: true,
+        comments: true,
+        feed: true,
+      },
+    });
+  }
+
   async createSuggestion(
     data: Partial<PartialSuggestion> &
-      Pick<Suggestion, 'body' | 'feedChannelID' | 'approvalStatus'>
+      Pick<Suggestion, 'body' | 'feedChannelID' | 'approvalStatus'>,
+    attachments?: {file: Buffer; type: string; name?: string}[]
   ) {
     if (!this.guildID) {
       throw new Error('guildID missing in ContextualDatabase');
     }
 
-    return this.prisma.suggestion.create({
+    const createdSuggestion = await this.prisma.suggestion.create({
       data: {
         ...data,
         guildID: this.guildID,
@@ -204,7 +235,22 @@ export class ContextualDatabase {
         feedChannelID: data.feedChannelID,
         approvalStatus: data.approvalStatus,
       },
+      include: {
+        attachments: true,
+        comments: true,
+        feed: true,
+      },
     });
+
+    if (attachments?.length) {
+      const suggestionWithAttachments = this.createAttachments(
+        createdSuggestion,
+        attachments
+      );
+      return suggestionWithAttachments;
+    }
+
+    return createdSuggestion;
   }
 
   async updateSuggestion(
@@ -221,6 +267,7 @@ export class ContextualDatabase {
     });
   }
 
+  // TODO: delete attachments from s3
   async deleteSuggestion(id: number) {
     return this.prisma.suggestion.delete({
       where: {id},
@@ -265,6 +312,103 @@ export class ContextualDatabase {
       (a, c) => ((a[c.kind] = c._count), a),
       {} as {[key in SuggestionVoteKind]: number}
     );
+  }
+
+  // --- attachments ---
+
+  async getAttachmentsByPublicID(feedID: number, publicID: number) {
+    return this.prisma.suggestion.findFirst({
+      where: {
+        guildID: this.guildID,
+        publicID,
+        feed: {
+          id: feedID,
+        },
+      },
+      select: {
+        attachments: true,
+        authorID: true,
+      },
+    });
+  }
+
+  async getAllAttachments(id: number) {
+    return this.prisma.suggestion.findFirst({
+      where: {id},
+      select: {
+        id: true,
+        feedChannelID: true,
+        authorID: true,
+        attachments: {
+          orderBy: {id: 'asc'},
+        },
+      },
+    });
+  }
+
+  async addAttachmentToSuggestion(
+    suggestion: Pick<Suggestion, 'feedChannelID' | 'id'>,
+    attachment: DownloadedAttachment
+  ) {
+    return this.createAttachments(suggestion, [attachment]);
+  }
+
+  async createAttachments(
+    suggestion: Pick<Suggestion, 'feedChannelID' | 'id'>,
+    attachments: DownloadedAttachment[]
+  ) {
+    const uploadedAttachments = await Promise.all(
+      attachments.map(
+        async a =>
+          [
+            await this.db.s3.uploadAttachment(
+              a.file,
+              a.type,
+              this.guildID!,
+              suggestion.feedChannelID,
+              suggestion.id,
+              this.userID
+            ),
+            a,
+          ] as const
+      )
+    );
+
+    const s3BaseURL =
+      this.db.s3.options.s3_endpoint + '/' + this.db.s3.options.s3_bucket + '/';
+
+    const s = await this.prisma.suggestion.update({
+      where: {id: suggestion.id},
+      data: {
+        attachments: {
+          createMany: {
+            data: uploadedAttachments.map(([u, a]) => ({
+              name: a.name,
+              url: s3BaseURL + u.key,
+              s3Key: u.key,
+            })),
+          },
+        },
+      },
+
+      include: {
+        attachments: true,
+        comments: true,
+        feed: true,
+      },
+    });
+
+    return s;
+  }
+
+  async deleteAttachmentByID(id: number) {
+    const deleted = await this.prisma.suggestionAttachment.delete({
+      where: {id},
+    });
+
+    await this.db.s3.deleteAttachment(deleted);
+
+    return deleted;
   }
 
   // --- ensures ---
