@@ -133,6 +133,23 @@ class AttachmentsAddCommand extends SubCommand {
   ) {
     const l = ctx.getLocalizer();
 
+    const attachment =
+      ctx.interaction.data.resolved!.attachments![
+        ctx.getOption('attachment').value
+      ];
+
+    if (
+      !attachment.content_type ||
+      !ALLOWED_ATTACHMENT_TYPES.includes(attachment.content_type)
+    ) {
+      await ctx.send({
+        content: l.user('disallowed-attachment-type'),
+        flags: MessageFlags.Ephemeral,
+      });
+
+      return;
+    }
+
     const feedName = ctx.getOption('feed')?.value;
     const feed = await ctx.db.getFeedByNameOrDefault(feedName);
 
@@ -174,11 +191,6 @@ class AttachmentsAddCommand extends SubCommand {
       });
       return;
     }
-
-    const attachment =
-      ctx.interaction.data.resolved!.attachments![
-        ctx.getOption('attachment').value
-      ];
 
     if (attachment.size > MAX_FILE_SIZE) {
       await ctx.send({

@@ -16,7 +16,14 @@ import {
   quote,
   role,
   timestamp,
-} from '..';
+} from '../md';
+
+// TODO: move to config or something
+const EMOJIS: Record<string, string> = {
+  default: emoji('1105204955620577402'),
+  mode: emoji('1105204958221062196'),
+  'log-channel': emoji('1105204957612871801'),
+};
 
 const formatBoolYesNo = (b?: boolean | null) => (b ? 'Yes' : 'No');
 const formatChannel = (c?: string | null) => (c ? channel(c) : 'None');
@@ -29,7 +36,8 @@ const buildFromParts = (
   parts: {[key in keyof Attrs<'feed-info-embed'>]?: FluentPlaceholder}
 ): string[] =>
   Object.entries(parts).map(([k, v]) => {
-    const key = l.guild(('feed-info-embed.' + k) as MessageNames);
+    const emoji = k in EMOJIS ? EMOJIS[k] + ' ' : '';
+    const key = emoji + l.guild(('feed-info-embed.' + k) as MessageNames);
     return `${bold(key)}: ${v}`;
   });
 

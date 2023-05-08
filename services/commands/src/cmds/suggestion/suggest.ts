@@ -31,6 +31,7 @@ import {MessageNames} from '@suggester/i18n';
 import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
+import {ALLOWED_ATTACHMENT_TYPES} from './attach';
 
 export type FullSuggestion = Suggestion & {
   comments: SuggestionComment[];
@@ -385,12 +386,23 @@ export class SuggestCommand extends Command {
       : undefined;
 
     if (attachment) {
-      // TODO: what mime types should be allowed?
       if (attachment.size > MAX_ATTACHMENT_SIZE) {
         await ctx.send({
           content: l.user('attachment-too-big'),
           flags: MessageFlags.Ephemeral,
         });
+        return;
+      }
+
+      if (
+        !attachment.content_type ||
+        !ALLOWED_ATTACHMENT_TYPES.includes(attachment.content_type)
+      ) {
+        await ctx.send({
+          content: l.user('disallowed-attachment-type'),
+          flags: MessageFlags.Ephemeral,
+        });
+
         return;
       }
     }
