@@ -17,7 +17,7 @@ import {fetch} from 'undici';
 import {MAX_FILE_SIZE, SuggestionFeed} from '@suggester/database';
 import {Command, Context, SubCommand} from '@suggester/framework';
 import {Localizer, MessageNames} from '@suggester/i18n';
-import {SuggestionAttachmentEmbed, code} from '@suggester/util';
+import {SuggestionAttachmentEmbed} from '@suggester/util';
 
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {FullSuggestion, createFeedMessage} from './suggest';
@@ -197,7 +197,7 @@ class AttachmentsAddCommand extends SubCommand {
       downloadedAttachment
     );
 
-    await updateFeedMessage(ctx, suggestion, feed);
+    updateFeedMessage(ctx, suggestion, feed);
 
     await ctx.send({
       content: l.user('attachment-added'),
@@ -311,7 +311,7 @@ class AttachmentsRemoveCommand extends SubCommand {
       buildAttachmentsMessage(l, ctx.interaction.member.user.id, suggestion)
     );
 
-    await ctx.send({
+    ctx.send({
       content: l.user('attachment-removed'),
       flags: MessageFlags.Ephemeral,
     });
