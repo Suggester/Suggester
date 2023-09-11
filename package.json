@@ -2,6 +2,7 @@
   "name": "suggester",
   "devDependencies": {
     "@bazel/ibazel": "^0.16.2",
+    "@nx/js": "^16.8.1",
     "@types/node": "^18.13.0",
     "prisma": "^4.11.0",
     "ts-node": "^10.9.1",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@sentry/node": "^7.42.0",
-    "@sentry/tracing": "^7.42.0"
+    "@sentry/tracing": "^7.42.0",
+    "nx": "^16.8.1"
   }
 }

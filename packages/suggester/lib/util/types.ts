@@ -13,6 +13,10 @@ export type UnionToTuple<T> = UnionToIntersection<
   ? [...UnionToTuple<Exclude<T, W>>, W]
   : [];
 
+export type DistributiveOmit<T, K extends keyof T> = T extends any
+  ? Omit<T, K>
+  : never;
+
 export interface GitHubReleaseData {
   url: string;
   assets_url: string;

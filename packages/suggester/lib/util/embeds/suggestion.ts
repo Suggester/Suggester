@@ -1,5 +1,8 @@
 import {APIEmbed, APIUser} from 'discord-api-types/v10';
 
+import {Localizer, MessageNames} from '@suggester/i18n';
+
+import {EmbedBuilder} from '.';
 import {
   Suggestion,
   SuggestionAttachment,
@@ -8,9 +11,6 @@ import {
   SuggestionFeed,
   SuggestionVoteKind,
 } from '@suggester/database';
-import {Localizer, MessageNames} from '@suggester/i18n';
-
-import {EmbedBuilder} from '.';
 import {TimestampStyle, formatAvatarURL, timestamp, user} from '../md';
 
 // TODO: add to config maybe?

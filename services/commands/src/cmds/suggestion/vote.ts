@@ -1,4 +1,5 @@
 import {
+  APIButtonComponent,
   APIChatInputApplicationCommandGuildInteraction,
   APIGuildInteraction,
   APIMessageComponentGuildInteraction,
@@ -8,11 +9,14 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 
-import {SuggestionFeed, SuggestionVoteKind} from '@suggester/database';
-import {Command, Context, SubCommand} from '@suggester/framework';
+// import {Command, Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
-import {emoji} from '@suggester/util';
+import {SuggestionFeed, SuggestionVoteKind} from '@suggester/database';
+import {Command, Context, SubCommand} from '@suggester/suggester';
+import {emoji} from '@suggester/suggester';
 
+// import {emoji}  from '@suggester/suggester';
+// // import {emoji} from '@suggester/util';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {FullSuggestion, createFeedButtons} from './suggest';
 
@@ -32,7 +36,10 @@ const updateFeedMessage = async (
     ),
   };
 
-  if (feed.showVoteCount) {
+  // for replacing buttons after showVoteCount is toggled. lol
+  const btn = ctx.interaction.message?.components?.[0]
+    ?.components?.[0] as APIButtonComponent;
+  if (feed.showVoteCount || btn?.label?.match(/\d/)) {
     if (feedChannelID) {
       // command
       ctx.framework.rest.patch(

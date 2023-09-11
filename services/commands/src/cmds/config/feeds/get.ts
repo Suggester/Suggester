@@ -10,17 +10,20 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
-import {SuggestionFeed} from '@suggester/database';
-import {Context, SubCommand} from '@suggester/framework';
+// import {Context, SubCommand} from '@suggester/framework';
 import {Localizer, MessageNames} from '@suggester/i18n';
+import {SuggestionFeed} from '@suggester/database';
+import {Context, SubCommand} from '@suggester/suggester';
 import {
   EmbedBuilder,
   FeedInfoChannelsEmbed,
   FeedInfoOtherEmbed,
   FeedInfoOverviewEmbed,
   FeedInfoRolesEmbed,
-} from '@suggester/util';
+} from '@suggester/suggester';
 
+// }  from '@suggester/suggester';
+// // } from '@suggester/util';
 import {feedNameAutocomplete} from '../../../util/commandComponents';
 
 const options = [

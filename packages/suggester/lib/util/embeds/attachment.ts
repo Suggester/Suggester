@@ -1,7 +1,7 @@
-import {SuggestionAttachment} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
+import {SuggestionAttachment} from '@suggester/database';
 
 export class SuggestionAttachmentEmbed extends EmbedBuilder {
   constructor(l: Localizer, attachment: SuggestionAttachment, n = 1) {

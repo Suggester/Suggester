@@ -1,5 +1,6 @@
-import {Command} from '@suggester/framework';
+// import {Command} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {Command} from '@suggester/suggester';
 
 import {DefaultAdminCommandPermissions} from '../../../constants';
 import {FeedsCreateCommand} from './create';

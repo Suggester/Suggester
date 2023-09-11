@@ -11,16 +11,20 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 
+// import {Context, SubCommand} from '@suggester/framework';
+import {MessageNames} from '@suggester/i18n';
 import {
   Prisma,
   SuggestionApprovalStatus,
   SuggestionFeed,
 } from '@suggester/database';
-import {Command} from '@suggester/framework';
-import {Context, SubCommand} from '@suggester/framework';
-import {MessageNames} from '@suggester/i18n';
-import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/util';
+import {Command} from '@suggester/suggester';
+// import {Command} from '@suggester/framework';
+import {Context, SubCommand} from '@suggester/suggester';
+import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/suggester';
 
+// import {ApprovedDeniedSuggestionReviewQueueEmbed}  from '@suggester/suggester';
+// // import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/util';
 import {DefaultModCommandPermissions} from '../../constants';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {FullSuggestion, sendFeedMessage} from './suggest';

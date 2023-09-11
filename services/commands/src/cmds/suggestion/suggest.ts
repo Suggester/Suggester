@@ -17,6 +17,8 @@ import {
 } from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
+// import {Command, Context, LogAction} from '@suggester/framework';
+import {MessageNames} from '@suggester/i18n';
 import {
   Suggestion,
   SuggestionApprovalStatus,
@@ -26,10 +28,14 @@ import {
   SuggestionFeedMode,
   SuggestionVoteKind,
 } from '@suggester/database';
-import {Command, Context} from '@suggester/framework';
-import {MessageNames} from '@suggester/i18n';
-import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
+import {Command, Context, LogAction} from '@suggester/suggester';
+import {
+  NewSuggestionReviewQueueEmbed,
+  SuggestionEmbed,
+} from '@suggester/suggester';
 
+// import {NewSuggestionReviewQueueEmbed, SuggestionEmbed}  from '@suggester/suggester';
+// // import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {ALLOWED_ATTACHMENT_TYPES} from './attach';
 
@@ -85,7 +91,7 @@ export const createFeedButtons = (
             type: ComponentType.Button,
             style: ButtonStyle.Secondary,
             emoji: emoji.length > 15 ? {id: emoji} : {name: emoji},
-            label: feed.showVoteCount && count.toString(),
+            label: feed.showVoteCount ? count.toString() : null,
             custom_id: `${action}:${suggestionID}`,
           }
       )
@@ -209,6 +215,22 @@ const createSuggestion = async <C extends APIGuildInteraction>(
     },
     attachments
   );
+
+  if (feed.logChannelID) {
+    ctx.log.suggestionCreated({
+      suggestion: createdSuggestion,
+      logChannel: feed.logChannelID,
+      author: ctx.interaction.member.user,
+    });
+
+    setTimeout(() => {
+      ctx.log.suggestionCreated({
+        suggestion: createdSuggestion,
+        logChannel: feed.logChannelID!,
+        author: ctx.interaction.member.user,
+      });
+    }, 1000);
+  }
 
   try {
     switch (feed.mode) {

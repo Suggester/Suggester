@@ -4,14 +4,18 @@ import {
 } from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
-import {Command, Context} from '@suggester/framework';
+// import {Command, Context} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {Command, Context} from '@suggester/suggester';
 import {
   ChangelogEmbed,
   GitHubReleaseData,
   chunk,
   chunkStringAt,
-} from '@suggester/util';
+} from '@suggester/suggester';
+
+// }  from '@suggester/suggester';
+// // } from '@suggester/util';
 
 export class ChangelogCommand extends Command {
   name: MessageNames = 'cmd-changelog.name';

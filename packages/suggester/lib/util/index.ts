@@ -4,5 +4,7 @@ export * from './embeds';
 export * from './flags';
 export * from './httpStatusCodes';
 export * from './md';
+export * from './promise';
 export * from './readdir';
+export * from './struct';
 export * from './types';

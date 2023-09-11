@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client';
+
 import {S3Client, S3ClientOptions} from './s3';
 
 export class Database {

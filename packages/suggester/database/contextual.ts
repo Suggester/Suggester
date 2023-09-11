@@ -1,4 +1,3 @@
-import {Database} from '.';
 import {
   Prisma,
   PrismaClient,
@@ -6,6 +5,8 @@ import {
   SuggestionFeed,
   SuggestionVoteKind,
 } from '@prisma/client';
+
+import {Database} from '.';
 
 export type PartialSuggestionFeed = Omit<
   SuggestionFeed,

@@ -22,15 +22,24 @@ import {
   ComponentType,
   InteractionResponseType,
   InteractionType,
+  RESTPostAPIChannelMessageJSONBody,
   Routes,
 } from 'discord-api-types/v10';
-// import {verify} from 'discord-verify/node';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
-import {Database} from '@suggester/database';
 import {LocalizationService} from '@suggester/i18n';
-import {BotConfig, HttpStatusCode, readdir} from '@suggester/util';
 
+import {Database} from '@suggester/database';
+import {
+  BotConfig,
+  BufferedQueue,
+  EmbedBuilder,
+  HttpStatusCode,
+  LogAction,
+  LogData,
+  LogEmbed,
+  readdir,
+} from '../util';
 import {
   AutocompleteFunction,
   ButtonFunction,
@@ -43,10 +52,12 @@ import {
 } from './command';
 import {Context} from './context';
 
+// import {LogAction, LogData} from './logging';
+
 const COMMAND_DIR = path.join(
   process.cwd(),
-  'services',
-  'commands',
+  // 'services',
+  // 'commands',
   __filename.endsWith('.js') ? 'build' : '',
   'src',
   'cmds'
@@ -155,6 +166,10 @@ export class Framework extends EventEmitter<FrameworkEvents> {
   readonly modalFns = new Map<string | RegExp, ModalFunction>();
   readonly autocompleteFns = new Map<string, AutocompleteFunction>();
 
+  readonly logQueue = new BufferedQueue<LogData>().setHandler(
+    this.#handleLog.bind(this)
+  );
+
   readonly db: Database;
   readonly locales: LocalizationService;
   readonly config: BotConfig;
@@ -185,6 +200,28 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     }).setToken(config.discord_application.token);
   }
 
+  async #handleLog(topic: string, data: LogData[]) {
+    console.log(
+      'handle',
+      topic,
+      data.map(d => LogAction[d.action])
+    );
+
+    const buildEmbeds = (data: LogData[]): EmbedBuilder[] => {
+      const langCode = data[0].localizer.getGuildLocale();
+
+      return data.map(d => new LogEmbed(d).localize(d.localizer, langCode));
+    };
+
+    const embeds = buildEmbeds(data);
+
+    await this.rest.post(Routes.channelMessages(topic), {
+      body: {
+        embeds,
+      } as RESTPostAPIChannelMessageJSONBody,
+    });
+  }
+
   async handleRequest(
     r: FastifyRequest<{
       Body: APIInteraction;
@@ -198,7 +235,6 @@ export class Framework extends EventEmitter<FrameworkEvents> {
     const scope = new Scope();
 
     const body = r.body;
-    // const publicKey = this.config.discord_application.public_key;
 
     const time = r.headers['x-signature-timestamp'];
     const sig = r.headers['x-signature-ed25519'];
@@ -209,14 +245,6 @@ export class Framework extends EventEmitter<FrameworkEvents> {
       Buffer.from(sig, 'hex'),
       Buffer.from(time + JSON.stringify(body))
     );
-
-    // const isVerified = await verify(
-    //   JSON.stringify(body),
-    //   sig,
-    //   time,
-    //   publicKey,
-    //   crypto.webcrypto.subtle
-    // );
 
     if (!isVerified) {
       await w.code(HttpStatusCode.UNAUTHORIZED).send();
@@ -592,5 +620,6 @@ export const stringifyCommand = (
   return '/' + fullcmd.join(' ');
 };
 
-export * from './context';
 export * from './command';
+export * from './context';
+// export * from './logging';

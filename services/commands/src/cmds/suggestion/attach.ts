@@ -14,11 +14,14 @@ import {
 } from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
-import {MAX_FILE_SIZE, SuggestionFeed} from '@suggester/database';
-import {Command, Context, SubCommand} from '@suggester/framework';
+// import {Command, Context, SubCommand} from '@suggester/framework';
 import {Localizer, MessageNames} from '@suggester/i18n';
-import {SuggestionAttachmentEmbed} from '@suggester/util';
+import {MAX_FILE_SIZE, SuggestionFeed} from '@suggester/database';
+import {Command, Context, SubCommand} from '@suggester/suggester';
+import {SuggestionAttachmentEmbed} from '@suggester/suggester';
 
+// import {SuggestionAttachmentEmbed}  from '@suggester/suggester';
+// // import {SuggestionAttachmentEmbed} from '@suggester/util';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {FullSuggestion, createFeedMessage} from './suggest';
 

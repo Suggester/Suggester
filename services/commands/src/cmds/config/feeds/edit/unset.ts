@@ -7,8 +7,9 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
-import {Context, SubCommand} from '@suggester/framework';
+// import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {Context, SubCommand} from '@suggester/suggester';
 
 import {feedNameAutocomplete} from '../../../../util/commandComponents';
 

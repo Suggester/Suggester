@@ -1,5 +1,6 @@
-import {SubCommandGroup} from '@suggester/framework';
+// import {SubCommandGroup} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {SubCommandGroup} from '@suggester/suggester';
 
 import {FeedsEditSetCommand} from './set';
 import {FeedsEditUnsetCommand} from './unset';

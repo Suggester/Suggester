@@ -15,8 +15,20 @@
     "prisma": "^4.11.0"
   },
   "scripts": {
-    "build": "prisma generate && tsc",
+    "build": "tsc",
     "lint": "eslint .",
-    "fmt": "prisma format && prettier --write --ignore-path=.eslintignore ."
+    "fmt": "prisma format && prettier --write --ignore-path=.eslintignore .",
+    "prisma-generate": "prisma generate"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "dependsOn": ["prisma-generate"]
+      },
+
+      "prisma-generate": {
+        "inputs": ["{projectRoot}/prisma/schema.prisma"]
+      }
+    }
   }
 }

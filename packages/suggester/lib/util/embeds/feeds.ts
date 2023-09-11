@@ -1,4 +1,3 @@
-import {SuggestionFeed} from '@suggester/database';
 import {
   Attrs,
   FluentPlaceholder,
@@ -7,6 +6,7 @@ import {
 } from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
+import {SuggestionFeed} from '@suggester/database';
 import {
   TimestampStyle,
   bold,

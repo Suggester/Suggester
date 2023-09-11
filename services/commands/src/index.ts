@@ -5,10 +5,10 @@ import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import fastify from 'fastify';
 
-import {Database} from '@suggester/database';
-import {Framework} from '@suggester/framework';
 import {LocalizationService} from '@suggester/i18n';
-import {parseConfigFile} from '@suggester/util';
+import {Database} from '@suggester/database';
+import {Framework} from '@suggester/suggester';
+import {parseConfigFile} from '@suggester/suggester';
 
 const server = fastify({
   logger: false,

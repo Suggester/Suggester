@@ -3,8 +3,9 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
-import {Command, Context} from '@suggester/framework';
+// import {Command, Context} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {Command, Context} from '@suggester/suggester';
 
 export class SupportCommand extends Command {
   name: MessageNames = 'cmd-support.name';

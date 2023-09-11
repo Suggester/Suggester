@@ -8,10 +8,13 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
-import {SuggestionFeed} from '@suggester/database';
-import {PartialSuggestionFeed} from '@suggester/database/build/suggestionFeed';
-import {Context, SubCommand} from '@suggester/framework';
+// import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
+import {SuggestionFeed, PartialSuggestionFeed} from '@suggester/database';
+import {
+  Context,
+  SubCommand,
+} from '@suggester/suggester';
 
 import {feedNameAutocomplete} from '../../../../util/commandComponents';
 

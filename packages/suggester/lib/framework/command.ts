@@ -15,9 +15,9 @@ import {
 } from 'discord-api-types/v10';
 
 import {LocalizationService, MessageNames} from '@suggester/i18n';
-import {DeepReadonly} from '@suggester/util';
 
 import {Framework} from '.';
+import {DeepReadonly} from '../util';
 import {Context} from './context';
 
 const toLocalizedMap = (

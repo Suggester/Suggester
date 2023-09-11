@@ -40,15 +40,22 @@ import {
 } from 'discord-api-types/v10';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
-import {ContextualDatabase} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
-import {
-  DeepReadonly,
-  HttpStatusCode,
-  KebabCaseToCamelCase,
-} from '@suggester/util';
 
 import {Framework} from '.';
+import {ContextualDatabase} from '@suggester/database';
+import {
+  DeepReadonly,
+  DistributiveOmit,
+  HttpStatusCode,
+  KebabCaseToCamelCase,
+} from '../util';
+import {
+  ContextualLogs,
+  LogAction,
+  LogData,
+  LogPayload,
+} from '../util/struct/logging';
 
 export interface ContextConfig<T extends APIInteraction> {
   interaction: T;
@@ -65,6 +72,7 @@ export class Context<
   >
 > {
   readonly db: ContextualDatabase;
+  readonly log: ContextualLogs<T> = new ContextualLogs(this);
   readonly locales: LocalizationService;
   readonly interaction: T;
   readonly framework: Framework;
@@ -89,6 +97,8 @@ export class Context<
       channelID: this.interaction.channel_id,
       userID: (this.interaction.member?.user.id || this.interaction.user?.id)!,
     });
+
+    // this.logs = new ContextualLogs(this);
   }
 
   getLocalizer(): Localizer {
@@ -238,6 +248,18 @@ export class Context<
 
     await this.framework.rest.delete(url);
   }
+
+  /**
+   * Pushes a server log message to the buffer of log messages to be sent
+   */
+  // pushLog<Data extends DistributiveOmit<LogData, 'localizer'>>(
+  //   data: Data
+  // ): void {
+  //   this.framework.log.push(data.logChannel, {
+  //     ...data,
+  //     localizer: this.getLocalizer(),
+  //   } as Extract<LogData, {action: typeof data.action}>);
+  // }
 
   // type checking
 
