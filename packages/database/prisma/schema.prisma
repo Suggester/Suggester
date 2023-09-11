@@ -77,6 +77,7 @@ model SuggestionFeed {
 
   logWebhookID    String? @map("log_webhook_id")
   logWebhookToken String? @map("log_webhook_token")
+  logVotes        Boolean @default(false) @map("log_votes")
 
   // how often users can submit
   submitCooldown        Int?    @map("submit_cooldown")

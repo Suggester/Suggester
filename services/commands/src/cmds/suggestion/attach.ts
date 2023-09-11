@@ -14,9 +14,9 @@ import {
 } from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
+import {MAX_FILE_SIZE, SuggestionFeed} from '@suggester/database';
 // import {Command, Context, SubCommand} from '@suggester/framework';
 import {Localizer, MessageNames} from '@suggester/i18n';
-import {MAX_FILE_SIZE, SuggestionFeed} from '@suggester/database';
 import {Command, Context, SubCommand} from '@suggester/suggester';
 import {SuggestionAttachmentEmbed} from '@suggester/suggester';
 
@@ -214,6 +214,13 @@ class AttachmentsAddCommand extends SubCommand {
 
     updateFeedMessage(ctx, suggestion, feed);
 
+    ctx.log.attachmentAdded({
+      suggestion,
+      attachment: suggestion.attachments.at(-1)!,
+      user: ctx.interaction.member.user,
+      logChannel: feed.logChannelID,
+    });
+
     await ctx.send({
       content: l.user('attachment-added'),
       flags: MessageFlags.Ephemeral,
@@ -313,7 +320,7 @@ class AttachmentsRemoveCommand extends SubCommand {
     const sID = parseInt(_sID);
     const aID = parseInt(_aID);
 
-    await ctx.db.deleteAttachmentByID(aID);
+    const deletedAttachment = await ctx.db.deleteAttachmentByID(aID);
     const suggestion = await ctx.db.getFullSuggestion(sID)!;
 
     if (!suggestion) {
@@ -325,6 +332,13 @@ class AttachmentsRemoveCommand extends SubCommand {
     await ctx.update(
       buildAttachmentsMessage(l, ctx.interaction.member.user.id, suggestion)
     );
+
+    ctx.log.attachmentRemoved({
+      attachment: deletedAttachment,
+      suggestion,
+      logChannel: suggestion.feed.logChannelID,
+      user: ctx.interaction.member.user,
+    });
 
     ctx.send({
       content: l.user('attachment-removed'),

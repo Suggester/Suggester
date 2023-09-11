@@ -18,16 +18,21 @@
     "build": "tsc",
     "lint": "eslint .",
     "fmt": "prisma format && prettier --write --ignore-path=.eslintignore .",
-    "prisma-generate": "prisma generate"
+    "prisma-generate": "prisma generate",
+    "prisma-db-push": "prisma db push"
   },
   "nx": {
     "targets": {
       "build": {
-        "dependsOn": ["prisma-generate"]
+        "dependsOn": [
+          "prisma-generate",
+          "prisma-db-push"
+        ]
       },
-
       "prisma-generate": {
-        "inputs": ["{projectRoot}/prisma/schema.prisma"]
+        "inputs": [
+          "{projectRoot}/prisma/schema.prisma"
+        ]
       }
     }
   }

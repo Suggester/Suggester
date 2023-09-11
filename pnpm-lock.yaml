@@ -14,6 +14,9 @@ importers:
       '@sentry/tracing':
         specifier: ^7.42.0
         version: 7.42.0
+      discord-api-types:
+        specifier: ^0.37.56
+        version: 0.37.56
       nx:
         specifier: ^16.8.1
         version: 16.8.1
@@ -23,7 +26,7 @@ importers:
         version: 0.16.2
       '@nx/js':
         specifier: ^16.8.1
-        version: 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@4.7.4)
+        version: 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@5.2.2)
       '@types/node':
         specifier: ^18.13.0
         version: 18.13.0
@@ -32,10 +35,10 @@ importers:
         version: 4.11.0
       ts-node:
         specifier: ^10.9.1
-        version: 10.9.1(@types/node@18.13.0)(typescript@4.7.4)
+        version: 10.9.1(@types/node@18.13.0)(typescript@5.2.2)
       typescript:
-        specifier: 4.7.4
-        version: 4.7.4
+        specifier: ^5.2.2
+        version: 5.2.2
 
   packages/amqp:
     dependencies:
@@ -264,9 +267,6 @@ importers:
       '@types/mime':
         specifier: ^3.0.1
         version: 3.0.1
-      discord-api-types:
-        specifier: ^0.37.35
-        version: 0.37.35
       eslint:
         specifier: ^7
         version: 7.32.0
@@ -343,9 +343,6 @@ importers:
       '@suggester/suggester':
         specifier: workspace:^
         version: link:../../packages/suggester
-      discord-api-types:
-        specifier: ^0.37.35
-        version: 0.37.35
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
@@ -2961,10 +2958,10 @@ packages:
       - nx
     dev: true
 
-  /@nrwl/js@16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@4.7.4):
+  /@nrwl/js@16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@5.2.2):
     resolution: {integrity: sha512-I5kCtk0TUvcvJXnD6fbOI1+L4EBHbSZCXVCkv3eXKOeAj0cJ6cOt2g6S7DpWPf2P7zTq22XOPNJy3C8u9tCbgQ==}
     dependencies:
-      '@nx/js': 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@4.7.4)
+      '@nx/js': 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@5.2.2)
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -3014,7 +3011,7 @@ packages:
       tslib: 2.5.0
     dev: true
 
-  /@nx/js@16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@4.7.4):
+  /@nx/js@16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@5.2.2):
     resolution: {integrity: sha512-SznU6GH/yxj2ro1pgUWDSaoiSiP7UgxMvb2qlyhU1iRB9sdOBhduzVq6+yTgrje2sVSnAWSGbWiQaYkxFLaKWw==}
     peerDependencies:
       verdaccio: ^5.0.4
@@ -3029,10 +3026,10 @@ packages:
       '@babel/preset-env': 7.22.15(@babel/core@7.22.17)
       '@babel/preset-typescript': 7.22.15(@babel/core@7.22.17)
       '@babel/runtime': 7.22.15
-      '@nrwl/js': 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@4.7.4)
+      '@nrwl/js': 16.8.1(@types/node@18.13.0)(nx@16.8.1)(typescript@5.2.2)
       '@nx/devkit': 16.8.1(nx@16.8.1)
       '@nx/workspace': 16.8.1
-      '@phenomnomnominal/tsquery': 5.0.1(typescript@4.7.4)
+      '@phenomnomnominal/tsquery': 5.0.1(typescript@5.2.2)
       babel-plugin-const-enum: 1.2.0(@babel/core@7.22.17)
       babel-plugin-macros: 2.8.0
       babel-plugin-transform-typescript-metadata: 0.3.2(@babel/core@7.22.17)
@@ -3045,7 +3042,7 @@ packages:
       minimatch: 3.0.5
       semver: 7.5.3
       source-map-support: 0.5.19
-      ts-node: 10.9.1(@types/node@18.13.0)(typescript@4.7.4)
+      ts-node: 10.9.1(@types/node@18.13.0)(typescript@5.2.2)
       tsconfig-paths: 4.2.0
       tslib: 2.5.0
     transitivePeerDependencies:
@@ -3166,13 +3163,13 @@ packages:
       node-addon-api: 3.2.1
       node-gyp-build: 4.6.1
 
-  /@phenomnomnominal/tsquery@5.0.1(typescript@4.7.4):
+  /@phenomnomnominal/tsquery@5.0.1(typescript@5.2.2):
     resolution: {integrity: sha512-3nVv+e2FQwsW8Aw6qTU6f+1rfcJ3hrcnvH/mu9i8YhxO+9sqbOfpL8m6PbET5+xKOlz/VSbp0RoYWYCtIsnmuA==}
     peerDependencies:
       typescript: ^3 || ^4 || ^5
     dependencies:
       esquery: 1.4.0
-      typescript: 4.7.4
+      typescript: 5.2.2
     dev: true
 
   /@prisma/client@4.11.0(prisma@4.11.0):
@@ -4055,6 +4052,11 @@ packages:
 
   /discord-api-types@0.37.35:
     resolution: {integrity: sha512-iyKZ/82k7FX3lcmHiAvvWu5TmyfVo78RtghBV/YsehK6CID83k5SI03DKKopBcln+TiEIYw5MGgq7SJXSpNzMg==}
+    dev: false
+
+  /discord-api-types@0.37.56:
+    resolution: {integrity: sha512-Ih3wj0ZTaQxaJRqUEXHMIXfXB86bwMGC0wc2nNsyCJqeo3lC4qnxXtFIsC+IGI46+dSIinuayCAZ6sLEEM02Bw==}
+    dev: false
 
   /discord-verify@1.0.0:
     resolution: {integrity: sha512-3oylOAVOArmCXedhLPmGCdh0qyQ8E8gnh2aokIl1Qg2b81C+xewyZegay9EOniWjuGXe3jMrvaMrKv398u4QFg==}
@@ -5918,7 +5920,7 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /ts-node@10.9.1(@types/node@18.13.0)(typescript@4.7.4):
+  /ts-node@10.9.1(@types/node@18.13.0)(typescript@5.2.2):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -5944,7 +5946,7 @@ packages:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 4.7.4
+      typescript: 5.2.2
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
@@ -6014,6 +6016,13 @@ packages:
     resolution: {integrity: sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==}
     engines: {node: '>=4.2.0'}
     hasBin: true
+    dev: false
+
+  /typescript@5.2.2:
+    resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true
 
   /undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}

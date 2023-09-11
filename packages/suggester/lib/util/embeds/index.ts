@@ -205,5 +205,6 @@ export interface LocalizedAPIEmbedField<T extends MessageNames> {
 export * from './attachment';
 export * from './changelog';
 export * from './feeds';
+export * from './log';
 export * from './review';
 export * from './suggestion';

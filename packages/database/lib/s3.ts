@@ -7,10 +7,9 @@ import {
   PutObjectCommand,
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
+import {SuggestionAttachment} from '@prisma/client';
 import {randomUUID} from 'crypto';
 import mime from 'mime';
-
-import {SuggestionAttachment} from '@prisma/client';
 
 const SINGLE_UPLOAD_THRESHOLD = 25 * 1_024 * 1_024; // 25mb
 export const MAX_FILE_SIZE = 100 * 1_024 * 1_024; // 100mb

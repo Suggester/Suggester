@@ -11,13 +11,13 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 
-// import {Context, SubCommand} from '@suggester/framework';
-import {MessageNames} from '@suggester/i18n';
 import {
   Prisma,
   SuggestionApprovalStatus,
   SuggestionFeed,
 } from '@suggester/database';
+// import {Context, SubCommand} from '@suggester/framework';
+import {MessageNames} from '@suggester/i18n';
 import {Command} from '@suggester/suggester';
 // import {Command} from '@suggester/framework';
 import {Context, SubCommand} from '@suggester/suggester';
@@ -73,6 +73,16 @@ const doAction = async <T extends APIGuildInteraction>(
   }
 
   await ctx.db.updateSuggestion(suggestion.id, updateSuggestion);
+
+  const logFn =
+    action === 'approve'
+      ? ctx.log.suggestionApproved
+      : ctx.log.suggestionDenied;
+  logFn({
+    suggestion,
+    user: ctx.interaction.member.user,
+    logChannel: feed.logChannelID,
+  });
 
   await ctx.send({
     content: l.guild(`review-${action}-success`, {

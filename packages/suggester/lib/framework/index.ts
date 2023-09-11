@@ -27,9 +27,9 @@ import {
 } from 'discord-api-types/v10';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
+import {Database} from '@suggester/database';
 import {LocalizationService} from '@suggester/i18n';
 
-import {Database} from '@suggester/database';
 import {
   BotConfig,
   BufferedQueue,
@@ -38,6 +38,7 @@ import {
   LogAction,
   LogData,
   LogEmbed,
+  getLogEmbed,
   readdir,
 } from '../util';
 import {
@@ -201,16 +202,13 @@ export class Framework extends EventEmitter<FrameworkEvents> {
   }
 
   async #handleLog(topic: string, data: LogData[]) {
-    console.log(
-      'handle',
-      topic,
-      data.map(d => LogAction[d.action])
-    );
-
     const buildEmbeds = (data: LogData[]): EmbedBuilder[] => {
       const langCode = data[0].localizer.getGuildLocale();
 
-      return data.map(d => new LogEmbed(d).localize(d.localizer, langCode));
+      return data.map(d => {
+        const Embed = getLogEmbed(d.action);
+        return new Embed(d).localize(d.localizer, langCode);
+      });
     };
 
     const embeds = buildEmbeds(data);

@@ -5,7 +5,6 @@
     "@suggester/configs": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/mime": "^3.0.1",
-    "discord-api-types": "^0.37.35",
     "eslint": "^7",
     "prettier": "^2.8.4",
     "prisma": "^4.11.0"
@@ -28,5 +27,8 @@
     "build": "tsc",
     "lint": "eslint .",
     "fmt": "prettier --write --ignore-path=.eslintignore ."
+  },
+  "engines": {
+    "node": ">=18.15.0"
   }
 }

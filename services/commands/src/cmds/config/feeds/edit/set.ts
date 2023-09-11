@@ -8,13 +8,10 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
+import {PartialSuggestionFeed, SuggestionFeed} from '@suggester/database';
 // import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
-import {SuggestionFeed, PartialSuggestionFeed} from '@suggester/database';
-import {
-  Context,
-  SubCommand,
-} from '@suggester/suggester';
+import {Context, SubCommand} from '@suggester/suggester';
 
 import {feedNameAutocomplete} from '../../../../util/commandComponents';
 
@@ -207,6 +204,12 @@ const options = [
     type: ApplicationCommandOptionType.Integer,
     min_value: 1,
   },
+  {
+    name: 'log-votes',
+    description:
+      'Send a message in the log channel when someone votes on a suggestion',
+    type: ApplicationCommandOptionType.Boolean,
+  },
 ] as const;
 
 export class FeedsEditSetCommand extends SubCommand {
@@ -240,7 +243,11 @@ export class FeedsEditSetCommand extends SubCommand {
 
     const opts = ctx.getFlatOptions();
 
-    if (Object.keys(opts) === ['feed']) {
+    const givenOptions = Object.keys(opts);
+    if (
+      !givenOptions.length ||
+      (givenOptions.length === 1 && givenOptions[0] === 'feed')
+    ) {
       const m = l.user('feeds-edit-set-no-options-provided');
       await ctx.send({
         content: m,
@@ -282,6 +289,7 @@ export class FeedsEditSetCommand extends SubCommand {
         showVoteCount: 'showVoteCount',
         suggestionFeedCap: 'suggestionCap',
         allowAnonymousSuggestions: 'allowAnonymous',
+        logVotes: 'logVotes',
       };
 
       const newKey = MAP[key as OptionKeys];

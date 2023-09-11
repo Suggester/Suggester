@@ -1,33 +1,44 @@
 import {APIInteraction, APIUser} from 'discord-api-types/v10';
 
+// import {Suggestion, SuggestionAttachment} from '../../database';
+import {
+  Suggestion,
+  SuggestionAttachment,
+  SuggestionVote,
+  SuggestionVoteKind,
+} from '@suggester/database';
 import {Localizer, MessageNames} from '@suggester/i18n';
 
-// import {Suggestion, SuggestionAttachment} from '../../database';
-import {Suggestion, SuggestionAttachment} from '@suggester/database';
 import {Context} from '../../framework';
+
 // import {Context} from '.';
-import {EmbedBuilder} from '../embeds';
+// import {EmbedBuilder} from '../embeds';
 
 export enum LogAction {
   SuggestionCreated,
+  SuggestionApproved,
+  SuggestionDenied,
+
   AttachmentAdded,
   AttachmentRemoved,
+
+  VoteAdded,
+  VoteRemoved,
+  VoteChanged,
 }
 
 type MakeLogPayload<E extends LogAction, T> = T & {
   action: E;
-  logChannel: string;
+  user: APIUser;
+  logChannel?: string | null;
   localizer: Localizer;
   suggestion: Suggestion;
 };
 
 export type LogData =
-  | MakeLogPayload<
-      LogAction.SuggestionCreated,
-      {
-        author: APIUser;
-      }
-    >
+  | MakeLogPayload<LogAction.SuggestionCreated, {}>
+  | MakeLogPayload<LogAction.SuggestionApproved, {}>
+  | MakeLogPayload<LogAction.SuggestionDenied, {}>
   | MakeLogPayload<
       LogAction.AttachmentAdded,
       {
@@ -39,11 +50,30 @@ export type LogData =
       {
         attachment: SuggestionAttachment;
       }
+    >
+  | MakeLogPayload<
+      LogAction.VoteAdded,
+      {
+        emoji: string;
+      }
+    >
+  | MakeLogPayload<
+      LogAction.VoteRemoved,
+      {
+        emoji: string;
+      }
+    >
+  | MakeLogPayload<
+      LogAction.VoteChanged,
+      {
+        old: string;
+        new: string;
+      }
     >;
 
-export type LogPayload<E extends LogAction> = Omit<
+export type LogPayload<E extends LogAction, OmitImplicit = true> = Omit<
   Extract<LogData, {action: E}>,
-  'action' | 'localizer'
+  OmitImplicit extends true ? 'action' | 'localizer' : ''
 >;
 
 // TODO: move to own package?
@@ -86,7 +116,9 @@ export class ContextualLogs<T extends APIInteraction> {
           const action = LogActionNameMap[prop];
 
           const f = (data: LogPayload<LogAction>) => {
-            this.#push(action, data);
+            if (data.logChannel) {
+              this.#push(action, data);
+            }
           };
 
           return f;
@@ -98,30 +130,10 @@ export class ContextualLogs<T extends APIInteraction> {
   }
 
   #push<E extends LogAction>(action: E, data: LogPayload<E>) {
-    this.ctx.framework.logQueue.push(data.logChannel, {
+    this.ctx.framework.logQueue.push(data.logChannel!, {
       ...data,
       action,
       localizer: this.ctx.getLocalizer(),
     } as Extract<LogData, {action: E}>);
-  }
-}
-
-export class LogEmbed extends EmbedBuilder {
-  constructor(data: LogData) {
-    super();
-
-    super.setTitleLocalized(
-      `log-action.${LogAction[data.action]}` as MessageNames
-    );
-    super.setColor(0x5865f2);
-    super.setFooterLocalized(
-      {
-        text: 'log-embed.footer',
-      },
-      {
-        authorID: data.suggestion.authorID,
-        suggestionID: data.suggestion.publicID,
-      }
-    );
   }
 }

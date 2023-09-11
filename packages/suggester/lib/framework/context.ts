@@ -40,10 +40,10 @@ import {
 } from 'discord-api-types/v10';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
+import {ContextualDatabase} from '@suggester/database';
 import {LocalizationService, Localizer} from '@suggester/i18n';
 
 import {Framework} from '.';
-import {ContextualDatabase} from '@suggester/database';
 import {
   DeepReadonly,
   DistributiveOmit,
@@ -103,6 +103,7 @@ export class Context<
 
   getLocalizer(): Localizer {
     return new Localizer(
+      // @ts-expect-error why did this break?
       this.interaction as Exclude<APIInteraction, APIPingInteraction>,
       this.locales
     );
@@ -190,7 +191,7 @@ export class Context<
     return this.respond({
       type: InteractionResponseType.DeferredChannelMessageWithSource,
       data: {
-        flags: ephemeral ? MessageFlags.Ephemeral : 0,
+        flags: ephemeral ? MessageFlags.Ephemeral : undefined,
       },
     });
   }
@@ -345,8 +346,6 @@ export class Context<
       o =>
         (o.type === ApplicationCommandOptionType.String ||
           o.type === ApplicationCommandOptionType.Number) &&
-        // FIXME: how fix
-        // @ts-expect-error bad types?
         o.focused
     );
   }

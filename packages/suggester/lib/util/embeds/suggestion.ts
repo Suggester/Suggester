@@ -1,8 +1,5 @@
 import {APIEmbed, APIUser} from 'discord-api-types/v10';
 
-import {Localizer, MessageNames} from '@suggester/i18n';
-
-import {EmbedBuilder} from '.';
 import {
   Suggestion,
   SuggestionAttachment,
@@ -11,7 +8,10 @@ import {
   SuggestionFeed,
   SuggestionVoteKind,
 } from '@suggester/database';
-import {TimestampStyle, formatAvatarURL, timestamp, user} from '../md';
+import {Localizer, MessageNames} from '@suggester/i18n';
+
+import {EmbedBuilder} from '.';
+import {TimestampStyle, formatAvatarURL, tag, timestamp, user} from '../md';
 
 // TODO: add to config maybe?
 
@@ -49,7 +49,7 @@ export class SuggestionEmbed extends EmbedBuilder {
     const authorName = suggestion.isAnonymous
       ? l.guild('suggestion-embed.title-anon')
       : l.guild('suggestion-embed.title', {
-          user: `${author.username}#${author.discriminator}`,
+          user: tag(author),
         });
 
     super.setAuthor({

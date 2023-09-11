@@ -10,7 +10,6 @@
     "@suggester/database": "workspace:^",
     "@suggester/i18n": "workspace:*",
     "@suggester/suggester": "workspace:^",
-    "discord-api-types": "^0.37.35",
     "dotenv": "^16.3.1",
     "fastify": "^4.13.0",
     "undici": "^5.19.1",
@@ -24,6 +23,7 @@
     "prettier": "^2.8.4"
   },
   "scripts": {
+    "start": "node --enable-source-maps .",
     "build": "tsc",
     "lint": "eslint .",
     "fmt": "prettier --write --ignore-path=.eslintignore ."

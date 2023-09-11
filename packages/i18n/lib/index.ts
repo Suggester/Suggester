@@ -8,7 +8,7 @@ import {MessageNames, Placeholders} from './fluentMessages';
 
 const FALLBACK_LOCALE = 'en-US';
 
-const LOCALE_DIR = path.join(process.cwd(), 'lang');
+const LOCALE_DIR = path.join('..', '..', 'lang');
 const COMMON_FILE_NAME = 'common.ftl';
 const LOCALE_FILE_NAME = 'translations.ftl';
 

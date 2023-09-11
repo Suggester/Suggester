@@ -1,3 +1,4 @@
+import {SuggestionFeed} from '@suggester/database';
 import {
   Attrs,
   FluentPlaceholder,
@@ -6,7 +7,6 @@ import {
 } from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
-import {SuggestionFeed} from '@suggester/database';
 import {
   TimestampStyle,
   bold,
@@ -119,6 +119,7 @@ export class FeedInfoOtherEmbed extends BaseFeedInfoEmbed {
       'suggestion-cap': feed.suggestionCap ? feed.suggestionCap : 'Unlimited',
       // TODO: suggestionCooldown: feed.submitCooldown,
       'annon-allowed': formatBoolYesNo(feed.allowAnonymous),
+      'log-votes': formatBoolYesNo(feed.logVotes),
     });
 
     const voteButtons = buildFromParts(l, {

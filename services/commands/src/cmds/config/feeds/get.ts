@@ -10,9 +10,9 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 
+import {SuggestionFeed} from '@suggester/database';
 // import {Context, SubCommand} from '@suggester/framework';
 import {Localizer, MessageNames} from '@suggester/i18n';
-import {SuggestionFeed} from '@suggester/database';
 import {Context, SubCommand} from '@suggester/suggester';
 import {
   EmbedBuilder,

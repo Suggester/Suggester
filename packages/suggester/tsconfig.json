@@ -4,7 +4,6 @@
     "rootDir": ".",
     "outDir": "build",
     "skipLibCheck": true,
-    "typeRoots": ["node_modules/@types"],
     "types": ["@suggester/types"]
   },
   "include": ["lib/**/*.ts"]

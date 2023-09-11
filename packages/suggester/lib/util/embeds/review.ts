@@ -1,9 +1,9 @@
 import {APIUser} from 'discord-api-types/v10';
 
+import {Suggestion, SuggestionApprovalStatus} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
-import {Suggestion, SuggestionApprovalStatus} from '@suggester/database';
 import {formatAvatarURL, tag} from '../md';
 
 const COLORS = {

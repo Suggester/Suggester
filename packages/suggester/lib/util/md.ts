@@ -40,10 +40,17 @@ export const role = (r: string) => `<@&${r}>`;
 export const emoji = (id: string, animated = false) =>
   id.length > 15 ? `<${animated ? 'a' : ''}:owo:${id}>` : id;
 
-export const tag = (u: APIUser) => `${u.username}#${u.discriminator}`;
+export const tag = (u: APIUser) =>
+  `${u.global_name} (@${
+    u.discriminator === '0' ? u.username : `${u.username}#${u.discriminator}`
+  })`;
 
 export const formatAvatarURL = (user: APIUser) =>
   RouteBases.cdn +
   (user.avatar
     ? `/avatars/${user.id}/${user.avatar}.png`
-    : `/embed/avatars/${Number(user.discriminator) % 5}.png`);
+    : `/embed/avatars/${
+        user.discriminator === '0'
+          ? (BigInt(user.id) >> 22n) % 6n
+          : Number(user.discriminator) % 5
+      }.png`);

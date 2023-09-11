@@ -9,7 +9,8 @@
           "build",
           "lint",
           "fmt",
-          "prisma-generate"
+          "prisma-generate",
+          "prisma-db-push"
         ]
       }
     }
@@ -24,6 +25,10 @@
     },
 
     "fmt": {
+    },
+
+    "start": {
+      "dependsOn": ["build"]
     }
   },
 

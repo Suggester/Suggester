@@ -5,8 +5,8 @@ import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import fastify from 'fastify';
 
-import {LocalizationService} from '@suggester/i18n';
 import {Database} from '@suggester/database';
+import {LocalizationService} from '@suggester/i18n';
 import {Framework} from '@suggester/suggester';
 import {parseConfigFile} from '@suggester/suggester';
 

@@ -9,9 +9,9 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 
+import {SuggestionFeed, SuggestionVoteKind} from '@suggester/database';
 // import {Command, Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
-import {SuggestionFeed, SuggestionVoteKind} from '@suggester/database';
 import {Command, Context, SubCommand} from '@suggester/suggester';
 import {emoji} from '@suggester/suggester';
 
@@ -113,7 +113,6 @@ const doAction = async (
   }
 
   feedEmoji = emoji(feedEmoji);
-  console.log(feedEmoji, ctx.interaction.app_permissions);
 
   if (
     ctx.interaction.member.user.id === suggestionAndFeed.authorID &&
@@ -139,6 +138,16 @@ const doAction = async (
         feedChannelID
       );
 
+      if (suggestionAndFeed.feed.logVotes) {
+        ctx.log.voteRemoved({
+          emoji: feedEmoji,
+          suggestion: suggestionAndFeed,
+          logChannel: suggestionAndFeed.feed.logChannelID,
+          user: ctx.interaction.member.user,
+        });
+      }
+
+      // TODO: why is this here??
       if (feedChannelID || !suggestionAndFeed.feed.showVoteCount) {
         await ctx.send({
           content: l.user('vote-remove-success', {kind: feedEmoji}),
@@ -149,9 +158,32 @@ const doAction = async (
       return;
     }
 
+    if (suggestionAndFeed.feed.logVotes) {
+      const oldEmoji =
+        suggestionAndFeed.feed[
+          (previousVote.kind.toLowerCase() +
+            'Emoji') as `${Lowercase<SuggestionVoteKind>}Emoji`
+        ]!;
+      ctx.log.voteChanged({
+        old: emoji(oldEmoji),
+        new: feedEmoji,
+        suggestion: suggestionAndFeed,
+        logChannel: suggestionAndFeed.feed.logChannelID,
+        user: ctx.interaction.member.user,
+      });
+    }
+
     await ctx.db.updateVoteKind(kind, previousVote.id);
   } else {
     await ctx.db.createVote(kind, suggestionAndFeed.id);
+    if (suggestionAndFeed.feed.logVotes) {
+      ctx.log.voteAdded({
+        emoji: feedEmoji,
+        suggestion: suggestionAndFeed,
+        logChannel: suggestionAndFeed.feed.logChannelID,
+        user: ctx.interaction.member.user,
+      });
+    }
   }
 
   await updateFeedMessage(
@@ -161,6 +193,7 @@ const doAction = async (
     feedChannelID
   );
 
+  // TODO: this too????
   if (feedChannelID || !suggestionAndFeed.feed.showVoteCount) {
     await ctx.send({
       content: l.user('vote-success', {

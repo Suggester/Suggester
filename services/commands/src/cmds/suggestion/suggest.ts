@@ -17,8 +17,6 @@ import {
 } from 'discord-api-types/v10';
 import {fetch} from 'undici';
 
-// import {Command, Context, LogAction} from '@suggester/framework';
-import {MessageNames} from '@suggester/i18n';
 import {
   Suggestion,
   SuggestionApprovalStatus,
@@ -28,6 +26,7 @@ import {
   SuggestionFeedMode,
   SuggestionVoteKind,
 } from '@suggester/database';
+import {MessageNames} from '@suggester/i18n';
 import {Command, Context, LogAction} from '@suggester/suggester';
 import {
   NewSuggestionReviewQueueEmbed,
@@ -216,21 +215,21 @@ const createSuggestion = async <C extends APIGuildInteraction>(
     attachments
   );
 
-  if (feed.logChannelID) {
-    ctx.log.suggestionCreated({
-      suggestion: createdSuggestion,
-      logChannel: feed.logChannelID,
-      author: ctx.interaction.member.user,
-    });
+  // if (feed.logChannelID) {
+  ctx.log.suggestionCreated({
+    suggestion: createdSuggestion,
+    logChannel: feed.logChannelID,
+    user: ctx.interaction.member.user,
+  });
 
-    setTimeout(() => {
-      ctx.log.suggestionCreated({
-        suggestion: createdSuggestion,
-        logChannel: feed.logChannelID!,
-        author: ctx.interaction.member.user,
-      });
-    }, 1000);
-  }
+  // setTimeout(() => {
+  //   ctx.log.suggestionCreated({
+  //     suggestion: createdSuggestion,
+  //     logChannel: feed.logChannelID!,
+  //     user: ctx.interaction.member.user,
+  //   });
+  // }, 400);
+  // }
 
   try {
     switch (feed.mode) {
@@ -387,8 +386,10 @@ export class SuggestCommand extends Command {
               {
                 type: ComponentType.TextInput,
                 custom_id: 'body',
+                // TODO: localize?
                 label: 'Suggestion Body',
                 style: TextInputStyle.Paragraph,
+                // TODO: localize?
                 placeholder: 'I would like you to add...',
                 required: true,
                 min_length: 1,
