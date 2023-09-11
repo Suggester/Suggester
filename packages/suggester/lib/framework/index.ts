@@ -35,9 +35,7 @@ import {
   BufferedQueue,
   EmbedBuilder,
   HttpStatusCode,
-  LogAction,
   LogData,
-  LogEmbed,
   getLogEmbed,
   readdir,
 } from '../util';
@@ -52,8 +50,6 @@ import {
   SubCommandGroup,
 } from './command';
 import {Context} from './context';
-
-// import {LogAction, LogData} from './logging';
 
 const COMMAND_DIR = path.join(
   process.cwd(),

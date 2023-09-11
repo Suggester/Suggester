@@ -1,6 +1,11 @@
 /.bazelrc
 /bazel-*
-/lang
+!/lang/
+/lang/*
+!/lang/en-US/
+/lang/en-US/*
+!/lang/en-US/translations.ftl
+!/lang/common.ftl
 /node_modules
 /old
 config*.toml
