@@ -21,9 +21,6 @@ importers:
         specifier: ^16.8.1
         version: 16.8.1
     devDependencies:
-      '@bazel/ibazel':
-        specifier: ^0.23.7
-        version: 0.23.7
       '@nx/js':
         specifier: ^16.8.1
         version: 16.8.1(@types/node@20.6.0)(nx@16.8.1)(typescript@5.2.2)
@@ -2065,11 +2062,6 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.15
       to-fast-properties: 2.0.0
-
-  /@bazel/ibazel@0.23.7:
-    resolution: {integrity: sha512-yXoEXfRXrrnr+3xz0nrL9N90A+SVInZzvReQqCwWxbFhRuEWawf1Nm5NCpOw+STwzH/N1Rbc+7McXIGaAVRi8g==}
-    hasBin: true
-    dev: true
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
