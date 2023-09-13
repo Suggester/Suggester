@@ -69,7 +69,7 @@ export class Context<
   T extends APIInteraction,
   Options extends DeepReadonly<APIApplicationCommandOption[]> = DeepReadonly<
     APIApplicationCommandOption[]
-  >
+  >,
 > {
   readonly db: ContextualDatabase;
   readonly log: ContextualLogs<T> = new ContextualLogs(this);
@@ -94,7 +94,7 @@ export class Context<
     this.db = new ContextualDatabase({
       db: cfg.framework.db,
       guildID: this.interaction.guild_id,
-      channelID: this.interaction.channel_id,
+      channelID: this.interaction.channel?.id,
       userID: (this.interaction.member?.user.id || this.interaction.user?.id)!,
     });
 
@@ -103,7 +103,6 @@ export class Context<
 
   getLocalizer(): Localizer {
     return new Localizer(
-      // @ts-expect-error why did this break?
       this.interaction as Exclude<APIInteraction, APIPingInteraction>,
       this.locales
     );
@@ -352,7 +351,7 @@ export class Context<
 
   // TODO: type this?
   getOptions<
-    Opts extends MapCommandOptionsToResponseOptions<FlattenOptions<Options>>
+    Opts extends MapCommandOptionsToResponseOptions<FlattenOptions<Options>>,
   >(): Opts {
     if (
       (this.interaction.type !== InteractionType.ApplicationCommand &&
@@ -390,7 +389,7 @@ export class Context<
       >]: Opts[Name]['required'] extends true
         ? ApplicationCommandOptionTypeMap[Opts[Name]['type']]
         : ApplicationCommandOptionTypeMap[Opts[Name]['type']] | undefined;
-    }
+    },
   >(): Typ {
     if (
       (this.interaction.type !== InteractionType.ApplicationCommand &&
@@ -430,7 +429,7 @@ export class Context<
     Opts extends FlattenOptions<Options>,
     Name extends Opts[number]['name'],
     Typ extends Extract<Opts[number], {name: Name}>['type'],
-    IsRequired extends Extract<Opts[number], {name: Name}>['required']
+    IsRequired extends Extract<Opts[number], {name: Name}>['required'],
   >(name: Name) {
     if (
       (this.interaction.type !== InteractionType.ApplicationCommand &&
@@ -478,7 +477,7 @@ type ApplicationCommandOptionTypeMap = {
 };
 
 export type FlattenOptions<
-  Options extends DeepReadonly<APIApplicationCommandOption[]>
+  Options extends DeepReadonly<APIApplicationCommandOption[]>,
 > = Options[number] extends DeepReadonly<
   Omit<APIApplicationCommandSubcommandGroupOption, 'options'> & {
     options: (Omit<APIApplicationCommandSubcommandOption, 'options'> & {
@@ -496,23 +495,23 @@ export type FlattenOptions<
   : Options;
 
 type OptionsToMapByName<
-  Options extends DeepReadonly<APIApplicationCommandOption[]>
+  Options extends DeepReadonly<APIApplicationCommandOption[]>,
 > = {
   [Name in Options[number]['name']]: Extract<Options[number], {name: Name}>;
 };
 
 // FIXME: can this be made better?
 type MapCommandOptionsToResponseOptions<
-  T extends DeepReadonly<APIApplicationCommandOption[]>
+  T extends DeepReadonly<APIApplicationCommandOption[]>,
 > = MapCommandOptionToResponseOption<T[number]>[];
 
 type MapCommandOptionToResponseOption<
-  T extends DeepReadonly<APIApplicationCommandOption>
+  T extends DeepReadonly<APIApplicationCommandOption>,
 > = MapOptionTypeToTypedOptionType<T['type'], T['required']> & {
   readonly name: T['name'];
 };
 
 export type MapOptionTypeToTypedOptionType<
   T extends keyof OptionTypeMap,
-  IsRequired extends boolean | undefined
+  IsRequired extends boolean | undefined,
 > = IsRequired extends true ? OptionTypeMap[T] : OptionTypeMap[T] | undefined;

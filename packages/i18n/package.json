@@ -3,13 +3,13 @@
   "main": "build/lib/index.js",
   "devDependencies": {
     "@suggester/configs": "workspace:*",
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
-    "discord-api-types": "^0.37.33",
-    "eslint": "^7",
-    "prettier": "^2.8.4"
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+    "discord-api-types": "^0.37.56",
+    "eslint": "^8.49.0",
+    "prettier": "^3.0.3"
   },
   "dependencies": {
-    "@fluent/bundle": "^0.17.1"
+    "@fluent/bundle": "^0.18.0"
   },
   "scripts": {
     "build": "tsc",
@@ -22,11 +22,10 @@
       "build": {
         "dependsOn": [
           "build-fluenttypes"
-        ]
-      },
-      "build-fluenttypes": {
+        ],
         "inputs": [
-          "{workspaceRoot}/lang/en-US/**.ftl"
+          "^lang",
+          "default"
         ]
       }
     }

@@ -59,7 +59,7 @@ export interface GitHubReleaseData {
 
 export type DelimCaseToCamelCase<
   S extends string,
-  Delim extends string
+  Delim extends string,
 > = S extends `${infer Fst}${Delim}${infer SndFstLetter}${infer Snd}`
   ? `${Fst}${Uppercase<SndFstLetter>}${DelimCaseToCamelCase<Snd, Delim>}`
   : UppercaseID<S>;

@@ -9,9 +9,8 @@ import {
   FEED_NAME_MAX_LENGTH,
   Prisma,
   PrismaErrorCode,
-  SuggestionFeedMode, // } from '@suggester/suggester';
+  SuggestionFeedMode,
 } from '@suggester/database';
-// import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
 import {Context, SubCommand} from '@suggester/suggester';
 

@@ -6,7 +6,7 @@
     "tsconfig.json"
   ],
   "dependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
-    "gts": "^3.1.1"
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+    "gts": "^5.0.1"
   }
 }

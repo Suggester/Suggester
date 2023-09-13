@@ -3,25 +3,25 @@
   "main": "build/lib/index.js",
   "devDependencies": {
     "@suggester/configs": "workspace:*",
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/mime": "^3.0.1",
-    "eslint": "^7",
-    "prettier": "^2.8.4",
-    "prisma": "^4.11.0"
+    "eslint": "^8.49.0",
+    "prettier": "^3.0.3",
+    "prisma": "^5.3.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.301.0",
-    "@discordjs/rest": "^1.5.0",
-    "@fluent/bundle": "^0.17.1",
+    "@aws-sdk/client-s3": "^3.410.0",
+    "@discordjs/rest": "^2.0.1",
+    "@fluent/bundle": "^0.18.0",
     "@ltd/j-toml": "^1.38.0",
-    "@prisma/client": "^4.11.0",
-    "@sentry/node": "^7.42.0",
+    "@prisma/client": "^5.3.0",
+    "@sentry/node": "^7.69.0",
     "@suggester/database": "workspace:^",
     "@suggester/i18n": "workspace:^",
     "@suggester/types": "workspace:^",
-    "fastify": "^4.13.0",
+    "fastify": "^4.23.1",
     "mime": "^3.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.22.2"
   },
   "scripts": {
     "build": "tsc",

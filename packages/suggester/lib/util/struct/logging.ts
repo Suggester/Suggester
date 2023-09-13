@@ -1,18 +1,9 @@
 import {APIInteraction, APIUser} from 'discord-api-types/v10';
 
-// import {Suggestion, SuggestionAttachment} from '../../database';
-import {
-  Suggestion,
-  SuggestionAttachment,
-  SuggestionVote,
-  SuggestionVoteKind,
-} from '@suggester/database';
-import {Localizer, MessageNames} from '@suggester/i18n';
+import {Suggestion, SuggestionAttachment} from '@suggester/database';
+import {Localizer} from '@suggester/i18n';
 
 import {Context} from '../../framework';
-
-// import {Context} from '.';
-// import {EmbedBuilder} from '../embeds';
 
 export enum LogAction {
   SuggestionCreated,

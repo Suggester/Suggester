@@ -47,16 +47,6 @@ export class SuggestionLogEmbed extends LogEmbed {
   }
 }
 
-// export class SuggestionReviewLogEmbed extends LogEmbed {
-//   constructor(data: LogPayload<LogAction.SuggestionApproved | LogAction.SuggestionDenied, false>) {
-//     super(data);
-
-//     if (data.action === LogAction.SuggestionApproved) {
-//       super.setColor()
-//     }
-//   }
-// }
-
 export class AttachmentAddedLogEmbed extends LogEmbed {
   constructor(data: LogPayload<LogAction.AttachmentAdded, false>) {
     super(data);

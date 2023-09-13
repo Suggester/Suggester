@@ -75,12 +75,12 @@ export type FrameworkEvents = {
   [Events.Ping]: [Context<APIPingInteraction>];
   [Events.Command]: [Context<APIChatInputApplicationCommandInteraction>];
   [Events.MessageComponentCommand]: [
-    Context<APIMessageApplicationCommandInteraction>
+    Context<APIMessageApplicationCommandInteraction>,
   ];
   [Events.UserContextCommand]: [Context<APIUserApplicationCommandInteraction>];
   [Events.Command]: [Context<APIChatInputApplicationCommandInteraction>];
   [Events.Autocomplete]: [
-    Context<APIApplicationCommandAutocompleteInteraction>
+    Context<APIApplicationCommandAutocompleteInteraction>,
   ];
   [Events.Button]: [Context<APIMessageComponentInteraction>];
   [Events.Select]: [Context<APIMessageComponentInteraction>];
@@ -89,7 +89,7 @@ export type FrameworkEvents = {
 
 const getAndExecFn = async <
   T extends APIInteraction,
-  U extends ButtonFunction | SelectFunction | ModalFunction
+  U extends ButtonFunction | SelectFunction | ModalFunction,
 >(
   id: string,
   ctx: Context<T>,
@@ -488,7 +488,7 @@ export class Framework extends EventEmitter<FrameworkEvents> {
           | ButtonFunction
           | SelectFunction
           | ModalFunction
-          | AutocompleteFunction
+          | AutocompleteFunction,
       >(
         ids: (string | RegExp)[],
         fn: T,

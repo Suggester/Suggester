@@ -122,6 +122,10 @@ cmd-review-deny =
     .name = deny
     .desc = Deny a suggestion in the review queue
 
+cmd-review-listqueue =
+    .name = list-queue
+    .desc = Lists the suggestions currently in the queue
+
 review-approve-success = {-emojis_success} Approved suggestion `{$id}`
 review-deny-success = {-emojis_success} Denied suggestion `{$id}`
 not-in-queue-error = {-emojis_error} That suggestion has already been {$status ->
@@ -319,6 +323,34 @@ view-attachments-button =
         [one] Attachment
         *[many] Attachments
     }
+
+## /suggestions
+
+# TODO: better description for this
+cmd-suggestions =
+    .name = suggestions
+    .desc = Manage your suggestions
+
+cmd-suggestions-create =
+    .name = create
+    .desc = Alias for /{cmd-suggest.name} | {cmd-suggest.desc}
+
+cmd-suggestions-delete =
+    .name = delete
+    .desc = Deletes a suggestion, removing it from the suggestions feed
+
+cmd-suggestions-search =
+    .name = search
+    .desc = Searches suggestions on this server
+
+cmd-suggestions-edit =
+    .name = edit
+    .desc = Edit a suggestion
+
+cmd-suggestions-info =
+    .name = info
+    .desc = Shows information about a suggestion
+
 
 ### ----- OTHER RESPONSES -----
 

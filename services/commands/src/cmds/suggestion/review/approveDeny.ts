@@ -16,18 +16,12 @@ import {
   SuggestionApprovalStatus,
   SuggestionFeed,
 } from '@suggester/database';
-// import {Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
-import {Command} from '@suggester/suggester';
-// import {Command} from '@suggester/framework';
 import {Context, SubCommand} from '@suggester/suggester';
 import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/suggester';
 
-// import {ApprovedDeniedSuggestionReviewQueueEmbed}  from '@suggester/suggester';
-// // import {ApprovedDeniedSuggestionReviewQueueEmbed} from '@suggester/util';
-import {DefaultModCommandPermissions} from '../../constants';
-import {feedNameAutocomplete} from '../../util/commandComponents';
-import {FullSuggestion, sendFeedMessage} from './suggest';
+import {feedNameAutocomplete} from '../../../util/commandComponents';
+import {FullSuggestion, sendFeedMessage} from '../suggest';
 
 const doAction = async <T extends APIGuildInteraction>(
   action: 'approve' | 'deny',
@@ -135,97 +129,90 @@ const doAction = async <T extends APIGuildInteraction>(
   // TODO: dispatch notification
 };
 
-const approveDenyCmds: SubCommand[] = (['Approve', 'Deny'] as const).map(s => {
-  const lc = s.toLowerCase() as 'approve' | 'deny';
+export const approveDenyCmds: SubCommand[] = (['Approve', 'Deny'] as const).map(
+  s => {
+    const lc = s.toLowerCase() as 'approve' | 'deny';
 
-  const options = [
-    {
-      name: 'suggestion',
-      description: `The ID of the suggestion to ${lc}`,
-      type: ApplicationCommandOptionType.Integer,
-      required: true,
-    },
-    feedNameAutocomplete,
-    {
-      name: 'reason',
-      description: 'The reason',
-      type: ApplicationCommandOptionType.String,
-      required: false,
-    },
-  ] as const;
+    const options = [
+      {
+        name: 'suggestion',
+        description: `The ID of the suggestion to ${lc}`,
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+      },
+      feedNameAutocomplete,
+      {
+        name: 'reason',
+        description: 'The reason',
+        type: ApplicationCommandOptionType.String,
+        required: false,
+      },
+    ] as const;
 
-  class S extends SubCommand {
-    name: MessageNames = `cmd-review-${lc}.name` as MessageNames;
-    description: MessageNames = `cmd-review-${lc}.desc` as MessageNames;
+    class S extends SubCommand {
+      name: MessageNames = `cmd-review-${lc}.name` as MessageNames;
+      description: MessageNames = `cmd-review-${lc}.desc` as MessageNames;
 
-    options = options;
+      options = options;
 
-    buttonIDs = [`review:${lc}:`];
+      buttonIDs = [`review:${lc}:`];
 
-    async command(
-      ctx: Context<
-        APIChatInputApplicationCommandGuildInteraction,
-        typeof options
-      >
-    ) {
-      const l = ctx.getLocalizer();
+      async command(
+        ctx: Context<
+          APIChatInputApplicationCommandGuildInteraction,
+          typeof options
+        >
+      ) {
+        const l = ctx.getLocalizer();
 
-      const feedName = ctx.getOption('feed')?.value;
-      const feed = await ctx.db.getFeedByNameOrDefault(feedName);
+        const feedName = ctx.getOption('feed')?.value;
+        const feed = await ctx.db.getFeedByNameOrDefault(feedName);
 
-      if (!feed) {
-        const msg = l.user('unknown-feed', {
-          cmd: ctx.framework.mentionCmd('feeds create'),
+        if (!feed) {
+          const msg = l.user('unknown-feed', {
+            cmd: ctx.framework.mentionCmd('feeds create'),
+          });
+
+          await ctx.send({
+            content: msg,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const selectedSuggestion = await ctx.db.getFullSuggestionByPublicID(
+          feed.id,
+          ctx.getOption('suggestion').value
+        );
+
+        const reason = ctx.getOption('reason')?.value;
+        await doAction(lc, ctx, feed, selectedSuggestion, reason);
+      }
+
+      async button(ctx: Context<APIMessageComponentGuildInteraction>) {
+        const [, , _id] = ctx.interaction.data.custom_id.split(':');
+        const id = parseInt(_id);
+        if (isNaN(id)) {
+          return;
+        }
+
+        const suggestionAndFeed = await ctx.db.db.prisma.suggestion.findFirst({
+          where: {id},
+          include: {
+            feed: true,
+            attachments: true,
+            comments: true,
+          },
         });
 
-        await ctx.send({
-          content: msg,
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
+        if (!suggestionAndFeed) {
+          return;
+        }
+
+        await doAction(lc, ctx, suggestionAndFeed.feed, suggestionAndFeed);
       }
-
-      const selectedSuggestion = await ctx.db.getFullSuggestionByPublicID(
-        feed.id,
-        ctx.getOption('suggestion').value
-      );
-
-      const reason = ctx.getOption('reason')?.value;
-      await doAction(lc, ctx, feed, selectedSuggestion, reason);
     }
 
-    async button(ctx: Context<APIMessageComponentGuildInteraction>) {
-      const [, , _id] = ctx.interaction.data.custom_id.split(':');
-      const id = parseInt(_id);
-      if (isNaN(id)) {
-        return;
-      }
-
-      const suggestionAndFeed = await ctx.db.db.prisma.suggestion.findFirst({
-        where: {id},
-        include: {
-          feed: true,
-          attachments: true,
-          comments: true,
-        },
-      });
-
-      if (!suggestionAndFeed) {
-        return;
-      }
-
-      await doAction(lc, ctx, suggestionAndFeed.feed, suggestionAndFeed);
-    }
+    return new S();
   }
-
-  return new S();
-});
-
-export class ReviewCommand extends Command {
-  name: MessageNames = 'cmd-review.name';
-  description: MessageNames = 'cmd-review.desc';
-
-  defaultMemberPermissions = DefaultModCommandPermissions;
-
-  subCommands = [...approveDenyCmds];
-}
+);

@@ -10,13 +10,10 @@ import {
 } from 'discord-api-types/v10';
 
 import {SuggestionFeed, SuggestionVoteKind} from '@suggester/database';
-// import {Command, Context, SubCommand} from '@suggester/framework';
 import {MessageNames} from '@suggester/i18n';
 import {Command, Context, SubCommand} from '@suggester/suggester';
 import {emoji} from '@suggester/suggester';
 
-// import {emoji}  from '@suggester/suggester';
-// // import {emoji} from '@suggester/util';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {FullSuggestion, createFeedButtons} from './suggest';
 
@@ -246,7 +243,7 @@ const subCmds: SubCommand[] = (
 
       if (!feed) {
         const msg = l.user('unknown-feed', {
-          cmd: ctx.framework.mentionCmd('feeds create'),
+          cmd: ctx.framework.mentionCmd('vote ' + lc),
         });
 
         await ctx.send({

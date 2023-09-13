@@ -26,11 +26,14 @@ const toLocalizedMap = (
   key: MessageNames,
   def: string
 ) =>
-  availableLocales.reduce((prev, curr) => {
-    const lo = l.get(curr, key);
-    prev[curr] = lo === key ? def : lo;
-    return prev;
-  }, {} as {[key: string]: string});
+  availableLocales.reduce(
+    (prev, curr) => {
+      const lo = l.get(curr, key);
+      prev[curr] = lo === key ? def : lo;
+      return prev;
+    },
+    {} as {[key: string]: string}
+  );
 
 const localize = (
   struct: Command | SubCommand | SubCommandGroup,
