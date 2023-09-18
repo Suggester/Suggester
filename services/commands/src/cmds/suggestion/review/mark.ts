@@ -122,6 +122,8 @@ const doAction = async <T extends APIGuildInteraction>(
     return;
   }
 
+  const old = suggestion.displayStatus;
+
   await ctx.db.updateSuggestion(suggestion.id, {
     displayStatus: status as SuggestionDisplayStatus,
   });
@@ -159,6 +161,14 @@ const doAction = async <T extends APIGuildInteraction>(
         `https://discord.com/channels/${suggestion.feedChannelID}/${suggestion.feedMessageID}`
       ),
     }),
+  });
+
+  ctx.log.displayStatusChanged({
+    old,
+    new: status,
+    suggestion,
+    logChannel: feed.logChannelID,
+    user: ctx.interaction.member.user,
   });
 };
 

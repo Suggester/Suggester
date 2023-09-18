@@ -12,6 +12,8 @@ const DEFAULT_LOG_EMBED_COLOR_MAP: {[key in LogAction]?: number} = {
 
   [LogAction.VoteAdded]: Color.Green,
   [LogAction.VoteRemoved]: Color.Red,
+
+  [LogAction.DisplayStatusChanged]: Color.Teal,
 } as const;
 
 export class LogEmbed extends EmbedBuilder {
@@ -78,6 +80,7 @@ export const LogEmbedMap: {[key in LogAction]?: typeof LogEmbed} = {
 
   [LogAction.AttachmentAdded]: AttachmentAddedLogEmbed,
   [LogAction.AttachmentRemoved]: AttachmentRemovedLogEmbed,
+  // [LogAction.DisplayStatusChanged]: DisplayStatusChangedLogEmbed,
 };
 
 export const getLogEmbed = (action: LogAction): typeof LogEmbed =>

@@ -387,3 +387,5 @@ log-action =
     .VoteAdded = {$emoji} Vote Added
     .VoteRemoved = {$emoji} Vote Removed
     .VoteChanged = {$old} Vote Changed to {$new}
+
+    .DisplayStatusChanged = Suggestion Status Changed from `{$old}` to `{$new}`

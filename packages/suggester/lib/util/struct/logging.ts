@@ -1,6 +1,6 @@
 import {APIInteraction, APIUser} from 'discord-api-types/v10';
 
-import {Suggestion, SuggestionAttachment} from '@suggester/database';
+import {Suggestion, SuggestionAttachment, SuggestionDisplayStatus} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {Context} from '../../framework';
@@ -16,6 +16,8 @@ export enum LogAction {
   VoteAdded,
   VoteRemoved,
   VoteChanged,
+
+  DisplayStatusChanged,
 }
 
 type MakeLogPayload<E extends LogAction, T> = T & {
@@ -59,6 +61,13 @@ export type LogData =
       {
         old: string;
         new: string;
+      }
+    >
+  | MakeLogPayload<
+      LogAction.DisplayStatusChanged,
+      {
+        old: SuggestionDisplayStatus;
+        new: SuggestionDisplayStatus;
       }
     >;
 
