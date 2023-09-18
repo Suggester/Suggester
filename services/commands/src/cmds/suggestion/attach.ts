@@ -45,7 +45,7 @@ export const downloadAttachment = async (a: APIAttachment) => {
   return attachment;
 };
 
-const updateFeedMessage = async (
+export const updateFeedMessage = async (
   ctx: Context<APIGuildInteraction>,
   suggestion: FullSuggestion,
   feed: SuggestionFeed

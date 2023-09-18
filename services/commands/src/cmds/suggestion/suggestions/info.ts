@@ -74,7 +74,9 @@ export class SuggestionsInfoCommand extends SubCommand {
         isAnonymous: suggestion.isAnonymous ? shouldRevealAnon : false,
       },
       opinion,
-      ctx.interaction.member.user
+      ctx.interaction.member.user,
+      undefined,
+      true
     );
 
     await ctx.send({

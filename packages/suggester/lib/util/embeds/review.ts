@@ -1,6 +1,10 @@
 import {APIUser} from 'discord-api-types/v10';
 
-import {Suggestion, SuggestionApprovalStatus} from '@suggester/database';
+import {
+  Suggestion,
+  SuggestionApprovalStatus,
+  SuggestionDisplayStatus,
+} from '@suggester/database';
 import {Localizer} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
@@ -67,25 +71,27 @@ export class NewSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
 
 export class ApprovedDeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
   constructor(
-    status: Exclude<SuggestionApprovalStatus, 'InQueue'>,
+    // status: Exclude<SuggestionApprovalStatus, 'InQueue'>,
     l: Localizer,
     suggestion: Suggestion,
     author: APIUser,
-    denier: APIUser,
-    reason?: string
+    denier: APIUser
   ) {
     super(l, suggestion, author);
 
-    const action = status.toLowerCase() as 'approved' | 'denied';
+    // const action = status.toLowerCase() as 'approved' | 'denied';
+    const action = suggestion.approvalStatus.toLowerCase() as
+      | 'approved'
+      | 'denied';
 
     super.setTitle(
       l.guild(`review-embed.title-${action}`, {id: suggestion.publicID})
     );
 
-    if (reason) {
+    if (suggestion.denialReason) {
       super.addField({
         name: l.guild('review-embed.reason-given'),
-        value: reason,
+        value: suggestion.denialReason,
       });
     }
 
@@ -104,8 +110,16 @@ export class ApprovedDeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmb
     });
 
     super.setColor(COLORS[action]);
+
+    if (suggestion.displayStatus !== SuggestionDisplayStatus.Default) {
+      super.addField({
+        name: l.guild('suggestion-embed.public-status'),
+        value: l.guild('display-status', {status: suggestion.displayStatus}),
+      });
+    }
   }
 }
+
 // export class DeniedSuggestionReviewQueueEmbed extends BaseReviewQueueEmbed {
 //   constructor(
 //     l: Localizer,

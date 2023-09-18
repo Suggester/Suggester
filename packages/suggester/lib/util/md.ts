@@ -37,6 +37,9 @@ export const user = (u: string) => `<@${u}>`;
 export const channel = (c: string) => `<#${c}>`;
 export const role = (r: string) => `<@&${r}>`;
 
+export const maskedLink = (s: string, u: string, suppressEmbed = false) =>
+  `[${s}](${suppressEmbed ? `<${u}>` : u})`;
+
 export const emoji = (id: string, animated = false) =>
   id.length > 15 ? `<${animated ? 'a' : ''}:owo:${id}>` : id;
 

@@ -22,6 +22,7 @@ import {
   SuggestionApprovalStatus,
   SuggestionAttachment,
   SuggestionComment,
+  SuggestionDisplayStatus,
   SuggestionFeed,
   SuggestionFeedMode,
   SuggestionVoteKind,
@@ -55,12 +56,19 @@ export const createFeedMessage = <T extends APIGuildInteraction>(
 
   const embeds = SuggestionEmbed.build(l, feed, suggestion, opinion, author);
 
-  const buttons = createFeedButtons(
-    feed,
-    opinion,
-    suggestion.id,
-    suggestion.attachments.length
-  );
+  const HIDE_BUTTONS_FOR: SuggestionDisplayStatus[] = [
+    SuggestionDisplayStatus.Implemented,
+    SuggestionDisplayStatus.NotHappening,
+  ];
+
+  const buttons = HIDE_BUTTONS_FOR.includes(suggestion.displayStatus)
+    ? []
+    : createFeedButtons(
+        feed,
+        opinion,
+        suggestion.id,
+        suggestion.attachments.length
+      );
 
   return {
     embeds,
@@ -273,12 +281,12 @@ const createSuggestion = async <C extends APIGuildInteraction>(
                   custom_id: `review:delete:${createdSuggestion.id}`,
                   label: l.guild('review-queue-buttons.delete'),
                 },
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Primary,
-                  custom_id: `review:status:${createdSuggestion.id}`,
-                  label: l.guild('review-queue-buttons.change-status'),
-                },
+                // {
+                //   type: ComponentType.Button,
+                //   style: ButtonStyle.Primary,
+                //   custom_id: `review:status:${createdSuggestion.id}`,
+                //   label: l.guild('review-queue-buttons.change-status'),
+                // },
               ],
             },
           ],

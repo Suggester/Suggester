@@ -2,6 +2,7 @@
 err_bot-unusable = {-emojis_error} This bot cannot be used in this server.
 err_bot-not-public = {-emojis_error} This bot cannot be invited to another server
 err_generic = {-emojis_error} Something went wrong.
+err_not-approved = You can only perform this action on approved suggestions.
 
 unknown-feed = {-emojis_error} Could not find that feed. Double check your spelling and try again, or create a new feed by running {$cmd}.
 
@@ -13,6 +14,14 @@ pagination-page-count = Page {$current}/{$total}
 feed-mode = {$mode ->
         [REVIEW] Review
         *[AUTOAPPROVE] Automatic Approval
+    }
+
+display-status = {$status ->
+        *[Default] Default
+        [Considering] Considering
+        [InProgress] In Progress
+        [Implemented] Implemented
+        [NotHappening] Not Happening
     }
 
 ### ----- COMMAND RESPONSES -----
@@ -102,6 +111,7 @@ suggestion-displaystatus =
     .working = Working
     .considering = Considering
     .nothappening = Not Happening
+    .inprogress = In Progress
 
 suggest-success =
     .autoapprove = :rocket: Suggestion submitted!
@@ -129,6 +139,11 @@ cmd-review-listqueue =
 cmd-review-mark =
     .name = set-status
     .desc = Change the status of a suggestion
+
+mark-select =
+    .placeholder = Suggestion Status
+
+mark-success = {-emojis_success} Set the status of {$suggestion} to `{$status}`
 
 review-approve-success = {-emojis_success} Approved suggestion `{$id}`
 review-deny-success = {-emojis_success} Denied suggestion `{$id}`
