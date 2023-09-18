@@ -3,27 +3,43 @@ import {
   APIChatInputApplicationCommandGuildInteraction,
   ApplicationCommandOptionType,
   MessageFlags,
-  PermissionFlagsBits,
 } from 'discord-api-types/v10';
 
+import {
+  SuggestionApprovalStatus,
+  SuggestionDisplayStatus,
+} from '@suggester/database';
 import {MessageNames} from '@suggester/i18n';
-import {Context, SubCommand, SuggestionEmbed} from '@suggester/suggester';
+import {Context, SubCommand} from '@suggester/suggester';
 
 import {feedNameAutocomplete} from '../../../util/commandComponents';
 
 const options = [
   {
     name: 'suggestion',
-    description: 'The ID of the suggestion to view',
+    description: 'The ID of the suggestion to delete',
     type: ApplicationCommandOptionType.Integer,
     required: true,
+  },
+  {
+    name: 'status',
+    description: 'The new status',
+    type: ApplicationCommandOptionType.String,
+    required: true,
+    choices: [
+      {name: 'Default', value: SuggestionDisplayStatus.Default},
+      {name: 'Considering', value: SuggestionDisplayStatus.Considering},
+      {name: 'In Progress', value: SuggestionDisplayStatus.InProgress},
+      {name: 'Implemented', value: SuggestionDisplayStatus.Implemented},
+      {name: 'Not Happening', value: SuggestionDisplayStatus.NotHappening},
+    ],
   },
   feedNameAutocomplete,
 ] as const;
 
-export class SuggestionsInfoCommand extends SubCommand {
-  name: MessageNames = 'cmd-suggestions-info.name';
-  description: MessageNames = 'cmd-suggestions-info.desc';
+export class ReviewMarkCommand extends SubCommand {
+  name: MessageNames = 'cmd-review-mark.name';
+  description: MessageNames = 'cmd-review-mark.desc';
 
   options = options;
 
@@ -32,13 +48,12 @@ export class SuggestionsInfoCommand extends SubCommand {
   ) {
     const l = ctx.getLocalizer();
 
-    const {suggestion: sID, feed: feedName} = ctx.getFlatOptions();
-
+    const {suggestion: sID, status, feed: feedName} = ctx.getFlatOptions();
     const feed = await ctx.db.getFeedByNameOrDefault(feedName);
 
     if (!feed) {
       const msg = l.user('unknown-feed', {
-        cmd: ctx.framework.mentionCmd('feeds create'),
+        cmd: ctx.framework.mentionCmd('review mark'),
       });
 
       await ctx.send({
@@ -48,7 +63,7 @@ export class SuggestionsInfoCommand extends SubCommand {
       return;
     }
 
-    const suggestion = await ctx.db.getFullSuggestionByPublicID(feed.id, sID);
+    const suggestion = ctx.db.getSuggestionByPublicID(feed.id, sID);
     if (!suggestion) {
       await ctx.send({
         content: l.user('unknown-suggestion'),
@@ -57,30 +72,6 @@ export class SuggestionsInfoCommand extends SubCommand {
 
       return;
     }
-
-    const opinion = await ctx.db.getOpinion(suggestion.id);
-
-    // TODO: is there a better perm to use than Moderate Members
-    const shouldRevealAnon = !(
-      BigInt(ctx.interaction.member.permissions) &
-      PermissionFlagsBits.ModerateMembers
-    );
-
-    const embed = SuggestionEmbed.build(
-      l,
-      {...feed, showVoteCount: true},
-      {
-        ...suggestion,
-        isAnonymous: suggestion.isAnonymous ? shouldRevealAnon : false,
-      },
-      opinion,
-      ctx.interaction.member.user
-    );
-
-    await ctx.send({
-      embeds: embed,
-      flags: MessageFlags.Ephemeral,
-    });
   }
 
   async autocomplete(
@@ -91,7 +82,7 @@ export class SuggestionsInfoCommand extends SubCommand {
   ): Promise<void> {
     const opt = ctx.getFocusedOption();
     if (
-      opt?.name === 'feed' &&
+      opt?.name === 'name' &&
       opt?.type === ApplicationCommandOptionType.String
     ) {
       const suggestions = await ctx.db.autocompleteFeeds(opt.value);

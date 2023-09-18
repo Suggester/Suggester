@@ -515,3 +515,17 @@ export type MapOptionTypeToTypedOptionType<
   T extends keyof OptionTypeMap,
   IsRequired extends boolean | undefined,
 > = IsRequired extends true ? OptionTypeMap[T] : OptionTypeMap[T] | undefined;
+
+export type FlatOptions<
+  Options extends DeepReadonly<APIApplicationCommandOption[]>,
+  Opts extends OptionsToMapByName<Options> = OptionsToMapByName<Options>,
+> = {
+  [Name in keyof Opts as KebabCaseToCamelCase<
+    Name extends string ? Name : never
+  >]: Opts[Name]['required'] extends true
+    ? ApplicationCommandOptionTypeMap[Opts[Name]['type']]
+    : ApplicationCommandOptionTypeMap[Opts[Name]['type']] | undefined;
+};
+
+// getFlatOptions<
+// >(): Typ {

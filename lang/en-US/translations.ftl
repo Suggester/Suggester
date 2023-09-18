@@ -126,6 +126,10 @@ cmd-review-listqueue =
     .name = list-queue
     .desc = Lists the suggestions currently in the queue
 
+cmd-review-mark =
+    .name = set-status
+    .desc = Change the status of a suggestion
+
 review-approve-success = {-emojis_success} Approved suggestion `{$id}`
 review-deny-success = {-emojis_success} Denied suggestion `{$id}`
 not-in-queue-error = {-emojis_error} That suggestion has already been {$status ->

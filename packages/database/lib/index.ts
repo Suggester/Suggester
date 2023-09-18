@@ -16,6 +16,10 @@ export class Database {
       },
     });
   }
+
+  async connect() {
+    return this.prisma.$connect();
+  }
 }
 
 // From https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes

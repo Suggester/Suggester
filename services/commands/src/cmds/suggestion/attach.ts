@@ -104,8 +104,6 @@ const buildAttachmentsMessage = (
   return resp;
 };
 
-// TODO: log actions
-
 const addOptions = [
   {
     name: 'suggestion',
@@ -296,6 +294,7 @@ class AttachmentsRemoveCommand extends SubCommand {
       return;
     }
 
+    // TODO: add a way to remove attachments from someone else's?
     if (suggestionWithAttachments.authorID !== ctx.interaction.member.user.id) {
       await ctx.send({
         content: l.user('only-attach-own-suggestions'),

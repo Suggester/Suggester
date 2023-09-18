@@ -26,6 +26,8 @@ const start = async () => {
   Sentry.init({
     dsn: config.sentry?.dsn,
     enabled: process.env.NODE_ENV === 'prod' && !!config.sentry?.dsn,
+
+    // TODO
     // release: 'v0.0.5',
 
     // integrations: [
@@ -34,6 +36,8 @@ const start = async () => {
   });
 
   const db = new Database(config.storage);
+  await db.connect();
+
   const locales = new LocalizationService().loadAll();
   const fw = new Framework({db, locales, config});
 

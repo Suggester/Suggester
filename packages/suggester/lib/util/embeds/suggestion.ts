@@ -11,7 +11,14 @@ import {
 import {Localizer, MessageNames} from '@suggester/i18n';
 
 import {EmbedBuilder} from '.';
-import {TimestampStyle, formatAvatarURL, tag, timestamp, user} from '../md';
+import {
+  TimestampStyle,
+  code,
+  formatAvatarURL,
+  tag,
+  timestamp,
+  user,
+} from '../md';
 
 // TODO: add to config maybe?
 
@@ -125,32 +132,32 @@ export class SuggestionEmbed extends EmbedBuilder {
     // -- votes --
 
     // TODO: do we still want this? I think it looks better without
-    // const totalVotes = upvotes + downvotes + mids;
+    const totalVotes = upvotes + downvotes; // + mids;
 
-    // if (feed.showVoteCount && totalVotes) {
-    //   const upPercentage = Math.floor((upvotes / totalVotes) * 100) + '%';
-    //   const downPercentage = Math.floor((downvotes / totalVotes) * 100) + '%';
-    //   const opinion = netVotes >= 0 ? `+${netVotes}` : netVotes;
+    if (feed.showVoteCount && totalVotes) {
+      const upPercentage = Math.floor((upvotes / totalVotes) * 100) + '%';
+      const downPercentage = Math.floor((downvotes / totalVotes) * 100) + '%';
+      const opinion = netVotes >= 0 ? `+${netVotes}` : netVotes;
 
-    //   const headerMsg = l.guild('suggestion-embed.votes-header');
+      const headerMsg = l.guild('suggestion-embed.votes-header');
 
-    //   const val = [
-    //     l.guild('suggestion-embed.votes-opinion', {opinion}),
-    //     l.guild('suggestion-embed.votes-up', {
-    //       upvotes: upvotes,
-    //       percentage: code(upPercentage),
-    //     }),
-    //     l.guild('suggestion-embed.votes-down', {
-    //       downvotes: downvotes,
-    //       percentage: code(downPercentage),
-    //     }),
-    //   ].join('\n');
+      const val = [
+        l.guild('suggestion-embed.votes-opinion', {opinion}),
+        l.guild('suggestion-embed.votes-up', {
+          upvotes: upvotes,
+          percentage: code(upPercentage),
+        }),
+        l.guild('suggestion-embed.votes-down', {
+          downvotes: downvotes,
+          percentage: code(downPercentage),
+        }),
+      ].join('\n');
 
-    //   super.addField({
-    //     name: headerMsg,
-    //     value: val,
-    //   });
-    // }
+      super.addField({
+        name: headerMsg,
+        value: val,
+      });
+    }
 
     // TODO: figure out how attachments should work -- should we use S3?
   }

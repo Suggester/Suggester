@@ -18,7 +18,7 @@ import {LocalizationService, MessageNames} from '@suggester/i18n';
 
 import {Framework} from '.';
 import {DeepReadonly} from '../util';
-import {Context} from './context';
+import {Context, FlatOptions} from './context';
 
 const toLocalizedMap = (
   l: LocalizationService,

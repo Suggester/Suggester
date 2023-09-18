@@ -27,14 +27,12 @@ import {
   SuggestionVoteKind,
 } from '@suggester/database';
 import {MessageNames} from '@suggester/i18n';
-import {Command, Context, LogAction} from '@suggester/suggester';
+import {Command, Context} from '@suggester/suggester';
 import {
   NewSuggestionReviewQueueEmbed,
   SuggestionEmbed,
 } from '@suggester/suggester';
 
-// import {NewSuggestionReviewQueueEmbed, SuggestionEmbed}  from '@suggester/suggester';
-// // import {NewSuggestionReviewQueueEmbed, SuggestionEmbed} from '@suggester/util';
 import {feedNameAutocomplete} from '../../util/commandComponents';
 import {ALLOWED_ATTACHMENT_TYPES} from './attach';
 

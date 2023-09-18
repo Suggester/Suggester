@@ -1,8 +1,9 @@
 import {MessageNames} from '@suggester/i18n';
-import {Command} from '@suggester/suggester';
+import {Command, SubCommand, SubCommandGroup} from '@suggester/suggester';
 
 import {DefaultModCommandPermissions} from '../../../constants';
 import {approveDenyCmds} from './approveDeny';
+import {ReviewMarkCommand} from './mark';
 
 export class ReviewCommand extends Command {
   name: MessageNames = 'cmd-review.name';
@@ -10,5 +11,8 @@ export class ReviewCommand extends Command {
 
   defaultMemberPermissions = DefaultModCommandPermissions;
 
-  subCommands = [...approveDenyCmds];
+  subCommands: (SubCommand | SubCommandGroup)[] = [
+    ...approveDenyCmds,
+    new ReviewMarkCommand(),
+  ];
 }
