@@ -43,7 +43,7 @@ module.exports = {
 		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		qSuggestionDB.attachment = res.attachments[0].url;
+		qSuggestionDB.attachment = res.attachments[0].url.split('?')[0];
 
 		if (qSuggestionDB.status === "approved") {
 			let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);
