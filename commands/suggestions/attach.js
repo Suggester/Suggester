@@ -33,7 +33,7 @@ module.exports = {
 
 		if (!args[1] && !message.attachments.first()) return message.channel.send(string(locale, "NO_ATTACHMENT_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		let attachment = message.attachments.first() ? message.attachments.first().url.split('?')[0] : args.splice(1).join(" ");
+		let attachment = message.attachments.first() ? message.attachments.first().url : args.splice(1).join(" ");
 
 		if (!(checkURL(attachment))) return message.channel.send(string(locale, "INVALID_AVATAR_ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
@@ -43,7 +43,7 @@ module.exports = {
 		if (res && res.code === 40005) return message.channel.send(string(locale, "ATTACHMENT_TOO_BIG", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 		if (!res || !res.attachments || !res.attachments[0]) return message.channel.send(string(locale, "ERROR", {}, "error")).then(sent => cleanCommand(message, sent, qServerDB));
 
-		qSuggestionDB.attachment = res.attachments[0].url.split('?')[0];
+		qSuggestionDB.attachment = res.attachments[0].url;
 
 		if (qSuggestionDB.status === "approved") {
 			let suggestionsCheck = checkSuggestions(locale, message.guild, qServerDB, qSuggestionDB);

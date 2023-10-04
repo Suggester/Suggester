@@ -40,7 +40,7 @@ module.exports = {
 			return;
 		}
 
-		const r = new RegExp(".*/(?<img>.*)$");
+		const r = new RegExp(".*/(?<img>.+)\\?.*$");
 		const execd = r.exec(link);
 		if (!execd || !execd.groups || !execd.groups.img) return null;
 

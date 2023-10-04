@@ -74,7 +74,7 @@ module.exports = async function (interaction, client) {
 	}
 
 	let suggestion = interaction.data.options && interaction.data.options.find(o => o.name === "suggestion") ? interaction.data.options.find(o => o.name === "suggestion").value : "";
-	let attachment = interaction.data.options && interaction.data.options.find(o => o.name === "attachment") ? interaction.data.options.find(o => o.name === "attachment").value.split('?')[0] : "";
+	let attachment = interaction.data.options && interaction.data.options.find(o => o.name === "attachment") ? interaction.data.options.find(o => o.name === "attachment").value : "";
 
 	if (!suggestion.trim() && !attachment) return respond(string(locale, "NO_SUGGESTION_ERROR", {}, "error"));
 	if (attachment && !(checkURL(attachment))) return respond(string(locale, "INVALID_AVATAR_ERROR", {}, "error"));
